@@ -1,0 +1,10 @@
+# REST extension localized strings
+# English language
+#
+# Important: This file must be saved with UTF-8 encoding
+#
+
+ERROR_BAD_LIBRARY_REQUEST_MALFORMED_URL             = Bad Request: Malformed URL
+ERROR_BAD_LIBRARY_REQUEST_UNDEFINED_RESOURCEID      = Bad Request: Could not parse resource ID
+ERROR_BAD_LIBRARY_REQUEST_UNDEFINED_ASPECT          = Bad Request: Could not parse aspect
+ERROR_BAD_LIBRARY_REQUEST_UNDEFINED_REPRESENTATION  = Bad Request: Could not parse representation
