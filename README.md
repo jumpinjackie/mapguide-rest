@@ -25,12 +25,12 @@ Setup
 
  1. Clone this repository into the www directory of your MapGuide Open Source installation (eg. C:\Program Files\OSGeo\MapGuide\Web\www\rest on windows or /usr/local/mapguideopensource-2.5.2/webserverextensions/www/rest on linux)
 
- 2. [OPTIONAL] Install and enable the Application Request Routing module for IIS. This allows for "cleaner" URLs. You can use the provided .htaccess file for clean URLs on Apache. If you have installed the ARR module, you can rename the web.config.iis file to web.config to activate ARR for the REST extension.
+ 2. [OPTIONAL] Install and enable the [Application Request Routing module for IIS](http://www.iis.net/downloads/microsoft/application-request-routing). This allows for "cleaner" URLs. If you have installed the ARR module, you can rename the web.config.iis file to web.config to activate ARR for the REST extension. For Apache, you can use the provided .htaccess file for clean URLs and skip this step.
 
  3. You can now access the REST endpoint at:
  
   - http://yourservername:port/mapguide/rest
-  - http://yourservername:port/mapguide/rest/index.php (if you don't have ARR installed for IIS)
+  - http://yourservername:port/mapguide/rest/index.php (if you don't have ARR installed for IIS or mod_rewrite enabled for Apache)
 
 License
 =======
