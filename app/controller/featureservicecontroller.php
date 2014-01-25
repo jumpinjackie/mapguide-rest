@@ -8,6 +8,125 @@ class MgFeatureServiceController extends MgBaseController {
         parent::__construct($app);
     }
 
+    public function GetConnectPropertyValues($providerName, $propName, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
+        $params = $this->app->request->get();
+        $partialConnStr = "";
+        foreach ($params as $key => $value) {
+            //HACK: In the very infinitsimally small case that there is an FDO connection property named "session", this will obviously break down
+            if (strtolower($key) === "session")
+                continue;
+
+            if ($partialConnStr === "") {
+                $partialConnStr = $key."=".$value;
+            } else {
+                $partialConnStr .= ";".$key."=".$value;
+            }
+        }
+
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $providerName, $propName, $partialConnStr) {
+            $param->AddParameter("OPERATION", "GETCONNECTIONPROPERTYVALUES");
+            $param->AddParameter("VERSION", "1.0.0");
+            $param->AddParameter("PROVIDER", $providerName);
+            $param->AddParameter("PROPERTY", $propName);
+            if ($fmt === "json")
+                $param->AddParameter("FORMAT", MgMimeType::Json);
+            else
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+            if ($partialConnStr !== "") {
+                $param->AddParameter("CONNECTIONSTRING", $partialConnStr);
+            }
+            $that->ExecuteHttpRequest($req);
+        });
+    }
+
+    public function EnumerateDataStores($providerName, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
+        $params = $this->app->request->get();
+        $partialConnStr = "";
+        foreach ($params as $key => $value) {
+            //HACK: In the very infinitsimally small case that there is an FDO connection property named "session", this will obviously break down
+            if (strtolower($key) === "session")
+                continue;
+
+            if ($partialConnStr === "") {
+                $partialConnStr = $key."=".$value;
+            } else {
+                $partialConnStr .= ";".$key."=".$value;
+            }
+        }
+
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $providerName, $partialConnStr) {
+            $param->AddParameter("OPERATION", "ENUMERATEDATASTORES");
+            $param->AddParameter("VERSION", "1.0.0");
+            $param->AddParameter("PROVIDER", $providerName);
+            if ($fmt === "json")
+                $param->AddParameter("FORMAT", MgMimeType::Json);
+            else
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+            if ($partialConnStr !== "") {
+                $param->AddParameter("CONNECTIONSTRING", $partialConnStr);
+            }
+            $that->ExecuteHttpRequest($req);
+        });
+    }
+
+    public function GetProviderCapabilities($providerName, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
+        $params = $this->app->request->get();
+        $partialConnStr = "";
+        foreach ($params as $key => $value) {
+            //HACK: In the very infinitsimally small case that there is an FDO connection property named "session", this will obviously break down
+            if (strtolower($key) === "session")
+                continue;
+
+            if ($partialConnStr === "") {
+                $partialConnStr = $key."=".$value;
+            } else {
+                $partialConnStr .= ";".$key."=".$value;
+            }
+        }
+
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $providerName, $partialConnStr) {
+            $param->AddParameter("OPERATION", "GETPROVIDERCAPABILITIES");
+            $param->AddParameter("VERSION", "2.0.0");
+            $param->AddParameter("PROVIDER", $providerName);
+            if ($fmt === "json")
+                $param->AddParameter("FORMAT", MgMimeType::Json);
+            else
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+            if ($partialConnStr !== "") {
+                $param->AddParameter("CONNECTIONSTRING", $partialConnStr);
+            }
+            $that->ExecuteHttpRequest($req);
+        });
+    }
+
+    public function GetFeatureProviders($format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
+            $param->AddParameter("OPERATION", "GETFEATUREPROVIDERS");
+            $param->AddParameter("VERSION", "1.0.0");
+            if ($fmt === "json")
+                $param->AddParameter("FORMAT", MgMimeType::Json);
+            else
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+            $that->ExecuteHttpRequest($req);
+        });
+    }
+
     public function GetSpatialContexts($resId, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
