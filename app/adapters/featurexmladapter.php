@@ -45,8 +45,28 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     /**
      * Queries the configured feature source and returns a MgReader based on the current GET query parameters and adapter configuration
      */
-    protected function CreateQueryOptions() {
+    protected function CreateQueryOptions($single) {
         $query = new MgFeatureQueryOptions();
+        if ($single === true) {
+            if ($this->featureId == null) {
+                throw new Exception("No feature ID set"); //TODO: Localize
+            }
+            $tokens = explode(":", $this->className);
+            $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $tokens[0], $tokens[1]);
+            $idProps = $clsDef->GetIdentityProperties();
+            if ($idProps->GetCount() == 0) {
+                throw new Exception(sprintf("Cannot query (%s) in %s by ID. Class has no identity properties", $this->className, $this->featureSourceId->ToString())); //TODO: Localize
+            } else if ($idProps->GetCount() > 1) {
+                throw new Exception(sprintf("Cannot query (%s) in %s by ID. Class has more than one identity property", $this->className, $this->featureSourceId->ToString())); //TODO: Localize
+            } else {
+                $idProp = $idProps->GetItem(0);
+                if ($idProp->GetDataType() == MgPropertyType::String) {
+                    $query->SetFilter($idProp->GetName()." = '".$this->featureId."'");
+                } else {
+                    $query->SetFilter($idProp->GetName()." = ".$this->featureId);
+                }
+            }
+        }
         return $query;
     }
 

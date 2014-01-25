@@ -88,7 +88,7 @@ class MgDataController extends MgBaseController {
             $config = json_decode(file_get_contents($path), true);
             $result = $this->ValidateConfiguration($config, $extension, "GET");
             if (!$this->container->offsetExists($result->adapterName)) {
-                throw new Exception("Adapter (".$result->adapterName.") not defined or registered");
+                throw new Exception("Adapter (".$result->adapterName.") not defined or registered"); //TODO: Localize
             }
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
@@ -97,7 +97,31 @@ class MgDataController extends MgBaseController {
             $this->container["AdapterConfig"] = $result->config;
             $this->container["FeatureClass"] = $result->className;
             $adapter = $this->container[$result->adapterName];
-            $adapter->HandleMethod("GET");
+            $adapter->HandleMethod("GET", false);
+        }
+    }
+
+    public function HandleGetSingle($uriParts, $id, $extension) {
+        $uriPath = implode("/", $uriParts);
+        $this->EnsureAuthenticationForSite();
+        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
+        if ($path === false) {
+            $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
+        } else {
+            $config = json_decode(file_get_contents($path), true);
+            $result = $this->ValidateConfiguration($config, $extension, "GET");
+            if (!$this->container->offsetExists($result->adapterName)) {
+                throw new Exception("Adapter (".$result->adapterName.") not defined or registered"); //TODO: Localize
+            }
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+            $this->container["MgSiteConnection"] = $siteConn;
+            $this->container["FeatureSource"] = $result->resId;
+            $this->container["AdapterConfig"] = $result->config;
+            $this->container["FeatureClass"] = $result->className;
+            $adapter = $this->container[$result->adapterName];
+            $adapter->SetFeatureId($id);
+            $adapter->HandleMethod("GET", true);
         }
     }
 }

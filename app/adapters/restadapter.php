@@ -28,13 +28,19 @@ abstract class MgRestAdapter
     protected $className;
 
     protected $featSvc;
+    protected $featureId;
 
     protected function __construct($app, $siteConn, $resId, $className, $config) {
+        $this->featureId = null;
         $this->app = $app;
         $this->featureSourceId = $resId;
         $this->siteConn = $siteConn;
         $this->className = $className;
         $this->InitAdapterConfig($config);
+    }
+
+    public function SetFeatureId($id) {
+        $this->featureId = $id;
     }
 
     /**
@@ -52,28 +58,28 @@ abstract class MgRestAdapter
     /**
      * Handles GET requests for this adapter. Overridable. Does nothing if not overridden.
      */
-    public function HandleGet() {
+    public function HandleGet($single) {
 
     }
 
     /**
      * Handles POST requests for this adapter. Overridable. Does nothing if not overridden.
      */
-    public function HandlePost() {
+    public function HandlePost($single) {
 
     }
 
     /**
      * Handles PUT requests for this adapter. Overridable. Does nothing if not overridden.
      */
-    public function HandlePut() {
+    public function HandlePut($single) {
 
     }
 
     /**
      * Handles DELETE requests for this adapter. Overridable. Does nothing if not overridden.
      */
-    public function HandleDelete() {
+    public function HandleDelete($single) {
 
     }
 
@@ -84,23 +90,23 @@ abstract class MgRestAdapter
         return strtoupper($method) === "GET";
     }
 
-    public function HandleMethod($method) {
+    public function HandleMethod($method, $single = false) {
         if (!$this->SupportsMethod($method)) {
             $this->app->halt(405, "Method not supported: ".$method); //TODO: Localize
         } else {
             $mth = strtoupper($method);
             switch ($mth) {
                 case "GET":
-                    $this->HandleGet();
+                    $this->HandleGet($single);
                     break;
                 case "POST":
-                    $this->HandlePost();
+                    $this->HandlePost($single);
                     break;
                 case "PUT":
-                    $this->HandlePut();
+                    $this->HandlePut($single);
                     break;
                 case "DELETE":
-                    $this->HandleDelete();
+                    $this->HandleDelete($single);
                     break;
                 default:
                     $this->app->halt(405, "Method not supported: ".$method); //TODO: Localize
@@ -120,8 +126,8 @@ abstract class MgFeatureRestAdapter extends MgRestAdapter {
         $this->featSvc = $this->siteConn->CreateService(MgServiceType::FeatureService);
     }
 
-    protected function CreateReader() {
-        $query = $this->CreateQueryOptions();
+    protected function CreateReader($single) {
+        $query = $this->CreateQueryOptions($single);
         $reader = $this->featSvc->SelectFeatures($this->featureSourceId, $this->className, $query);
         return $reader;
     }
@@ -129,7 +135,7 @@ abstract class MgFeatureRestAdapter extends MgRestAdapter {
     /**
      * Queries the configured feature source and returns a MgReader based on the current GET query parameters and adapter configuration
      */
-    protected abstract function CreateQueryOptions();
+    protected abstract function CreateQueryOptions($single);
 
     /**
      * Writes the GET response header based on content of the given MgReader
@@ -155,8 +161,8 @@ abstract class MgFeatureRestAdapter extends MgRestAdapter {
     /**
      * Handles GET requests for this adapter. Overridden.
      */
-    public function HandleGet() {
-        $reader = $this->CreateReader();
+    public function HandleGet($single) {
+        $reader = $this->CreateReader($single);
         $this->GetResponseBegin($reader);
         while ($reader->ReadNext()) {
             if (!$this->GetResponseShouldContinue($reader))

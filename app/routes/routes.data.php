@@ -24,9 +24,18 @@ $app->get("/data/:args+/config", function($args) use ($app, $container) {
     $ctrl = new MgDataController($app, $container);
     $ctrl->GetDataConfiguration($args);
 });
-$app->get("/data/:args+/.:extension", function($args, $extension) use ($app, $container) {
+$app->get("/data/:args+/:filename", function($args, $filename) use ($app, $container) {
+    $tokens = explode(".", $filename);
     $ctrl = new MgDataController($app, $container);
-    $ctrl->HandleGet($args, $extension);
+    if (count($tokens) == 2) {
+        if (strlen($tokens[0]) === 0) {
+            $ctrl->HandleGet($args, $tokens[1]);
+        } else {
+            $ctrl->HandleGetSingle($args, $tokens[0], $tokens[1]);
+        }
+    } else {
+        $ctrl->HandleGet($args, substr($filename, 1));
+    }
 });
 
 ?>
