@@ -71,6 +71,11 @@ $app->get("/library/:resourcePath+/references.:format", function($resourcePath, 
     $ctrl = new MgResourceServiceController($app);
     $ctrl->EnumerateResourceReferences($resId, $format);
 });
+$app->delete("/library/:resourcePath+", function($resourcePath) use ($app) {
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgResourceServiceController($app);
+    $ctrl->DeleteResource($resId); 
+});
 // Feature Service APIs
 $app->get("/library/:resourcePath+.FeatureSource/spatialcontexts", function($resourcePath) use ($app) {
     $count = count($resourcePath);

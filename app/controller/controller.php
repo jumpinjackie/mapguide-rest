@@ -75,21 +75,26 @@ class MgBaseController
             $this->app->halt(401, "You must enter a valid login ID and password to access this site"); //TODO: Localize
         } else {
             $this->app->response->header("Content-Type", $mimeType);
+            //Amend error code for certain classes of errors
+            $status = 500;
+            if ($statusMessage === "MgResourceNotFoundException" || $statusMessage === "MgResourceDataNotFoundException") {
+                $status = 404;
+            }
             $errResponse = "";
             if ($mimeType === MgMimeType::Xml) {
                 $errResponse = sprintf(
                     "<?xml version=\"1.0\"?><Error><Type>%s</Type><Message>%s</Message><Details>%s</Details><StackTrace>%s</StackTrace></Error>",
-                    $statusMessage,
-                    $result->GetErrorMessage(),
-                    $result->GetDetailedErrorMessage(),
-                    $e->getTraceAsString());
+                    MgUtils::EscapeXmlChars($statusMessage),
+                    MgUtils::EscapeXmlChars($result->GetErrorMessage()),
+                    MgUtils::EscapeXmlChars($result->GetDetailedErrorMessage()),
+                    MgUtils::EscapeXmlChars($e->getTraceAsString()));
             } else if ($mimeType === MgMimeType::Json) {
                 $errResponse = sprintf(
-                    "{ \"Type\": '%s', \"Message\": '%s', \"Details\": '%s', \"StackTrace\": '%s' }",
-                    $statusMessage,
-                    $result->GetErrorMessage(),
-                    $result->GetDetailedErrorMessage(),
-                    $e->getTraceAsString());
+                    "{ \"Type\": \"%s\", \"Message\": \"%s\", \"Details\": \"%s\", \"StackTrace\": \"%s\" }",
+                    MgUtils::EscapeJsonString($statusMessage),
+                    MgUtils::EscapeJsonString($result->GetErrorMessage()),
+                    MgUtils::EscapeJsonString($result->GetDetailedErrorMessage()),
+                    MgUtils::EscapeJsonString($e->getTraceAsString()));
             } else {
                 $errResponse = sprintf(
                     "<html><head><title>%s</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><h2>%s</h2>%s<h2>Stack Trace</h2><pre>%s</pre></body></html>",
@@ -98,7 +103,7 @@ class MgBaseController
                     $result->GetDetailedErrorMessage(),
                     $e->getTraceAsString());
             }
-            $this->app->halt(500, $errResponse);
+            $this->app->halt($status, $errResponse);
         }
     }
 

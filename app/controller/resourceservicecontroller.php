@@ -7,6 +7,17 @@ class MgResourceServiceController extends MgBaseController {
         parent::__construct($app);
     }
 
+    public function DeleteResource($resId) {
+        $resIdStr = $resId->ToString();
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr) {
+            $param->AddParameter("OPERATION", "DELETERESOURCE");
+            $param->AddParameter("VERSION", "1.0.0");
+            $param->AddParameter("RESOURCEID", $resIdStr);
+            $that->ExecuteHttpRequest($req);
+        });
+    }
+
     public function GetResourceData($resId, $dataName) {
         $resIdStr = $resId->ToString();
         $that = $this;
