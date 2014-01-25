@@ -20,6 +20,7 @@
 $app->config(array(
     "GeoRest.ConfigPath" => "./conf",
     "MapGuide.PhysicalTilePath" => "C:/Program Files/OSGeo/MapGuide/Server/Repositories/TileCache",
+    "MapGuide.TileImageFormat" => "png",
     "Locale" => "en"
 ));
 

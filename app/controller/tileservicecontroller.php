@@ -24,10 +24,65 @@ class MgTileServiceController extends MgBaseController {
         parent::__construct($app);
     }
 
+    private static function GetFolderName($prefix, $index, $tilesPerFolder = 30) {
+        $folder = "";
+        $folderIndex = floor($index / $tilesPerFolder);
+        $firstTileIndex = floor($folderIndex * $tilesPerFolder);
+        if ($index < 0 && $firstTileIndex === 0) {
+            $folder = "-0";
+        } else {
+            $folder = "$firstTileIndex";
+        }
+        return $prefix.$folder;
+    }
+
+    private static function GetTileIndexString($index, $tilesPerFolder = 30) {
+        $name = "";
+        $tnIndex = $index % $tilesPerFolder;
+        if ($index < 0 && $tnIndex === 0) {
+            $name = "-0";
+        } else {
+            $name = "$tnIndex";
+        }
+        return $name;
+    }
+
+    public function GetTileModificationDate($mapDefIdStr, $groupName, $scaleIndex, $row, $col) {
+        $tileCacheName = str_replace("Library://", "", $mapDefIdStr);
+        $tileCacheName = str_replace(".MapDefinition", "", $tileCacheName);
+        $tileCacheName = str_replace("/", "_", $tileCacheName);
+        $path = sprintf("%s/%s/S%s/%s/%s/%s/%s_%s.%s", 
+                        $this->app->config("MapGuide.PhysicalTilePath"),
+                        $tileCacheName,
+                        $scaleIndex,
+                        $groupName,
+                        MgTileServiceController::GetFolderName("R", $row),
+                        MgTileServiceController::GetFolderName("C", $col),
+                        MgTileServiceController::GetTileIndexString($row),
+                        MgTileServiceController::GetTileIndexString($col),
+                        $this->app->config("MapGuide.TileImageFormat"));
+        //var_dump($path);
+        //die;
+        $path = str_replace("/", DIRECTORY_SEPARATOR, $path);
+        if (file_exists($path)) {
+            return filemtime($path);
+        } else {
+            //$this->app->response->header("X-Debug-Message", "Could not fetch mtime of $path. File does not exist");
+            return false;
+        }
+    }
+
     public function GetTile($resId, $groupName, $scaleIndex, $row, $col) {
         $resIdStr = $resId->ToString();
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr, $groupName, $scaleIndex, $row, $col) {
+        $app = $this->app;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($app, $that, $resIdStr, $groupName, $scaleIndex, $row, $col) {
+
+            $tmd = $that->GetTileModificationDate($resIdStr, $groupName, $scaleIndex, $row, $col);
+            if ($tmd !== FALSE) {
+                $app->lastModified($tmd);
+            }
+
             $param->AddParameter("OPERATION", "GETTILEIMAGE");
             $param->AddParameter("VERSION", "1.2.0");
             $param->AddParameter("MAPDEFINITION", $resIdStr);
@@ -36,6 +91,12 @@ class MgTileServiceController extends MgBaseController {
             $param->AddParameter("TILEROW", $row);
             $param->AddParameter("TILECOL", $col);
             $that->ExecuteHttpRequest($req);
+
+            $tmd = $that->GetTileModificationDate($resIdStr, $groupName, $scaleIndex, $row, $col);
+            if ($tmd !== FALSE) {
+                $app->lastModified($tmd);
+            }
+            $app->expires("+6 months");
         }, true); //Tile access can be anonymous, so allow for it if credentials/session specified
     }
 }
