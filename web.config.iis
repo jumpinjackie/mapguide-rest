@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+IIS configuration to enable URL rewriting. Requires the Application Request Routing module installed for IIS
+-->
+<configuration>
+    <system.webServer>
+        <rewrite>
+            <rules>
+                <rule name="some-name" patternSyntax="Wildcard">
+                    <match url="*"/>
+                    <conditions>
+                        <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true"/>
+                        <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true"/>
+                    </conditions>
+                    <action type="Rewrite" url="index.php"/>
+                </rule>
+            </rules>
+        </rewrite>
+    </system.webServer>
+</configuration>
