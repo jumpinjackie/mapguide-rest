@@ -1,0 +1,25 @@
+{
+    "Source": {
+        "Type": "MapGuide",
+        "FeatureSource": "Library://Samples/Sheboygan/Data/VotingDistricts.FeatureSource",
+        "FeatureClass": "SDF_2_Schema:VotingDistricts"
+    },
+    "Representations": {
+        "xml": {
+            "Adapter": "FeatureSetXml",
+            "Methods": {
+                "GET": {
+                    "MaxCount": 500
+                }
+            }
+        },
+        "geojson": {
+            "Adapter": "FeatureSetGeoJson",
+            "Methods": {
+                "GET": {
+                    "MaxCount": 500
+                }
+            }
+        }
+    }
+}
