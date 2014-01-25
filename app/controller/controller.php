@@ -12,6 +12,12 @@ class MgBaseController
         $this->userInfo = null;
     }
 
+    protected function OutputXmlByteReaderAsJson($byteReader) {
+        $content = MgUtils::Xml2Json($byteReader->ToString());
+        $this->app->response->header("Content-Type", MgMimeType::Json);
+        $this->app->response->write($content);
+    }
+
     protected function OutputByteReader($byteReader, $chunkResult = false) {
         $rdrLen = $byteReader->GetLength();
         do
@@ -55,15 +61,132 @@ class MgBaseController
         $this->app->halt(400, "Unsupported representation: ".$format); //TODO: Localize
     }
 
-    private function OutputMgStringCollection($strCol, $mimeType = MgMimeType::Xml) {
-        $content = "<StringCollection />";
-        if ($strCol != null) {
-            $content = $strCol->ToXml();
+    protected function OutputMgPropertyCollection($props, $mimeType = MgMimeType::Xml) {
+        $content = "<PropertyCollection />";
+        $count = $props->GetCount();
+        $agfRw = null;
+        $wktRw = null;
+        $this->app->response->header("Content-Type", $mimeType);
+        if ($count > 0) {
+            $content = "<PropertyCollection>";
+            for ($i = 0; $i < $count; $i++) {
+                $prop = $props->GetItem($i);
+                $name = $prop->GetName();
+                $type = null;
+                $propType = $prop->GetPropertyType();
+                switch ($propType) {
+                    case MgPropertyType::Boolean:
+                        $type = "boolean";
+                        break;
+                    case MgPropertyType::Byte:
+                        $type = "byte";
+                        break;
+                    case MgPropertyType::DateTime:
+                        $type = "datetime";
+                        break;
+                    case MgPropertyType::Decimal:
+                    case MgPropertyType::Double:
+                        $type = "double";
+                        break;
+                    case MgPropertyType::Geometry:
+                        $type = "geometry";
+                        break;
+                    case MgPropertyType::Int16:
+                        $type = "int16";
+                        break;
+                    case MgPropertyType::Int32:
+                        $type = "int32";
+                        break;
+                    case MgPropertyType::Int64:
+                        $type = "int64";
+                        break;
+                    case MgPropertyType::Single:
+                        $type = "single";
+                        break;
+                    case MgPropertyType::String:
+                        $type = "string";
+                        break;
+                }
+
+                if ($prop->IsNull()) {
+                    $content .= "<Property><Name>$name</Name><Type>$type</Type></Property>";
+                } else {
+                    $value = "";
+                    if ($propType === MgPropertyType::DateTime) {
+                        $dt = $prop->GetValue();
+                        $value = $dt->ToString();
+                    } else if ($propType === MgPropertyType::Geometry) {
+                        if ($wktRw == null)
+                            $wktRw = new MgWktReaderWriter();
+                        if ($agfRw == null)
+                            $agfRw = new MgAgfReaderWriter();
+
+                        try {
+                            $agf = $prop->GetValue();
+                            $geom = $agfRw->Read($agf);
+                            if ($geom != null) {
+                                $value = $wktRw->Write($geom);
+                            }
+                        } catch (MgException $ex) {
+                            $value = "";
+                        }
+                    } else {
+                        $value = $prop->GetValue();
+                    }
+                    $content .= "<Property><Name>$name</Name><Type>$type</Type><Value>$value</Value></Property>";
+                }
+            }
+            $content .= "</PropertyCollection>";
         }
         if ($mimeType === MgMimeType::Json) {
             $content = MgUtils::Xml2Json($content);
         }
         $this->app->response->setBody($content);
+    }
+
+    protected function OutputMgStringCollection($strCol, $mimeType = MgMimeType::Xml) {
+        $content = "<StringCollection />";
+        if ($strCol != null) {
+            // MgStringCollection::ToXml() doesn't seem to be reliable in PHP (bug?), so do this manually
+            $count = $strCol->GetCount();
+            $content = "<StringCollection>";
+            for ($i = 0; $i < $count; $i++) {
+                $value = MgUtils::EscapeXmlChars($strCol->GetItem($i));
+                $content .= "<Item>$value</Item>";
+            }
+            $content .= "</StringCollection>";
+        }
+        if ($mimeType === MgMimeType::Json) {
+            $content = MgUtils::Xml2Json($content);
+        }
+        $this->app->response->setBody($content);
+    }
+
+    private function OutputException($statusMessage, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
+        $errResponse = "";
+        if ($mimeType === MgMimeType::Xml) {
+            $errResponse = sprintf(
+                "<?xml version=\"1.0\"?><Error><Type>%s</Type><Message>%s</Message><Details>%s</Details><StackTrace>%s</StackTrace></Error>",
+                MgUtils::EscapeXmlChars($statusMessage),
+                MgUtils::EscapeXmlChars($errorMessage),
+                MgUtils::EscapeXmlChars($details),
+                MgUtils::EscapeXmlChars($phpTrace));
+        } else if ($mimeType === MgMimeType::Json) {
+            $errResponse = sprintf(
+                "{ \"Type\": \"%s\", \"Message\": \"%s\", \"Details\": \"%s\", \"StackTrace\": \"%s\" }",
+                MgUtils::EscapeJsonString($statusMessage),
+                MgUtils::EscapeJsonString($errorMessage),
+                MgUtils::EscapeJsonString($details),
+                MgUtils::EscapeJsonString($phpTrace));
+        } else {
+            $errResponse = sprintf(
+                "<html><head><title>%s</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><h2>%s</h2>%s<h2>Stack Trace</h2><pre>%s</pre></body></html>",
+                $statusMessage,
+                $errorMessage,
+                $details,
+                $phpTrace);
+        }
+        $this->app->halt($status, $errResponse);
     }
 
     private function OutputError($result, $mimeType = MgMimeType::Html) {
@@ -80,6 +203,8 @@ class MgBaseController
             if ($statusMessage === "MgResourceNotFoundException" || $statusMessage === "MgResourceDataNotFoundException") {
                 $status = 404;
             }
+            $this->OutputException($statusMessage, $result->GetErrorMessage(), $result->GetDetailedErrorMessage(), $e->getTraceAsString(), $status, $mimeType);
+            /*
             $errResponse = "";
             if ($mimeType === MgMimeType::Xml) {
                 $errResponse = sprintf(
@@ -104,6 +229,7 @@ class MgBaseController
                     $e->getTraceAsString());
             }
             $this->app->halt($status, $errResponse);
+            */
         }
     }
 
@@ -118,7 +244,11 @@ class MgBaseController
             if ($resultObj != null) {
                 $this->app->response->headers->set("Content-Type", $result->GetResultContentType());
                 if ($resultObj instanceof MgByteReader) {
-                    $this->OutputByteReader($resultObj, $chunkResult);
+                    if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
+                        $this->OutputXmlByteReaderAsJson($resultObj);
+                    } else {
+                        $this->OutputByteReader($resultObj, $chunkResult);
+                    }
                 } else if ($resultObj instanceof MgStringCollection) {
                     $this->OutputMgStringCollection($resultObj, $param->GetParameterValue("FORMAT"));
                 } else if ($resultObj instanceof MgHttpPrimitiveValue) {
@@ -251,8 +381,7 @@ class MgBaseController
         $callback($req, $param);
     }
 
-    private function GetClientIp()
-    {
+    private function GetClientIp() {
         //TODO: Ripped from AJAX viewer. Use the abstractions provided by Slim
         $clientIp = '';
         if (array_key_exists('HTTP_CLIENT_IP', $_SERVER)

@@ -207,7 +207,6 @@ class MgFeatureServiceController extends MgBaseController {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "geojson"));
 
-        $that = $this;
         $this->EnsureAuthenticationForSite();
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
