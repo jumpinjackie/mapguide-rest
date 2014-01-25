@@ -6,7 +6,7 @@ mapguide-rest is a RESTful web extension for [MapGuide Open Source](http://mapgu
 mapguide-rest provides the following services:
 
  - A REST-ful http interface modeled on original discussions on a [RESTful web service for MapGuide](http://trac.osgeo.org/mapguide/wiki/Future/RESTfulWebServices)
- - A re-imaging of GeoREST and its data publishing capabilities
+ - A re-imagining of GeoREST and its data publishing capabilities
 
 mapguide-rest is written in PHP and uses the following libraries:
 
