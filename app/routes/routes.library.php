@@ -25,33 +25,33 @@ require_once dirname(__FILE__)."/../controller/renderingservicecontroller.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
 // Resource Service APIs
-$app->get("/library/:resourcePath+/datalist", function($resourcePath) use ($app) {
+$app->get("/library/:resourcePath+/data", function($resourcePath) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgResourceServiceController($app);
     $ctrl->EnumerateResourceData($resId, "xml");
 });
-$app->get("/library/:resourcePath+/datalist.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+/data.:format", function($resourcePath, $format) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgResourceServiceController($app);
     $ctrl->EnumerateResourceData($resId, $format);
 });
-$app->get("/library/resourcelist", function() use ($app) {
+$app->get("/library/list", function() use ($app) {
     $resId = new MgResourceIdentifier("Library://");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->EnumerateResources($resId, "xml");
 });
-$app->get("/library/resourcelist.:format", function($format) use ($app) {
+$app->get("/library/list.:format", function($format) use ($app) {
     $resId = new MgResourceIdentifier("Library://");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->EnumerateResources($resId, $format);
 });
-$app->get("/library/:resourcePath+/resourcelist", function($resourcePath) use ($app) {
-    $resId = MgUtils::ParseLibraryResourceID($resourcePath, "resourcelist");
+$app->get("/library/:resourcePath+/list", function($resourcePath) use ($app) {
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath, "list");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->EnumerateResources($resId, "xml");
 });
-$app->get("/library/:resourcePath+/resourcelist.:format", function($resourcePath, $format) use ($app) {
-    $resId = MgUtils::ParseLibraryResourceID($resourcePath, "resourcelist.".$format);
+$app->get("/library/:resourcePath+/list.:format", function($resourcePath, $format) use ($app) {
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath, "list.".$format);
     $ctrl = new MgResourceServiceController($app);
     $ctrl->EnumerateResources($resId, $format);
 });

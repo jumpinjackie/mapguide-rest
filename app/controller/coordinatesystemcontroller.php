@@ -79,7 +79,7 @@ class MgCoordinateSystemController extends MgBaseController {
 
     public function ConvertEpsgToWkt($epsg) {
         $factory = new MgCoordinateSystemFactory();
-        $wkt = $factory->ConvertEpsgCodeToWkt($wkt);
+        $wkt = $factory->ConvertEpsgCodeToWkt($epsg);
 
         $this->app->response->setBody($wkt);
     }

@@ -181,6 +181,18 @@ class MgBaseController
         $this->app->response->setBody($content);
     }
 
+    protected function OnException($ex, $mimeType = MgMimeType::Html) {
+        $status = 500;
+        if ($ex instanceof MgAuthenticationFailedException || $ex instanceof MgUnauthorizedAccessException) {
+            $status = 401;
+        } else if ($ex instanceof MgResourceNotFoundException || $ex instanceof MgResourceDataNotFoundException) {
+            $status = 404;
+        }
+        $e = new Exception();
+        $this->app->response->header("Content-Type", $mimeType);
+        $this->OutputException(get_class($ex), $ex->GetExceptionMessage(), $ex->GetDetails(), $e->getTraceAsString(), $status, $mimeType);
+    }
+
     private function OutputException($statusMessage, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
         $errResponse = "";
         if ($mimeType === MgMimeType::Xml) {
@@ -213,7 +225,10 @@ class MgBaseController
         $e = new Exception();
         if ($statusMessage === "MgAuthenticationFailedException" || $statusMessage === "MgUnauthorizedAccessException") {
             //Send back 401
-            $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
+            //HACK: But don't put the WWW-Authenticate header so the test harness doesn't trip up
+            $fromTestHarness = $this->app->request->header("x-mapguide-test-harness");
+            if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
+                $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
             $this->app->halt(401, "You must enter a valid login ID and password to access this site"); //TODO: Localize
         } else {
             $this->app->response->header("Content-Type", $mimeType);
@@ -388,7 +403,10 @@ class MgBaseController
                     $username = "Anonymous";
                 } else {
                     //Send back 401
-                    $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
+                    //HACK: But don't put the WWW-Authenticate header so the test harness doesn't trip up
+                    $fromTestHarness = $this->app->request->header("x-mapguide-test-harness");
+                    if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
+                        $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
                     $this->app->halt(401, "You must enter a valid login ID and password to access this site"); //TODO: Localize
                 }
             }
@@ -476,7 +494,10 @@ class MgBaseController
                     $this->userInfo->SetMgUsernamePassword($username, $password);
                 } else {
                     //Send back 401
-                    $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
+                    //HACK: But don't put the WWW-Authenticate header so the test harness doesn't trip up
+                    $fromTestHarness = $this->app->request->header("x-mapguide-test-harness");
+                    if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
+                        $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
                     $this->app->halt(401, "You must enter username/password");
                 }
             }

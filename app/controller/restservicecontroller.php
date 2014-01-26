@@ -25,14 +25,30 @@ class MgRestServiceController extends MgBaseController {
     }
 
     public function CreateSession() {
-        $this->EnsureAuthenticationForSite();
-        $siteConn = new MgSiteConnection();
-        $siteConn->Open($this->userInfo);
-        $site = $siteConn->GetSite();
-        $session = $site->CreateSession();
+        try {
+            $this->EnsureAuthenticationForSite();
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+            $site = $siteConn->GetSite();
+            $session = $site->CreateSession();
 
-        $this->app->response->setStatus(201);
-        $this->app->response->setBody($session);
+            $this->app->response->setStatus(201);
+            $this->app->response->setBody($session);
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
+    }
+
+    public function DestroySession($sessionId) {
+        try {
+            $siteConn = new MgSiteConnection();
+            $userInfo = new MgUserInformation($sessionId);
+            $siteConn->Open($userInfo);
+            $site = $siteConn->GetSite();
+            $site->DestroySession($sessionId);
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
     }
 }
 

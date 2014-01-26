@@ -50,7 +50,7 @@ $app->get("/coordsys/epsg/:epsg/mentor", function($epsg) use ($app) {
 });
 $app->get("/coordsys/epsg/:epsg/wkt", function($epsg) use ($app) {
     $ctrl = new MgCoordinateSystemController($app);
-    $ctrl->ConvertEpsgToWkt($wkt);
+    $ctrl->ConvertEpsgToWkt($epsg);
 });
 /*
 $app->post("/coordsys/tomentor/:wkt+", function($wkt) use ($app) {

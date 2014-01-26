@@ -27,6 +27,10 @@ $app->post("/session", function() use ($app) {
     $ctrl = new MgRestServiceController($app);
     $ctrl->CreateSession();
 });
+$app->delete("/session/:sessionId", function($sessionId) use ($app) {
+    $ctrl = new MgRestServiceController($app);
+    $ctrl->DestroySession($sessionId);
+});
 $app->get("/session/:sessionId/:mapName.Map/image.:format", function($sessionId, $mapName, $format) use ($app) {
     $ctrl = new MgRenderingServiceController($app);
     $ctrl->RenderRuntimeMap($sessionId, $mapName, $format);
