@@ -158,6 +158,7 @@ class MgBaseController
         if ($mimeType === MgMimeType::Json) {
             $content = MgUtils::Xml2Json($content);
         }
+        $this->app->response->header("Content-Type", $mimeType);
         $this->app->response->setBody($content);
     }
 
@@ -176,6 +177,7 @@ class MgBaseController
         if ($mimeType === MgMimeType::Json) {
             $content = MgUtils::Xml2Json($content);
         }
+        $this->app->response->header("Content-Type", $mimeType);
         $this->app->response->setBody($content);
     }
 
@@ -398,7 +400,7 @@ class MgBaseController
         $callback($req, $param);
     }
 
-    private function GetClientIp() {
+    protected function GetClientIp() {
         //TODO: Ripped from AJAX viewer. Use the abstractions provided by Slim
         $clientIp = '';
         if (array_key_exists('HTTP_CLIENT_IP', $_SERVER)

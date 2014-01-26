@@ -21,6 +21,7 @@ require_once dirname(__FILE__)."/../controller/resourceservicecontroller.php";
 require_once dirname(__FILE__)."/../controller/featureservicecontroller.php";
 require_once dirname(__FILE__)."/../controller/tileservicecontroller.php";
 require_once dirname(__FILE__)."/../controller/mappingservicecontroller.php";
+require_once dirname(__FILE__)."/../controller/renderingservicecontroller.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
 // Resource Service APIs
@@ -210,6 +211,16 @@ $app->get("/library/:resourcePath+.LayerDefinition/legend/:scale/:geomtype/:them
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgMappingServiceController($app);
     $ctrl->GenerateLegendImage($resId, $scale, $geomtype, $themecat, $format);
+});
+// Rendering Service APIs
+$app->get("/library/:resourcePath+.MapDefinition/image.:format", function($resourcePath, $format) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgRenderingServiceController($app);
+    $ctrl->RenderMapDefinition($resId, $format);
 });
 
 ?>
