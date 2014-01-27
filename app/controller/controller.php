@@ -29,6 +29,107 @@ class MgBaseController
         $this->userInfo = null;
     }
 
+    protected function OutputUpdateFeaturesResult($commands, $result, $classDef) {
+        $output = "<UpdateFeaturesResult>";
+        $ccount = $commands->GetCount();
+        $rcount = $result->GetCount();
+        //Should be equal, but just in case ...
+        $count = min($ccount, $rcount);
+        for ($i = 0; $i < $count; $i++) {
+            $cmd = $commands->GetItem($i);
+            $cmdType = $cmd->GetCommandType();
+            $prop = $result->GetItem($i);
+            switch($cmdType) {
+                case MgFeatureCommandType::InsertFeatures:
+                    {
+                        $output .= "<InsertResult>";
+                        if ($prop->GetPropertyType() == MgPropertyType::String) {
+                            $output .= "<Error>".$prop->GetValue()."</Error>";
+                        } else if ($prop->GetPropertyType() == MgPropertyType::Feature) {
+                            $output .= "<FeatureSet><Features>";
+                            $reader = $prop->GetValue();
+                            $idProps = $classDef->GetIdentityProperties();
+                            $propCount = $idProps->GetCount();
+                            while ($reader->ReadNext()) {
+                                $output .= "<Feature>";
+                                //HACK: There is a bug that prevents us from inferring the structure of the MgFeatureReader 
+                                //that's put into the UpdateFeatures result, so we workaround this by using the already fetched
+                                //MgClassDefinition to extract the relevant identity property values
+                                for ($i = 0; $i < $propCount; $i++) {
+                                    $idProp = $idProps->GetItem($i);
+                                    $name = $idProp->GetName();
+                                    $propType = $idProp->GetDataType();
+                                    $output .= "<Property><Name>$name</Name>";
+                                    if (!$reader->IsNull($i)) {
+                                        $output .= "<Value>";
+                                        switch($propType) {
+                                            case MgPropertyType::Boolean:
+                                                $output .= $reader->GetBoolean($name);
+                                                break;
+                                            case MgPropertyType::Byte:
+                                                $output .= $reader->GetByte($name);
+                                                break;
+                                            case MgPropertyType::Decimal:
+                                            case MgPropertyType::Double:
+                                                $output .= $reader->GetDouble($name);
+                                                break;
+                                            case MgPropertyType::Int16:
+                                                $output .= $reader->GetInt16($name);
+                                                break;
+                                            case MgPropertyType::Int32:
+                                                $output .= $reader->GetInt32($name);
+                                                break;
+                                            case MgPropertyType::Int64:
+                                                $output .= $reader->GetInt64($name);
+                                                break;
+                                            case MgPropertyType::Single:
+                                                $output .= $reader->GetSingle($name);
+                                                break;
+                                            case MgPropertyType::String:
+                                                $output .= MgUtils::EscapeXmlChars($reader->GetString($name));
+                                                break;
+                                        }
+                                        $output .= "</Value>";
+                                    }
+                                    $output .= "</Property>";
+                                }
+                                $output .= "</Feature>";
+                            }
+                            $reader->Close();
+                            $output .= "</Features></FeatureSet>";
+                        }
+                        $output .= "</InsertResult>";
+                    }
+                    break;
+                case MgFeatureCommandType::UpdateFeatures:
+                    {
+                        $output .= "<UpdateResult>";
+                        if ($prop->GetPropertyType() == MgPropertyType::String) {
+                            $output .= "<Error>".$prop->GetValue()."</Error>";
+                        } else if ($prop->GetPropertyType() == MgPropertyType::Int32) {
+                            $output .= "<ResultsAffected>".$prop->GetValue()."</ResultsAffected>";
+                        }
+                        $output .= "</UpdateResult>";
+                    }
+                    break;
+                case MgFeatureCommandType::DeleteFeatures:
+                    {
+                        $output .= "<DeleteResult>";
+                        if ($prop->GetPropertyType() == MgPropertyType::String) {
+                            $output .= "<Error>".$prop->GetValue()."</Error>";
+                        } else if ($prop->GetPropertyType() == MgPropertyType::Int32) {
+                            $output .= "<ResultsAffected>".$prop->GetValue()."</ResultsAffected>";
+                        }
+                        $output .= "</DeleteResult>";
+                    }
+                    break;
+            }
+        }
+        $output .= "</UpdateFeaturesResult>";
+        $this->app->response->header("Content-Type", MgMimeType::Xml);
+        $this->app->response->write($output);
+    }
+
     protected function OutputXmlByteReaderAsJson($byteReader) {
         $content = MgUtils::Xml2Json($byteReader->ToString());
         $this->app->response->header("Content-Type", MgMimeType::Json);
@@ -46,22 +147,6 @@ class MgBaseController
                 $this->app->response->write(substr($data, 0, $len));
             }
         } while ($len > 0);
-        /*
-        $buffer = '';
-        $contentLen = 0;
-        do
-        {
-            $data = str_pad("\0", 50000, "\0");
-            $len = $byteReader->Read($data, 50000);
-            if ($len > 0)
-            {
-                $contentLen = $contentLen + $len;
-                $buffer = $buffer . substr($data, 0, $len);
-            }
-        } while ($len > 0);
-        $this->app->response->setBody($buffer);
-        $this->app->response->headers->set("Content-Length", $contentLen);
-        */
     }
 
     protected function ValidateRepresentation($format, $validRepresentations = null) {
@@ -75,8 +160,9 @@ class MgBaseController
                     return $fmt;
             }
         }
-        $e = new Exception();
-        $this->app->halt(400, "Unsupported representation: ".$format."<pre>".$e->getTraceAsString()."</pre>"); //TODO: Localize
+        $this->app->halt(400, "Unsupported representation: ".$format); //TODO: Localize
+        //$e = new Exception();
+        //$this->app->halt(400, "Unsupported representation: ".$format."<pre>".$e->getTraceAsString()."</pre>"); //TODO: Localize
     }
 
     protected function OutputMgPropertyCollection($props, $mimeType = MgMimeType::Xml) {
@@ -228,6 +314,8 @@ class MgBaseController
         if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
             $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
         $this->app->halt(401, "You must enter a valid login ID and password to access this site"); //TODO: Localize
+        //$e = new Exception();
+        //$this->app->halt(401, "You must enter a valid login ID and password to access this site<br/>".$e->getTraceAsString()); //TODO: Localize
     }
 
     private function OutputError($result, $mimeType = MgMimeType::Html) {

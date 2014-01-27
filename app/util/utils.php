@@ -211,6 +211,179 @@ class MgUtils
 
         return $xslt->transformToXml($doc);
     }
+
+    private static function ParseFeatureNode($propNodes, $agfRw, $wktRw, $classProps) {
+        $props = new MgPropertyCollection();
+        for ($j = 0; $j < $propNodes->length; $j++) {
+            $propNode = $propNodes->item($j);
+
+            $name = $propNode->getElementsByTagName("Name")->item(0)->nodeValue;
+            $valueNodes = $propNode->getElementsByTagName("Value");
+            $value = "";
+            $bNull = true;
+            if ($valueNodes->length == 1) {
+                $value = $valueNodes->item(0)->nodeValue;
+                $bNull = false;
+            } else {
+                $bNull = true;
+            }
+
+            $pidx = $classProps->IndexOf($name);
+            if ($pidx >= 0) {
+                $propDef = $classProps->GetItem($pidx);
+                if ($propDef->GetPropertyType() == MgFeaturePropertyType::GeometricProperty) {
+                    $geom = $wktRw->Read($value);
+                    $agf = $agfRw->Write($geom);
+
+                    $geomVal = new MgGeometryProperty($name, $agf);
+                    $props->Add($geomVal);
+                } else if ($propDef->GetPropertyType() == MgFeaturePropertyType::DataProperty) {
+                    $dataType = $propDef->GetDataType();
+                    switch ($dataType) {
+                        case MgPropertyType::Boolean:
+                            {
+                                if ($bNull) {
+                                    $boolVal = new MgBooleanProperty($name, false);
+                                    $boolVal->SetNull();
+                                } else {
+                                    $boolVal = new MgBooleanProperty($name, boolval($value));
+                                }
+                                $props->Add($boolVal);
+                            }
+                            break;
+                        case MgPropertyType::Byte:
+                            {
+                                if ($bNull) {
+                                    $byteVal = new MgByteProperty($name, 0);
+                                    $byteVal->SetNull();
+                                } else {
+                                    $byteVal = new MgByteProperty($name, intval($value));
+                                }
+                                $props->Add($byteVal);
+                            }
+                            break;
+                        case MgPropertyType::DateTime:
+                            {
+                                throw new Exception("Case not supported yet: DateTime"); //TODO: Localize
+                            }
+                            break;
+                        case MgPropertyType::Decimal:
+                        case MgPropertyType::Double:
+                            {
+                                if ($bNull) {
+                                    $doubleVal = new MgDoubleProperty($name, 0.0);
+                                    $doubleVal->SetNull();
+                                } else {
+                                    $doubleVal = new MgDoubleProperty($name, floatval($value));
+                                }
+                                $props->Add($doubleVal);
+                            }
+                            break;
+                        case MgPropertyType::Int16:
+                            {
+                                if ($bNull) {
+                                    $i16val = new MgInt16Property($name, 0);
+                                    $i16val->SetNull();
+                                } else {
+                                    $i16val = new MgInt16Property($name, intval($value));
+                                }
+                                $props->Add($i16prop);
+                            }
+                            break;
+                        case MgPropertyType::Int32:
+                            {
+                                if ($bNull) {
+                                    $i32val = new MgInt32Property($name, 0);
+                                    $i32val->SetNull();
+                                } else {
+                                    $i32val = new MgInt32Property($name, intval($value));
+                                }
+                                $props->Add($i32prop);   
+                            }
+                            break;
+                        case MgPropertyType::Int64:
+                            {
+                                if ($bNull) {
+                                    $i64val = new MgInt64Property($name, 0);
+                                    $i64val->SetNull();
+                                } else {
+                                    $i64val = new MgInt64Property($name, intval($value));
+                                }
+                                $props->Add($i64prop);
+                            }
+                            break;
+                        case MgPropertyType::Single:
+                            {
+                                if ($bNull) {
+                                    $sinProp = new MgSingleProperty($name, 0.0);
+                                    $sinProp->SetNull();
+                                } else {
+                                    $sinProp = new MgSingleProperty($name, floatval($value));
+                                }
+                                $props->Add($sinProp);
+                            }
+                            break;
+                        case MgPropertyType::String:
+                            {
+                                if ($bNull) {
+                                    $strProp = new MgStringProperty($name, "");
+                                    $strProp->SetNull();
+                                } else {
+                                    $strProp = new MgStringProperty($name, $value);
+                                }
+                                $props->Add($strProp);
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+        return $props;
+    }
+
+    public static function ParseMultiFeatureXml($classDef, $xml, $featureNodeName = "feature", $propertyNodeName = "Property") {
+        $doc = new DOMDocument();
+        $doc->loadXML($xml);
+
+        return MgUtils::ParseMultiFeatureDocument($classDef, $doc, $featureNodeName, $propertyNodeName);
+    }
+
+    public static function ParseMultiFeatureDocument($classDef, $doc, $featureNodeName = "feature", $propertyNodeName = "Property") {
+        $batchProps = new MgBatchPropertyCollection();
+        $featureNodes = $doc->getElementsByTagName($featureNodeName);
+
+        $wktRw = new MgWktReaderWriter();
+        $agfRw = new MgAgfReaderWriter();
+        $classProps = $classDef->GetProperties();
+
+        for ($i = 0; $i < $featureNodes->length; $i++) {
+            $propNodes = $featureNodes->item($i)->getElementsByTagName($propertyNodeName);
+            $props = MgUtils::ParseFeatureNode($propNodes, $agfRw, $wktRw, $classProps);
+            $batchProps->Add($props);
+        }
+
+        return $batchProps;
+    }
+
+    public static function ParseSingleFeatureDocument($classDef, $doc, $featureNodeName = "feature", $propertyNodeName = "Property") {
+        $wktRw = new MgWktReaderWriter();
+        $agfRw = new MgAgfReaderWriter();
+        $classProps = $classDef->GetProperties();
+
+        $props = new MgPropertyCollection();
+        $featureNodes = $doc->GetElementsByTagName($featureNodeName);
+        $propNodes = $featureNodes->item(0)->getElementsByTagName($propertyNodeName);
+
+        $props = MgUtils::ParseFeatureNode($propNodes, $agfRw, $wktRw, $classProps);
+        return $props;
+    }
+
+    public static function ParseSingleFeatureXml($classDef, $xml, $featureNodeName = "feature", $propertyNodeName = "Property") {
+        $doc = new DOMDocument($xml);
+        $doc->loadXML($xml);
+
+        return MgUtils::ParseSingleFeatureDocument($classDef, $doc, $featureNodeName, $propertyNodeName);
+    }
 }
 
 ?>

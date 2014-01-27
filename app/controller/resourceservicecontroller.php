@@ -113,6 +113,27 @@ class MgResourceServiceController extends MgBaseController {
         });
     }
 
+    public function SetResourceContent($resId) {
+        try {
+            $resIdStr = $resId->ToString();
+            $this->EnsureAuthenticationForSite();
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+
+            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+            $body = $this->app->request->getBody();
+            $bs = new MgByteSource($body, strlen($body));
+            $content = $bs->GetReader();
+
+            $resSvc->SetResource($resId, $content, null);
+
+            $this->app->response->setStatus(201);
+            $this->app->response->setBody($resId->ToString());
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
+    }
+
     public function GetResourceContent($resId, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));

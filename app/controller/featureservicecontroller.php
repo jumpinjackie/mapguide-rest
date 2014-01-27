@@ -236,6 +236,77 @@ class MgFeatureServiceController extends MgBaseController {
         });
     }
 
+    public function InsertFeatures($resId, $schemaName, $className) {
+        try {
+            $this->EnsureAuthenticationForSite();
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+
+            $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
+
+            $commands = new MgFeatureCommandCollection();
+            $classDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
+            $batchProps = MgUtils::ParseMultiFeatureXml($classDef, $this->app->request->getBody());
+            $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
+            $commands->Add($insertCmd);
+
+            $result = $featSvc->UpdateFeatures($resId, $commands, false);
+            $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
+    }
+
+    public function UpdateFeatures($resId, $schemaName, $className) {
+        try {
+            $this->EnsureAuthenticationForSite();
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+
+            $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
+
+            $doc = new DOMDocument();
+            $doc->loadXML($this->app->request->getBody());
+
+            $commands = new MgFeatureCommandCollection();
+            $filter = "";
+            $filterNode = $doc->getElementsByTagName("Filter");
+            if ($filterNode->length == 1)
+                $filter = $filterNode->item(0)->nodeValue;
+            $classDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
+            $props = MgUtils::ParseSingleFeatureDocument($classDef, $doc, "UpdateProperties");
+            $updateCmd = new MgUpdateFeatures("$schemaName:$className", $props, $filter);
+            $commands->Add($updateCmd);
+
+            $result = $featSvc->UpdateFeatures($resId, $commands, false);
+            $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
+    }
+
+    public function DeleteFeatures($resId, $schemaName, $className) {
+        try {
+            $this->EnsureAuthenticationForSite();
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+
+            $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
+            $classDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
+            $commands = new MgFeatureCommandCollection();
+            $filter = $this->app->request->params("filter");
+            if ($filter == null)
+                $filter = "";
+            $deleteCmd = new MgDeleteFeatures("$schemaName:$className", $filter);
+            $commands->Add($deleteCmd);
+
+            $result = $featSvc->UpdateFeatures($resId, $commands, false);
+            $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
+    }
+
     public function SelectFeatures($resId, $schemaName, $className, $format) {
         try {
             //Check for unsupported representations
