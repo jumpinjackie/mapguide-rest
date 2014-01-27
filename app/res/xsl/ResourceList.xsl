@@ -52,7 +52,7 @@
                 [References]
             </a>
             &#160;
-            <a href="{$resName}/data.html">
+            <a href="{$resName}/datalist.html">
                 [Data]
             </a>
             <xsl:if test="substring($resName, (string-length($resName) - string-length('FeatureSource')) + 1) = 'FeatureSource'">

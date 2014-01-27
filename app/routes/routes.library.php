@@ -177,12 +177,12 @@ $app->get("/library/:resourcePath+/features.:format/:schemaName/:className", fun
     $ctrl->SelectFeatures($resId, $schemaName, $className, $format);
 });
 // Resource Service APIs
-$app->get("/library/:resourcePath+/data", function($resourcePath) use ($app) {
+$app->get("/library/:resourcePath+/datalist", function($resourcePath) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgResourceServiceController($app);
     $ctrl->EnumerateResourceData($resId, "xml");
 });
-$app->get("/library/:resourcePath+/data.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+/datalist.:format", function($resourcePath, $format) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgResourceServiceController($app);
     $ctrl->EnumerateResourceData($resId, $format);
