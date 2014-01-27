@@ -25,7 +25,7 @@ class MgCoordinateSystemController extends MgBaseController {
     }
 
     public function EnumerateCategories($format) {
-        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
@@ -44,7 +44,7 @@ class MgCoordinateSystemController extends MgBaseController {
     }
 
     public function EnumerateCoordinateSystemsByCategory($category, $format) {
-        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $category) {

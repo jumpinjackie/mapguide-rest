@@ -186,6 +186,42 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:schemaName/:c
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetClassDefinition($resId, $schemaName, $className, $format);
 });
+$app->get("/library/:resourcePath+.FeatureSource/classdef/:qualifiedClassName", function($resourcePath, $qualifiedClassName) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgFeatureServiceController($app);
+    $tokens = explode(":", $qualifiedClassName);
+    $schemaName = "";
+    $className = "";
+    if (count($tokens) == 2) {
+        $schemaName = $tokens[0];
+        $className = $tokens[1];
+    } else {
+        $className = $qualifiedClassName;
+    }
+    $ctrl->GetClassDefinition($resId, $schemaName, $className, "xml");
+});
+$app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:qualifiedClassName", function($resourcePath, $format, $qualifiedClassName) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgFeatureServiceController($app);
+    $tokens = explode(":", $qualifiedClassName);
+    $schemaName = "";
+    $className = "";
+    if (count($tokens) == 2) {
+        $schemaName = $tokens[0];
+        $className = $tokens[1];
+    } else {
+        $className = $qualifiedClassName;
+    }
+    $ctrl->GetClassDefinition($resId, $schemaName, $className, $format);
+});
 $app->get("/library/:resourcePath+/features/:schemaName/:className", function($resourcePath, $schemaName, $className) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);

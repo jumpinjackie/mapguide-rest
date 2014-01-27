@@ -87,51 +87,67 @@ class MgSiteAdminController extends MgBaseController {
     }
 
     public function EnumerateGroupsForUser($userName, $format) {
-        //Check for unsupported representations
-        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
-
-        $this->EnsureAuthenticationForSite();
-        $siteConn = new MgSiteConnection();
-        $siteConn->Open($this->userInfo);
-
-        $site = $siteConn->GetSite();
         try {
-            $user = $site->GetUserForSession();
-        } catch (MgException $ex) {
-            //Could happen if we have non-anonymous credentials in the http authentication header
-        }
-        $content = $site->EnumerateGroups($userName);
+            //Check for unsupported representations
+            $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
-        if ($fmt === "json") {
-            $this->OutputXmlByteReaderAsJson($content);
-        } else {
-            $this->app->response->header("Content-Type", $content->GetMimeType());
-            $this->OutputByteReader($content);
+            $this->EnsureAuthenticationForSite();
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+
+            $site = $siteConn->GetSite();
+            try {
+                $user = $site->GetUserForSession();
+                //Hmmm. Should we allow Anonymous to discover its own roles?
+                if($user === "Anonymous" && $userName !== "Anonymous") {
+                    $this->Unauthorized();
+                }
+            } catch (MgException $ex) {
+                //Could happen if we have non-anonymous credentials in the http authentication header
+            }
+            $content = $site->EnumerateGroups($userName);
+
+            if ($fmt === "json") {
+                $this->OutputXmlByteReaderAsJson($content);
+            } else {
+                $this->app->response->header("Content-Type", $content->GetMimeType());
+                $this->OutputByteReader($content);
+            }
+        } catch (MgException $ex) {
+            $this->OnException($ex);
         }
     }
 
     public function EnumerateRolesForUser($userName, $format) {
-        //Check for unsupported representations
-        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
-
-        $this->EnsureAuthenticationForSite();
-        $siteConn = new MgSiteConnection();
-        $siteConn->Open($this->userInfo);
-
-        $site = $siteConn->GetSite();
         try {
-            $user = $site->GetUserForSession();
-        } catch (MgException $ex) {
-            //Could happen if we have non-anonymous credentials in the http authentication header
-        }
+            //Check for unsupported representations
+            $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
-        $content = $site->EnumerateRoles($userName);
-        $mimeType = MgMimeType::Xml;
-        if ($fmt === "json") {
-            $mimeType = MgMimeType::Json;
-        } 
-        $this->app->response->header("Content-Type", $mimeType);
-        $this->OutputMgStringCollection($content, $mimeType);
+            $this->EnsureAuthenticationForSite();
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+
+            $site = $siteConn->GetSite();
+            try {
+                $user = $site->GetUserForSession();
+                //Hmmm. Should we allow Anonymous to discover its own roles?
+                if($user === "Anonymous" && $userName !== "Anonymous") {
+                    $this->Unauthorized();
+                }
+            } catch (MgException $ex) {
+                //Could happen if we have non-anonymous credentials in the http authentication header
+            }
+
+            $content = $site->EnumerateRoles($userName);
+            $mimeType = MgMimeType::Xml;
+            if ($fmt === "json") {
+                $mimeType = MgMimeType::Json;
+            } 
+            $this->app->response->header("Content-Type", $mimeType);
+            $this->OutputMgStringCollection($content, $mimeType);
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
     }
 }
 

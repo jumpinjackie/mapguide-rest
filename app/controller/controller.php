@@ -75,7 +75,8 @@ class MgBaseController
                     return $fmt;
             }
         }
-        $this->app->halt(400, "Unsupported representation: ".$format); //TODO: Localize
+        $e = new Exception();
+        $this->app->halt(400, "Unsupported representation: ".$format."<pre>".$e->getTraceAsString()."</pre>"); //TODO: Localize
     }
 
     protected function OutputMgPropertyCollection($props, $mimeType = MgMimeType::Xml) {
@@ -220,16 +221,20 @@ class MgBaseController
         $this->app->halt($status, $errResponse);
     }
 
+    protected function Unauthorized() {
+        //Send back 401
+        //HACK: But don't put the WWW-Authenticate header so the test harness doesn't trip up
+        $fromTestHarness = $this->app->request->headers->get("x-mapguide-test-harness");
+        if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
+            $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
+        $this->app->halt(401, "You must enter a valid login ID and password to access this site"); //TODO: Localize
+    }
+
     private function OutputError($result, $mimeType = MgMimeType::Html) {
         $statusMessage = $result->GetHttpStatusMessage();
         $e = new Exception();
         if ($statusMessage === "MgAuthenticationFailedException" || $statusMessage === "MgUnauthorizedAccessException") {
-            //Send back 401
-            //HACK: But don't put the WWW-Authenticate header so the test harness doesn't trip up
-            $fromTestHarness = $this->app->request->headers->get("x-mapguide-test-harness");
-            if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
-                $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
-            $this->app->halt(401, "You must enter a valid login ID and password to access this site"); //TODO: Localize
+            $this->Unauthorized();
         } else {
             $this->app->response->header("Content-Type", $mimeType);
             //Amend error code for certain classes of errors
@@ -238,32 +243,6 @@ class MgBaseController
                 $status = 404;
             }
             $this->OutputException($statusMessage, $result->GetErrorMessage(), $result->GetDetailedErrorMessage(), $e->getTraceAsString(), $status, $mimeType);
-            /*
-            $errResponse = "";
-            if ($mimeType === MgMimeType::Xml) {
-                $errResponse = sprintf(
-                    "<?xml version=\"1.0\"?><Error><Type>%s</Type><Message>%s</Message><Details>%s</Details><StackTrace>%s</StackTrace></Error>",
-                    MgUtils::EscapeXmlChars($statusMessage),
-                    MgUtils::EscapeXmlChars($result->GetErrorMessage()),
-                    MgUtils::EscapeXmlChars($result->GetDetailedErrorMessage()),
-                    MgUtils::EscapeXmlChars($e->getTraceAsString()));
-            } else if ($mimeType === MgMimeType::Json) {
-                $errResponse = sprintf(
-                    "{ \"Type\": \"%s\", \"Message\": \"%s\", \"Details\": \"%s\", \"StackTrace\": \"%s\" }",
-                    MgUtils::EscapeJsonString($statusMessage),
-                    MgUtils::EscapeJsonString($result->GetErrorMessage()),
-                    MgUtils::EscapeJsonString($result->GetDetailedErrorMessage()),
-                    MgUtils::EscapeJsonString($e->getTraceAsString()));
-            } else {
-                $errResponse = sprintf(
-                    "<html><head><title>%s</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><h2>%s</h2>%s<h2>Stack Trace</h2><pre>%s</pre></body></html>",
-                    $statusMessage,
-                    $result->GetErrorMessage(),
-                    $result->GetDetailedErrorMessage(),
-                    $e->getTraceAsString());
-            }
-            $this->app->halt($status, $errResponse);
-            */
         }
     }
 
@@ -277,7 +256,7 @@ class MgBaseController
             $name = $names->GetItem($i);
             if (MgUtils::StringStartsWith($name, "XSLPARAM.")) {
                 $val = $param->GetParameterValue($name);
-                $names[substr($name, strlen("XSLPARAM."))] = $val;
+                $values[substr($name, strlen("XSLPARAM."))] = $val;
             }
         }
         return $values;
@@ -426,12 +405,7 @@ class MgBaseController
                 if ($allowAnonymous) {
                     $username = "Anonymous";
                 } else {
-                    //Send back 401
-                    //HACK: But don't put the WWW-Authenticate header so the test harness doesn't trip up
-                    $fromTestHarness = $this->app->request->headers->get("x-mapguide-test-harness");
-                    if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
-                        $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
-                    $this->app->halt(401, "You must enter a valid login ID and password to access this site"); //TODO: Localize
+                    $this->Unauthorized();
                 }
             }
         }
@@ -517,12 +491,7 @@ class MgBaseController
                 if ($username != null) {
                     $this->userInfo->SetMgUsernamePassword($username, $password);
                 } else {
-                    //Send back 401
-                    //HACK: But don't put the WWW-Authenticate header so the test harness doesn't trip up
-                    $fromTestHarness = $this->app->request->headers->get("x-mapguide-test-harness");
-                    if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
-                        $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
-                    $this->app->halt(401, "You must enter username/password");
+                    $this->Unauthorized();
                 }
             }
         }
