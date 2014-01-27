@@ -79,6 +79,38 @@ class MgDataController extends MgBaseController {
     }
 
     public function HandleGet($uriParts, $extension) {
+        $this->HandleMethod($uriParts, $extension, "GET");
+    }
+
+    public function HandleGetSingle($uriParts, $id, $extension) {
+        $this->HandleMethodSingle($uriPart, $id, $extension, "GET");
+    }
+
+    public function HandlePost($uriParts, $extension) {
+        $this->HandleMethod($uriParts, $extension, "POST");
+    }
+
+    public function HandlePostSingle($uriParts, $id, $extension) {
+        $this->HandleMethodSingle($uriPart, $id, $extension, "POST");
+    }
+
+    public function HandlePut($uriParts, $extension) {
+        $this->HandleMethod($uriParts, $extension, "PUT");
+    }
+
+    public function HandlePutSingle($uriParts, $id, $extension) {
+        $this->HandleMethodSingle($uriPart, $id, $extension, "PUT");
+    }
+
+    public function HandleDelete($uriParts, $extension) {
+        $this->HandleMethod($uriParts, $extension, "DELETE");
+    }
+
+    public function HandleDeleteSingle($uriParts, $id, $extension) {
+        $this->HandleMethodSingle($uriPart, $id, $extension, "DELETE");
+    }
+
+    private function HandleMethod($uriParts, $extension, $method) {
         $uriPath = implode("/", $uriParts);
         $this->EnsureAuthenticationForSite();
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
@@ -86,7 +118,7 @@ class MgDataController extends MgBaseController {
             $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
         } else {
             $config = json_decode(file_get_contents($path), true);
-            $result = $this->ValidateConfiguration($config, $extension, "GET");
+            $result = $this->ValidateConfiguration($config, $extension, $method);
             if (!$this->container->offsetExists($result->adapterName)) {
                 throw new Exception("Adapter (".$result->adapterName.") not defined or registered"); //TODO: Localize
             }
@@ -97,11 +129,11 @@ class MgDataController extends MgBaseController {
             $this->container["AdapterConfig"] = $result->config;
             $this->container["FeatureClass"] = $result->className;
             $adapter = $this->container[$result->adapterName];
-            $adapter->HandleMethod("GET", false);
+            $adapter->HandleMethod($method, false);
         }
     }
 
-    public function HandleGetSingle($uriParts, $id, $extension) {
+    private function HandleMethodSingle($uriParts, $id, $extension, $method) {
         $uriPath = implode("/", $uriParts);
         $this->EnsureAuthenticationForSite();
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
@@ -109,7 +141,7 @@ class MgDataController extends MgBaseController {
             $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
         } else {
             $config = json_decode(file_get_contents($path), true);
-            $result = $this->ValidateConfiguration($config, $extension, "GET");
+            $result = $this->ValidateConfiguration($config, $extension, $method);
             if (!$this->container->offsetExists($result->adapterName)) {
                 throw new Exception("Adapter (".$result->adapterName.") not defined or registered"); //TODO: Localize
             }
@@ -121,7 +153,7 @@ class MgDataController extends MgBaseController {
             $this->container["FeatureClass"] = $result->className;
             $adapter = $this->container[$result->adapterName];
             $adapter->SetFeatureId($id);
-            $adapter->HandleMethod("GET", true);
+            $adapter->HandleMethod($method, true);
         }
     }
 }

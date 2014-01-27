@@ -341,14 +341,14 @@ class MgUtils
         return $props;
     }
 
-    public static function ParseMultiFeatureXml($classDef, $xml, $featureNodeName = "feature", $propertyNodeName = "Property") {
+    public static function ParseMultiFeatureXml($classDef, $xml, $featureNodeName = "Feature", $propertyNodeName = "Property") {
         $doc = new DOMDocument();
         $doc->loadXML($xml);
 
         return MgUtils::ParseMultiFeatureDocument($classDef, $doc, $featureNodeName, $propertyNodeName);
     }
 
-    public static function ParseMultiFeatureDocument($classDef, $doc, $featureNodeName = "feature", $propertyNodeName = "Property") {
+    public static function ParseMultiFeatureDocument($classDef, $doc, $featureNodeName = "Feature", $propertyNodeName = "Property") {
         $batchProps = new MgBatchPropertyCollection();
         $featureNodes = $doc->getElementsByTagName($featureNodeName);
 
@@ -365,7 +365,7 @@ class MgUtils
         return $batchProps;
     }
 
-    public static function ParseSingleFeatureDocument($classDef, $doc, $featureNodeName = "feature", $propertyNodeName = "Property") {
+    public static function ParseSingleFeatureDocument($classDef, $doc, $featureNodeName = "Feature", $propertyNodeName = "Property") {
         $wktRw = new MgWktReaderWriter();
         $agfRw = new MgAgfReaderWriter();
         $classProps = $classDef->GetProperties();
@@ -378,7 +378,7 @@ class MgUtils
         return $props;
     }
 
-    public static function ParseSingleFeatureXml($classDef, $xml, $featureNodeName = "feature", $propertyNodeName = "Property") {
+    public static function ParseSingleFeatureXml($classDef, $xml, $featureNodeName = "Feature", $propertyNodeName = "Property") {
         $doc = new DOMDocument($xml);
         $doc->loadXML($xml);
 

@@ -35,6 +35,16 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     }
 
     /**
+     * Returns true if the given HTTP method is supported. Overridable.
+     */
+    public function SupportsMethod($method) {
+        return strtoupper($method) === "GET" ||
+               strtoupper($method) === "POST" ||
+               strtoupper($method) === "PUT" ||
+               strtoupper($method) === "DELETE";
+    }
+
+    /**
      * Initializes the adapater with the given REST configuration
      */
     protected function InitAdapterConfig($config) {
@@ -186,28 +196,89 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
      * Handles POST requests for this adapter. Overridable. Does nothing if not overridden.
      */
     public function HandlePost($single) {
-        $commands = new MgFeatureCommandCollection();
-        $classDef = $this->featSvc->GetClassDefinition($resId, $schemaName, $className);
-        $batchProps = MgUtils::ParseMultiFeatureXml($classDef, $this->app->request->getBody());
-        $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
-        $commands->Add($insertCmd);
+        try {
+            $tokens = explode(":", $this->className);
+            $schemaName = $tokens[0];
+            $className = $tokens[1];
+            $commands = new MgFeatureCommandCollection();
+            $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
+            $batchProps = MgUtils::ParseMultiFeatureXml($classDef, $this->app->request->getBody());
+            $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
+            $commands->Add($insertCmd);
 
-        $result = $this->featSvc->UpdateFeatures($resId, $commands, false);
-        $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
+            $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, false);
+            $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
     }
 
     /**
      * Handles PUT requests for this adapter. Overridable. Does nothing if not overridden.
      */
     public function HandlePut($single) {
+        try {
+            $tokens = explode(":", $this->className);
+            $schemaName = $tokens[0];
+            $className = $tokens[1];
+            $doc = new DOMDocument();
+            $doc->loadXML($this->app->request->getBody());
 
+            $commands = new MgFeatureCommandCollection();
+
+            $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
+            $filter = "";
+            //If single-record, infer filter from URI
+            if ($single === true) {
+                $idProps = $classDef->GetIdentityProperties();
+                if ($idProps->GetCount() != 1) {
+                    $app->halt(400, "Cannot apply update. The value (".$this->featureId.") is not enough to uniquely identify the feature to be updated. Class definition has ".$idProps->GetCount()." identity properties"); //TODO: Localize
+                } else {
+                    $idProp = $idProps->GetItem(0);
+                    if ($idProp->GetDataType() == MgPropertyType::String) {
+                        $filter = $idProp->GetName()." = '".$this->featureId."'";
+                    } else {
+                        $filter = $idProp->GetName()." = ".$this->featureId;
+                    }
+                }
+            } else { //Otherwise, use the filter from the request envelope (if specified)
+                $filterNode = $doc->getElementsByTagName("Filter");
+                if ($filterNode->length == 1)
+                    $filter = $filterNode->item(0)->nodeValue;
+            }
+            $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
+            $props = MgUtils::ParseSingleFeatureDocument($classDef, $doc, "UpdateProperties");
+            $updateCmd = new MgUpdateFeatures("$schemaName:$className", $props, $filter);
+            $commands->Add($updateCmd);
+
+            $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, false);
+            $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
     }
 
     /**
      * Handles DELETE requests for this adapter. Overridable. Does nothing if not overridden.
      */
     public function HandleDelete($single) {
+        try {
+            $tokens = explode(":", $this->className);
+            $schemaName = $tokens[0];
+            $className = $tokens[1];
+            $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
+            $commands = new MgFeatureCommandCollection();
+            $filter = $this->app->request->params("filter");
+            if ($filter == null)
+                $filter = "";
+            $deleteCmd = new MgDeleteFeatures("$schemaName:$className", $filter);
+            $commands->Add($deleteCmd);
 
+            $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, false);
+            $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
     }
 }
 

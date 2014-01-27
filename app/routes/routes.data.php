@@ -37,5 +37,44 @@ $app->get("/data/:args+/:filename", function($args, $filename) use ($app, $conta
         $ctrl->HandleGet($args, substr($filename, 1));
     }
 });
+$app->post("/data/:args+/:filename", function($args, $filename) use ($app, $container) {
+    $tokens = explode(".", $filename);
+    $ctrl = new MgDataController($app, $container);
+    if (count($tokens) == 2) {
+        if (strlen($tokens[0]) === 0) {
+            $ctrl->HandlePost($args, $tokens[1]);
+        } else {
+            $ctrl->HandlePostSingle($args, $tokens[0], $tokens[1]);
+        }
+    } else {
+        $ctrl->HandlePost($args, substr($filename, 1));
+    }
+});
+$app->put("/data/:args+/:filename", function($args, $filename) use ($app, $container) {
+    $tokens = explode(".", $filename);
+    $ctrl = new MgDataController($app, $container);
+    if (count($tokens) == 2) {
+        if (strlen($tokens[0]) === 0) {
+            $ctrl->HandlePut($args, $tokens[1]);
+        } else {
+            $ctrl->HandlePutSingle($args, $tokens[0], $tokens[1]);
+        }
+    } else {
+        $ctrl->HandlePut($args, substr($filename, 1));
+    }
+});
+$app->delete("/data/:args+/:filename", function($args, $filename) use ($app, $container) {
+    $tokens = explode(".", $filename);
+    $ctrl = new MgDataController($app, $container);
+    if (count($tokens) == 2) {
+        if (strlen($tokens[0]) === 0) {
+            $ctrl->HandleDelete($args, $tokens[1]);
+        } else {
+            $ctrl->HandleDeleteSingle($args, $tokens[0], $tokens[1]);
+        }
+    } else {
+        $ctrl->HandleDelete($args, substr($filename, 1));
+    }
+});
 
 ?>
