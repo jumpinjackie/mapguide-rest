@@ -17,12 +17,13 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+require_once dirname(__FILE__)."/../core/responsehandler.php";
+
 /**
  * The base class of all REST adapters
  */
-abstract class MgRestAdapter
+abstract class MgRestAdapter extends MgResponseHandler
 {
-    protected $app;
     protected $featureSourceId;
     protected $siteConn;
     protected $className;
@@ -31,8 +32,8 @@ abstract class MgRestAdapter
     protected $featureId;
 
     protected function __construct($app, $siteConn, $resId, $className, $config) {
+        parent::__construct($app);
         $this->featureId = null;
-        $this->app = $app;
         $this->featureSourceId = $resId;
         $this->siteConn = $siteConn;
         $this->className = $className;

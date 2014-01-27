@@ -181,6 +181,34 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     protected function GetResponseEnd($reader) {
         $this->app->response->write("</Features></FeatureSet>");
     }
+
+    /**
+     * Handles POST requests for this adapter. Overridable. Does nothing if not overridden.
+     */
+    public function HandlePost($single) {
+        $commands = new MgFeatureCommandCollection();
+        $classDef = $this->featSvc->GetClassDefinition($resId, $schemaName, $className);
+        $batchProps = MgUtils::ParseMultiFeatureXml($classDef, $this->app->request->getBody());
+        $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
+        $commands->Add($insertCmd);
+
+        $result = $this->featSvc->UpdateFeatures($resId, $commands, false);
+        $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
+    }
+
+    /**
+     * Handles PUT requests for this adapter. Overridable. Does nothing if not overridden.
+     */
+    public function HandlePut($single) {
+
+    }
+
+    /**
+     * Handles DELETE requests for this adapter. Overridable. Does nothing if not overridden.
+     */
+    public function HandleDelete($single) {
+
+    }
 }
 
 ?>
