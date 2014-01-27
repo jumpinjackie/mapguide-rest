@@ -57,11 +57,12 @@ class MgUtils
         return new MgResourceIdentifier($resIdStr);
     }
 
-    public static function StringEndsWith($string, $test) {
-        $strlen = strlen($string);
-        $testlen = strlen($test);
-        if ($testlen > $strlen) return false;
-        return substr_compare($string, $test, -$testlen) === 0;
+    public static function StringStartsWith($haystack, $needle) {
+        return $needle === "" || strpos($haystack, $needle) === 0;
+    }
+
+    public static function StringEndsWith($haystack, $needle) {
+        return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
     }
 
     public static function EscapeJsonString($str) {
@@ -190,6 +191,25 @@ class MgUtils
         $doc->loadXML($xml);
         $root = $doc->documentElement;
         echo '{"' . $root->tagName . '":' . MgUtils::DomElementToJson($root) . '}'; 
+    }
+
+    public static function XslTransformByteReader($byteReader, $xslStylesheet, $xslParams) {
+        $xslPath = dirname(__FILE__)."/../res/xsl/$xslStylesheet";
+        
+        $xsl = new DOMDocument();
+        $xsl->load($xslPath);
+
+        $doc = new DOMDocument();
+        $doc->loadXML($byteReader->ToString());
+
+        $xslt = new XSLTProcessor();
+        $xslt->importStylesheet($xsl);
+
+        foreach ($xslParams as $key => $value) {
+            $xslt->setParameter('', $key, $value);
+        }
+
+        return $xslt->transformToXml($doc);
     }
 }
 

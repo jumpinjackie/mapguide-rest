@@ -31,10 +31,14 @@ class MgCoordinateSystemController extends MgBaseController {
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
             $param->AddParameter("OPERATION", "CS.ENUMERATECATEGORIES");
             $param->AddParameter("VERSION", "1.0.0");
-            if ($fmt === "json")
+            if ($fmt === "json") {
                 $param->AddParameter("FORMAT", MgMimeType::Json);
-            else
+            } else if ($fmt === "xml") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+            } else if ($fmt === "html") {
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("XSLSTYLESHEET", "CoordinateSystemCategoryList.xsl");
+            }
             $that->ExecuteHttpRequest($req);
         });
     }
@@ -46,10 +50,14 @@ class MgCoordinateSystemController extends MgBaseController {
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $category) {
             $param->AddParameter("OPERATION", "CS.ENUMERATECOORDINATESYSTEMS");
             $param->AddParameter("VERSION", "1.0.0");
-            if ($fmt === "json")
+            if ($fmt === "json") {
                 $param->AddParameter("FORMAT", MgMimeType::Json);
-            else
+            } else if ($fmt === "xml") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+            } else if ($fmt === "html") {
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("XSLSTYLESHEET", "CoordinateSystemList.xsl");
+            }
             $param->AddParameter("CSCATEGORY", $category);
             $that->ExecuteHttpRequest($req);
         });

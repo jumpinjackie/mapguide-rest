@@ -111,16 +111,20 @@ class MgFeatureServiceController extends MgBaseController {
 
     public function GetFeatureProviders($format) {
         //Check for unsupported representations
-        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
             $param->AddParameter("OPERATION", "GETFEATUREPROVIDERS");
             $param->AddParameter("VERSION", "1.0.0");
-            if ($fmt === "json")
+            if ($fmt === "json") {
                 $param->AddParameter("FORMAT", MgMimeType::Json);
-            else
+            } else if ($fmt === "xml") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+            } else if ($fmt === "html") {
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("XSLSTYLESHEET", "FdoProviderList.xsl");
+            }
             $that->ExecuteHttpRequest($req);
         });
     }
@@ -146,17 +150,21 @@ class MgFeatureServiceController extends MgBaseController {
 
     public function GetSchemaNames($resId, $format) {
         //Check for unsupported representations
-        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
         $resIdStr = $resId->ToString();
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr) {
             $param->AddParameter("OPERATION", "GETSCHEMAS");
             $param->AddParameter("VERSION", "1.0.0");
-            if ($fmt === "json")
+            if ($fmt === "json") {
                 $param->AddParameter("FORMAT", MgMimeType::Json);
-            else
+            } else if ($fmt === "xml") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+            } else if ($fmt === "html") {
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("XSLSTYLESHEET", "FeatureSchemaNameList.xsl");
+            }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
         });
@@ -164,17 +172,21 @@ class MgFeatureServiceController extends MgBaseController {
 
     public function DescribeSchema($resId, $schemaName, $format) {
         //Check for unsupported representations
-        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
         $resIdStr = $resId->ToString();
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $resIdStr) {
             $param->AddParameter("OPERATION", "DESCRIBEFEATURESCHEMA");
             $param->AddParameter("VERSION", "1.0.0");
-            if ($fmt === "json")
+            if ($fmt === "json") {
                 $param->AddParameter("FORMAT", MgMimeType::Json);
-            else
+            } else if ($fmt === "xml") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+            } else if ($fmt === "html") {
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("XSLSTYLESHEET", "FeatureSchema.xsl");
+            }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $param->AddParameter("SCHEMA", $schemaName);
             $that->ExecuteHttpRequest($req);

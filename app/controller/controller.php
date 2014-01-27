@@ -226,7 +226,7 @@ class MgBaseController
         if ($statusMessage === "MgAuthenticationFailedException" || $statusMessage === "MgUnauthorizedAccessException") {
             //Send back 401
             //HACK: But don't put the WWW-Authenticate header so the test harness doesn't trip up
-            $fromTestHarness = $this->app->request->header("x-mapguide-test-harness");
+            $fromTestHarness = $this->app->request->headers->get("x-mapguide-test-harness");
             if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
                 $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
             $this->app->halt(401, "You must enter a valid login ID and password to access this site"); //TODO: Localize
@@ -267,6 +267,22 @@ class MgBaseController
         }
     }
 
+    private function CollectXslParameters($param) {
+        $names = $param->GetParameterNames();
+        if ($names == null || $names->GetCount() == 0)
+            return array();
+
+        $values = array();
+        for ($i = 0; $i < $names->GetCount(); $i++) {
+            $name = $names->GetItem($i);
+            if (MgUtils::StringStartsWith($name, "XSLPARAM.")) {
+                $val = $param->GetParameterValue($name);
+                $names[substr($name, strlen("XSLPARAM."))] = $val;
+            }
+        }
+        return $values;
+    }
+
     public function ExecuteHttpRequest($req, $chunkResult = false) {
         $param = $req->GetRequestParam();
         $response = $req->Execute();
@@ -281,7 +297,12 @@ class MgBaseController
                     if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
                         $this->OutputXmlByteReaderAsJson($resultObj);
                     } else {
-                        $this->OutputByteReader($resultObj, $chunkResult);
+                        if ($result->GetResultContentType() === MgMimeType::Xml && $param->ContainsParameter("XSLSTYLESHEET")) {
+                            $this->app->response->header("Content-Type", MgMimeType::Html);
+                            $this->app->response->setBody(MgUtils::XslTransformByteReader($resultObj, $param->GetParameterValue("XSLSTYLESHEET"), $this->CollectXslParameters($param)));
+                        } else {
+                            $this->OutputByteReader($resultObj, $chunkResult);
+                        }
                     }
                 } else if ($resultObj instanceof MgStringCollection) {
                     $this->OutputMgStringCollection($resultObj, $param->GetParameterValue("FORMAT"));
@@ -296,6 +317,9 @@ class MgBaseController
             }
         } else {
             $format = $param->GetParameterValue("FORMAT");
+            if ($param->ContainsParameter("XSLSTYLESHEET"))
+                $format = MgMimeType::Html;
+
             if ($format != "") {
                 $this->OutputError($result, $format);
             } else {
@@ -404,7 +428,7 @@ class MgBaseController
                 } else {
                     //Send back 401
                     //HACK: But don't put the WWW-Authenticate header so the test harness doesn't trip up
-                    $fromTestHarness = $this->app->request->header("x-mapguide-test-harness");
+                    $fromTestHarness = $this->app->request->headers->get("x-mapguide-test-harness");
                     if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
                         $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
                     $this->app->halt(401, "You must enter a valid login ID and password to access this site"); //TODO: Localize
@@ -495,7 +519,7 @@ class MgBaseController
                 } else {
                     //Send back 401
                     //HACK: But don't put the WWW-Authenticate header so the test harness doesn't trip up
-                    $fromTestHarness = $this->app->request->header("x-mapguide-test-harness");
+                    $fromTestHarness = $this->app->request->headers->get("x-mapguide-test-harness");
                     if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
                         $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
                     $this->app->halt(401, "You must enter username/password");
