@@ -23,6 +23,7 @@ include dirname(__FILE__)."/../mapadmin/constants.php";
 
 require_once dirname(__FILE__)."/app/adapters/featurexmladapter.php";
 require_once dirname(__FILE__)."/app/adapters/geojsonadapter.php";
+require_once dirname(__FILE__)."/app/adapters/mapimageadapter.php";
 
 $webConfigPath = dirname(__FILE__)."/../webconfig.ini";
 MgInitializeWebTier($webConfigPath);
@@ -36,6 +37,9 @@ $container["FeatureSetXml"] = function($container) use ($app) {
 };
 $container["FeatureSetGeoJson"] = function($container) use ($app) {
     return new MgGeoJsonRestAdapter($app, $container["MgSiteConnection"], $container["FeatureSource"], $container["FeatureClass"], $container["AdapterConfig"]);
+};
+$container["MapImage"] = function($container) use ($app) {
+    return new MgMapImageRestAdapter($app, $container["MgSiteConnection"], $container["FeatureSource"], $container["FeatureClass"], $container["AdapterConfig"]);
 };
 
 //Set the root dir of this file for code that needs to know about it

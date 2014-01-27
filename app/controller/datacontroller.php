@@ -83,7 +83,7 @@ class MgDataController extends MgBaseController {
     }
 
     public function HandleGetSingle($uriParts, $id, $extension) {
-        $this->HandleMethodSingle($uriPart, $id, $extension, "GET");
+        $this->HandleMethodSingle($uriParts, $id, $extension, "GET");
     }
 
     public function HandlePost($uriParts, $extension) {
@@ -91,7 +91,7 @@ class MgDataController extends MgBaseController {
     }
 
     public function HandlePostSingle($uriParts, $id, $extension) {
-        $this->HandleMethodSingle($uriPart, $id, $extension, "POST");
+        $this->HandleMethodSingle($uriParts, $id, $extension, "POST");
     }
 
     public function HandlePut($uriParts, $extension) {
@@ -99,7 +99,7 @@ class MgDataController extends MgBaseController {
     }
 
     public function HandlePutSingle($uriParts, $id, $extension) {
-        $this->HandleMethodSingle($uriPart, $id, $extension, "PUT");
+        $this->HandleMethodSingle($uriParts, $id, $extension, "PUT");
     }
 
     public function HandleDelete($uriParts, $extension) {
@@ -107,7 +107,7 @@ class MgDataController extends MgBaseController {
     }
 
     public function HandleDeleteSingle($uriParts, $id, $extension) {
-        $this->HandleMethodSingle($uriPart, $id, $extension, "DELETE");
+        $this->HandleMethodSingle($uriParts, $id, $extension, "DELETE");
     }
 
     private function HandleMethod($uriParts, $extension, $method) {

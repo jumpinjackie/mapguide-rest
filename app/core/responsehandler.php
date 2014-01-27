@@ -27,6 +27,85 @@ abstract class MgResponseHandler
         $this->app = $app;
     }
 
+    protected function CollectXslParameters($param) {
+        $names = $param->GetParameterNames();
+        if ($names == null || $names->GetCount() == 0)
+            return array();
+
+        $values = array();
+        for ($i = 0; $i < $names->GetCount(); $i++) {
+            $name = $names->GetItem($i);
+            if (MgUtils::StringStartsWith($name, "XSLPARAM.")) {
+                $val = $param->GetParameterValue($name);
+                $values[substr($name, strlen("XSLPARAM."))] = $val;
+            }
+        }
+        return $values;
+    }
+
+    public function ExecuteHttpRequest($req, $chunkResult = false) {
+        $param = $req->GetRequestParam();
+        $response = $req->Execute();
+        $result = $response->GetResult();
+
+        $status = $result->GetStatusCode();
+        if ($status == 200) {
+            $resultObj = $result->GetResultObject();
+            if ($resultObj != null) {
+                $this->app->response->headers->set("Content-Type", $result->GetResultContentType());
+                if ($resultObj instanceof MgByteReader) {
+                    if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
+                        $this->OutputXmlByteReaderAsJson($resultObj);
+                    } else {
+                        if ($result->GetResultContentType() === MgMimeType::Xml && $param->ContainsParameter("XSLSTYLESHEET")) {
+                            $this->app->response->header("Content-Type", MgMimeType::Html);
+                            $this->app->response->setBody(MgUtils::XslTransformByteReader($resultObj, $param->GetParameterValue("XSLSTYLESHEET"), $this->CollectXslParameters($param)));
+                        } else {
+                            $this->OutputByteReader($resultObj, $chunkResult);
+                        }
+                    }
+                } else if ($resultObj instanceof MgStringCollection) {
+                    $this->OutputMgStringCollection($resultObj, $param->GetParameterValue("FORMAT"));
+                } else if ($resultObj instanceof MgHttpPrimitiveValue) {
+                    $this->app->response->setBody($resultObj->ToString());
+                } else if (method_exists($resultObj, "ToXml")) {
+                    $byteReader = $resultObj->ToXml();
+                    $this->OutputByteReader($byteReader, $chunkResult);
+                } else {
+                    throw new Exception("Could not determine how to output: ".$resultObj->ToString()); //TODO: Localize
+                }
+            }
+        } else {
+            $format = $param->GetParameterValue("FORMAT");
+            if ($param->ContainsParameter("XSLSTYLESHEET"))
+                $format = MgMimeType::Html;
+
+            if ($format != "") {
+                $this->OutputError($result, $format);
+            } else {
+                $this->OutputError($result);
+            }
+            //throw new Exception("Error executing operation: ".$param->GetParameterValue("OPERATION").". The status code is: $status"); //TODO: Localize
+        }
+        return $status;
+    }
+
+    private function OutputError($result, $mimeType = MgMimeType::Html) {
+        $statusMessage = $result->GetHttpStatusMessage();
+        $e = new Exception();
+        if ($statusMessage === "MgAuthenticationFailedException" || $statusMessage === "MgUnauthorizedAccessException") {
+            $this->Unauthorized();
+        } else {
+            $this->app->response->header("Content-Type", $mimeType);
+            //Amend error code for certain classes of errors
+            $status = 500;
+            if ($statusMessage === "MgResourceNotFoundException" || $statusMessage === "MgResourceDataNotFoundException") {
+                $status = 404;
+            }
+            $this->OutputException($statusMessage, $result->GetErrorMessage(), $result->GetDetailedErrorMessage(), $e->getTraceAsString(), $status, $mimeType);
+        }
+    }
+
     protected function GetClientIp() {
         //TODO: Ripped from AJAX viewer. Use the abstractions provided by Slim
         $clientIp = '';
