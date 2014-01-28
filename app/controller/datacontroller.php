@@ -21,11 +21,8 @@ require_once "controller.php";
 
 class MgDataController extends MgBaseController {
 
-    private $container;
-
-    public function __construct($app, $container) {
+    public function __construct($app) {
         parent::__construct($app);
-        $this->container = $container;
     }
 
     public function GetDataConfiguration($uriParts) {
@@ -119,16 +116,17 @@ class MgDataController extends MgBaseController {
         } else {
             $config = json_decode(file_get_contents($path), true);
             $result = $this->ValidateConfiguration($config, $extension, $method);
-            if (!$this->container->offsetExists($result->adapterName)) {
+            if (!$this->app->container->has($result->adapterName)) {
                 throw new Exception("Adapter (".$result->adapterName.") not defined or registered"); //TODO: Localize
             }
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
-            $this->container["MgSiteConnection"] = $siteConn;
-            $this->container["FeatureSource"] = $result->resId;
-            $this->container["AdapterConfig"] = $result->config;
-            $this->container["FeatureClass"] = $result->className;
-            $adapter = $this->container[$result->adapterName];
+            $this->app->MgSiteConnection = $siteConn;
+            $this->app->FeatureSource = $result->resId;
+            $this->app->AdapterConfig = $result->config;
+            $this->app->FeatureClass = $result->className;
+            $this->app->ConfigPath = dirname($path);
+            $adapter = $this->app->container[$result->adapterName];
             $adapter->HandleMethod($method, false);
         }
     }
@@ -142,16 +140,17 @@ class MgDataController extends MgBaseController {
         } else {
             $config = json_decode(file_get_contents($path), true);
             $result = $this->ValidateConfiguration($config, $extension, $method);
-            if (!$this->container->offsetExists($result->adapterName)) {
+            if (!$this->app->container->has($result->adapterName)) {
                 throw new Exception("Adapter (".$result->adapterName.") not defined or registered"); //TODO: Localize
             }
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
-            $this->container["MgSiteConnection"] = $siteConn;
-            $this->container["FeatureSource"] = $result->resId;
-            $this->container["AdapterConfig"] = $result->config;
-            $this->container["FeatureClass"] = $result->className;
-            $adapter = $this->container[$result->adapterName];
+            $this->app->MgSiteConnection = $siteConn;
+            $this->app->FeatureSource = $result->resId;
+            $this->app->AdapterConfig = $result->config;
+            $this->app->FeatureClass = $result->className;
+            $this->app->ConfigPath = dirname($path);
+            $adapter = $this->app->container[$result->adapterName];
             $adapter->SetFeatureId($id);
             $adapter->HandleMethod($method, true);
         }

@@ -18,29 +18,15 @@
 //
 
 require 'vendor/autoload.php';
-require_once dirname(__FILE__)."/app/lib/pimple.php";
+//require_once dirname(__FILE__)."/app/lib/pimple.php";
 include dirname(__FILE__)."/../mapadmin/constants.php";
-
-require_once dirname(__FILE__)."/app/adapters/featurexmladapter.php";
-require_once dirname(__FILE__)."/app/adapters/geojsonadapter.php";
-require_once dirname(__FILE__)."/app/adapters/mapimageadapter.php";
 
 $webConfigPath = dirname(__FILE__)."/../webconfig.ini";
 MgInitializeWebTier($webConfigPath);
 
 $app = new \Slim\Slim();
-
 //Register known REST adapters to our pimple container
-$container = new Pimple();
-$container["FeatureSetXml"] = function($container) use ($app) {
-    return new MgFeatureXmlRestAdapter($app, $container["MgSiteConnection"], $container["FeatureSource"], $container["FeatureClass"], $container["AdapterConfig"]);
-};
-$container["FeatureSetGeoJson"] = function($container) use ($app) {
-    return new MgGeoJsonRestAdapter($app, $container["MgSiteConnection"], $container["FeatureSource"], $container["FeatureClass"], $container["AdapterConfig"]);
-};
-$container["MapImage"] = function($container) use ($app) {
-    return new MgMapImageRestAdapter($app, $container["MgSiteConnection"], $container["FeatureSource"], $container["FeatureClass"], $container["AdapterConfig"]);
-};
+include dirname(__FILE__)."/app/adapters/registration.php";
 
 //Set the root dir of this file for code that needs to know about it
 $app->config("AppRootDir", dirname(__FILE__));

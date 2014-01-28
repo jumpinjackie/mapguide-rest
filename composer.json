@@ -1,5 +1,6 @@
 {
     "require": {
-        "slim/slim": "2.x"
+        "slim/slim": "2.x",
+        "smarty/smarty": "3.*"
     }
 }

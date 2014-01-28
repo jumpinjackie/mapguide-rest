@@ -29,11 +29,11 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
     private $read;
     private $firstFeature;
 
-    public function __construct($app, $siteConn, $resId, $className, $config) {
+    public function __construct($app, $siteConn, $resId, $className, $config, $configPath) {
         $this->transform = null;
         $this->limit = -1;
         $this->read = 0;
-        parent::__construct($app, $siteConn, $resId, $className, $config);
+        parent::__construct($app, $siteConn, $resId, $className, $config, $configPath);
     }
 
     /**

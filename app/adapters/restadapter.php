@@ -30,12 +30,15 @@ abstract class MgRestAdapter extends MgResponseHandler
 
     protected $featSvc;
     protected $featureId;
+    protected $configPath;
 
-    protected function __construct($app, $siteConn, $resId, $className, $config) {
+    protected function __construct($app, $siteConn, $resId, $className, $config, $configPath) {
         parent::__construct($app);
+        $this->configPath = $configPath;
         $this->featureId = null;
         $this->featureSourceId = $resId;
         $this->siteConn = $siteConn;
+        $this->featSvc = $this->siteConn->CreateService(MgServiceType::FeatureService);
         $this->className = $className;
         $this->InitAdapterConfig($config);
     }
@@ -80,6 +83,10 @@ abstract class MgRestAdapter extends MgResponseHandler
                     $query->SetFilter($idProp->GetName()." = ".$this->featureId);
                 }
             }
+        } else {
+            $flt = $this->app->request->get("filter");
+            if ($flt != null)
+                $query->SetFilter($flt);
         }
         return $query;
     }
@@ -150,9 +157,8 @@ abstract class MgRestAdapter extends MgResponseHandler
  * allowing for subclasses to handle the MgReader output logic
  */
 abstract class MgFeatureRestAdapter extends MgRestAdapter { 
-    public function __construct($app, $siteConn, $resId, $className, $config) {
-        parent::__construct($app, $siteConn, $resId, $className, $config);
-        $this->featSvc = $this->siteConn->CreateService(MgServiceType::FeatureService);
+    public function __construct($app, $siteConn, $resId, $className, $config, $configPath) {
+        parent::__construct($app, $siteConn, $resId, $className, $config, $configPath);
     }
 
     protected function CreateReader($single) {

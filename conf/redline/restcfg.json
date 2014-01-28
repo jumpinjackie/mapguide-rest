@@ -1,0 +1,28 @@
+{
+    "Source": {
+        "Type": "MapGuide",
+        "FeatureSource": "Library://RedlineLayer.FeatureSource",
+        "FeatureClass": "MarkupSchema:Markup"
+    },
+    "Representations": {
+        "xml": {
+            "Adapter": "FeatureSetXml",
+            "Methods": {
+                "GET": {
+                    "MaxCount": 500
+                },
+                "POST": { },
+                "PUT": { },
+                "DELETE": { }
+            }
+        },
+        "geojson": {
+            "Adapter": "FeatureSetGeoJson",
+            "Methods": {
+                "GET": {
+                    "MaxCount": 500
+                }
+            }
+        }
+    }
+}

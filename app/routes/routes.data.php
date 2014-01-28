@@ -20,13 +20,13 @@
 require_once dirname(__FILE__)."/../controller/datacontroller.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
-$app->get("/data/:args+/config", function($args) use ($app, $container) {
-    $ctrl = new MgDataController($app, $container);
+$app->get("/data/:args+/config", function($args) use ($app) {
+    $ctrl = new MgDataController($app);
     $ctrl->GetDataConfiguration($args);
 });
-$app->get("/data/:args+/:filename", function($args, $filename) use ($app, $container) {
+$app->get("/data/:args+/:filename", function($args, $filename) use ($app) {
     $tokens = explode(".", $filename);
-    $ctrl = new MgDataController($app, $container);
+    $ctrl = new MgDataController($app);
     if (count($tokens) == 2) {
         if (strlen($tokens[0]) === 0) {
             $ctrl->HandleGet($args, $tokens[1]);
@@ -37,9 +37,9 @@ $app->get("/data/:args+/:filename", function($args, $filename) use ($app, $conta
         $ctrl->HandleGet($args, substr($filename, 1));
     }
 });
-$app->post("/data/:args+/:filename", function($args, $filename) use ($app, $container) {
+$app->post("/data/:args+/:filename", function($args, $filename) use ($app) {
     $tokens = explode(".", $filename);
-    $ctrl = new MgDataController($app, $container);
+    $ctrl = new MgDataController($app);
     if (count($tokens) == 2) {
         if (strlen($tokens[0]) === 0) {
             $ctrl->HandlePost($args, $tokens[1]);
@@ -50,9 +50,9 @@ $app->post("/data/:args+/:filename", function($args, $filename) use ($app, $cont
         $ctrl->HandlePost($args, substr($filename, 1));
     }
 });
-$app->put("/data/:args+/:filename", function($args, $filename) use ($app, $container) {
+$app->put("/data/:args+/:filename", function($args, $filename) use ($app) {
     $tokens = explode(".", $filename);
-    $ctrl = new MgDataController($app, $container);
+    $ctrl = new MgDataController($app);
     if (count($tokens) == 2) {
         if (strlen($tokens[0]) === 0) {
             $ctrl->HandlePut($args, $tokens[1]);
@@ -63,9 +63,9 @@ $app->put("/data/:args+/:filename", function($args, $filename) use ($app, $conta
         $ctrl->HandlePut($args, substr($filename, 1));
     }
 });
-$app->delete("/data/:args+/:filename", function($args, $filename) use ($app, $container) {
+$app->delete("/data/:args+/:filename", function($args, $filename) use ($app) {
     $tokens = explode(".", $filename);
-    $ctrl = new MgDataController($app, $container);
+    $ctrl = new MgDataController($app);
     if (count($tokens) == 2) {
         if (strlen($tokens[0]) === 0) {
             $ctrl->HandleDelete($args, $tokens[1]);

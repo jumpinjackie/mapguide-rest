@@ -32,13 +32,13 @@ class MgMapImageRestAdapter extends MgRestAdapter {
     private $dpi;
     private $zoomFactor;
 
-    public function __construct($app, $siteConn, $resId, $className, $config) {
+    public function __construct($app, $siteConn, $resId, $className, $config, $configPath) {
         $this->limit = 0;
         $this->mapDefId = null;
         $this->map = null;
         $this->sel = null;
 
-        parent::__construct($app, $siteConn, $resId, $className, $config);
+        parent::__construct($app, $siteConn, $resId, $className, $config, $configPath);
         $this->sessionId = "";
         $this->imgFormat = "PNG";
         $this->imgWidth = 300;

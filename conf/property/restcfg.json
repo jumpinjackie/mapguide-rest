@@ -13,6 +13,22 @@
                 }
             }
         },
+        "html": {
+            "Adapter": "Template",
+            "Methods": {
+                "GET": {
+                    "PageSize": 20,
+                    "MaxCount": 500,
+                    "MimeType": "text/html",
+                    "Templates": {
+                        "Single": "property_single.tpl",
+                        "Many": "property_many.tpl",
+                        "None": "property_none.tpl",
+                        "Error": "property_error.tpl"
+                    }
+                }
+            }
+        },
         "png": {
             "Adapter": "MapImage",
             "Methods": {
