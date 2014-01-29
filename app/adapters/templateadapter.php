@@ -3,16 +3,55 @@
 require_once "restadapter.php";
 
 /**
+ * A set of lazy-loaded geometry formatters
+ */
+class MgGeometryFormatterSet
+{
+    private $app;
+    private $formatters;
+
+    public function __construct($app) {
+        $this->app = $app;
+        $this->formatters = array();
+    }
+    
+    public function GetFormatter($formatterName) {
+        if (!array_key_exists($formatterName, $this->formatters)) {
+            if (!$this->app->container->has($formatterName)) {
+                throw new Exception("No Geometry Formatter named ".$formatterName." registered"); //TODO: Localize
+            }
+            $this->formatters[$formatterName] = $this->app->container->$formatterName;
+        }
+        return $this->formatters[$formatterName];
+    }
+}
+
+/**
  * Template model for "single" result templates
  */
 class MgFeatureModel
 {
     private $reader;
     private $data;
+    private $formatters;
 
-    public function __construct($reader) {
+    public function __construct($formatters, $reader) {
         $this->reader = $reader;
         $this->data = array();
+        $this->formatters = $formatters;
+    }
+
+    public function GeometryAsType($name, $formatterName) {
+        if (!array_key_exists($name, $this->data)) {
+            $this->data[$name] = array();
+        }
+        if (!array_key_exists($formatterName, $this->data[$name])) {
+            $fmt = $this->formatters->GetFormatter($formatterName);
+            if ($fmt == null)
+                throw new Exception("No Geometry Formatter named ".$formatterName." registered"); //TODO: Localize
+            $this->data[$name][$formatterName] = $fmt->Output($this->reader, $name, null);
+        }
+        return $this->data[$name][$formatterName];
     }
 
     public function __get($name) {
@@ -22,9 +61,8 @@ class MgFeatureModel
 
         $idx = $this->reader->GetPropertyIndex($name);
         if ($idx >= 0) {
-            $this->data[$name] = "";
+            $ptype = $this->reader->GetPropertyType($idx);
             if (!$this->reader->IsNull($idx)) {
-                $ptype = $this->reader->GetPropertyType($idx);
                 switch ($ptype) {
                     case MgPropertyType::Boolean:
                         $this->data[$name] = $this->reader->GetBoolean($idx)."";
@@ -42,7 +80,7 @@ class MgFeatureModel
                         break;
                     case MgPropertyType::Geometry:
                         {
-                            $this->data[$name] = "TODO: Geometry Value";
+                            $this->GeometryAsType($name, "GeomWKT");
                         }
                         break;
                     case MgPropertyType::Int16:
@@ -61,8 +99,18 @@ class MgFeatureModel
                         $this->data[$name] = $this->reader->GetString($idx);
                         break;
                 }
+            } else {
+                if ($ptype == MgPropertyType::Geometry) {
+                    $this->data[$name] = array();
+                } else {
+                    $this->data[$name] = "";
+                }
             }
-            return $this->data[$name];
+            if ($ptype == MgPropertyType::Geometry) {
+                return $this->data[$name]["GeomWKT"];
+            } else {
+                return $this->data[$name];
+            }
         } else {
             return "";
         }
@@ -78,12 +126,14 @@ class MgFeatureReaderModel
     private $current;
     private $read;
     private $limit;
+    private $formatters;
 
-    public function __construct($reader, $limit, $read) {
+    public function __construct($formatters, $reader, $limit, $read) {
         $this->current = null;
         $this->reader = $reader;
         $this->read = $read;
         $this->limit = $limit;
+        $this->formatters = $formatters;
     }
 
     public function Next() {
@@ -98,7 +148,7 @@ class MgFeatureReaderModel
 
     public function Current() {
         if ($this->current == null)
-            $this->current = new MgFeatureModel($this->reader);
+            $this->current = new MgFeatureModel($this->formatters, $this->reader);
         return $this->current;
     }
 }
@@ -167,7 +217,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
             if ($single === true) {
                 //Have to advance the read to initialize the record
                 if ($reader->ReadNext()) {
-                    $smarty->assign("model", new MgFeatureModel($reader));
+                    $smarty->assign("model", new MgFeatureModel(new MgGeometryFormatterSet($this->app), $reader));
                     $output = $smarty->fetch($this->singleViewPath);    
                 } else {
                     $this->app->response->setStatus(404);
@@ -175,7 +225,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
                     $output = $smarty->fetch($this->noneViewPath);
                 }
             } else {
-                $smarty->assign("model", new MgFeatureReaderModel($reader, $this->limit, $this->read));
+                $smarty->assign("model", new MgFeatureReaderModel(new MgGeometryFormatterSet($this->app), $reader, $this->limit, $this->read));
                 $output = $smarty->fetch($this->manyViewPath);
             }
             $this->app->response->header("Content-Type", $this->mimeType);

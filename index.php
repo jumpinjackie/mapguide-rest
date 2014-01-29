@@ -18,15 +18,15 @@
 //
 
 require 'vendor/autoload.php';
-//require_once dirname(__FILE__)."/app/lib/pimple.php";
 include dirname(__FILE__)."/../mapadmin/constants.php";
 
 $webConfigPath = dirname(__FILE__)."/../webconfig.ini";
 MgInitializeWebTier($webConfigPath);
 
 $app = new \Slim\Slim();
-//Register known REST adapters to our pimple container
+//Register known REST adapters and geom formatters to our DI container
 include dirname(__FILE__)."/app/adapters/registration.php";
+include dirname(__FILE__)."/app/formatters/registration.php";
 
 //Set the root dir of this file for code that needs to know about it
 $app->config("AppRootDir", dirname(__FILE__));
