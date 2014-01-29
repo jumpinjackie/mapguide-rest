@@ -11,7 +11,7 @@ mapguide-rest provides the following services:
 mapguide-rest is written in PHP and uses the following libraries:
 
  - [Slim Framework](http://www.slimframework.com/)
- - [Pimple DI container](https://github.com/fabpot/Pimple)
+ - [Smarty Template Engine](http://www.smarty.net)
 
 Requirements
 ============
@@ -31,6 +31,11 @@ Setup
  
   - http://yourservername:port/mapguide/rest
   - http://yourservername:port/mapguide/rest/index.php (if you don't have ARR installed for IIS or mod_rewrite enabled for Apache)
+
+Documentation
+=============
+
+Check out the [wiki](https://github.com/jumpinjackie/mapguide-rest/wiki) for additional information and documentation.
 
 License
 =======
