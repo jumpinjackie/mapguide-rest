@@ -13,6 +13,14 @@
                 }
             }
         },
+        "csv": {
+            "Adapter": "FeatureSetCsv",
+            "Methods": {
+                "GET": {
+                    "MaxCount": 500
+                }
+            }
+        },
         "kml": {
             "Adapter": "Template",
             "Methods": {

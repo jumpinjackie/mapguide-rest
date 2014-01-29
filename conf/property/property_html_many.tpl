@@ -3,10 +3,29 @@
     <head>
         <title>Property Results</title>
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" />
+        <script type="text/javascript">
+
+            function viewResultsAs(format) {
+                var url = window.location.href.replace(".html", "." + format);
+                window.location.href = url;
+            }
+
+        </script>
     </head>
     <body>
         <div class="container">
             <h3>Property Results</h3>
+            <div>
+                <span>View result as:</span>
+                <a href="javascript:viewResultsAs('xml')">XML</a>
+                <a href="javascript:viewResultsAs('csv')">CSV</a>
+                <a href="javascript:viewResultsAs('kml')">KML</a>
+                <a href="javascript:viewResultsAs('geojson')">GeoJSON</a>
+                <a href="javascript:viewResultsAs('png')">PNG</a>
+                <a href="javascript:viewResultsAs('png8')">PNG8</a>
+                <a href="javascript:viewResultsAs('jpg')">JPG</a>
+                <a href="javascript:viewResultsAs('gif')">GIF</a>
+            </div>
             <table class="table table-striped table-bordered table-hover">
                 <thead>
                     <tr>
