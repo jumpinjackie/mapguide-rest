@@ -39,16 +39,6 @@
                 }
             }
         },
-        "png": {
-            "Adapter": "MapImage",
-            "Methods": {
-                "GET": {
-                    "MapDefinition": "Library://Samples/Sheboygan/Maps/Sheboygan.MapDefinition",
-                    "SelectionLayer": "Parcels",
-                    "MaxCount": 100
-                }
-            }
-        },
         "png8": {
             "Adapter": "MapImage",
             "Methods": {

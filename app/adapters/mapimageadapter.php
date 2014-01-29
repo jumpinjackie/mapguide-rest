@@ -59,6 +59,8 @@ class MgMapImageRestAdapter extends MgRestAdapter {
         
         $this->mapDefId = new MgResourceIdentifier($config["MapDefinition"]);
         $this->selLayerName = $config["SelectionLayer"];
+        if (array_key_exists("ZoomFactor", $config))
+            $this->zoomFactor = floatval($config["ZoomFactor"]);
         if (array_key_exists("ImageFormat", $config))
             $this->imgFormat = $config["ImageFormat"];
     }
