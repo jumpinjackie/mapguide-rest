@@ -13,6 +13,22 @@
                 }
             }
         },
+        "kml": {
+            "Adapter": "Template",
+            "Methods": {
+                "GET": {
+                    "PageSize": 20,
+                    "MaxCount": 500,
+                    "MimeType": "application/vnd.google-earth.kml+xml",
+                    "Templates": {
+                        "Single": "property_kml_single.tpl",
+                        "Many": "property_kml_many.tpl",
+                        "None": "property_kml_none.tpl",
+                        "Error": "property_kml_error.tpl"
+                    }
+                }
+            }
+        },
         "html": {
             "Adapter": "Template",
             "Methods": {

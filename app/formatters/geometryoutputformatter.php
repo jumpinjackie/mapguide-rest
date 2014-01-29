@@ -19,9 +19,30 @@
 
 abstract class MgGeometryOutputFormatter
 {
-    protected function __construct() {}
+    private $agfRw;
+
+    protected function __construct() {
+        $this->agfRw = new MgAgfReaderWriter();
+    }
+
+    protected abstract function OutputGeom($geom);
     
-    public abstract function Output($reader, $geomName, $transform);
+    public function Output($reader, $geomName, $transform) {
+        $output = "";
+        try {
+            if (!$reader->IsNull($geomName)) {
+                if ($transform != null)
+                    $agf = $reader->GetGeometry($geomName, $transform);
+                else
+                    $agf = $reader->GetGeometry($geomName);
+                $geom = $this->agfRw->Read($agf);
+                if ($geom != null)
+                    $output = $this->OutputGeom($geom);
+            }
+        } catch (MgException $ex) {
+        }
+        return $output;
+    }
 };
 
 ?>

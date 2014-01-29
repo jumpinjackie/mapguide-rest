@@ -21,29 +21,15 @@ require_once "geometryoutputformatter.php";
 
 class MgWktGeometryOutputFormatter extends MgGeometryOutputFormatter
 {
-    private $agfRw;
     private $wktRw;
 
     public function __construct() {
         parent::__construct();
-        $this->agfRw = new MgAgfReaderWriter();
         $this->wktRw = new MgWktReaderWriter();
     }
-    
-    public function Output($reader, $geomName, $transform) {
-        $output = "";
-        try {
-            if (!$reader->IsNull($geomName)) {
-                if ($transform != null)
-                    $agf = $reader->GetGeometry($geomName, $transform);
-                else
-                    $agf = $reader->GetGeometry($geomName);
-                $geom = $this->agfRw->Read($agf);
-                $output = $this->wktRw->Write($geom);
-            }
-        } catch (MgException $ex) {
-        }
-        return $output;
+
+    protected function OutputGeom($geom) {
+        return $this->wktRw->Write($geom);
     }
 }
 

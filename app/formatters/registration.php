@@ -18,9 +18,13 @@
 //
 
 require_once "wktgeometryoutputformatter.php";
+require_once "kmlgeometryoutputformatter.php";
 
 $app->container->GeomWKT = function() {
     return new MgWktGeometryOutputFormatter();
+};
+$app->container->GeomKML = function() {
+    return new MgKmlGeometryOutputFormatter();
 };
 
 ?>
