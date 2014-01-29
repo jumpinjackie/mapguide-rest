@@ -37,14 +37,13 @@ class MgMapImageRestAdapter extends MgRestAdapter {
         $this->mapDefId = null;
         $this->map = null;
         $this->sel = null;
-
-        parent::__construct($app, $siteConn, $resId, $className, $config, $configPath);
         $this->sessionId = "";
         $this->imgFormat = "PNG";
         $this->imgWidth = 300;
         $this->imgHeight = 200;
         $this->dpi = 96;
         $this->zoomFactor = 1.3;
+        parent::__construct($app, $siteConn, $resId, $className, $config, $configPath);
     }
 
     /**
@@ -60,6 +59,8 @@ class MgMapImageRestAdapter extends MgRestAdapter {
         
         $this->mapDefId = new MgResourceIdentifier($config["MapDefinition"]);
         $this->selLayerName = $config["SelectionLayer"];
+        if (array_key_exists("ImageFormat", $config))
+            $this->imgFormat = $config["ImageFormat"];
     }
 
     /**
@@ -67,6 +68,17 @@ class MgMapImageRestAdapter extends MgRestAdapter {
      */
     public function HandleGet($single) {
         try {
+            //Apply any overrides from query string
+            $ovWidth = $this->app->request->get("width");
+            $ovHeight = $this->app->request->get("height");
+            $ovDpi = $this->app->request->get("dpi");
+            if ($ovWidth != null)
+                $this->imgWidth = $ovWidth;
+            if ($ovHeight != null)
+                $this->imgHeight = $ovHeight;
+            if ($ovDpi != null)
+                $this->dpi = $ovDpi;
+        
             $site = $this->siteConn->GetSite();
             $this->sessionId = $site->GetCurrentSession();
             if ($this->sessionId === "") {
