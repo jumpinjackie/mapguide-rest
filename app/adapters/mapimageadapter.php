@@ -130,8 +130,8 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             $req = new MgHttpRequest("");
             $param = $req->GetRequestParam();
 
-            $param->AddParameter("OPERATION", "GETDYNAMICMAPOVERLAYIMAGE");
-            $param->AddParameter("VERSION", "2.1.0");
+            $param->AddParameter("OPERATION", "GETMAPIMAGE");
+            $param->AddParameter("VERSION", "2.0.0");
             $param->AddParameter("SESSION", $this->sessionId);
             $param->AddParameter("LOCALE", $this->app->config("Locale"));
             $param->AddParameter("CLIENTAGENT", "MapGuide REST Extension");
@@ -139,6 +139,7 @@ class MgMapImageRestAdapter extends MgRestAdapter {
 
             $param->AddParameter("FORMAT", $this->imgFormat);
             $param->AddParameter("MAPNAME", $mapName);
+            $param->AddParameter("KEEPSELECTION", "1");
             $param->AddParameter("SETDISPLAYWIDTH", $this->imgWidth);
             $param->AddParameter("SETDISPLAYHEIGHT", $this->imgHeight);
             $param->AddParameter("SETDISPLAYDPI", $this->dpi);
