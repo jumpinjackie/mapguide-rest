@@ -11,7 +11,7 @@
         <div class="container">
             <h3>Property Report - {$model->RPROPAD}</h3>
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-7">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
                             Property Details
@@ -63,8 +63,34 @@
                             </table>
                         </div>
                     </div>
+                    <!--
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            Related Properties
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                    <th>ID</th>
+                                    <th>Address</th>
+                                    <th>Owner</th>
+                                    <th>Zone</th>
+                                </thead>
+                                <tbody>
+                                {* assign var=db value=$related->GetRelation('ParcelsDB') *}
+                                {* while $db->Next() *}
+                                    <td>{* $db->Current()->ID *}</td>
+                                    <td>{* $db->Current()->RPROPAD *}</td>
+                                    <td>{* $db->Current()->RNAME *}</td>
+                                    <td>{* $db->Current()->RTYPE *}</td>
+                                {* /while *}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    -->
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <div class="panel panel-primary">
                         <div class="panel-heading">Image</div>
                         <div class="panel-body">

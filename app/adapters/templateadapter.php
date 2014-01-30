@@ -119,6 +119,53 @@ class MgFeatureModel
     }
 }
 
+class MgNullFeatureModel
+{
+    public function GeometryAsType($name, $formatterName) {
+        return "";
+    }
+
+    public function __get($name) {
+        return "";
+    }
+}
+
+class MgNullFeatureReaderModel
+{
+    public function Next() { return false; }
+
+    public function Current() { return new MgNullFeatureModel(); }
+
+    public function Done() { }
+}
+
+class MgRelatedFeaturesSet
+{
+    private $relations;
+
+    public function __construct() {
+        $this->relations = array();
+    }
+
+    public function Add($relName, $relModel) {
+        $this->relations[$relName] = $relModel;
+    }
+
+    public function GetRelation($relName) {
+        if (array_key_exists($relName, $this->relations)) {
+            return $this->relations[$relName];
+        } else {
+            return new MgNullFeatureReaderModel();
+        }
+    }
+
+    public function Cleanup() {
+        foreach ($this->relations as $relName => $relModel) {
+            $relModel->Done();
+        }
+    }
+}
+
 /**
  * Template model for "many" result templates
  */
@@ -155,6 +202,10 @@ class MgFeatureReaderModel
             $this->current = new MgFeatureModel($this->formatters, $this->reader, $this->transform);
         return $this->current;
     }
+
+    public function Done() {
+        $this->reader->Close();
+    }
 }
 
 class MgTemplateRestAdapter extends MgRestAdapter
@@ -169,10 +220,13 @@ class MgTemplateRestAdapter extends MgRestAdapter
     private $errorViewPath;
     private $mimeType;
 
+    private $relations;
+
     public function __construct($app, $siteConn, $resId, $className, $config, $configPath) {
         $this->transform = null;
         $this->limit = -1;
         $this->read = 0;
+        $this->relations = array();
         parent::__construct($app, $siteConn, $resId, $className, $config, $configPath);
     }
 
@@ -212,6 +266,61 @@ class MgTemplateRestAdapter extends MgRestAdapter
         $this->manyViewPath     = "file:".$this->configPath."/".$tplConfig["Many"];
         $this->noneViewPath     = "file:".$this->configPath."/".$tplConfig["None"];
         $this->errorViewPath    = "file:".$this->configPath."/".$tplConfig["Error"];
+
+        if (array_key_exists("Relations", $config)) {
+            $cfgRelations = $config["Relations"];
+            foreach ($cfgRelations as $relName => $relCfg) {
+                //Make our lives easier, don't put spaces in relation names
+                if (strpos($relName, ' ') !== FALSE)
+                    throw new Exception("Relation '$relName' cannot have spaces"); //TODO: Localize
+                if (!array_key_exists("Source", $relCfg)) {
+                    throw new Exception("Configuration for relation $relName is missing 'Source' property"); //TODO: Localize
+                }
+                if (!array_key_exists("KeyMap", $relCfg)) {
+                    throw new Exception("Configuration for relation $relName is missing 'KeyMap' property"); //TODO: Localize   
+                }
+                $cfgSource = $relCfg["Source"];
+                $cfgKeyMap = $relCfg["KeyMap"];
+                if (!array_key_exists("FeatureSource", $cfgSource)) {
+                    throw new Exception("Source configuration for relation $relName is missing 'FeatureSource' property"); //TODO: Localize
+                }
+                if (!array_key_exists("FeatureClass", $cfgSource)) {
+                    throw new Exception("Source configuration for relation $relName is missing 'FeatureSource' property"); //TODO: Localize
+                }
+                $rel = new stdClass();
+                $rel->FeatureSource = new MgResourceIdentifier($cfgSource["FeatureSource"]);
+                $rel->FeatureClass = $cfgSource["FeatureClass"];
+                $rel->KeyMap = array();
+                foreach ($cfgKeyMap as $sourceProp => $targetProp) {
+                    $rel->KeyMap[$sourceProp] = $targetProp;
+                }
+                $this->relations[$relName] = $rel;
+            }
+        }
+    }
+
+    private static function GetPropertyValue($reader, $propName) {
+        $type = $reader->GetPropertyType($propName);
+        //NOTE: Only querying the subset that are possible candidates for identity properties
+        switch ($type) {
+            case MgPropertyType::Boolean:
+                return $reader->GetBoolean($propName);
+            case MgPropertyType::Decimal:
+            case MgPropertyType::Double:
+                return $reader->GetDouble($propName);
+            case MgPropertyType::Int16:
+                return $reader->GetInt16($propName);
+            case MgPropertyType::Int32:
+                return $reader->GetInt32($propName);
+            case MgPropertyType::Int64:
+                return $reader->GetInt64($propName);
+            case MgPropertyType::Single:
+                return $reader->GetSingle($propName);
+            case MgPropertyType::String:
+                return $reader->GetString($propName);
+            default:
+                return "";
+        }
     }
 
     /**
@@ -219,6 +328,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
      */
     public function HandleGet($single) {
         $reader = null;
+        $related = new MgRelatedFeaturesSet();
         $smarty = new Smarty();
         //$smarty->setCaching(false);
         try {
@@ -228,8 +338,48 @@ class MgTemplateRestAdapter extends MgRestAdapter
             if ($single === true) {
                 //Have to advance the read to initialize the record
                 if ($reader->ReadNext()) {
+                    //Set up queries for any relations that are defined
+                    foreach ($this->relations as $relName => $rel) {
+                        $relFilterParts = array();
+                        $bQuery = false;
+                        //At least one source property must have a value before we continue because finding related
+                        //records where sourceID is null in target is kind of pointless
+                        foreach ($rel->KeyMap as $sourceProp => $targetProp) {
+                            if (!$reader->IsNull($sourceProp)) {
+                                $value = MgTemplateRestAdapter::GetPropertyValue($reader, $sourceProp);
+                                if ($value !== "") {
+                                    $bQuery = true;
+                                    if ($reader->GetPropertyType($sourceProp) == MgPropertyType::String)
+                                        array_push($relFilterParts, "\"$targetProp\" = '$value'");
+                                    else
+                                        array_push($relFilterParts, "\"$targetProp\" = $value");
+                                } else {
+                                    if ($reader->GetPropertyType($sourceProp) == MgPropertyType::String)
+                                        array_push($relFilterParts, "\"$targetProp\" = ''");
+                                    else
+                                        array_push($relFilterParts, "\"$targetProp\" NULL");
+                                }
+                            } else {
+                                array_push($relFilterParts, "\"$targetProp\" NULL");
+                            }
+                        }
+                        if ($bQuery === false) {
+                            continue;
+                        }
+                        //Fire off related query and stash in map for template
+                        $relQuery = new MgFeatureQueryOptions();
+                        $relFilter = implode(" AND ", $relFilterParts);
+                        $relQuery->SetFilter($relFilter);
+                        try {
+                            $relReader = $this->featSvc->SelectFeatures($rel->FeatureSource, $rel->FeatureClass, $relQuery);
+                            $related->Add($relName, new MgFeatureReaderModel(new MgGeometryFormatterSet($this->app), $relReader, -1, 0, null));
+                        } catch (MgException $ex) {
+                            throw new Exception("Error setting up related query. Filter was: $relFilter, Details:".$ex->GetDetails()); //TODO: Localize
+                        }
+                    }
                     $smarty->assign("model", new MgFeatureModel(new MgGeometryFormatterSet($this->app), $reader, $this->transform));
-                    $output = $smarty->fetch($this->singleViewPath);    
+                    $smarty->assign("related", $related);
+                    $output = $smarty->fetch($this->singleViewPath);
                 } else {
                     $this->app->response->setStatus(404);
                     $smarty->assign("ID", $this->featureId);
@@ -245,6 +395,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
             $smarty->assign("error", $ex);
             $this->app->response->write($smarty->fetch($this->errorViewPath));
         }
+        $related->Cleanup();
         if ($reader != null)
             $reader->Close();
     }
