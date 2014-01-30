@@ -27,6 +27,7 @@
                 "GET": {
                     "PageSize": 20,
                     "MaxCount": 500,
+                    "TransformTo": "LL84",
                     "MimeType": "application/vnd.google-earth.kml+xml",
                     "Templates": {
                         "Single": "property_kml_single.tpl",

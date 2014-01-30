@@ -34,11 +34,13 @@ class MgFeatureModel
     private $reader;
     private $data;
     private $formatters;
+    private $transform;
 
-    public function __construct($formatters, $reader) {
+    public function __construct($formatters, $reader, $transform = null) {
         $this->reader = $reader;
         $this->data = array();
         $this->formatters = $formatters;
+        $this->transform = $transform;
     }
 
     public function GeometryAsType($name, $formatterName) {
@@ -49,7 +51,7 @@ class MgFeatureModel
             $fmt = $this->formatters->GetFormatter($formatterName);
             if ($fmt == null)
                 throw new Exception("No Geometry Formatter named ".$formatterName." registered"); //TODO: Localize
-            $this->data[$name][$formatterName] = $fmt->Output($this->reader, $name, null);
+            $this->data[$name][$formatterName] = $fmt->Output($this->reader, $name, $this->transform);
         }
         return $this->data[$name][$formatterName];
     }
@@ -127,13 +129,15 @@ class MgFeatureReaderModel
     private $read;
     private $limit;
     private $formatters;
+    private $transform;
 
-    public function __construct($formatters, $reader, $limit, $read) {
+    public function __construct($formatters, $reader, $limit, $read, $transform = null) {
         $this->current = null;
         $this->reader = $reader;
         $this->read = $read;
         $this->limit = $limit;
         $this->formatters = $formatters;
+        $this->transform = $transform;
     }
 
     public function Next() {
@@ -148,7 +152,7 @@ class MgFeatureReaderModel
 
     public function Current() {
         if ($this->current == null)
-            $this->current = new MgFeatureModel($this->formatters, $this->reader);
+            $this->current = new MgFeatureModel($this->formatters, $this->reader, $this->transform);
         return $this->current;
     }
 }
@@ -178,6 +182,13 @@ class MgTemplateRestAdapter extends MgRestAdapter
     protected function InitAdapterConfig($config) {
         if (array_key_exists("MaxCount", $config))
             $this->limit = intval($config["MaxCount"]);
+
+        if (array_key_exists("TransformTo", $config)) {
+            $tokens = explode(":", $this->className);
+            $schemaName = $tokens[0];
+            $className = $tokens[1];
+            $this->transform = MgUtils::GetTransform($this->featSvc, $this->featureSourceId, $schemaName, $className, $config["TransformTo"]);
+        }
 
         if (!array_key_exists("Templates", $config))
             throw new Exception("Missing required property 'Templates' in adapter configuration"); //TODO: Localize
@@ -217,7 +228,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
             if ($single === true) {
                 //Have to advance the read to initialize the record
                 if ($reader->ReadNext()) {
-                    $smarty->assign("model", new MgFeatureModel(new MgGeometryFormatterSet($this->app), $reader));
+                    $smarty->assign("model", new MgFeatureModel(new MgGeometryFormatterSet($this->app), $reader, $this->transform));
                     $output = $smarty->fetch($this->singleViewPath);    
                 } else {
                     $this->app->response->setStatus(404);
@@ -225,7 +236,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
                     $output = $smarty->fetch($this->noneViewPath);
                 }
             } else {
-                $smarty->assign("model", new MgFeatureReaderModel(new MgGeometryFormatterSet($this->app), $reader, $this->limit, $this->read));
+                $smarty->assign("model", new MgFeatureReaderModel(new MgGeometryFormatterSet($this->app), $reader, $this->limit, $this->read, $this->transform));
                 $output = $smarty->fetch($this->manyViewPath);
             }
             $this->app->response->header("Content-Type", $this->mimeType);

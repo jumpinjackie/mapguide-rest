@@ -384,6 +384,35 @@ class MgUtils
 
         return MgUtils::ParseSingleFeatureDocument($classDef, $doc, $featureNodeName, $propertyNodeName);
     }
+    
+    public static function GetTransform($featSvc, $resId, $schemaName, $className, $transformto) {
+        $transform = null;
+        $factory = new MgCoordinateSystemFactory();
+        $targetWkt = $factory->ConvertCoordinateSystemCodeToWkt($transformto);
+        $clsDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
+        //Has a designated geometry property, use it's spatial context
+        if ($clsDef->GetDefaultGeometryPropertyName() !== "") {
+            $props = $clsDef->GetProperties();
+            $idx = $props->IndexOf($clsDef->GetDefaultGeometryPropertyName());
+            if ($idx >= 0) {
+                $geomProp = $props->GetItem($idx);
+                $scName = $geomProp->GetSpatialContextAssociation();
+                $scReader = $featSvc->GetSpatialContexts($resId, false);
+                while ($scReader->ReadNext()) {
+                    if ($scReader->GetName() === $scName) {
+                        if ($scReader->GetCoordinateSystemWkt() !== $targetWkt) {
+                            $targetCs = $factory->CreateFromCode($transformto);
+                            $sourceCs = $factory->Create($scReader->GetCoordinateSystemWkt());
+                            $transform = $factory->GetTransform($sourceCs, $targetCs);
+                            break;
+                        }
+                    }
+                }
+                $scReader->Close();
+            }
+        }
+        return $transform;
+    }
 }
 
 ?>

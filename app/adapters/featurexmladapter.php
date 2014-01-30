@@ -18,6 +18,7 @@
 //
 
 require_once "restadapter.php";
+require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     private $agfRw;
@@ -50,6 +51,12 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     protected function InitAdapterConfig($config) {
         if (array_key_exists("MaxCount", $config))
             $this->limit = intval($config["MaxCount"]);
+        if (array_key_exists("TransformTo", $config)) {
+            $tokens = explode(":", $this->className);
+            $schemaName = $tokens[0];
+            $className = $tokens[1];
+            $this->transform = MgUtils::GetTransform($this->featSvc, $this->featureSourceId, $schemaName, $className, $config["TransformTo"]);
+        }
     }
     
     /**

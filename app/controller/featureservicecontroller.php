@@ -19,6 +19,7 @@
 
 require_once "controller.php";
 require_once dirname(__FILE__)."/../util/readerchunkedresult.php";
+require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgFeatureServiceController extends MgBaseController {
     public function __construct($app) {
@@ -353,26 +354,7 @@ class MgFeatureServiceController extends MgBaseController {
             }
             $transform = null;
             if ($transformto !== "") {
-                $factory = new MgCoordinateSystemFactory();
-                $targetCs = $factory->CreateFromCode($transformto);
-                $clsDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
-                //Has a designated geometry property, use it's spatial context
-                if ($clsDef->GetDefaultGeometryPropertyName() !== "") {
-                    $props = $clsDef->GetProperties();
-                    $idx = $props->IndexOf($clsDef->GetDefaultGeometryPropertyName());
-                    if ($idx >= 0) {
-                        $geomProp = $props->GetItem($idx);
-                        $scName = $geomProp->GetSpatialContextAssociation();
-                        $scReader = $featSvc->GetSpatialContexts($resId, false);
-                        while ($scReader->ReadNext()) {
-                            if ($scReader->GetName() === $scName) {
-                                $sourceCs = $factory->Create($scReader->GetCoordinateSystemWkt());
-                                $transform = $factory->GetTransform($sourceCs, $targetCs);
-                            }
-                        }
-                        $scReader->Close();
-                    }
-                }
+                $transform = MgUtils::GetTransform($featSvc, $resId, $schemaName, $className, $transformto);
             }
 
             $reader = $featSvc->SelectFeatures($resId, "$schemaName:$className", $query);

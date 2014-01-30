@@ -31,11 +31,12 @@ abstract class MgGeometryOutputFormatter
         $output = "";
         try {
             if (!$reader->IsNull($geomName)) {
+                $agf = $reader->GetGeometry($geomName);
                 if ($transform != null)
-                    $agf = $reader->GetGeometry($geomName, $transform);
+                    $geom = $this->agfRw->Read($agf, $transform);
                 else
-                    $agf = $reader->GetGeometry($geomName);
-                $geom = $this->agfRw->Read($agf);
+                    $geom = $this->agfRw->Read($agf);
+
                 if ($geom != null)
                     $output = $this->OutputGeom($geom);
             }

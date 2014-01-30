@@ -23,6 +23,7 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
 {
     private $agfRw;
     private $wktRw;
+    private $transform;
 
     private $limit;
     private $read;
@@ -44,6 +45,12 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
     protected function InitAdapterConfig($config) {
         if (array_key_exists("MaxCount", $config))
             $this->limit = intval($config["MaxCount"]);
+        if (array_key_exists("TransformTo", $config)) {
+            $tokens = explode(":", $this->className);
+            $schemaName = $tokens[0];
+            $className = $tokens[1];
+            $this->transform = MgUtils::GetTransform($this->featSvc, $this->featureSourceId, $schemaName, $className, $config["TransformTo"]);
+        }
     }
 
     /**
