@@ -212,6 +212,11 @@ $app->get("/library/:resourcePath+/data/:dataName", function($resourcePath, $dat
     $ctrl = new MgResourceServiceController($app);
     $ctrl->GetResourceData($resId, $dataName);
 });
+$app->post("/library/:resourcePath+/header", function($resourcePath) use ($app) {
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgResourceServiceController($app);
+    $ctrl->SetResourceHeader($resId);
+});
 $app->get("/library/:resourcePath+/header", function($resourcePath) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgResourceServiceController($app);

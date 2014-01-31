@@ -121,6 +121,26 @@ class MgResourceServiceController extends MgBaseController {
         });
     }
 
+    public function SetResourceHeader($resId) {
+        try {
+            $this->EnsureAuthenticationForSite();
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+
+            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+            $body = $this->app->request->getBody();
+            $bs = new MgByteSource($body, strlen($body));
+            $header = $bs->GetReader();
+
+            $resSvc->SetResource($resId, null, $header);
+
+            //$this->app->response->setStatus(201);
+            $this->app->response->setBody($resId->ToString());
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
+    }
+
     public function SetResourceContent($resId) {
         try {
             $sessionId = "";

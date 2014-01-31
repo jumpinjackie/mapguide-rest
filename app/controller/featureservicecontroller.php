@@ -22,6 +22,10 @@ require_once dirname(__FILE__)."/../util/readerchunkedresult.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgFeatureServiceController extends MgBaseController {
+    const PROP_ALLOW_INSERT = "_MgRestAllowInsert";
+    const PROP_ALLOW_UPDATE = "_MgRestAllowUpdate";
+    const PROP_ALLOW_DELETE = "_MgRestAllowDelete";
+
     public function __construct($app) {
         parent::__construct($app);
     }
@@ -257,6 +261,30 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId);
     }
 
+    private static function HasPermission($resSvc, $resId, $permission) {
+        $resHeader = $resSvc->GetResourceHeader($resId);
+        $resHeaderDoc = new DOMDocument();
+        $resHeaderDoc->loadXML($resHeader->ToString());
+        $bAllowed = false;
+        $propNodes = $resHeaderDoc->getElementsByTagName("Property");
+        for ($i = 0; $i < $propNodes->length; $i++) {
+            $propNode = $propNodes->item($i);
+            $nameNode = $propNode->getElementsByTagName("Name");
+            if ($nameNode->length == 1) {
+                if ($nameNode->item(0)->nodeValue === $permission) {
+                    $valueNodes = $propNode->getElementsByTagName("Value");
+                    if ($valueNodes->length == 1) {
+                        if ($valueNodes->item(0)->nodeValue === "1") {
+                            $bAllowed = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return $bAllowed;
+    }
+
     public function InsertFeatures($resId, $schemaName, $className) {
         try {
             $sessionId = "";
@@ -266,6 +294,16 @@ class MgFeatureServiceController extends MgBaseController {
             $this->EnsureAuthenticationForSite($sessionId);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
+
+            //Not a session-based resource, must check for appropriate flag in header before we continue
+            if ($sessionId === "") {
+                $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+                $bAllowed = self::HasPermission($resSvc, $resId, self::PROP_ALLOW_INSERT);
+                if ($bAllowed === false) {
+                    $e = new Exception();
+                    $this->OutputException("Forbidden", "Operation not allowed", "The resource ".$resId->ToString()." is not configured to allow feature updates", $e->getTraceAsString(), 403, MgMimeType::Xml);
+                }
+            }
 
             $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
 
@@ -292,8 +330,17 @@ class MgFeatureServiceController extends MgBaseController {
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
-            $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
+            //Not a session-based resource, must check for appropriate flag in header before we continue
+            if ($sessionId === "") {
+                $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+                $bAllowed = self::HasPermission($resSvc, $resId, self::PROP_ALLOW_UPDATE);
+                if ($bAllowed === false) {
+                    $e = new Exception();
+                    $this->OutputException("Forbidden", "Operation not allowed", "The resource ".$resId->ToString()." is not configured to allow feature updates", $e->getTraceAsString(), 403, MgMimeType::Xml);
+                }
+            }
 
+            $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
             $doc = new DOMDocument();
             $doc->loadXML($this->app->request->getBody());
 
@@ -323,6 +370,16 @@ class MgFeatureServiceController extends MgBaseController {
             $this->EnsureAuthenticationForSite($sessionId);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
+
+            //Not a session-based resource, must check for appropriate flag in header before we continue
+            if ($sessionId === "") {
+                $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+                $bAllowed = self::HasPermission($resSvc, $resId, self::PROP_ALLOW_DELETE);
+                if ($bAllowed === false) {
+                    $e = new Exception();
+                    $this->OutputException("Forbidden", "Operation not allowed", "The resource ".$resId->ToString()." is not configured to allow feature updates", $e->getTraceAsString(), 403, MgMimeType::Xml);
+                }
+            }
 
             $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
             $classDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
