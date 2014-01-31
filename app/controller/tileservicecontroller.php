@@ -76,6 +76,11 @@ class MgTileServiceController extends MgBaseController {
         $resIdStr = $resId->ToString();
         $that = $this;
         $app = $this->app;
+        $sessionId = "";
+        if ($resId->GetRepositoryType() === MgRepositoryType::Session && $this->app->request->get("session") == null) {
+            $sessionId = $resId->GetRepositoryName();
+        }
+
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($app, $that, $resIdStr, $groupName, $scaleIndex, $row, $col) {
 
             $tmd = $that->GetTileModificationDate($resIdStr, $groupName, $scaleIndex, $row, $col);
@@ -97,7 +102,7 @@ class MgTileServiceController extends MgBaseController {
                 $app->lastModified($tmd);
             }
             $app->expires("+6 months");
-        }, true); //Tile access can be anonymous, so allow for it if credentials/session specified
+        }, true, "", $sessionId); //Tile access can be anonymous, so allow for it if credentials/session specified, but if this is a session-based Map Definition, use the session id as the nominated one
     }
 }
 

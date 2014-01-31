@@ -1922,26 +1922,6 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
             });
 
-            module("Tile Service", {
-                setup: function() {
-
-                },
-                teardown: function() {
-
-                }
-            });
-            test("GetTile", function() {
-                //With raw credentials
-                api_test(rest_root_url + "/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result) {
-                    ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
-                });
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result) {
-                    ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result) {
-                    ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
-                });
-            });
             module("REST Services", {
                 setup: function() {
                     var self = this;
@@ -1955,7 +1935,15 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     });
                 },
                 teardown: function() {
+                    api_test(rest_root_url + "/session/" + this.anonymousSessionId, "DELETE", null, function(status, result) {
+                        ok(status == 200, "(" + status + ") - Expected anonymous session to be destroyed");
+                        delete this.anonymousSessionId;
+                    });
 
+                    api_test(rest_root_url + "/session/" + this.adminSessionId, "DELETE", null, function(status, result) {
+                        ok(status == 200, "(" + status + ") - Expected admin session to be destroyed");
+                        delete this.adminSessionId;
+                    });
                 }
             });
             test("CopyResource", function() {
@@ -2049,6 +2037,54 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
                 api_test(rest_root_url + "/library/RestUnitTests/Parcels.LayerDefinition/content", "GET", { session: this.anonymousSessionId }, function(status, result) {
                     ok(status == 404, "(" + status + ") - the parcels layerdef shouldn't exist");
+                });
+            });
+
+            module("Tile Service", {
+                setup: function() {
+                    var self = this;
+                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result) {
+                        ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                        self.anonymousSessionId = result;
+                    });
+                },
+                teardown: function() {
+                    api_test(rest_root_url + "/session/" + this.anonymousSessionId, "DELETE", null, function(status, result) {
+                        ok(status == 200, "(" + status + ") - Expected anonymous session to be destroyed");
+                        delete this.anonymousSessionId;
+                    });
+                }
+            });
+            test("GetTile", function() {
+                //With raw credentials
+                api_test(rest_root_url + "/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
+                });
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
+                });
+            });
+            test("GetTile - session copy", function() {
+                api_test(rest_root_url + "/services/copyresource", "POST", {
+                    session: this.anonymousSessionId,
+                    source: "Library://Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition",
+                    destination: "Session:" + this.anonymousSessionId + "//Sheboygan.MapDefinition",
+                    overwrite: 1
+                }, function(status, result) {
+                    ok(status == 200, "(" + status + ") copy operation should've succeeded");
+                });
+                //With raw credentials
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
                 });
             });
 

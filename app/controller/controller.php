@@ -29,7 +29,7 @@ class MgBaseController extends MgResponseHandler
         $this->userInfo = null;
     }
 
-    protected function EnsureAuthenticationForHttp($callback, $allowAnonymous = false, $agentUri = "") {
+    protected function EnsureAuthenticationForHttp($callback, $allowAnonymous = false, $agentUri = "", $nominatedSessionId = "") {
         //agent URI is only required if responses must contain a reference
         //back to the mapagent. This is not the case for most, if not all
         //our scenarios so the passed URI can be assumed to be empty most of the
@@ -41,59 +41,64 @@ class MgBaseController extends MgResponseHandler
         if ($session != null) {
             $param->AddParameter("SESSION", $session);
         } else {
-            $username = null;
-            $password = "";
-
-            // Username/password extraction logic ripped from PHP implementation of the MapGuide AJAX viewer
-
-            //TODO: Ripped from AJAX viewer. Use the abstractions provided by Slim
-
-            // No session, no credentials explicitely passed. Check for HTTP Auth user/passwd.  Under Apache CGI, the
-            // PHP_AUTH_USER and PHP_AUTH_PW are not set.  However, the Apache admin may
-            // have rewritten the authentication information to REMOTE_USER.  This is a
-            // suggested approach from the Php.net website.
-
-            // Has REMOTE_USER been rewritten?
-            if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['REMOTE_USER']) &&
-            preg_match('/Basic +(.*)$/i', $_SERVER['REMOTE_USER'], $matches))
-            {
-                list($name, $password) = explode(':', base64_decode($matches[1]));
-                $_SERVER['PHP_AUTH_USER'] = strip_tags($name);
-                $_SERVER['PHP_AUTH_PW']    = strip_tags($password);
-            }
-
-
-            // REMOTE_USER may also appear as REDIRECT_REMOTE_USER depending on CGI setup.
-            //  Check for this as well.
-            if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['REDIRECT_REMOTE_USER']) &&
-            preg_match('/Basic (.*)$/i', $_SERVER['REDIRECT_REMOTE_USER'], $matches))
-            {
-                list($name, $password) = explode(':', base64_decode($matches[1]));
-                $_SERVER['PHP_AUTH_USER'] = strip_tags($name);
-                $_SERVER['PHP_AUTH_PW'] = strip_tags($password);
-            }
-
-            // Finally, PHP_AUTH_USER may actually be defined correctly.  If it is set, or
-            // has been pulled from REMOTE_USER rewriting then set our USERNAME and PASSWORD
-            // parameters.
-            if (isset($_SERVER['PHP_AUTH_USER']) && strlen($_SERVER['PHP_AUTH_USER']) > 0)
-            {
-                $username = $_SERVER['PHP_AUTH_USER'];
-                if (isset($_SERVER['PHP_AUTH_PW']) && strlen($_SERVER['PHP_AUTH_PW']) > 0)
-                    $password = $_SERVER['PHP_AUTH_PW'];
-            }
-
-            //If we have everything we need, put it into the MgHttpRequestParam
-            if ($username != null) {
-                $param->AddParameter("USERNAME", $username);
-                if ($password !== "") {
-                    $param->AddParameter("PASSWORD", $password);
-                }
+            if ($nominatedSessionId !== "") {
+                $param->AddParameter("SESSION", $nominatedSessionId);
             } else {
-                if ($allowAnonymous) {
-                    $username = "Anonymous";
+                $username = null;
+                $password = "";
+
+                // Username/password extraction logic ripped from PHP implementation of the MapGuide AJAX viewer
+
+                //TODO: Ripped from AJAX viewer. Use the abstractions provided by Slim
+
+                // No session, no credentials explicitely passed. Check for HTTP Auth user/passwd.  Under Apache CGI, the
+                // PHP_AUTH_USER and PHP_AUTH_PW are not set.  However, the Apache admin may
+                // have rewritten the authentication information to REMOTE_USER.  This is a
+                // suggested approach from the Php.net website.
+
+                // Has REMOTE_USER been rewritten?
+                if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['REMOTE_USER']) &&
+                preg_match('/Basic +(.*)$/i', $_SERVER['REMOTE_USER'], $matches))
+                {
+                    list($name, $password) = explode(':', base64_decode($matches[1]));
+                    $_SERVER['PHP_AUTH_USER'] = strip_tags($name);
+                    $_SERVER['PHP_AUTH_PW']    = strip_tags($password);
+                }
+
+
+                // REMOTE_USER may also appear as REDIRECT_REMOTE_USER depending on CGI setup.
+                //  Check for this as well.
+                if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['REDIRECT_REMOTE_USER']) &&
+                preg_match('/Basic (.*)$/i', $_SERVER['REDIRECT_REMOTE_USER'], $matches))
+                {
+                    list($name, $password) = explode(':', base64_decode($matches[1]));
+                    $_SERVER['PHP_AUTH_USER'] = strip_tags($name);
+                    $_SERVER['PHP_AUTH_PW'] = strip_tags($password);
+                }
+
+                // Finally, PHP_AUTH_USER may actually be defined correctly.  If it is set, or
+                // has been pulled from REMOTE_USER rewriting then set our USERNAME and PASSWORD
+                // parameters.
+                if (isset($_SERVER['PHP_AUTH_USER']) && strlen($_SERVER['PHP_AUTH_USER']) > 0)
+                {
+                    $username = $_SERVER['PHP_AUTH_USER'];
+                    if (isset($_SERVER['PHP_AUTH_PW']) && strlen($_SERVER['PHP_AUTH_PW']) > 0)
+                        $password = $_SERVER['PHP_AUTH_PW'];
+                }
+
+                //If we have everything we need, put it into the MgHttpRequestParam
+                if ($username != null) {
+                    $param->AddParameter("USERNAME", $username);
+                    if ($password !== "") {
+                        $param->AddParameter("PASSWORD", $password);
+                    }
                 } else {
-                    $this->Unauthorized();
+                    if ($allowAnonymous === true) {
+                        $username = "Anonymous";
+                        $param->AddParameter("USERNAME", $username);
+                    } else {
+                        $this->Unauthorized();
+                    }
                 }
             }
         }
