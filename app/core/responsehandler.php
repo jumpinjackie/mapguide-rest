@@ -93,7 +93,7 @@ abstract class MgResponseHandler
     private function OutputError($result, $mimeType = MgMimeType::Html) {
         $statusMessage = $result->GetHttpStatusMessage();
         $e = new Exception();
-        if ($statusMessage === "MgAuthenticationFailedException" || $statusMessage === "MgUnauthorizedAccessException") {
+        if ($statusMessage === "MgAuthenticationFailedException" || $statusMessage === "MgUnauthorizedAccessException" || $statusMessage == "MgPermissionDeniedException") {
             $this->Unauthorized();
         } else {
             $this->app->response->header("Content-Type", $mimeType);
@@ -399,7 +399,7 @@ abstract class MgResponseHandler
 
     protected function OnException($ex, $mimeType = MgMimeType::Html) {
         $status = 500;
-        if ($ex instanceof MgAuthenticationFailedException || $ex instanceof MgUnauthorizedAccessException) {
+        if ($ex instanceof MgAuthenticationFailedException || $ex instanceof MgUnauthorizedAccessException || $ex instanceof MgPermissionDeniedException) {
             $status = 401;
         } else if ($ex instanceof MgResourceNotFoundException || $ex instanceof MgResourceDataNotFoundException) {
             $status = 404;
@@ -442,9 +442,9 @@ abstract class MgResponseHandler
         $fromTestHarness = $this->app->request->headers->get("x-mapguide-test-harness");
         if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
             $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
-        $this->app->halt(401, "You must enter a valid login ID and password to access this site"); //TODO: Localize
-        //$e = new Exception();
-        //$this->app->halt(401, "You must enter a valid login ID and password to access this site<br/>".$e->getTraceAsString()); //TODO: Localize
+        //$this->app->halt(401, "You must enter a valid login ID and password to access this site"); //TODO: Localize
+        $e = new Exception();
+        $this->app->halt(401, "You must enter a valid login ID and password to access this site<br/>".$e->getTraceAsString()); //TODO: Localize
     }
 }
 

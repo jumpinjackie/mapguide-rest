@@ -177,6 +177,33 @@ class MgResourceServiceController extends MgBaseController {
             $that->ExecuteHttpRequest($req);
         });
     }
+
+    public function CopyResource() {
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that) {
+            $param->AddParameter("OPERATION", "COPYRESOURCE");
+            $param->AddParameter("VERSION", "1.0.0");
+            $param->AddParameter("SOURCE", $that->GetRequestParameter("source"));
+            $param->AddParameter("DESTINATION", $that->GetRequestParameter("destination"));
+            //Default the depth to 1 if not specified (think of the MapGuide Server!)
+            $param->AddParameter("OVERWRITE", $that->GetRequestParameter("overwrite", "0"));
+            $that->ExecuteHttpRequest($req);
+        });
+    }
+
+    public function MoveResource() {
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that) {
+            $param->AddParameter("OPERATION", "MOVERESOURCE");
+            $param->AddParameter("VERSION", "2.2.0");
+            $param->AddParameter("SOURCE", $that->GetRequestParameter("source"));
+            $param->AddParameter("DESTINATION", $that->GetRequestParameter("destination"));
+            //Default the depth to 1 if not specified (think of the MapGuide Server!)
+            $param->AddParameter("OVERWRITE", $that->GetRequestParameter("overwrite", "0"));
+            $param->AddParameter("OVERWRITE", $that->GetRequestParameter("cascade", "1"));
+            $that->ExecuteHttpRequest($req);
+        });
+    }
 }
 
 ?>
