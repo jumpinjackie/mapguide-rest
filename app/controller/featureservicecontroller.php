@@ -134,6 +134,10 @@ class MgFeatureServiceController extends MgBaseController {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
         $resIdStr = $resId->ToString();
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr) {
@@ -146,13 +150,17 @@ class MgFeatureServiceController extends MgBaseController {
             $param->AddParameter("RESOURCEID", $resIdStr);
             $param->AddParameter("ACTIVEONLY", "0");
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId);
     }
 
     public function GetSchemaNames($resId, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
         $resIdStr = $resId->ToString();
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr) {
@@ -168,13 +176,17 @@ class MgFeatureServiceController extends MgBaseController {
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId);
     }
 
     public function DescribeSchema($resId, $schemaName, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
         $resIdStr = $resId->ToString();
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $resIdStr) {
@@ -191,13 +203,17 @@ class MgFeatureServiceController extends MgBaseController {
             $param->AddParameter("RESOURCEID", $resIdStr);
             $param->AddParameter("SCHEMA", $schemaName);
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId);
     }
 
     public function GetClassNames($resId, $schemaName, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
         $resIdStr = $resId->ToString();
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $resIdStr) {
@@ -214,13 +230,17 @@ class MgFeatureServiceController extends MgBaseController {
             $param->AddParameter("RESOURCEID", $resIdStr);
             $param->AddParameter("SCHEMA", $schemaName);
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId);
     }
 
     public function GetClassDefinition($resId, $schemaName, $className, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
         $resIdStr = $resId->ToString();
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $className, $resIdStr) {
@@ -234,12 +254,16 @@ class MgFeatureServiceController extends MgBaseController {
             $param->AddParameter("SCHEMA", $schemaName);
             $param->AddParameter("CLASSNAMES", $className);
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId);
     }
 
     public function InsertFeatures($resId, $schemaName, $className) {
         try {
-            $this->EnsureAuthenticationForSite();
+            $sessionId = "";
+            if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+                $sessionId = $resId->GetRepositoryName();
+            }
+            $this->EnsureAuthenticationForSite($sessionId);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
@@ -260,7 +284,11 @@ class MgFeatureServiceController extends MgBaseController {
 
     public function UpdateFeatures($resId, $schemaName, $className) {
         try {
-            $this->EnsureAuthenticationForSite();
+            $sessionId = "";
+            if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+                $sessionId = $resId->GetRepositoryName();
+            }
+            $this->EnsureAuthenticationForSite($sessionId);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
@@ -288,7 +316,11 @@ class MgFeatureServiceController extends MgBaseController {
 
     public function DeleteFeatures($resId, $schemaName, $className) {
         try {
-            $this->EnsureAuthenticationForSite();
+            $sessionId = "";
+            if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+                $sessionId = $resId->GetRepositoryName();
+            }
+            $this->EnsureAuthenticationForSite($sessionId);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
@@ -313,7 +345,11 @@ class MgFeatureServiceController extends MgBaseController {
             //Check for unsupported representations
             $fmt = $this->ValidateRepresentation($format, array("xml", "geojson"));
 
-            $this->EnsureAuthenticationForSite();
+            $sessionId = "";
+            if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+                $sessionId = $resId->GetRepositoryName();
+            }
+            $this->EnsureAuthenticationForSite($sessionId);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 

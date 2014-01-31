@@ -883,7 +883,6 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
                 });
             });
-            
             test("Set/Get/Delete resource", function() {
                 var xml = '<?= $emptyFeatureSourceXml ?>';
                 api_test_with_credentials(rest_root_url + "/library/RestUnitTests/Empty.FeatureSource/content", "POST", {}, "Foo", "Bar", function(status, result) {
@@ -1060,6 +1059,82 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas.html", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("DescribeSchema - SHP_Schema", function() {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.sdgudkf/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.sdgudkf/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.json/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.json/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.json/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.json/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.html/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.html/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.html/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.html/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
@@ -1695,15 +1770,6 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
-            });
-
-            module("Feature Service - Session", {
-                setup: function() {
-
-                },
-                teardown: function() {
-
-                }
             });
 
             module("Site Service", {
@@ -2524,7 +2590,6 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
                 });
             });
-            
             test("Set/Get/Delete resource - anon session", function() {
                 var xml = '<?= $emptyFeatureSourceXml ?>';
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource/content", "POST", xml, function(status, result) {
@@ -2545,6 +2610,816 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource", "DELETE", xml, function(status, result) {
                     ok(status == 200, "(" + status + ") - Should've deleted resource");
+                });
+            });
+
+            module("Feature Service - Session", {
+                setup: function() {
+                    var self = this;
+                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result) {
+                        ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                        self.anonymousSessionId = result;
+                    });
+                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                        ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                        self.adminSessionId = result;
+                    });
+                    api_test(rest_root_url + "/services/copyresource", "POST", {
+                        session: this.anonymousSessionId,
+                        source: "Library://Samples/Sheboygan/Data/Parcels.FeatureSource",
+                        destination: "Session:" + this.anonymousSessionId + "//Parcels.FeatureSource",
+                        overwrite: 1
+                    }, function(status, result) {
+                        ok(status == 200, "(" + status + ") copy operation should've succeeded");
+                    });
+                },
+                teardown: function() {
+                    api_test(rest_root_url + "/session/" + this.anonymousSessionId, "DELETE", null, function(status, result) {
+                        ok(status == 200, "(" + status + ") - Expected anonymous session to be destroyed");
+                        delete this.anonymousSessionId;
+                    });
+
+                    api_test(rest_root_url + "/session/" + this.adminSessionId, "DELETE", null, function(status, result) {
+                        ok(status == 200, "(" + status + ") - Expected admin session to be destroyed");
+                        delete this.adminSessionId;
+                    });
+                }
+            });
+            test("Get Spatial Contexts", function() {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.sdigud", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.sdigud", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.json", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.json", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Get Schemas", function() {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.ksjdg", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.ksjdg", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.json", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.json", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.html", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.html", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.html", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.html", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("DescribeSchema - SHP_Schema", function() {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema.sdgudkf/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema.sdgudkf/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema.json/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema.json/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema.json/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema.json/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema.html/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema.html/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema.html/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema.html/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Get Classes - SHP_Schema", function() {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.sdgudkf/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.sdgudkf/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.json/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.json/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.json/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.json/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.html/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.html/SHP_Schema", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.html/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.html/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Get Class Definition - SHP_Schema:Parcels", function() {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.jsdfjkdf/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.jsdfjkdf/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.json/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.json/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.json/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.json/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.html/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected unsupported html representation");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.html/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected unsupported html representation");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.html/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected unsupported html representation");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.html/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected unsupported html representation");
+                });
+            });
+            test("Get Class Definition - SHP_Schema:Parcels alternate route", function() {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.jsdfjkdf/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.jsdfjkdf/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.json/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.json/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.json/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.json/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.html/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected unsupported html representation");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.html/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected unsupported html representation");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.html/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected unsupported html representation");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.html/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected unsupported html representation");
+                });
+            });
+            test("Get FDO Providers", function() {
+                api_test_anon(rest_root_url + "/providers.sdgfdsf", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+                api_test_admin(rest_root_url + "/providers.sdgfdsf", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/providers", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/providers", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/providers", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/providers", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/providers.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/providers.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/providers.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/providers.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/providers.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/providers.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/providers.json", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/providers.json", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/providers.html", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/providers.html", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/providers.html", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/providers.html", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("SDF Provider Capabilities", function() {
+                api_test_anon(rest_root_url + "/providers/OSGeo.SDF/capabilities.ksdjgdf", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+                api_test_admin(rest_root_url + "/providers/OSGeo.SDF/capabilities.ksdjgdf", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/providers/OSGeo.SDF/capabilities.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/providers/OSGeo.SDF/capabilities.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/providers/OSGeo.SDF/capabilities.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/providers/OSGeo.SDF/capabilities.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities.json", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities.json", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            //List Data Stores test case excluded as that requires a SQL Server feature source set up. Can always manually verify
+            test("SDF Provider - Connection Property Values for ReadOnly", function() {
+                api_test_anon(rest_root_url + "/providers/OSGeo.SDF/connectvalues.skdjfkd/ReadOnly", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+                api_test_admin(rest_root_url + "/providers/OSGeo.SDF/connectvalues.skdjfkd/ReadOnly", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/providers/OSGeo.SDF/connectvalues.xml/ReadOnly", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/providers/OSGeo.SDF/connectvalues.xml/ReadOnly", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues.xml/ReadOnly", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues.xml/ReadOnly", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/providers/OSGeo.SDF/connectvalues.json/ReadOnly", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/providers/OSGeo.SDF/connectvalues.json/ReadOnly", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues.json/ReadOnly", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues.json/ReadOnly", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                /*
+                api_test_anon(rest_root_url + "/providers/OSGeo.SDF/connectvalues.html/ReadOnly", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/providers/OSGeo.SDF/connectvalues.html/ReadOnly", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                */
+            });
+            test("Select 100 Parcels", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Select 100 Parcels - GeoJSON", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Parcels owned by SCHMITT", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Parcels owned by SCHMITT - GeoJSON", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Select 100 Parcels with projected property list", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Select 100 Parcels with projected property list - GeoJSON", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Select 100 Parcels (xformed to WGS84.PseudoMercator)", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Select 100 Parcels (xformed to WGS84.PseudoMercator) - GeoJSON", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
 
