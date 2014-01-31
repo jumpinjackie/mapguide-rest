@@ -26,8 +26,10 @@ class MgMappingServiceController extends MgBaseController {
 
     public function GenerateLegendImage($resId, $scale, $geomtype, $themecat, $format) {
         $resIdStr = $resId->ToString();
+        $width = $this->app->request->params("width");
+        $height = $this->app->request->params("height");
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr, $scale, $geomtype, $themecat, $format) {
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr, $width, $height, $scale, $geomtype, $themecat, $format) {
             $param->AddParameter("OPERATION", "GETLEGENDIMAGE");
             $param->AddParameter("VERSION", "1.0.0");
             $param->AddParameter("LAYERDEFINITION", $resIdStr);
@@ -35,6 +37,10 @@ class MgMappingServiceController extends MgBaseController {
             $param->AddParameter("TYPE", $geomtype);
             $param->AddParameter("FORMAT", strtoupper($format));
             $param->AddParameter("THEMECATEGORY", $themecat);
+            if ($width != null)
+                $param->AddParameter("WIDTH", $width);
+            if ($height != null)
+                $param->AddParameter("HEIGHT", $height);
             $that->ExecuteHttpRequest($req);
         });
     }
