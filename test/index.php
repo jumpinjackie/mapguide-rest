@@ -25,6 +25,18 @@ try {
 
     $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
     $resSvc->ApplyResourcePackage($br);
+
+
+    $rdsdfsource = new MgByteSource(dirname(__FILE__)."/data/RedlineLayer.sdf");
+    $rdsdfrdr = $rdsdfsource->GetReader();
+    $resId = new MgResourceIdentifier("Library://RestUnitTests/RedlineLayer.FeatureSource");
+
+    $rdXml = '<?xml version="1.0"?><FeatureSource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="FeatureSource-1.0.0.xsd"><Provider>OSGeo.SDF</Provider><Parameter><Name>File</Name><Value>%MG_DATA_FILE_PATH%RedlineLayer.sdf</Value></Parameter></FeatureSource>';
+    $rdXmlSource = new MgByteSource($rdXml, strlen($rdXml));
+    $rdXmlRdr = $rdXmlSource->GetReader();
+
+    $resSvc->SetResource($resId, $rdXmlRdr, null);
+    $resSvc->SetResourceData($resId, "RedlineLayer.sdf", MgResourceDataType::File, $rdsdfrdr);
 } catch (MgException $ex) {
     echo "Failed to bootstrap the test suite. Exception was: ".$ex->GetDetails();
     die;
@@ -44,6 +56,132 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
         <div id="qunit"></div>
         <script src="qunit-1.10.0.js" type="text/javascript"></script>
         <script type="text/javascript">
+
+            /**
+             * jQuery plugin to convert a given $.ajax response xml object to json.
+             *
+             * @example var json = $.xml2json(response);
+             */
+            (function() {
+
+                // default options based on https://github.com/Leonidas-from-XIV/node-xml2js
+                var defaultOptions = {
+                    attrkey: '$',
+                    charkey: '_',
+                    normalize: false
+                };
+
+                // extracted from jquery
+                function parseXML(data) {
+                    var xml, tmp;
+                    if (!data || typeof data !== "string") {
+                        return null;
+                    }
+                    try {
+                        if (window.DOMParser) { // Standard
+                            tmp = new DOMParser();
+                            xml = tmp.parseFromString(data, "text/xml");
+                        } else { // IE
+                            xml = new ActiveXObject("Microsoft.XMLDOM");
+                            xml.async = "false";
+                            xml.loadXML(data);
+                        }
+                    } catch (e) {
+                        xml = undefined;
+                    }
+                    if (!xml || !xml.documentElement || xml.getElementsByTagName("parsererror").length) {
+                        throw new Error("Invalid XML: " + data);
+                    }
+                    return xml;
+                }
+
+                function normalize(value, options){
+                    if (!!options.normalize){
+                        return (value || '').trim();
+                    }
+                    return value;
+                }
+
+                function xml2jsonImpl(xml, options) {
+
+                    var i, result = {}, attrs = {}, node, child, name;
+                    result[options.attrkey] = attrs;
+
+                    if (xml.attributes && xml.attributes.length > 0) {
+                        for (i = 0; i < xml.attributes.length; i++){
+                            var item = xml.attributes.item(i);
+                            attrs[item.nodeName] = item.value;
+                        }
+                    }
+
+                    // element content
+                    if (xml.childElementCount === 0) {
+                        result[options.charkey] = normalize(xml.textContent, options);
+                    }
+
+                    for (i = 0; i < xml.childNodes.length; i++) {
+                        node = xml.childNodes[i];
+                        if (node.nodeType === 1) {
+
+                            if (node.attributes.length === 0 && node.childElementCount === 0){
+                                child = normalize(node.textContent, options);
+                            } else {
+                                child = xml2jsonImpl(node, options);
+                            }
+
+                            name = node.nodeName;
+                            if (result.hasOwnProperty(name)) {
+                                // For repeating elements, cast/promote the node to array
+                                var val = result[name];
+                                if (!Array.isArray(val)) {
+                                    val = [val];
+                                    result[name] = val;
+                                }
+                                val.push(child);
+                            } else {
+                                result[name] = child;
+                            }
+                        }
+                    }
+
+                    return result;
+                }
+
+                /**w
+                 * Converts an xml document or string to a JSON object.
+                 *
+                 * @param xml
+                 */
+                function xml2json(xml, options) {
+                    if (!xml) {
+                        return xml;
+                    }
+
+                    options = options || defaultOptions;
+
+                    if (typeof xml === 'string') {
+                        xml = parseXML(xml).documentElement;
+                    }
+
+                    var root = {};
+
+                    if (xml.attributes.length === 0 && xml.childElementCount === 0){
+                        root[xml.nodeName] = normalize(xml.textContent, options);
+                    } else {
+                        root[xml.nodeName] = xml2jsonImpl(xml, options);
+                    }
+
+                    return root;
+                }
+
+                if (typeof jQuery !== 'undefined') {
+                    jQuery.extend({xml2json: xml2json});
+                } else if (typeof module !== 'undefined') {
+                    module.exports = xml2json;
+                } else if (typeof window !== 'undefined') {
+                    window.xml2json = xml2json;
+                }
+            })();
 
             //NOTES:
             //
@@ -115,7 +253,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 var dataType = "xml";
                 var processData = true;
-                if (origType == "POST" && typeof(data) == "object") {
+                if (type == "POST" && typeof(data) == "object") {
                     var fd = new FormData();
                     for (var key in data) {
                         fd.append(key, data[key]);
@@ -159,7 +297,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 else if (type == "DELETE")
                     type = "POST";
 
-                if (origType == "POST" && typeof(data) == "object") {
+                if (type == "POST" && typeof(data) == "object") {
                     var fd = new FormData();
                     for (var key in data) {
                         fd.append(key, data[key]);
@@ -1771,6 +1909,82 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
+            test("Insert/Update/Delete Features", function() {
+
+                function createInsertXml(text, geom) {
+                    var xml = "<FeatureSet><Features><Feature>";
+                    xml += "<Property><Name>Text</Name><Value>" + text + "</Value></Property>";
+                    xml += "<Property><Name>Geometry</Name><Value>" + geom + "</Value></Property>";
+                    xml += "</Feature></Features></FeatureSet>";
+                    return xml;
+                }
+
+                function createUpdateXml(filter, text, geom) {
+                    var xml = "<UpdateOperation>";
+                    xml += "<Filter>" + filter + "</Filter>";
+                    xml += "<UpdateProperties>";
+                    xml += "<Property><Name>Text</Name><Value>" + text + "</Value></Property>";
+                    xml += "<Property><Name>Geometry</Name><Value>" + geom + "</Value></Property>";
+                    xml += "</UpdateProperties>";
+                    xml += "</UpdateOperation>";
+                    return xml;
+                }
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("anon credential insert", "POINT (0 0)"), function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect anon insert success");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("admin credential insert", "POINT (1 1)"), function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect admin insert success");
+                });
+                api_test(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 2, "Expected 2 inserted features");
+                    for (var i = 0; i < gj.features.length; i++) {
+                        if (gj.features[i].properties.ID == 1) {
+                            ok(gj.features[i].properties.Text == "anon credential insert", "expected correct feature text for ID 1");
+                        } else if (gj.features[i].properties.ID == 2) {
+                            ok(gj.features[i].properties.Text == "admin credential insert", "expected correct feature text for ID 2");
+                        }
+                    }
+                });
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect anon update success");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect admin update success");
+                });
+                api_test(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 2, "Expected 2 inserted features");
+                    for (var i = 0; i < gj.features.length; i++) {
+                        if (gj.features[i].properties.ID == 1) {
+                            ok(gj.features[i].properties.Text == "anon credential update", "expected correct updated feature text for ID 1");
+                        } else if (gj.features[i].properties.ID == 2) {
+                            ok(gj.features[i].properties.Text == "admin credential update", "expected correct updated feature text for ID 2");
+                        }
+                    }
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect admin delete success");
+                });
+                api_test(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 1, "Expected 1 inserted features. Got " + gj.features.length);
+                    ok(gj.features[0].properties.ID == 1, "expected feature ID 2 to be deleted");
+                });
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect admin delete success");
+                });
+                api_test(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 0, "Expected 0 inserted features. Got " + gj.features.length);
+                });
+            });
 
             module("Site Service", {
                 setup: function() {
@@ -2632,6 +2846,14 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     }, function(status, result) {
                         ok(status == 200, "(" + status + ") copy operation should've succeeded");
                     });
+                    api_test(rest_root_url + "/services/copyresource", "POST", {
+                        session: this.anonymousSessionId,
+                        source: "Library://RestUnitTests/RedlineLayer.FeatureSource",
+                        destination: "Session:" + this.anonymousSessionId + "//RedlineLayer.FeatureSource",
+                        overwrite: 1
+                    }, function(status, result) {
+                        ok(status == 200, "(" + status + ") copy operation should've succeeded");
+                    });
                 },
                 teardown: function() {
                     api_test(rest_root_url + "/session/" + this.anonymousSessionId, "DELETE", null, function(status, result) {
@@ -3420,6 +3642,82 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Insert/Update/Delete Features", function() {
+
+                function createInsertXml(text, geom) {
+                    var xml = "<FeatureSet><Features><Feature>";
+                    xml += "<Property><Name>Text</Name><Value>" + text + "</Value></Property>";
+                    xml += "<Property><Name>Geometry</Name><Value>" + geom + "</Value></Property>";
+                    xml += "</Feature></Features></FeatureSet>";
+                    return xml;
+                }
+
+                function createUpdateXml(filter, text, geom) {
+                    var xml = "<UpdateOperation>";
+                    xml += "<Filter>" + filter + "</Filter>";
+                    xml += "<UpdateProperties>";
+                    xml += "<Property><Name>Text</Name><Value>" + text + "</Value></Property>";
+                    xml += "<Property><Name>Geometry</Name><Value>" + geom + "</Value></Property>";
+                    xml += "</UpdateProperties>";
+                    xml += "</UpdateOperation>";
+                    return xml;
+                }
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("anon credential insert", "POINT (0 0)"), function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect anon insert success");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("admin credential insert", "POINT (1 1)"), function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect admin insert success");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 2, "Expected 2 inserted features");
+                    for (var i = 0; i < gj.features.length; i++) {
+                        if (gj.features[i].properties.ID == 1) {
+                            ok(gj.features[i].properties.Text == "anon credential insert", "expected correct feature text for ID 1");
+                        } else if (gj.features[i].properties.ID == 2) {
+                            ok(gj.features[i].properties.Text == "admin credential insert", "expected correct feature text for ID 2");
+                        }
+                    }
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect anon update success");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect admin update success");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 2, "Expected 2 inserted features");
+                    for (var i = 0; i < gj.features.length; i++) {
+                        if (gj.features[i].properties.ID == 1) {
+                            ok(gj.features[i].properties.Text == "anon credential update", "expected correct updated feature text for ID 1");
+                        } else if (gj.features[i].properties.ID == 2) {
+                            ok(gj.features[i].properties.Text == "admin credential update", "expected correct updated feature text for ID 2");
+                        }
+                    }
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect admin delete success");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 1, "Expected 1 inserted features. Got " + gj.features.length);
+                    ok(gj.features[0].properties.ID == 1, "expected feature ID 2 to be deleted");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect admin delete success");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 0, "Expected 0 inserted features. Got " + gj.features.length);
                 });
             });
 
