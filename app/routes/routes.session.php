@@ -174,7 +174,7 @@ $app->get("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaNa
     $ctrl->SelectFeatures($resId, $schemaName, $className, $format);
 });
 // Resource Service APIs
-$app->get("/session/:sessionId/:resName/datalist", function($resourcePath) use ($app) {
+$app->get("/session/:sessionId/:resName/datalist", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->EnumerateResourceData($resId, "xml");
@@ -189,7 +189,9 @@ $app->get("/session/:sessionId/:resName/data/:dataName", function($sessionId, $r
     $ctrl = new MgResourceServiceController($app);
     $ctrl->GetResourceData($resId, $dataName);
 });
-$app->get("/session/:sessionId/:resName/header", function($resourcePath) use ($app) {
+/*
+//Need to confirm if like EnumerateResources, this is not permitted on session repos
+$app->get("/session/:sessionId/:resName/header", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->GetResourceHeader($resId, "xml");
@@ -199,6 +201,7 @@ $app->get("/session/:sessionId/:resName/header.:format", function($sessionId, $r
     $ctrl = new MgResourceServiceController($app);
     $ctrl->GetResourceHeader($resId, $format);
 });
+*/
 $app->post("/session/:sessionId/:resName/content", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
     $ctrl = new MgResourceServiceController($app);

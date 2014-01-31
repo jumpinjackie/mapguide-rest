@@ -903,26 +903,6 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
             });
 
-            module("Resource Service - Session", {
-                setup: function() {
-
-                },
-                teardown: function() {
-
-                }
-            });
-            test("Bad Routes", function() {
-                api_test(rest_root_url + "/library/UnitTests/", "GET", null, function(status, result) {
-                    ok(status == 404, "(" + status + ") - Route should not be legal");
-                });
-                api_test(rest_root_url + "/library/UnitTests/list", "POST", {}, function(status, result) {
-                    ok(status == 404, "(" + status + ") - Route should not be legal");
-                });
-                api_test(rest_root_url + "/library/UnitTests/list", "POST", { depth: -1, type: "FeatureSource" }, function(status, result) {
-                    ok(status == 404, "(" + status + ") - Route should not be legal");
-                });
-            });
-
             module("Feature Service - Library", {
                 setup: function() {
                     var self = this;
@@ -2037,6 +2017,534 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
                 api_test(rest_root_url + "/library/RestUnitTests/Parcels.LayerDefinition/content", "GET", { session: this.anonymousSessionId }, function(status, result) {
                     ok(status == 404, "(" + status + ") - the parcels layerdef shouldn't exist");
+                });
+            });
+
+            module("Resource Service - Session", {
+                setup: function() {
+                    var self = this;
+                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result) {
+                        ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                        self.anonymousSessionId = result;
+                    });
+                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                        ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                        self.adminSessionId = result;
+                    });
+                    api_test(rest_root_url + "/services/copyresource", "POST", {
+                        session: this.anonymousSessionId,
+                        source: "Library://Samples/Sheboygan/Data/Parcels.FeatureSource",
+                        destination: "Session:" + this.anonymousSessionId + "//Parcels.FeatureSource",
+                        overwrite: 1
+                    }, function(status, result) {
+                        ok(status == 200, "(" + status + ") copy operation should've succeeded");
+                    });
+                },
+                teardown: function() {
+                    api_test(rest_root_url + "/session/" + this.anonymousSessionId, "DELETE", null, function(status, result) {
+                        ok(status == 200, "(" + status + ") - Expected anonymous session to be destroyed");
+                        delete this.anonymousSessionId;
+                    });
+
+                    api_test(rest_root_url + "/session/" + this.adminSessionId, "DELETE", null, function(status, result) {
+                        ok(status == 200, "(" + status + ") - Expected admin session to be destroyed");
+                        delete this.adminSessionId;
+                    });
+                }
+            });
+            test("Get Resource Content - anon session", function() {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.bar", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected a bad representation response");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.bar", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected a bad representation response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.bar", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected a bad representation response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.bar", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected a bad representation response");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as json");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.json", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as json");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as json");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.json", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as json");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.json", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as json");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.json", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as json");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.json", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as json");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.json", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back as json");
+                });
+            });
+            /*
+            //Need to confirm if like EnumerateResources, this is not permitted on session repos
+            test("Get Resource Header - anon session", function() {
+                api_test_with_credentials(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", null, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+                api_test_with_credentials(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", "depth=-1&type=FeatureSource", "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.sdfjkdsg", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected a bad representation response");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.sdfjkdsg", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected a bad representation response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.sdfjkdsg", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected a bad representation response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.sdfjkdsg", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected a bad representation response");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.xml", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.xml", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as json");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.json", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as json");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as json");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.json", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as json");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.json", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as json");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.json", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as json");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.json", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as json");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.json", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource header back as json");
+                });
+            });
+            */
+            test("Enumerate Resource Data - anon session", function() {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "POST", null, function(status, result) {
+                    ok(status == 404, "(" + status + ") - Route should not be legal");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "PUT", null, function(status, result) {
+                    ok(status == 404, "(" + status + ") - Route should not be legal");
+                });
+
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.jsdhf", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected a bad representation response");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.jsdhf", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected a bad representation response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.jsdhf", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected a bad representation response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.jsdhf", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected a bad representation response");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.json", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.json", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.json", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.json", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.json", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.json", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.html", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.html", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.html", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.html", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.html", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.html", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.html", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.html", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+            });
+            test("Enumerate Resource References - anon session", function() {
+                api_test_with_credentials(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", null, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+                api_test_with_credentials(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { depth: -1, type: "FeatureSource" }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.sdjf", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.sdjf", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.sdjf", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.sdjf", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad representation response");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.json", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.json", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.json", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.json", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.json", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.json", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.json", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as json");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.html", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.html", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.html", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.html", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.html", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.html", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.html", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.html", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've got resource data list back as html");
+                });
+            });
+            
+            test("Set/Get/Delete resource - anon session", function() {
+                var xml = '<?= $emptyFeatureSourceXml ?>';
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource/content", "POST", xml, function(status, result) {
+                    ok(status == 201, "(" + status + ") - Should've saved resource by anon");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource/content", "POST", xml, function(status, result) {
+                    ok(status == 201, "(" + status + ") - Should've saved resource by admin");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource/content", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Empty fs should exist");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource/content", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Empty2 fs should exist");
+                });
+                //Even if admin saved it, controller always uses session id as first priority so this should be a delete on anon's behalf
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource", "DELETE", xml, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've deleted resource");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource", "DELETE", xml, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Should've deleted resource");
                 });
             });
 

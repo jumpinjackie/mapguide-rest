@@ -109,7 +109,7 @@ class MgBaseController extends MgResponseHandler
         $callback($req, $param);
     }
 
-    protected function EnsureAuthenticationForSite() {
+    protected function EnsureAuthenticationForSite($nominatedSessionId = "") {
         if ($this->userInfo == null) {
             $this->userInfo = new MgUserInformation();
             $this->userInfo->SetClientAgent("MapGuide REST Extension");
@@ -118,53 +118,57 @@ class MgBaseController extends MgResponseHandler
             if ($session != null) {
                 $this->userInfo->SetMgSessionId($session);
             } else {
-                $username = null;
-                $password = "";
-
-                // Username/password extraction logic ripped from PHP implementation of the MapGuide AJAX viewer
-
-                //TODO: Ripped from AJAX viewer. Use the abstractions provided by Slim
-
-                // No session, no credentials explicitely passed. Check for HTTP Auth user/passwd.  Under Apache CGI, the
-                // PHP_AUTH_USER and PHP_AUTH_PW are not set.  However, the Apache admin may
-                // have rewritten the authentication information to REMOTE_USER.  This is a
-                // suggested approach from the Php.net website.
-
-                // Has REMOTE_USER been rewritten?
-                if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['REMOTE_USER']) &&
-                preg_match('/Basic +(.*)$/i', $_SERVER['REMOTE_USER'], $matches))
-                {
-                    list($name, $password) = explode(':', base64_decode($matches[1]));
-                    $_SERVER['PHP_AUTH_USER'] = strip_tags($name);
-                    $_SERVER['PHP_AUTH_PW']    = strip_tags($password);
-                }
-
-
-                // REMOTE_USER may also appear as REDIRECT_REMOTE_USER depending on CGI setup.
-                //  Check for this as well.
-                if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['REDIRECT_REMOTE_USER']) &&
-                preg_match('/Basic (.*)$/i', $_SERVER['REDIRECT_REMOTE_USER'], $matches))
-                {
-                    list($name, $password) = explode(':', base64_decode($matches[1]));
-                    $_SERVER['PHP_AUTH_USER'] = strip_tags($name);
-                    $_SERVER['PHP_AUTH_PW'] = strip_tags($password);
-                }
-
-                // Finally, PHP_AUTH_USER may actually be defined correctly.  If it is set, or
-                // has been pulled from REMOTE_USER rewriting then set our USERNAME and PASSWORD
-                // parameters.
-                if (isset($_SERVER['PHP_AUTH_USER']) && strlen($_SERVER['PHP_AUTH_USER']) > 0)
-                {
-                    $username = $_SERVER['PHP_AUTH_USER'];
-                    if (isset($_SERVER['PHP_AUTH_PW']) && strlen($_SERVER['PHP_AUTH_PW']) > 0)
-                        $password = $_SERVER['PHP_AUTH_PW'];
-                }
-
-                //If we have everything we need, put it into the MgUserInformation
-                if ($username != null) {
-                    $this->userInfo->SetMgUsernamePassword($username, $password);
+                if ($nominatedSessionId !== "") {
+                    $this->userInfo->SetMgSessionId($nominatedSessionId);
                 } else {
-                    $this->Unauthorized();
+                    $username = null;
+                    $password = "";
+
+                    // Username/password extraction logic ripped from PHP implementation of the MapGuide AJAX viewer
+
+                    //TODO: Ripped from AJAX viewer. Use the abstractions provided by Slim
+
+                    // No session, no credentials explicitely passed. Check for HTTP Auth user/passwd.  Under Apache CGI, the
+                    // PHP_AUTH_USER and PHP_AUTH_PW are not set.  However, the Apache admin may
+                    // have rewritten the authentication information to REMOTE_USER.  This is a
+                    // suggested approach from the Php.net website.
+
+                    // Has REMOTE_USER been rewritten?
+                    if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['REMOTE_USER']) &&
+                    preg_match('/Basic +(.*)$/i', $_SERVER['REMOTE_USER'], $matches))
+                    {
+                        list($name, $password) = explode(':', base64_decode($matches[1]));
+                        $_SERVER['PHP_AUTH_USER'] = strip_tags($name);
+                        $_SERVER['PHP_AUTH_PW']    = strip_tags($password);
+                    }
+
+
+                    // REMOTE_USER may also appear as REDIRECT_REMOTE_USER depending on CGI setup.
+                    //  Check for this as well.
+                    if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['REDIRECT_REMOTE_USER']) &&
+                    preg_match('/Basic (.*)$/i', $_SERVER['REDIRECT_REMOTE_USER'], $matches))
+                    {
+                        list($name, $password) = explode(':', base64_decode($matches[1]));
+                        $_SERVER['PHP_AUTH_USER'] = strip_tags($name);
+                        $_SERVER['PHP_AUTH_PW'] = strip_tags($password);
+                    }
+
+                    // Finally, PHP_AUTH_USER may actually be defined correctly.  If it is set, or
+                    // has been pulled from REMOTE_USER rewriting then set our USERNAME and PASSWORD
+                    // parameters.
+                    if (isset($_SERVER['PHP_AUTH_USER']) && strlen($_SERVER['PHP_AUTH_USER']) > 0)
+                    {
+                        $username = $_SERVER['PHP_AUTH_USER'];
+                        if (isset($_SERVER['PHP_AUTH_PW']) && strlen($_SERVER['PHP_AUTH_PW']) > 0)
+                            $password = $_SERVER['PHP_AUTH_PW'];
+                    }
+
+                    //If we have everything we need, put it into the MgUserInformation
+                    if ($username != null) {
+                        $this->userInfo->SetMgUsernamePassword($username, $password);
+                    } else {
+                        $this->Unauthorized();
+                    }
                 }
             }
         }

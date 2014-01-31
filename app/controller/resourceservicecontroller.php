@@ -26,13 +26,17 @@ class MgResourceServiceController extends MgBaseController {
 
     public function DeleteResource($resId) {
         $resIdStr = $resId->ToString();
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr) {
             $param->AddParameter("OPERATION", "DELETERESOURCE");
             $param->AddParameter("VERSION", "1.0.0");
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId);
     }
 
     public function GetResourceData($resId, $dataName) {
@@ -51,6 +55,10 @@ class MgResourceServiceController extends MgBaseController {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
         $resIdStr = $resId->ToString();
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr) {
@@ -66,7 +74,7 @@ class MgResourceServiceController extends MgBaseController {
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId);
     }
 
     public function EnumerateResourceReferences($resId, $format) {
@@ -94,7 +102,7 @@ class MgResourceServiceController extends MgBaseController {
     public function GetResourceHeader($resId, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
-
+        
         $resIdStr = $resId->ToString();
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr) {
@@ -115,8 +123,11 @@ class MgResourceServiceController extends MgBaseController {
 
     public function SetResourceContent($resId) {
         try {
-            $resIdStr = $resId->ToString();
-            $this->EnsureAuthenticationForSite();
+            $sessionId = "";
+            if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+                $sessionId = $resId->GetRepositoryName();
+            }
+            $this->EnsureAuthenticationForSite($sessionId);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
@@ -137,7 +148,10 @@ class MgResourceServiceController extends MgBaseController {
     public function GetResourceContent($resId, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
-
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
         $resIdStr = $resId->ToString();
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr) {
@@ -149,7 +163,7 @@ class MgResourceServiceController extends MgBaseController {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId);
     }
 
     public function EnumerateResources($resId, $format) {
