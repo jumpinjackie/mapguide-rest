@@ -54,6 +54,10 @@ class MgDataController extends MgBaseController {
             throw new Exception("Missing property 'FeatureSource' in configuration section 'Source'"); //TODO: Localize
         if (!array_key_exists("FeatureClass", $cfgSource))
             throw new Exception("Missing property 'FeatureClass' in configuration section 'Source'"); //TODO: Localize
+        if (array_key_exists("IdentityProperty", $cfgSource))
+            $result->IdentityProperty = $cfgSource["IdentityProperty"];
+        else
+            $result->IdentityProperty = null;
 
         $result->resId = new MgResourceIdentifier($cfgSource["FeatureSource"]);
         $result->className = $cfgSource["FeatureClass"];
@@ -126,6 +130,7 @@ class MgDataController extends MgBaseController {
             $this->app->AdapterConfig = $result->config;
             $this->app->FeatureClass = $result->className;
             $this->app->ConfigPath = dirname($path);
+            $this->app->IdentityProperty = $result->IdentityProperty;
             $adapter = $this->app->container[$result->adapterName];
             $adapter->HandleMethod($method, false);
         }
@@ -150,6 +155,7 @@ class MgDataController extends MgBaseController {
             $this->app->AdapterConfig = $result->config;
             $this->app->FeatureClass = $result->className;
             $this->app->ConfigPath = dirname($path);
+            $this->app->IdentityProperty = $result->IdentityProperty;
             $adapter = $this->app->container[$result->adapterName];
             $adapter->SetFeatureId($id);
             $adapter->HandleMethod($method, true);

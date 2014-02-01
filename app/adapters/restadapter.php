@@ -32,10 +32,13 @@ abstract class MgRestAdapter extends MgResponseHandler
     protected $featureId;
     protected $configPath;
 
-    protected function __construct($app, $siteConn, $resId, $className, $config, $configPath) {
+    protected $featureIdProp;
+
+    protected function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp = null) {
         parent::__construct($app);
         $this->configPath = $configPath;
         $this->featureId = null;
+        $this->featureIdProp = $featureIdProp;
         $this->featureSourceId = $resId;
         $this->siteConn = $siteConn;
         $this->featSvc = $this->siteConn->CreateService(MgServiceType::FeatureService);
@@ -68,21 +71,35 @@ abstract class MgRestAdapter extends MgResponseHandler
             if ($this->featureId == null) {
                 throw new Exception("No feature ID set"); //TODO: Localize
             }
+            $idType = MgPropertyType::String;
             $tokens = explode(":", $this->className);
             $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $tokens[0], $tokens[1]);
-            $idProps = $clsDef->GetIdentityProperties();
-            if ($idProps->GetCount() == 0) {
-                throw new Exception(sprintf("Cannot query (%s) in %s by ID. Class has no identity properties", $this->className, $this->featureSourceId->ToString())); //TODO: Localize
-            } else if ($idProps->GetCount() > 1) {
-                throw new Exception(sprintf("Cannot query (%s) in %s by ID. Class has more than one identity property", $this->className, $this->featureSourceId->ToString())); //TODO: Localize
-            } else {
-                $idProp = $idProps->GetItem(0);
-                if ($idProp->GetDataType() == MgPropertyType::String) {
-                    $query->SetFilter($idProp->GetName()." = '".$this->featureId."'");
+            if ($this->featureIdProp == null) {
+                $idProps = $clsDef->GetIdentityProperties();
+                if ($idProps->GetCount() == 0) {
+                    throw new Exception(sprintf("Cannot query (%s) in %s by ID. Class has no identity properties", $this->className, $this->featureSourceId->ToString())); //TODO: Localize
+                } else if ($idProps->GetCount() > 1) {
+                    throw new Exception(sprintf("Cannot query (%s) in %s by ID. Class has more than one identity property", $this->className, $this->featureSourceId->ToString())); //TODO: Localize
                 } else {
-                    $query->SetFilter($idProp->GetName()." = ".$this->featureId);
+                    $idProp = $idProps->GetItem(0);
+                    $this->featureIdProp = $idProp->GetName();
+                    $idType = $idProp->GetDataType();
+                }
+            } else {
+                $props = $clsDef->GetProperties();
+                $iidx = $props->IndexOf($this->featureIdProp);
+                if ($iidx >= 0) {
+                    $propDef = $props->GetItem($iidx);
+                    if ($propDef->GetPropertyType() != MgFeaturePropertyType::DataProperty)
+                        throw new Exception("Specified identity property ".$this->featureIdProp." is not a data property");
+                } else {
+                    throw new Exception("Specified identity property ".$this->featureIdProp." not found in class definition");
                 }
             }
+            if ($idType == MgPropertyType::String)
+                $query->SetFilter($this->featureIdProp." = '".$this->featureId."'");
+            else
+                $query->SetFilter($this->featureIdProp." = ".$this->featureId);
         } else {
             $flt = $this->app->request->get("filter");
             if ($flt != null)
@@ -157,8 +174,8 @@ abstract class MgRestAdapter extends MgResponseHandler
  * allowing for subclasses to handle the MgReader output logic
  */
 abstract class MgFeatureRestAdapter extends MgRestAdapter { 
-    public function __construct($app, $siteConn, $resId, $className, $config, $configPath) {
-        parent::__construct($app, $siteConn, $resId, $className, $config, $configPath);
+    public function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
+        parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
     }
 
     protected function CreateReader($single) {

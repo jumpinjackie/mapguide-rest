@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Property Results</title>
-        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" />
         <script type="text/javascript">
 
             function viewResultsAs(format) {

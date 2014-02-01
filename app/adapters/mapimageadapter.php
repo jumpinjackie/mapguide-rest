@@ -31,8 +31,9 @@ class MgMapImageRestAdapter extends MgRestAdapter {
     private $imgFormat;
     private $dpi;
     private $zoomFactor;
+    private $viewScale;
 
-    public function __construct($app, $siteConn, $resId, $className, $config, $configPath) {
+    public function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
         $this->limit = 0;
         $this->mapDefId = null;
         $this->map = null;
@@ -43,7 +44,8 @@ class MgMapImageRestAdapter extends MgRestAdapter {
         $this->imgHeight = 200;
         $this->dpi = 96;
         $this->zoomFactor = 1.3;
-        parent::__construct($app, $siteConn, $resId, $className, $config, $configPath);
+        $this->viewScale = 0;
+        parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
     }
 
     /**
@@ -63,6 +65,9 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             $this->zoomFactor = floatval($config["ZoomFactor"]);
         if (array_key_exists("ImageFormat", $config))
             $this->imgFormat = $config["ImageFormat"];
+
+        if (array_key_exists("ViewScale", $config))
+            $this->viewScale = intval($config["ViewScale"]);
     }
 
     /**
@@ -74,12 +79,15 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             $ovWidth = $this->app->request->get("width");
             $ovHeight = $this->app->request->get("height");
             $ovDpi = $this->app->request->get("dpi");
+            $ovScale = $this->app->request->get("scale");
             if ($ovWidth != null)
                 $this->imgWidth = $ovWidth;
             if ($ovHeight != null)
                 $this->imgHeight = $ovHeight;
             if ($ovDpi != null)
                 $this->dpi = $ovDpi;
+            if ($ovScale != null)
+                $this->viewScale = intval($ovScale);
         
             $site = $this->siteConn->GetSite();
             $this->sessionId = $site->GetCurrentSession();
@@ -122,24 +130,24 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             $x = ($extLL->GetX() + $extUR->GetX()) / 2.0;
             $y = ($extLL->GetY() + $extUR->GetY()) / 2.0;
 
+            if ($this->viewScale === 0) {
+                $csFactory = new MgCoordinateSystemFactory();
+                $cs = $csFactory->Create($this->map->GetMapSRS());
+                $metersPerUnit = $cs->ConvertCoordinateSystemUnitsToMeters(1.0);
 
-            $csFactory = new MgCoordinateSystemFactory();
-            $cs = $csFactory->Create($this->map->GetMapSRS());
-            $metersPerUnit = $cs->ConvertCoordinateSystemUnitsToMeters(1.0);
+                $mcsH = $extUR->GetY() - $extLL->GetY();
+                $mcsW = $extUR->GetX() - $extLL->GetX();
+                
+                $mcsH = $mcsH * $this->zoomFactor;
+                $mcsW = $mcsW * $this->zoomFactor;
+                     
+                $metersPerPixel  = 0.0254 / $this->dpi;
 
-            $mcsH = $extUR->GetY() - $extLL->GetY();
-            $mcsW = $extUR->GetX() - $extLL->GetX();
-            
-            $mcsH = $mcsH * $this->zoomFactor;
-            $mcsW = $mcsW * $this->zoomFactor;
-                 
-            $metersPerPixel  = 0.0254 / $this->dpi;
-
-            $scale = 0.0;
-            if ($this->imgHeight * $mcsW > $this->imgWidth * $mcsH)
-                $scale = $mcsW * $metersPerUnit / ($this->imgWidth * $metersPerPixel); // width-limited
-            else
-                $scale = $mcsH * $metersPerUnit / ($this->imgHeight * $metersPerPixel); // height-limited
+                if ($this->imgHeight * $mcsW > $this->imgWidth * $mcsH)
+                    $this->viewScale = $mcsW * $metersPerUnit / ($this->imgWidth * $metersPerPixel); // width-limited
+                else
+                    $this->viewScale = $mcsH * $metersPerUnit / ($this->imgHeight * $metersPerPixel); // height-limited
+            }
 
             $req = new MgHttpRequest("");
             $param = $req->GetRequestParam();
@@ -159,7 +167,7 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             $param->AddParameter("SETDISPLAYDPI", $this->dpi);
             $param->AddParameter("SETVIEWCENTERX", $x);
             $param->AddParameter("SETVIEWCENTERY", $y);
-            $param->AddParameter("SETVIEWSCALE", $scale);
+            $param->AddParameter("SETVIEWSCALE", $this->viewScale);
             $param->AddParameter("BEHAVIOR", 3); //Layers + Selection
 
             $this->ExecuteHttpRequest($req);

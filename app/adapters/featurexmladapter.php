@@ -28,11 +28,11 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     private $limit;
     private $read;
 
-    public function __construct($app, $siteConn, $resId, $className, $config, $configPath) {
+    public function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
         $this->transform = null;
         $this->limit = -1;
         $this->read = 0;
-        parent::__construct($app, $siteConn, $resId, $className, $config, $configPath);
+        parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
     }
 
     /**
@@ -133,7 +133,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
                                 $geom = ($this->transform != null) ? $this->agfRw->Read($agf, $this->transform) : $this->agfRw->Read($agf);
                                 $output .= $this->wktRw->Write($geom);
                             } catch (MgException $ex) {
-
+                                
                             }
                         }
                         break;

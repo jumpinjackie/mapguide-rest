@@ -5,7 +5,7 @@ require_once "restadapter.php";
 /**
  * A set of lazy-loaded geometry formatters
  */
-class MgGeometryFormatterSet
+class MgFormatterSet
 {
     private $app;
     private $formatters;
@@ -18,7 +18,7 @@ class MgGeometryFormatterSet
     public function GetFormatter($formatterName) {
         if (!array_key_exists($formatterName, $this->formatters)) {
             if (!$this->app->container->has($formatterName)) {
-                throw new Exception("No Geometry Formatter named ".$formatterName." registered"); //TODO: Localize
+                throw new Exception("No formatter named ".$formatterName." registered"); //TODO: Localize
             }
             $this->formatters[$formatterName] = $this->app->container->$formatterName;
         }
@@ -41,6 +41,19 @@ class MgFeatureModel
         $this->data = array();
         $this->formatters = $formatters;
         $this->transform = $transform;
+    }
+
+    public function DateTimeAsType($name, $formatterName) {
+        if (!array_key_exists($name, $this->data)) {
+            $this->data[$name] = array();
+        }
+        if (!array_key_exists($formatterName, $this->data[$name])) {
+            $fmt = $this->formatters->GetFormatter($formatterName);
+            if ($fmt == null)
+                throw new Exception("No DateTime Formatter named ".$formatterName." registered"); //TODO: Localize
+            $this->data[$name][$formatterName] = $fmt->Output($this->reader, $name);
+        }
+        return $this->data[$name][$formatterName];
     }
 
     public function GeometryAsType($name, $formatterName) {
@@ -73,8 +86,9 @@ class MgFeatureModel
                         $this->data[$name] = $this->reader->GetByte($idx)."";
                         break;
                     case MgPropertyType::DateTime:
-                        $dt = $this->reader->GetDateTime($idx);
-                        $this->data[$name] = $dt->ToString();
+                        {
+                            $this->DateTimeAsType($name, "DateDefault");
+                        }
                         break;
                     case MgPropertyType::Decimal:
                     case MgPropertyType::Double:
@@ -104,12 +118,22 @@ class MgFeatureModel
             } else {
                 if ($ptype == MgPropertyType::Geometry) {
                     $this->data[$name] = array();
+                } else if ($ptype == MgPropertyType::DateTime) {
+                    $this->data[$name] = array();
                 } else {
                     $this->data[$name] = "";
                 }
             }
             if ($ptype == MgPropertyType::Geometry) {
-                return $this->data[$name]["GeomWKT"];
+                if (array_key_exists("GeomWKT", $this->data[$name]))
+                    return $this->data[$name]["GeomWKT"];
+                else
+                    return "";
+            } else if ($ptype == MgPropertyType::DateTime) {
+                if (array_key_exists("DateDefault", $this->data[$name]))
+                    return $this->data[$name]["DateDefault"];
+                else
+                    return "";
             } else {
                 return $this->data[$name];
             }
@@ -166,8 +190,7 @@ class MgRelatedFeaturesSet
     }
 }
 
-/**
- * Template model for "many" result templates
+/** * Template model for "many" result templates
  */
 class MgFeatureReaderModel
 {
@@ -222,12 +245,12 @@ class MgTemplateRestAdapter extends MgRestAdapter
 
     private $relations;
 
-    public function __construct($app, $siteConn, $resId, $className, $config, $configPath) {
+    public function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
         $this->transform = null;
         $this->limit = -1;
         $this->read = 0;
         $this->relations = array();
-        parent::__construct($app, $siteConn, $resId, $className, $config, $configPath);
+        parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
     }
 
     /**
@@ -346,7 +369,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
                         //records where sourceID is null in target is kind of pointless
                         foreach ($rel->KeyMap as $sourceProp => $targetProp) {
                             if (!$reader->IsNull($sourceProp)) {
-                                $value = MgTemplateRestAdapter::GetPropertyValue($reader, $sourceProp);
+                                $value = self::GetPropertyValue($reader, $sourceProp);
                                 if ($value !== "") {
                                     $bQuery = true;
                                     if ($reader->GetPropertyType($sourceProp) == MgPropertyType::String)
@@ -372,12 +395,12 @@ class MgTemplateRestAdapter extends MgRestAdapter
                         $relQuery->SetFilter($relFilter);
                         try {
                             $relReader = $this->featSvc->SelectFeatures($rel->FeatureSource, $rel->FeatureClass, $relQuery);
-                            $related->Add($relName, new MgFeatureReaderModel(new MgGeometryFormatterSet($this->app), $relReader, -1, 0, null));
+                            $related->Add($relName, new MgFeatureReaderModel(new MgFormatterSet($this->app), $relReader, -1, 0, null));
                         } catch (MgException $ex) {
                             throw new Exception("Error setting up related query. Filter was: $relFilter, Details:".$ex->GetDetails()); //TODO: Localize
                         }
                     }
-                    $smarty->assign("model", new MgFeatureModel(new MgGeometryFormatterSet($this->app), $reader, $this->transform));
+                    $smarty->assign("model", new MgFeatureModel(new MgFormatterSet($this->app), $reader, $this->transform));
                     $smarty->assign("related", $related);
                     $output = $smarty->fetch($this->singleViewPath);
                 } else {
@@ -386,7 +409,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
                     $output = $smarty->fetch($this->noneViewPath);
                 }
             } else {
-                $smarty->assign("model", new MgFeatureReaderModel(new MgGeometryFormatterSet($this->app), $reader, $this->limit, $this->read, $this->transform));
+                $smarty->assign("model", new MgFeatureReaderModel(new MgFormatterSet($this->app), $reader, $this->limit, $this->read, $this->transform));
                 $output = $smarty->fetch($this->manyViewPath);
             }
             $this->app->response->header("Content-Type", $this->mimeType);

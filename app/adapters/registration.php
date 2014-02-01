@@ -14,7 +14,8 @@ $app->container->FeatureSetXml = function() use ($app) {
         $app->container->FeatureSource,
         $app->container->FeatureClass,
         $app->container->AdapterConfig,
-        $app->container->ConfigPath);
+        $app->container->ConfigPath,
+        $app->container->IdentityProperty);
 };
 $app->container->FeatureSetGeoJson = function() use ($app) {
     return new MgGeoJsonRestAdapter(
@@ -23,7 +24,8 @@ $app->container->FeatureSetGeoJson = function() use ($app) {
         $app->container->FeatureSource,
         $app->container->FeatureClass,
         $app->container->AdapterConfig,
-        $app->container->ConfigPath);
+        $app->container->ConfigPath,
+        $app->container->IdentityProperty);
 };
 $app->container->MapImage = function() use ($app) {
     return new MgMapImageRestAdapter(
@@ -32,7 +34,8 @@ $app->container->MapImage = function() use ($app) {
         $app->container->FeatureSource,
         $app->container->FeatureClass,
         $app->container->AdapterConfig,
-        $app->container->ConfigPath);
+        $app->container->ConfigPath,
+        $app->container->IdentityProperty);
 };
 $app->container->Template = function() use ($app) {
     return new MgTemplateRestAdapter(
@@ -41,7 +44,8 @@ $app->container->Template = function() use ($app) {
         $app->container->FeatureSource,
         $app->container->FeatureClass,
         $app->container->AdapterConfig,
-        $app->container->ConfigPath);
+        $app->container->ConfigPath,
+        $app->container->IdentityProperty);
 };
 $app->container->FeatureSetCsv = function() use ($app) {
     return new MgCsvRestAdapter(
@@ -50,7 +54,8 @@ $app->container->FeatureSetCsv = function() use ($app) {
         $app->container->FeatureSource,
         $app->container->FeatureClass,
         $app->container->AdapterConfig,
-        $app->container->ConfigPath);
+        $app->container->ConfigPath,
+        $app->container->IdentityProperty);
 };
 
 ?>
