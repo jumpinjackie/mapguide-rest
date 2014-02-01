@@ -21,6 +21,23 @@
                 }
             }
         },
+        "georss": {
+            "Adapter": "Template",
+            "Methods": {
+                "GET": {
+                    "PageSize": 20,
+                    "MaxCount": 100,
+                    "TransformTo": "LL84",
+                    "MimeType": "application/rss+xml",
+                    "Templates": {
+                        "Single": "property_georss_single.tpl",
+                        "Many": "property_georss_many.tpl",
+                        "None": "property_georss_none.tpl",
+                        "Error": "property_georss_error.tpl"
+                    }
+                }
+            }
+        },
         "atom": {
             "Adapter": "Template",
             "Methods": {

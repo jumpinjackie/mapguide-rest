@@ -44,9 +44,9 @@ class MgGeoRssSimpleGeometryOutputFormatter extends MgGeometryOutputFormatter {
             $coord = $iter->GetCurrent();
             if ($coord != null) {
                 if ($bFirstCoord)
-                    $output .= $coord->GetX()." ".$coord->GetY();
+                    $output .= $coord->GetY()." ".$coord->GetX();
                 else
-                    $output .= " ".$coord->GetX()." ".$coord->GetY();
+                    $output .= " ".$coord->GetY()." ".$coord->GetX();
             }
             $bFirstCoord = false;
         }
@@ -72,7 +72,7 @@ class MgGeoRssSimpleGeometryOutputFormatter extends MgGeometryOutputFormatter {
         $output  = "<georss:point>";
         $coord = $geom->GetCoordinate();
         if ($coord != null) {
-            $output .= $coord->GetX()." ".$coord->GetY();
+            $output .= $coord->GetY()." ".$coord->GetX();
         }
         $output .= "</georss:point>";
         if ($zval != null)
