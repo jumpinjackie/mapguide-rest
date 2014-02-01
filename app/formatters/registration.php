@@ -19,16 +19,29 @@
 
 require_once "wktgeometryoutputformatter.php";
 require_once "kmlgeometryoutputformatter.php";
+require_once "gmlgeometryoutputformatter.php";
+require_once "georssgeometryoutputformatter.php";
 
 require_once "defaultdatetimeoutputformatter.php";
 
+//Geometry formatters
 $app->container->GeomWKT = function() {
     return new MgWktGeometryOutputFormatter();
 };
 $app->container->GeomKML = function() {
     return new MgKmlGeometryOutputFormatter();
 };
+$app->container->GeomRSSSimple = function() {
+    return new MgGeoRssSimpleGeometryOutputFormatter();
+};
+$app->container->GeomRSSGml = function() {
+    return new MgGeoRssGmlGeometryOutputFormatter();
+};
+$app->container->GeomGml = function() {
+    return new MgGmlGeometryOutputFormatter();
+};
 
+//Date formatters
 $app->container->DateDefault = function() {
     return new MgDefaultDateTimeOutputFormatter();
 };
@@ -50,5 +63,8 @@ $app->container->DateMDYFull = function() {
 $app->container->DateISO9601Full = function() {
     return new MgISO9601FullDateTimeFormatter();
 };
+$app->container->DateAtom = function() {
+    return new MgAtomDateTimeFormatter();
+}
 
 ?>

@@ -89,4 +89,14 @@ class MgISO9601FullDateTimeFormatter extends MgDateTimeOutputFormatter {
     }
 }
 
+class MgAtomDateTimeFormatter extends MgDateTimeOutputFormatter {
+    public function __construct() {
+        parent::__construct();
+    }
+
+    protected function OutputDateTime($dt) {
+        return sprintf("%d-%02d-%02dT%02d:%02d:%02dZ", $dt->GetYear(), $dt->GetMonth(), $dt->GetDay(), $dt->GetHour(), $dt->GetMinute(), $dt->GetSecond());
+    }
+}
+
 ?>

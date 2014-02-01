@@ -21,6 +21,23 @@
                 }
             }
         },
+        "atom": {
+            "Adapter": "Template",
+            "Methods": {
+                "GET": {
+                    "PageSize": 20,
+                    "MaxCount": 100,
+                    "TransformTo": "LL84",
+                    "MimeType": "application/atom+xml",
+                    "Templates": {
+                        "Single": "property_atom_single.tpl",
+                        "Many": "property_atom_many.tpl",
+                        "None": "property_atom_none.tpl",
+                        "Error": "property_atom_error.tpl"
+                    }
+                }
+            }
+        },
         "kml": {
             "Adapter": "Template",
             "Methods": {
