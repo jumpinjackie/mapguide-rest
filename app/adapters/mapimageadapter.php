@@ -119,7 +119,39 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             $query = $this->CreateQueryOptions($single);
             $reader = $this->featSvc->SelectFeatures($this->featureSourceId, $this->className, $query);
            
-            $this->sel->AddFeatures($this->selLayer, $reader, $this->limit);
+            $start = -1;
+            $end = -1;
+            $read = 0;
+            $limit = $this->limit;
+
+            $pageNo = $this->app->request->get("page");
+            if ($pageNo == null)
+                $pageNo = 1;
+            else
+                $pageNo = intval($pageNo);
+
+            $bEndOfReader = false;
+            if ($this->pageSize > 0) {
+                if ($pageNo > 1) {
+                    $skipThisMany = (($pageNo - 1) * $this->pageSize) - 1;
+                    //echo "skip this many: $skipThisMany<br/>";
+                    $bEndOfReader = true;
+                    while ($reader->ReadNext()) {
+                        if ($read == $skipThisMany) {
+                            $bEndOfReader = false;
+                            $limit = min(($skipThisMany + $this->pageSize), $this->limit - 1) - $read;
+                            break;
+                        }
+                        $read++;
+                    }
+                } else { //first page, set limit to page size
+                    $limit = $this->pageSize;
+                }
+            }
+
+            //echo "read: $read, limit: $limit, pageSize: ".$this->pageSize." result limit: ".$this->limit;
+            //die;
+            $this->sel->AddFeatures($this->selLayer, $reader, $limit);
             $reader->Close();
             $this->sel->Save($this->resSvc, $mapName);
             
