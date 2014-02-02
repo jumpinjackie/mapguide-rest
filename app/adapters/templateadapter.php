@@ -233,8 +233,6 @@ class MgFeatureReaderModel
 
 class MgTemplateRestAdapter extends MgRestAdapter
 {
-    private $transform;
-    private $limit;
     private $read;
 
     private $singleViewPath;
@@ -246,8 +244,6 @@ class MgTemplateRestAdapter extends MgRestAdapter
     private $relations;
 
     public function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
-        $this->transform = null;
-        $this->limit = -1;
         $this->read = 0;
         $this->relations = array();
         parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
@@ -257,16 +253,6 @@ class MgTemplateRestAdapter extends MgRestAdapter
      * Initializes the adapater with the given REST configuration
      */
     protected function InitAdapterConfig($config) {
-        if (array_key_exists("MaxCount", $config))
-            $this->limit = intval($config["MaxCount"]);
-
-        if (array_key_exists("TransformTo", $config)) {
-            $tokens = explode(":", $this->className);
-            $schemaName = $tokens[0];
-            $className = $tokens[1];
-            $this->transform = MgUtils::GetTransform($this->featSvc, $this->featureSourceId, $schemaName, $className, $config["TransformTo"]);
-        }
-
         if (!array_key_exists("Templates", $config))
             throw new Exception("Missing required property 'Templates' in adapter configuration"); //TODO: Localize
 

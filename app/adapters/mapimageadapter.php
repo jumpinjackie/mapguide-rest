@@ -25,7 +25,6 @@ class MgMapImageRestAdapter extends MgRestAdapter {
     private $sel;
     private $sessionId;
 
-    private $limit;
     private $imgWidth;
     private $imgHeight;
     private $imgFormat;
@@ -34,7 +33,6 @@ class MgMapImageRestAdapter extends MgRestAdapter {
     private $viewScale;
 
     public function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
-        $this->limit = 0;
         $this->mapDefId = null;
         $this->map = null;
         $this->sel = null;
@@ -52,8 +50,9 @@ class MgMapImageRestAdapter extends MgRestAdapter {
      * Initializes the adapater with the given REST configuration
      */
     protected function InitAdapterConfig($config) {
-        if (array_key_exists("MaxCount", $config))
-            $this->limit = intval($config["MaxCount"]);
+        //Where -1 is normally used to indicate un-bounded limits, 0 is used here.
+        if ($this->limit === -1)
+            $this->limit = 0;
         if (!array_key_exists("MapDefinition", $config))
             throw new Exception("Missing required adapter property 'MapDefinition'"); //TODO: Localize
         if (!array_key_exists("SelectionLayer", $config))

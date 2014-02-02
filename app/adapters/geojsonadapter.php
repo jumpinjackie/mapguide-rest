@@ -23,15 +23,11 @@ require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
     private $agfRw;
-    private $transform;
 
-    private $limit;
     private $read;
     private $firstFeature;
 
     public function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
-        $this->transform = null;
-        $this->limit = -1;
         $this->read = 0;
         parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
     }
@@ -40,14 +36,7 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
      * Initializes the adapater with the given REST configuration
      */
     protected function InitAdapterConfig($config) {
-        if (array_key_exists("MaxCount", $config))
-            $this->limit = intval($config["MaxCount"]);
-        if (array_key_exists("TransformTo", $config)) {
-            $tokens = explode(":", $this->className);
-            $schemaName = $tokens[0];
-            $className = $tokens[1];
-            $this->transform = MgUtils::GetTransform($this->featSvc, $this->featureSourceId, $schemaName, $className, $config["TransformTo"]);
-        }
+        
     }
 
     /**

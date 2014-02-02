@@ -36,9 +36,14 @@ abstract class MgRestAdapter extends MgResponseHandler
 
     protected $propertyList;
     protected $computedPropertyList;
+    protected $pageSize;
+    protected $limit;
+    protected $transform;
 
     protected function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp = null) {
         parent::__construct($app);
+        $this->limit = -1;
+        $this->transform = null;
         $this->configPath = $configPath;
         $this->featureId = null;
         $this->featureIdProp = $featureIdProp;
@@ -56,6 +61,18 @@ abstract class MgRestAdapter extends MgResponseHandler
         if (array_key_exists("ComputedProperties", $config)) {
             $cfgComputedProps = $config["ComputedProperties"];
             $this->computedPropertyList = $cfgComputedProps;
+        }
+        if (array_key_exists("PageSize", $config)) {
+            $this->pageSize = intval($config["PageSize"]);
+        }
+        if (array_key_exists("MaxCount", $config)) {
+            $this->limit = intval($config["MaxCount"]);
+        }
+        if (array_key_exists("TransformTo", $config)) {
+            $tokens = explode(":", $this->className);
+            $schemaName = $tokens[0];
+            $className = $tokens[1];
+            $this->transform = MgUtils::GetTransform($this->featSvc, $this->featureSourceId, $schemaName, $className, $config["TransformTo"]);
         }
 
         $this->InitAdapterConfig($config);
