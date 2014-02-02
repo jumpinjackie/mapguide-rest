@@ -43,6 +43,7 @@ abstract class MgRestAdapter extends MgResponseHandler
     protected function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp = null) {
         parent::__construct($app);
         $this->limit = -1;
+        $this->pageSize = -1;
         $this->transform = null;
         $this->configPath = $configPath;
         $this->featureId = null;
@@ -253,13 +254,49 @@ abstract class MgFeatureRestAdapter extends MgRestAdapter {
     public function HandleGet($single) {
         $reader = $this->CreateReader($single);
         $this->GetResponseBegin($reader);
+
+        $start = -1;
+        $end = -1;
+        $read = 0;
+
+        $pageNo = $this->app->request->get("page");
+        if ($pageNo == null)
+            $pageNo = 1;
+        else
+            $pageNo = intval($pageNo);
+
+        if ($this->pageSize > 0) {
+            $start = ($this->pageSize * ($pageNo - 1)) + 1;
+            $end = ($this->pageSize * $pageNo);
+        }
+        //echo "PageNo: $pageNo<br/>";
+        //echo "PageSize: ".$this->pageSize."<br/>";
+        //echo "$start - $end<br/>";
         while ($reader->ReadNext()) {
+            $read++;
+            if ($this->limit > 0 && $read > $this->limit) {
+                //echo "At limit<br/>";
+                break;
+            }
             if (!$this->GetResponseShouldContinue($reader))
                 break;
+            
+            if ($start >= 0 && $end > $start) {
+                if ($read < $start) {
+                    //echo "Skip $read<br/>";
+                    continue;
+                }
+                if ($read > $end) {
+                    //echo "End $read<br/>";
+                    break;
+                }
+            }
             $this->GetResponseBodyRecord($reader);
+            //echo "$read<br/>";
         }
         $this->GetResponseEnd($reader);
         $reader->Close();
+        //die;
     }
 }
 

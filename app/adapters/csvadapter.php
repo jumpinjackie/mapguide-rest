@@ -24,10 +24,7 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
     private $agfRw;
     private $wktRw;
 
-    private $read;
-
     public function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
-        $this->read = 0;
         parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
     }
 
@@ -63,9 +60,7 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
      * Returns true if the current reader iteration loop should continue, otherwise the loop is broken
      */
     protected function GetResponseShouldContinue($reader) {
-        $this->read++;
-        $result = !($this->limit > 0 && $this->read > $this->limit);
-        return $result;
+        return true;
     }
 
     /**

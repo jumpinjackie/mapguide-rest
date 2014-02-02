@@ -5,14 +5,38 @@
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" />
         <script type="text/javascript">
 
+            //NOTE: All representations in restcfg.json have been set up with the same maxcount and pagesize, ensuring
+            //that switching between representations results in the same "page" of data being represented
+            //in a different fashion.
             function viewResultsAs(format) {
                 var url = window.location.href.replace(".html", "." + format);
                 window.location.href = url;
             }
 
+            function updateQueryStringParameter(uri, key, value) {
+                var re = new RegExp("([?|&])" + key + "=.*?(&|$)", "i");
+                separator = uri.indexOf('?') !== -1 ? "&" : "?";
+                if (uri.match(re)) {
+                    return uri.replace(re, '$1' + key + "=" + value + '$2');
+                } else {
+                    return uri + separator + key + "=" + value;
+                }
+            }
+
+            function gotoPage(pageNo) {
+                window.location.href = updateQueryStringParameter(window.location.href, "page", pageNo);
+            }
+
         </script>
     </head>
     <body>
+        <!--
+        Values for pagination debugging
+
+        Current Page: {$currentPage}
+        Max Pages: {$maxPages}
+        End of Reader: {$endOfReader}
+        -->
         <div class="container">
             <h3>Property Results</h3>
             <div>
@@ -26,6 +50,19 @@
                 <a href="javascript:viewResultsAs('jpg')">JPG</a>
                 <a href="javascript:viewResultsAs('gif')">GIF</a>
             </div>
+            {if $maxPages > 1}
+                {if $currentPage > 1}
+                <a class="pull-left" href="javascript:gotoPage({$currentPage - 1})">&lt;&lt;&nbsp;Previous Page</a>
+                {/if}
+                {if $currentPage < $maxPages}
+                <a class="pull-right" href="javascript:gotoPage({$currentPage + 1})">Next Page&nbsp;&gt;&gt;</a>
+                {/if}
+            {elseif $maxPages = -1}
+                {if $currentPage > 1}
+                <a class="pull-left" href="javascript:gotoPage({$currentPage - 1})">&lt;&lt;&nbsp;Previous Page</a>
+                {/if}
+                <a class="pull-right" href="javascript:gotoPage({$currentPage + 1})">Next Page&nbsp;&gt;&gt;</a>
+            {/if}
             <table class="table table-striped table-bordered table-hover">
                 <thead>
                     <tr>
@@ -56,6 +93,19 @@
                     {/while}
                 </tbody>
             </table>
+            {if $maxPages > 1}
+                {if $currentPage > 1}
+                <a class="pull-left" href="javascript:gotoPage({$currentPage - 1})">&lt;&lt;&nbsp;Previous Page</a>
+                {/if}
+                {if $currentPage < $maxPages}
+                <a class="pull-right" href="javascript:gotoPage({$currentPage + 1})">Next Page&nbsp;&gt;&gt;</a>
+                {/if}
+            {elseif $maxPages = -1}
+                {if $currentPage > 1}
+                <a class="pull-left" href="javascript:gotoPage({$currentPage - 1})">&lt;&lt;&nbsp;Previous Page</a>
+                {/if}
+                <a class="pull-right" href="javascript:gotoPage({$currentPage + 1})">Next Page&nbsp;&gt;&gt;</a>
+            {/if}
         </div>
     </body>
 </html>

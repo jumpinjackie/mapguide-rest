@@ -233,8 +233,6 @@ class MgFeatureReaderModel
 
 class MgTemplateRestAdapter extends MgRestAdapter
 {
-    private $read;
-
     private $singleViewPath;
     private $manyViewPath;
     private $noneViewPath;
@@ -244,7 +242,6 @@ class MgTemplateRestAdapter extends MgRestAdapter
     private $relations;
 
     public function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
-        $this->read = 0;
         $this->relations = array();
         parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
     }
@@ -395,7 +392,56 @@ class MgTemplateRestAdapter extends MgRestAdapter
                     $output = $smarty->fetch($this->noneViewPath);
                 }
             } else {
-                $smarty->assign("model", new MgFeatureReaderModel(new MgFormatterSet($this->app), $reader, $this->limit, $this->read, $this->transform));
+                $start = -1;
+                $end = -1;
+                $read = 0;
+                $limit = $this->limit;
+
+                $pageNo = $this->app->request->get("page");
+                if ($pageNo == null)
+                    $pageNo = 1;
+                else
+                    $pageNo = intval($pageNo);
+
+                $bEndOfReader = false;
+                if ($this->pageSize > 0) {
+                    if ($pageNo > 1) {
+                        $skipThisMany = (($pageNo - 1) * $this->pageSize) - 1;
+                        //echo "skip this many: $skipThisMany<br/>";
+                        $bEndOfReader = true;
+                        while ($reader->ReadNext()) {
+                            if ($read == $skipThisMany) {
+                                $bEndOfReader = false;
+                                $limit = min(($skipThisMany + $this->pageSize), $this->limit - 1);
+                                break;
+                            }
+                            $read++;
+                        }
+                    } else { //first page, set limit to page size
+                        $limit = $this->pageSize;
+                    }
+                }
+                //echo "read: $read, limit: $limit, pageSize: ".$this->pageSize." result limit: ".$this->limit;
+                //die;
+                $smarty->assign("model", new MgFeatureReaderModel(new MgFormatterSet($this->app), $reader, $limit, $read, $this->transform));
+                $smarty->assign("currentPage", $pageNo);
+                $smarty->assign("endOfReader", $bEndOfReader ? "true" : "false");
+                if ($this->limit > 0) {
+                    if ($bEndOfReader) {
+                        $smarty->assign("maxPages", $pageNo);
+                    } else {
+                        $smarty->assign("maxPages", ceil($this->limit / $this->pageSize));
+                    }
+                } else {
+                    if ($bEndOfReader) {
+                        $smarty->assign("maxPages", $pageNo);
+                    } else {
+                        if ($this->pageSize > 0)
+                            $smarty->assign("maxPages", -1);
+                        else
+                            $smarty->assign("maxPages", 1);
+                    }
+                }
                 $output = $smarty->fetch($this->manyViewPath);
             }
             $this->app->response->header("Content-Type", $this->mimeType);

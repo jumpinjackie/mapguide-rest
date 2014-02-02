@@ -24,10 +24,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     private $agfRw;
     private $wktRw;
 
-    private $read;
-
     public function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
-        $this->read = 0;
         parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
     }
 
@@ -78,12 +75,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
      * Returns true if the current reader iteration loop should continue, otherwise the loop is broken
      */
     protected function GetResponseShouldContinue($reader) {
-        $this->read++;
-        $result = !($this->limit > 0 && $this->read > $this->limit);
-        //$this->app->response->write('<!-- $this->limit == '.$this->limit.' -->');
-        //$this->app->response->write('<!-- $this->read == '.$this->read.' -->');
-        //$this->app->response->write('<!-- !($this->limit > 0 && $this->read > $this->limit) == '.$result.' -->');
-        return $result;
+        return true;
     }
 
     /**
