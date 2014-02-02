@@ -109,7 +109,7 @@ class MgBaseController extends MgResponseHandler
         $callback($req, $param);
     }
 
-    protected function EnsureAuthenticationForSite($nominatedSessionId = "") {
+    protected function EnsureAuthenticationForSite($nominatedSessionId = "", $allowAnonymous = false) {
         if ($this->userInfo == null) {
             $this->userInfo = new MgUserInformation();
             $this->userInfo->SetClientAgent("MapGuide REST Extension");
@@ -167,7 +167,11 @@ class MgBaseController extends MgResponseHandler
                     if ($username != null) {
                         $this->userInfo->SetMgUsernamePassword($username, $password);
                     } else {
-                        $this->Unauthorized();
+                        if ($allowAnonymous === true) {
+                            $this->userInfo->SetMgUsernamePassword("Anonymous", "");
+                        } else {
+                            $this->Unauthorized();
+                        }
                     }
                 }
             }

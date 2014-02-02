@@ -34,6 +34,9 @@ abstract class MgRestAdapter extends MgResponseHandler
 
     protected $featureIdProp;
 
+    protected $propertyList;
+    protected $computedPropertyList;
+
     protected function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp = null) {
         parent::__construct($app);
         $this->configPath = $configPath;
@@ -43,6 +46,18 @@ abstract class MgRestAdapter extends MgResponseHandler
         $this->siteConn = $siteConn;
         $this->featSvc = $this->siteConn->CreateService(MgServiceType::FeatureService);
         $this->className = $className;
+        $this->propertyList = array();
+        $this->computedPropertyList = array();
+
+        if (array_key_exists("Properties", $config)) {
+            $cfgProps = $config["Properties"];
+            $this->propertyList = $cfgProps;
+        }
+        if (array_key_exists("ComputedProperties", $config)) {
+            $cfgComputedProps = $config["ComputedProperties"];
+            $this->computedPropertyList = $cfgComputedProps;
+        }
+
         $this->InitAdapterConfig($config);
     }
 
@@ -104,6 +119,16 @@ abstract class MgRestAdapter extends MgResponseHandler
             $flt = $this->app->request->get("filter");
             if ($flt != null)
                 $query->SetFilter($flt);
+        }
+        if (count($this->propertyList) > 0) {
+            foreach($this->propertyList as $propName) {
+                $query->AddFeatureProperty($propName);
+            }
+        }
+        if (count($this->computedPropertyList) > 0) {
+            foreach ($this->computedPropertyList as $alias => $expression) {
+                $query->AddComputedProperty($alias, $expression);
+            }
         }
         return $query;
     }

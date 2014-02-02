@@ -27,14 +27,11 @@ class MgDataController extends MgBaseController {
 
     public function GetDataConfiguration($uriParts) {
         $uriPath = implode("/", $uriParts);
-        $this->EnsureAuthenticationForSite();
+        $this->EnsureAuthenticationForSite("", true);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
             $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
         } else {
-            //$config = json_decode(file_get_contents($path), true);
-            //var_dump($config);
-            //die;
             $this->app->response->setBody(file_get_contents($path));
         }
     }
