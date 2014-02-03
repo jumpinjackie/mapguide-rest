@@ -139,7 +139,7 @@ class MgCoordinateSystemController extends MgBaseController {
                     $output .= "<Coordinate><X>".$txCoord->GetX()."</X><Y>".$txCoord->GetY()."</Y></Coordinate>";
                 } else {
                     //TODO: We should accept a partial response, but there's currently no way an empty <Coordinate/> tag survives the
-                    //XML to JSON conversion
+                    //XML to JSON conversion, so we have to throw lest we return an inconsisten partial result
                     throw new Exception("Encountered invalid coordinate pair: '$coordPair'. Found $tokenCount tokens. Expected 2"); //TODO: Localize
                 }
             }
