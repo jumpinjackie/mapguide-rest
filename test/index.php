@@ -1930,7 +1930,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     return xml;
                 }
 
-                function createHeaderXml(bInsert, bUpdate, bDelete) {
+                function createHeaderXml(bInsert, bUpdate, bDelete, bUseTransaction) {
                     var xml = '<ResourceDocumentHeader xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="ResourceDocumentHeader-1.0.0.xsd">'
                     xml += '<Security><Inherited>true</Inherited></Security>';
                     xml += '<Metadata><Simple>'
@@ -1949,15 +1949,20 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     } else {
                         xml += "<Property><Name>_MgRestAllowDelete</Name><Value>0</Value></Property>";
                     }
+                    if (bUseTransaction === true) {
+                        xml += "<Property><Name>_MgRestUseTransaction</Name><Value>1</Value></Property>";
+                    } else {
+                        xml += "<Property><Name>_MgRestUseTransaction</Name><Value>0</Value></Property>";   
+                    }
                     xml += '</Simple></Metadata></ResourceDocumentHeader>';
                     return xml;
                 }
 
                 //Disable everything
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(false, false, false), function(status, result) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(false, false, false, false), function(status, result) {
                     ok(status == 401, "(" + status + ") - Expect anon setresourceheader denial");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(false, false, false), function(status, result) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(false, false, false, false), function(status, result) {
                     ok(status == 200, "(" + status + ") - Expect admin setresourceheader success");
                 });
 
@@ -1969,11 +1974,20 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 //Enable insert
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, false, false), function(status, result) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, false, false, false), function(status, result) {
                     ok(status == 401, "(" + status + ") - Expect anon setresourceheader denial");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, false, false), function(status, result) {
-                    ok(status == 200, "(" + status + ") - Expect admin setresourceheader success");
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, false, false, true), function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect admin setresourceheader success. Enable insert/transactions");
+                });
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("anon credential insert", "POINT (0 0)"), function(status, result) {
+                    ok(status == 500, "(" + status + ") - Expect anon insert failure. Transactions not supported");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("admin credential insert", "POINT (1 1)"), function(status, result) {
+                    ok(status == 500, "(" + status + ") - Expect admin insert failure. Transactions not supported");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, false, false, false), function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect admin setresourceheader success. Enable insert. Disable transactions");
                 });
 
                 api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("anon credential insert", "POINT (0 0)"), function(status, result) {
@@ -2003,11 +2017,20 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 //Enable update
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, false), function(status, result) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, false, false), function(status, result) {
                     ok(status == 401, "(" + status + ") - Expect anon setresourceheader denial");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, false), function(status, result) {
-                    ok(status == 200, "(" + status + ") - Expect admin setresourceheader success");
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, false, true), function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect admin setresourceheader success - Enable insert/update/transactions");
+                });
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result) {
+                    ok(status == 500, "(" + status + ") - Expect anon update failure - Transactions not supported");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result) {
+                    ok(status == 500, "(" + status + ") - Expect admin update failure - Transactions not supported");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, false, false), function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect admin setresourceheader success - Enable insert/update. Disable transactions");
                 });
 
                 api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result) {
@@ -2037,11 +2060,20 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 //Enable everything
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, true), function(status, result) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, true, false), function(status, result) {
                     ok(status == 401, "(" + status + ") - Expect anon setresourceheader denial");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, true), function(status, result) {
-                    ok(status == 200, "(" + status + ") - Expect admin setresourceheader success");
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, true, true), function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect admin setresourceheader success. Enable everything");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result) {
+                    ok(status == 500, "(" + status + ") - Expect admin delete failure. Transactions not supported");
+                });
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result) {
+                    ok(status == 500, "(" + status + ") - Expect anon delete failure. Transactions not supported");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, true, false), function(status, result) {
+                    ok(status == 200, "(" + status + ") - Expect admin setresourceheader success. Enable everything except transactions");
                 });
 
                 api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result) {
@@ -2054,7 +2086,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(gj.features[0].properties.ID == 1, "expected feature ID 2 to be deleted");
                 });
                 api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result) {
-                    ok(status == 200, "(" + status + ") - Expect admin delete success");
+                    ok(status == 200, "(" + status + ") - Expect anon delete success");
                 });
                 api_test(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
@@ -3722,7 +3754,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
             });
             test("Insert/Update/Delete Features", function() {
-
+                
                 function createInsertXml(text, geom) {
                     var xml = "<FeatureSet><Features><Feature>";
                     xml += "<Property><Name>Text</Name><Value>" + text + "</Value></Property>";

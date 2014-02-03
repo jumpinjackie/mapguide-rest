@@ -25,6 +25,7 @@ class MgFeatureServiceController extends MgBaseController {
     const PROP_ALLOW_INSERT = "_MgRestAllowInsert";
     const PROP_ALLOW_UPDATE = "_MgRestAllowUpdate";
     const PROP_ALLOW_DELETE = "_MgRestAllowDelete";
+    const PROP_USE_TRANSACTION = "_MgRestUseTransaction";
 
     public function __construct($app) {
         parent::__construct($app);
@@ -261,31 +262,69 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId);
     }
 
-    private static function HasPermission($resSvc, $resId, $permission) {
+    private static function CheckPermissions($resSvc, $resId) {
+        $perms = new stdClass();
+        $perms->allowInsert = false;
+        $perms->allowUpdate = false;
+        $perms->allowDelete = false;
+        $perms->useTransaction = false;
+
+        //A session-based user can do whatever they want on a session-based Feature Source
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $perms->allowInsert = true;
+            $perms->allowUpdate = true;
+            $perms->allowDelete = true;
+            $perms->useTransaction = false;
+            return $perms;
+        }
+
         $resHeader = $resSvc->GetResourceHeader($resId);
         $resHeaderDoc = new DOMDocument();
         $resHeaderDoc->loadXML($resHeader->ToString());
-        $bAllowed = false;
         $propNodes = $resHeaderDoc->getElementsByTagName("Property");
         for ($i = 0; $i < $propNodes->length; $i++) {
             $propNode = $propNodes->item($i);
             $nameNode = $propNode->getElementsByTagName("Name");
             if ($nameNode->length == 1) {
-                if ($nameNode->item(0)->nodeValue === $permission) {
+                if ($nameNode->item(0)->nodeValue === self::PROP_ALLOW_INSERT) {
                     $valueNodes = $propNode->getElementsByTagName("Value");
                     if ($valueNodes->length == 1) {
                         if ($valueNodes->item(0)->nodeValue === "1") {
-                            $bAllowed = true;
-                            break;
+                            $perms->allowInsert = true;
+                        }
+                    }
+                }
+                else if ($nameNode->item(0)->nodeValue === self::PROP_ALLOW_UPDATE) {
+                    $valueNodes = $propNode->getElementsByTagName("Value");
+                    if ($valueNodes->length == 1) {
+                        if ($valueNodes->item(0)->nodeValue === "1") {
+                            $perms->allowUpdate = true;
+                        }
+                    }
+                }
+                else if ($nameNode->item(0)->nodeValue === self::PROP_ALLOW_DELETE) {
+                    $valueNodes = $propNode->getElementsByTagName("Value");
+                    if ($valueNodes->length == 1) {
+                        if ($valueNodes->item(0)->nodeValue === "1") {
+                            $perms->allowDelete = true;
+                        }
+                    }
+                }
+                else if ($nameNode->item(0)->nodeValue === self::PROP_USE_TRANSACTION) {
+                    $valueNodes = $propNode->getElementsByTagName("Value");
+                    if ($valueNodes->length == 1) {
+                        if ($valueNodes->item(0)->nodeValue === "1") {
+                            $perms->useTransaction = true;
                         }
                     }
                 }
             }
         }
-        return $bAllowed;
+        return $perms;
     }
 
     public function InsertFeatures($resId, $schemaName, $className) {
+        $trans = null;
         try {
             $sessionId = "";
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
@@ -295,11 +334,12 @@ class MgFeatureServiceController extends MgBaseController {
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
+            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+            $perms = self::CheckPermissions($resSvc, $resId);
+
             //Not a session-based resource, must check for appropriate flag in header before we continue
             if ($sessionId === "") {
-                $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-                $bAllowed = self::HasPermission($resSvc, $resId, self::PROP_ALLOW_INSERT);
-                if ($bAllowed === false) {
+                if ($perms->allowInsert === false) {
                     $e = new Exception();
                     $this->OutputException("Forbidden", "Operation not allowed", "The resource ".$resId->ToString()." is not configured to allow feature updates", $e->getTraceAsString(), 403, MgMimeType::Xml);
                 }
@@ -313,14 +353,28 @@ class MgFeatureServiceController extends MgBaseController {
             $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
             $commands->Add($insertCmd);
 
-            $result = $featSvc->UpdateFeatures($resId, $commands, false);
+            if ($perms->useTransaction === true)
+                $trans = $featSvc->BeginTransaction($resId);
+
+            //HACK: Due to #2252, we can't call UpdateFeatures() with NULL MgTransaction, so to workaround
+            //that we call the original UpdateFeatures() overload with useTransaction = false if we find a
+            //NULL MgTransaction
+            if ($trans == null)
+                $result = $featSvc->UpdateFeatures($resId, $commands, false);
+            else
+                $result = $featSvc->UpdateFeatures($resId, $commands, $trans);
+            if ($trans != null)
+                $trans->Commit();
             $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
         } catch (MgException $ex) {
-            $this->OnException($ex);
+            if ($trans != null)
+                $trans->Rollback();
+            $this->OnException($ex, MgMimeType::Xml);
         }
     }
 
     public function UpdateFeatures($resId, $schemaName, $className) {
+        $trans = null;
         try {
             $sessionId = "";
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
@@ -330,11 +384,12 @@ class MgFeatureServiceController extends MgBaseController {
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
+            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+            $perms = self::CheckPermissions($resSvc, $resId);
+
             //Not a session-based resource, must check for appropriate flag in header before we continue
             if ($sessionId === "") {
-                $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-                $bAllowed = self::HasPermission($resSvc, $resId, self::PROP_ALLOW_UPDATE);
-                if ($bAllowed === false) {
+                if ($perms->allowUpdate === false) {
                     $e = new Exception();
                     $this->OutputException("Forbidden", "Operation not allowed", "The resource ".$resId->ToString()." is not configured to allow feature updates", $e->getTraceAsString(), 403, MgMimeType::Xml);
                 }
@@ -354,14 +409,28 @@ class MgFeatureServiceController extends MgBaseController {
             $updateCmd = new MgUpdateFeatures("$schemaName:$className", $props, $filter);
             $commands->Add($updateCmd);
 
-            $result = $featSvc->UpdateFeatures($resId, $commands, false);
+            if ($perms->useTransaction === true)
+                $trans = $featSvc->BeginTransaction($resId);
+
+            //HACK: Due to #2252, we can't call UpdateFeatures() with NULL MgTransaction, so to workaround
+            //that we call the original UpdateFeatures() overload with useTransaction = false if we find a
+            //NULL MgTransaction
+            if ($trans == null)
+                $result = $featSvc->UpdateFeatures($resId, $commands, false);
+            else
+                $result = $featSvc->UpdateFeatures($resId, $commands, $trans);
+            if ($trans != null)
+                $trans->Commit();
             $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
         } catch (MgException $ex) {
-            $this->OnException($ex);
+            if ($trans != null)
+                $trans->Rollback();
+            $this->OnException($ex, MgMimeType::Xml);
         }
     }
 
     public function DeleteFeatures($resId, $schemaName, $className) {
+        $trans = null;
         try {
             $sessionId = "";
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
@@ -371,11 +440,12 @@ class MgFeatureServiceController extends MgBaseController {
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
+            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+            $perms = self::CheckPermissions($resSvc, $resId);
+
             //Not a session-based resource, must check for appropriate flag in header before we continue
             if ($sessionId === "") {
-                $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-                $bAllowed = self::HasPermission($resSvc, $resId, self::PROP_ALLOW_DELETE);
-                if ($bAllowed === false) {
+                if ($perms->allowDelete === false) {
                     $e = new Exception();
                     $this->OutputException("Forbidden", "Operation not allowed", "The resource ".$resId->ToString()." is not configured to allow feature updates", $e->getTraceAsString(), 403, MgMimeType::Xml);
                 }
@@ -390,10 +460,23 @@ class MgFeatureServiceController extends MgBaseController {
             $deleteCmd = new MgDeleteFeatures("$schemaName:$className", $filter);
             $commands->Add($deleteCmd);
 
-            $result = $featSvc->UpdateFeatures($resId, $commands, false);
+            if ($perms->useTransaction === true)
+                $trans = $featSvc->BeginTransaction($resId);
+
+            //HACK: Due to #2252, we can't call UpdateFeatures() with NULL MgTransaction, so to workaround
+            //that we call the original UpdateFeatures() overload with useTransaction = false if we find a
+            //NULL MgTransaction
+            if ($trans == null)
+                $result = $featSvc->UpdateFeatures($resId, $commands, false);
+            else
+                $result = $featSvc->UpdateFeatures($resId, $commands, $trans);
+            if ($trans != null)
+                $trans->Commit();
             $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
         } catch (MgException $ex) {
-            $this->OnException($ex);
+            if ($trans != null)
+                $trans->Rollback();
+            $this->OnException($ex, MgMimeType::Xml);
         }
     }
 
