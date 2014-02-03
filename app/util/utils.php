@@ -57,6 +57,10 @@ class MgUtils
         return new MgResourceIdentifier($resIdStr);
     }
 
+    public static function MakeWktPolygon($x1, $y1, $x2, $y2) {
+        return "POLYGON(($x1 $y1, $x2 $y1, $x2 $y2, $x1 $y2, $x1 $y1))";
+    }
+
     public static function StringStartsWith($haystack, $needle) {
         return $needle === "" || strpos($haystack, $needle) === 0;
     }
@@ -190,7 +194,7 @@ class MgUtils
         $doc = new DOMDocument();
         $doc->loadXML($xml);
         $root = $doc->documentElement;
-        echo '{"' . $root->tagName . '":' . MgUtils::DomElementToJson($root) . '}'; 
+        echo '{"'.$root->tagName.'":'.MgUtils::DomElementToJson($root).'}'; 
     }
 
     public static function XslTransformByteReader($byteReader, $xslStylesheet, $xslParams) {

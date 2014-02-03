@@ -100,13 +100,13 @@ abstract class MgRestAdapter extends MgResponseHandler
      */
     protected function CreateQueryOptions($single) {
         $query = new MgFeatureQueryOptions();
+        $tokens = explode(":", $this->className);
+        $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $tokens[0], $tokens[1]);
         if ($single === true) {
             if ($this->featureId == null) {
                 throw new Exception("No feature ID set"); //TODO: Localize
             }
             $idType = MgPropertyType::String;
-            $tokens = explode(":", $this->className);
-            $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $tokens[0], $tokens[1]);
             if ($this->featureIdProp == null) {
                 $idProps = $clsDef->GetIdentityProperties();
                 if ($idProps->GetCount() == 0) {
@@ -137,6 +137,15 @@ abstract class MgRestAdapter extends MgResponseHandler
             $flt = $this->app->request->get("filter");
             if ($flt != null)
                 $query->SetFilter($flt);
+            $bbox = $this->app->request->get("bbox");
+            if ($bbox != null) {
+                $parts = explode(",", $bbox);
+                if (count($parts) == 4) {
+                    $wktRw = new MgWktReaderWriter();
+                    $geom = $wktRw->Read(MgUtils::MakeWktPolygon($parts[0], $parts[1], $parts[2], $parts[3]));
+                    $query->SetSpatialFilter($clsDef->GetDefaultGeometryPropertyName(), $geom, MgFeatureSpatialOperations::EnvelopeIntersects);
+                }
+            }
         }
         if (count($this->propertyList) > 0) {
             foreach($this->propertyList as $propName) {
