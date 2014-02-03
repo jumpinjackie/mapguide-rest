@@ -156,6 +156,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
      * Handles POST requests for this adapter. Overridable. Does nothing if not overridden.
      */
     public function HandlePost($single) {
+        $trans = null;
         try {
             $tokens = explode(":", $this->className);
             $schemaName = $tokens[0];
@@ -166,9 +167,22 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
             $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
             $commands->Add($insertCmd);
 
-            $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, false);
+            if ($this->useTransaction)
+                $trans = $this->featSvc->BeginTransaction($this->featureSourceId);
+
+            //HACK: Due to #2252, we can't call UpdateFeatures() with NULL MgTransaction, so to workaround
+            //that we call the original UpdateFeatures() overload with useTransaction = false if we find a
+            //NULL MgTransaction
+            if ($trans == null)
+                $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, false);
+            else
+                $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, $trans);
+            if ($trans != null)
+                $trans->Commit();
             $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
         } catch (MgException $ex) {
+            if ($trans != null)
+                $trans->Rollback();
             $this->OnException($ex);
         }
     }
@@ -177,6 +191,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
      * Handles PUT requests for this adapter. Overridable. Does nothing if not overridden.
      */
     public function HandlePut($single) {
+        $trans = null;
         try {
             $tokens = explode(":", $this->className);
             $schemaName = $tokens[0];
@@ -211,9 +226,22 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
             $updateCmd = new MgUpdateFeatures("$schemaName:$className", $props, $filter);
             $commands->Add($updateCmd);
 
-            $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, false);
+            if ($this->useTransaction)
+                $trans = $this->featSvc->BeginTransaction($this->featureSourceId);
+
+            //HACK: Due to #2252, we can't call UpdateFeatures() with NULL MgTransaction, so to workaround
+            //that we call the original UpdateFeatures() overload with useTransaction = false if we find a
+            //NULL MgTransaction
+            if ($trans == null)
+                $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, false);
+            else
+                $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, $trans);
+            if ($trans != null)
+                $trans->Commit();
             $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
         } catch (MgException $ex) {
+            if ($trans != null)
+                $trans->Rollback();
             $this->OnException($ex);
         }
     }
@@ -222,6 +250,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
      * Handles DELETE requests for this adapter. Overridable. Does nothing if not overridden.
      */
     public function HandleDelete($single) {
+        $trans = null;
         try {
             $tokens = explode(":", $this->className);
             $schemaName = $tokens[0];
@@ -234,9 +263,22 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
             $deleteCmd = new MgDeleteFeatures("$schemaName:$className", $filter);
             $commands->Add($deleteCmd);
 
-            $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, false);
+            if ($this->useTransaction)
+                $trans = $this->featSvc->BeginTransaction($this->featureSourceId);
+
+            //HACK: Due to #2252, we can't call UpdateFeatures() with NULL MgTransaction, so to workaround
+            //that we call the original UpdateFeatures() overload with useTransaction = false if we find a
+            //NULL MgTransaction
+            if ($trans == null)
+                $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, false);
+            else
+                $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, $trans);
+            if ($trans != null)
+                $trans->Commit();
             $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
         } catch (MgException $ex) {
+            if ($trans != null)
+                $trans->Rollback();
             $this->OnException($ex);
         }
     }

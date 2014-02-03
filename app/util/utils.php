@@ -248,7 +248,7 @@ class MgUtils
                             {
                                 if ($bNull) {
                                     $boolVal = new MgBooleanProperty($name, false);
-                                    $boolVal->SetNull();
+                                    $boolVal->SetNull(true);
                                 } else {
                                     $boolVal = new MgBooleanProperty($name, boolval($value));
                                 }
@@ -259,7 +259,7 @@ class MgUtils
                             {
                                 if ($bNull) {
                                     $byteVal = new MgByteProperty($name, 0);
-                                    $byteVal->SetNull();
+                                    $byteVal->SetNull(true);
                                 } else {
                                     $byteVal = new MgByteProperty($name, intval($value));
                                 }
@@ -276,7 +276,7 @@ class MgUtils
                             {
                                 if ($bNull) {
                                     $doubleVal = new MgDoubleProperty($name, 0.0);
-                                    $doubleVal->SetNull();
+                                    $doubleVal->SetNull(true);
                                 } else {
                                     $doubleVal = new MgDoubleProperty($name, floatval($value));
                                 }
@@ -287,7 +287,7 @@ class MgUtils
                             {
                                 if ($bNull) {
                                     $i16val = new MgInt16Property($name, 0);
-                                    $i16val->SetNull();
+                                    $i16val->SetNull(true);
                                 } else {
                                     $i16val = new MgInt16Property($name, intval($value));
                                 }
@@ -298,7 +298,7 @@ class MgUtils
                             {
                                 if ($bNull) {
                                     $i32val = new MgInt32Property($name, 0);
-                                    $i32val->SetNull();
+                                    $i32val->SetNull(true);
                                 } else {
                                     $i32val = new MgInt32Property($name, intval($value));
                                 }
@@ -309,7 +309,7 @@ class MgUtils
                             {
                                 if ($bNull) {
                                     $i64val = new MgInt64Property($name, 0);
-                                    $i64val->SetNull();
+                                    $i64val->SetNull(true);
                                 } else {
                                     $i64val = new MgInt64Property($name, intval($value));
                                 }
@@ -320,7 +320,7 @@ class MgUtils
                             {
                                 if ($bNull) {
                                     $sinProp = new MgSingleProperty($name, 0.0);
-                                    $sinProp->SetNull();
+                                    $sinProp->SetNull(true);
                                 } else {
                                     $sinProp = new MgSingleProperty($name, floatval($value));
                                 }
@@ -331,7 +331,7 @@ class MgUtils
                             {
                                 if ($bNull) {
                                     $strProp = new MgStringProperty($name, "");
-                                    $strProp->SetNull();
+                                    $strProp->SetNull(true);
                                 } else {
                                     $strProp = new MgStringProperty($name, $value);
                                 }

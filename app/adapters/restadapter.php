@@ -39,9 +39,11 @@ abstract class MgRestAdapter extends MgResponseHandler
     protected $pageSize;
     protected $limit;
     protected $transform;
+    protected $useTransaction;
 
     protected function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp = null) {
         parent::__construct($app);
+        $this->useTransaction = false;
         $this->limit = -1;
         $this->pageSize = -1;
         $this->transform = null;
@@ -74,6 +76,9 @@ abstract class MgRestAdapter extends MgResponseHandler
             $schemaName = $tokens[0];
             $className = $tokens[1];
             $this->transform = MgUtils::GetTransform($this->featSvc, $this->featureSourceId, $schemaName, $className, $config["TransformTo"]);
+        }
+        if (array_key_exists("UseTransaction", $config)) {
+            $this->useTransaction = ($config["UseTransaction"] === true || $config["UseTransaction"] === "true");
         }
 
         $this->InitAdapterConfig($config);
