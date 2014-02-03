@@ -27,7 +27,7 @@ class MgDataController extends MgBaseController {
 
     public function GetDataConfiguration($uriParts) {
         $uriPath = implode("/", $uriParts);
-        $this->EnsureAuthenticationForSite("", true);
+        $this->EnsureAuthenticationForSite();
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
             $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
@@ -110,7 +110,7 @@ class MgDataController extends MgBaseController {
 
     private function HandleMethod($uriParts, $extension, $method) {
         $uriPath = implode("/", $uriParts);
-        $this->EnsureAuthenticationForSite();
+        $this->EnsureAuthenticationForSite("", true);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
             $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
@@ -135,7 +135,7 @@ class MgDataController extends MgBaseController {
 
     private function HandleMethodSingle($uriParts, $id, $extension, $method) {
         $uriPath = implode("/", $uriParts);
-        $this->EnsureAuthenticationForSite();
+        $this->EnsureAuthenticationForSite("", true);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
             $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize

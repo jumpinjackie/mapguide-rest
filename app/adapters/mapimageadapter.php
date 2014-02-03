@@ -90,8 +90,10 @@ class MgMapImageRestAdapter extends MgRestAdapter {
         
             $site = $this->siteConn->GetSite();
             $this->sessionId = $site->GetCurrentSession();
+            $bCreatedSession = false;
             if ($this->sessionId === "") {
                 $this->sessionId = $site->CreateSession();
+                $bCreatedSession = true;
             }
             $userInfo = new MgUserInformation($this->sessionId);
             $siteConn = new MgSiteConnection();
@@ -202,6 +204,14 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             $param->AddParameter("BEHAVIOR", 3); //Layers + Selection
 
             $this->ExecuteHttpRequest($req);
+            
+            if ($bCreatedSession === true) {
+                $conn2 = new MgSiteConnection();
+                $user2 = new MgUserInformation($this->sessionId);
+                $conn2->Open($user2);
+                $site2 = $conn2->GetSite();
+                $site2->DestroySession($this->sessionId);
+            }
         } catch (MgException $ex) {
             $this->OnException($ex);
         }
