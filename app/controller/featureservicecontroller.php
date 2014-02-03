@@ -420,6 +420,7 @@ class MgFeatureServiceController extends MgBaseController {
             $spatialFilter = $this->GetRequestParameter("spatialfilter", "");
             $maxFeatures = $this->GetRequestParameter("maxfeatures", "");
             $transformto = $this->GetRequestParameter("transformto", "");
+            $bbox = $this->GetRequestParameter("bbox", "");
 
             $finalFilter = "";
             if ($filter !== "") {
@@ -445,6 +446,16 @@ class MgFeatureServiceController extends MgBaseController {
                     $query->AddFeatureProperty($propName);
                 }
             }
+            if ($bbox !== "") {
+                $parts = explode(",", $bbox);
+                if (count($parts) == 4) {
+                    $wktRw = new MgWktReaderWriter();
+                    $geom = $wktRw->Read(MgUtils::MakeWktPolygon($parts[0], $parts[1], $parts[2], $parts[3]));
+                    $clsDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
+                    $query->SetSpatialFilter($clsDef->GetDefaultGeometryPropertyName(), $geom, MgFeatureSpatialOperations::EnvelopeIntersects);
+                }
+            }
+
             $transform = null;
             if ($transformto !== "") {
                 $transform = MgUtils::GetTransform($featSvc, $resId, $schemaName, $className, $transformto);

@@ -17,19 +17,11 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-$app->config(array(
+return array(
     "GeoRest.ConfigPath" => "./conf/data",
     "MapGuide.PhysicalTilePath" => "C:/Program Files/OSGeo/MapGuide/Server/Repositories/TileCache",
     "MapGuide.TileImageFormat" => "png",
     "Locale" => "en"
-));
-
-$bundlePath = dirname(__FILE__)."/text/".$app->config("Locale");
-if (!file_exists($bundlePath))
-    $bundlePath = dirname(__FILE__)."/text/en";
-if (!file_exists($bundlePath))
-    throw new Exception("Could not find string bundle at: ".$bundlePath);
-SetLocalizedFilesPath($bundlePath);
-//print_r("Using string bundle at: ".$bundlePath);
+);
 
 ?>

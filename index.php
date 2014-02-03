@@ -23,7 +23,9 @@ include dirname(__FILE__)."/../mapadmin/constants.php";
 $webConfigPath = dirname(__FILE__)."/../webconfig.ini";
 MgInitializeWebTier($webConfigPath);
 
-$app = new \Slim\Slim();
+$config = require_once dirname(__FILE__)."/app/config.php";
+$app = new \Slim\Slim($config);
+
 //Register known REST adapters and geom formatters to our DI container
 include dirname(__FILE__)."/app/adapters/registration.php";
 include dirname(__FILE__)."/app/formatters/registration.php";
