@@ -105,6 +105,59 @@ class MgCoordinateSystemController extends MgBaseController {
 
         $this->app->response->setBody($cs->GetEpsgCode()."");
     }
+
+    public function TransformCoordinates() {
+        $source = $this->app->request->post("from");
+        $target = $this->app->request->post("to");
+        $coordList = $this->app->request->post("coords");
+        $format = $this->app->request->post("format");
+        if ($format == null)
+            $format = "xml";
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
+        if ($source == null)
+            $this->app->halt(400, "Missing required parameter: from"); //TODO: Localize
+        if ($target == null)
+            $this->app->halt(400, "Missing required parameter: to"); //TODO: Localize
+        if ($coordList == null)
+            $this->app->halt(400, "Missing required parameter: coords"); //TODO: Localize
+
+        try {
+            $factory = new MgCoordinateSystemFactory();
+            $sourceCs = $factory->CreateFromCode($source);
+            $targetCs = $factory->CreateFromCode($target);
+
+            $trans = $factory->GetTransform($sourceCs, $targetCs);
+            $coords = explode(",",$coordList);
+
+            $output = "<CoordinateCollection>";
+            foreach ($coords as $coordPair) {
+                $tokens = explode(" ", trim($coordPair));
+                $tokenCount = count($tokens);
+                if ($tokenCount === 2) {
+                    $txCoord = $trans->Transform(floatval($tokens[0]), floatval($tokens[1]));
+                    $output .= "<Coordinate><X>".$txCoord->GetX()."</X><Y>".$txCoord->GetY()."</Y></Coordinate>";
+                } else {
+                    //TODO: We should accept a partial response, but there's currently no way an empty <Coordinate/> tag survives the
+                    //XML to JSON conversion
+                    throw new Exception("Encountered invalid coordinate pair: '$coordPair'. Found $tokenCount tokens. Expected 2"); //TODO: Localize
+                }
+            }
+            $output .= "</CoordinateCollection>";
+
+            if ($fmt === "json") {
+                $this->app->response->header("Content-Type", MgMimeType::Json);
+                $json = MgUtils::Xml2Json($output);
+                $this->app->response->write($json);
+            } else {
+                $this->app->response->header("Content-Type", MgMimeType::Xml);
+                $this->app->response->write($output);
+            }
+        }
+        catch (MgException $ex) {
+            $this->OnException($ex);
+        }
+    }
 }
 
 ?>

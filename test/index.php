@@ -3754,7 +3754,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
             });
             test("Insert/Update/Delete Features", function() {
-                
+
                 function createInsertXml(text, geom) {
                     var xml = "<FeatureSet><Features><Feature>";
                     xml += "<Property><Name>Text</Name><Value>" + text + "</Value></Property>";
@@ -3901,6 +3901,139 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                         delete this.adminSessionId;
                     });
                 }
+            });
+            test("Transform batch coordinates", function() {
+                var params = {
+                    from: "LL84",
+                    to: "WGS84.PseudoMercator",
+                    coords: "-87.1 43.2,-87.2 43.3,-87.4 43.1"
+                };
+                var paramsWithPadding = {
+                    from: "LL84",
+                    to: "WGS84.PseudoMercator",
+                    coords: "-87.1 43.2, -87.2 43.3, -87.4 43.1"
+                };
+                var paramsBadCoords = {
+                    from: "LL84",
+                    to: "WGS84.PseudoMercator",
+                    coords: "-87.1 43.2,-87.2,43.3,-87.4 43.1"
+                };
+                var paramsBogusCs = {
+                    from: "LL84",
+                    to: "Foobar",
+                    coords: "-87.1 43.2,-87.2 43.3,-87.4 43.1"
+                };
+                var paramsIncomplete1 = {
+                    coords: "-87.1 43.2,-87.2 43.3,-87.4 43.1"
+                };
+                var paramsIncomplete2 = {
+                    from: "LL84",
+                    coords: "-87.1 43.2,-87.2 43.3,-87.4 43.1"
+                };
+
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", paramsBogusCs, "Anonymous", "", function(status, result) {
+                    ok(status == 500, "(" + status+ ") - Expected server error. Bogus target coord sys.");
+                });
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", paramsBogusCs, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 500, "(" + status+ ") - Expected server error. Bogus target coord sys.");
+                });
+                api_test_anon(rest_root_url + "/services/transformcoords", "POST", paramsBogusCs, function(status, result) {
+                    ok(status == 500, "(" + status + ") - Expected server error. Bogus target coord sys.");
+                });
+                api_test_admin(rest_root_url + "/services/transformcoords", "POST", paramsBogusCs, function(status, result) {
+                    ok(status == 500, "(" + status + ") - Expected server error. Bogus target coord sys.");
+                });
+
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", paramsIncomplete1, "Anonymous", "", function(status, result) {
+                    ok(status == 400, "(" + status+ ") - Expected bad response. Incomplete params specified.");
+                });
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", paramsIncomplete1, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 400, "(" + status+ ") - Expected bad response. Incomplete params specified.");
+                });
+                api_test_anon(rest_root_url + "/services/transformcoords", "POST", paramsIncomplete1, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad response. Incomplete params specified.");
+                });
+                api_test_admin(rest_root_url + "/services/transformcoords", "POST", paramsIncomplete1, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad response. Incomplete params specified.");
+                });
+
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", paramsIncomplete2, "Anonymous", "", function(status, result) {
+                    ok(status == 400, "(" + status+ ") - Expected bad response. Incomplete params specified.");
+                });
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", paramsIncomplete2, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 400, "(" + status+ ") - Expected bad response. Incomplete params specified.");
+                });
+                api_test_anon(rest_root_url + "/services/transformcoords", "POST", paramsIncomplete2, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad response. Incomplete params specified.");
+                });
+                api_test_admin(rest_root_url + "/services/transformcoords", "POST", paramsIncomplete2, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected bad response. Incomplete params specified.");
+                });
+
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", params, "Anonymous", "", function(status, result) {
+                    ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
+                });
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", params, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
+                });
+                api_test_anon(rest_root_url + "/services/transformcoords", "POST", params, function(status, result) {
+                    ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
+                });
+                api_test_admin(rest_root_url + "/services/transformcoords", "POST", params, function(status, result) {
+                    ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
+                });
+
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", paramsWithPadding, "Anonymous", "", function(status, result) {
+                    ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
+                });
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", paramsWithPadding, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
+                });
+                api_test_anon(rest_root_url + "/services/transformcoords", "POST", paramsWithPadding, function(status, result) {
+                    ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
+                });
+                api_test_admin(rest_root_url + "/services/transformcoords", "POST", paramsWithPadding, function(status, result) {
+                    ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
+                });
+
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", paramsBadCoords, "Anonymous", "", function(status, result) {
+                    ok(status == 500, "(" + status+ ") - Expected success with partial list of transformed coordinates");
+                });
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", paramsBadCoords, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 500, "(" + status+ ") - Expected success with partial list of transformed coordinates");
+                });
+                api_test_anon(rest_root_url + "/services/transformcoords", "POST", paramsBadCoords, function(status, result) {
+                    ok(status == 500, "(" + status+ ") - Expected success with partial list of transformed coordinates");
+                });
+                api_test_admin(rest_root_url + "/services/transformcoords", "POST", paramsBadCoords, function(status, result) {
+                    ok(status == 500, "(" + status+ ") - Expected success with partial list of transformed coordinates");
+                });
+
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", $.extend(paramsWithPadding, { format: "json" }), "Anonymous", "", function(status, result) {
+                    ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
+                });
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", $.extend(paramsWithPadding, { format: "json" }), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
+                });
+                api_test_anon(rest_root_url + "/services/transformcoords", "POST", $.extend(paramsWithPadding, { format: "json" }), function(status, result) {
+                    ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
+                });
+                api_test_admin(rest_root_url + "/services/transformcoords", "POST", $.extend(paramsWithPadding, { format: "json" }), function(status, result) {
+                    ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
+                });
+
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", $.extend(paramsBadCoords, { format: "json" }), "Anonymous", "", function(status, result) {
+                    ok(status == 500, "(" + status+ ") - Expected success with partial list of transformed coordinates");
+                });
+                api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", $.extend(paramsBadCoords, { format: "json" }), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 500, "(" + status+ ") - Expected success with partial list of transformed coordinates");
+                });
+                api_test_anon(rest_root_url + "/services/transformcoords", "POST", $.extend(paramsBadCoords, { format: "json" }), function(status, result) {
+                    ok(status == 500, "(" + status+ ") - Expected success with partial list of transformed coordinates");
+                });
+                api_test_admin(rest_root_url + "/services/transformcoords", "POST", $.extend(paramsBadCoords, { format: "json" }), function(status, result) {
+                    ok(status == 500, "(" + status+ ") - Expected success with partial list of transformed coordinates");
+                });
             });
             test("Enum categories", function() {
                 api_test(rest_root_url + "/coordsys/categories", "GET", null, function(status, result) {
