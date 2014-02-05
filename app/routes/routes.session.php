@@ -173,6 +173,16 @@ $app->get("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaNa
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->SelectFeatures($resId, $schemaName, $className, $format);
 });
+$app->get("/session/:sessionId/:resName.FeatureSource/aggregates/:type/:schemaName/:className", function($sessionId, $resName, $type, $schemaName, $className) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->SelectAggregates($resId, $schemaName, $className, $type, "xml");
+});
+$app->get("/session/:sessionId/:resName.FeatureSource/aggregates.:format/:type/:schemaName/:className", function($sessionId, $resName, $format, $type, $schemaName, $className) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->SelectAggregates($resId, $schemaName, $className, $type, $format);
+});
 // Resource Service APIs
 $app->get("/session/:sessionId/:resName/datalist", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
@@ -236,7 +246,12 @@ $app->delete("/session/:sessionId/:resName", function($sessionId, $resName) use 
 $app->get("/session/:sessionId/:resName/tile/:groupName/:scaleIndex/:col/:row", function($sessionId, $resName, $groupName, $scaleIndex, $col, $row) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
     $ctrl = new MgTileServiceController($app);
-    $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row);
+    $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, "img");
+});
+$app->get("/session/:sessionId/:resName/tile.:format/:groupName/:scaleIndex/:col/:row", function($sessionId, $resName, $format, $groupName, $scaleIndex, $col, $row) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+    $ctrl = new MgTileServiceController($app);
+    $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $format);
 });
 // Mapping Service APIs
 $app->get("/session/:sessionId/:resName.LayerDefinition/legend/:scale/:geomtype/:themecat/icon.:format", function($sessionId, $resName, $scale, $geomtype, $themecat, $format) use ($app) {

@@ -1741,6 +1741,158 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
                 */
             });
+            test("Aggregates - count", function() {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/count/SHP_Schema/Parcels", "GET", null, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/count/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/count/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Aggregates - bbox", function() {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", null, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Aggregates - distinctvalues", function() {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
             test("Select 100 Parcels", function() {
                 api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") - Request should've required authentication");
@@ -3616,6 +3768,137 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 */
+            });
+            test("Aggregates - count", function() {
+                                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Aggregates - bbox", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Aggregates - distinctvalues", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
             });
             test("Select 100 Parcels", function() {
                 //With raw credentials

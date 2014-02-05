@@ -480,6 +480,135 @@ class MgFeatureServiceController extends MgBaseController {
         }
     }
 
+    public function SelectAggregates($resId, $schemaName, $className, $type, $format) {
+        try {
+            //Check for unsupported representations
+            $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+            $aggType = $this->ValidateValueInDomain($type, array("count", "bbox", "distinctvalues"));
+            $distinctPropName = $this->GetRequestParameter("property", "");
+            if ($aggType === "distinctvalues" && $distinctPropName === "") {
+                $this->app->halt(400, "Missing required parameter: property"); //TODO: Localize
+            }
+
+            $sessionId = "";
+            if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+                $sessionId = $resId->GetRepositoryName();
+            }
+            $this->EnsureAuthenticationForSite($sessionId);
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+
+            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+            $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
+            $query = new MgFeatureAggregateOptions();
+            $capsXml = MgUtils::GetProviderCapabilties($featSvc, $resSvc, $resId);
+
+            $supportsDistinct = !(strstr($capsXml, "<SupportsSelectDistinct>true</SupportsSelectDistinct>") === false);
+            $supportsCount = !(strstr($capsXml, "<Name>Count</Name>") === false);
+            $supportsSpatialExtents = !(strstr($capsXml, "<Name>SpatialExtents</Name>") === false);
+
+            switch ($type) {
+                case "count":
+                    {
+                        $count = MgUtils::GetFeatureCount($featSvc, $resId, $schemaName, $className, $supportsCount);
+                        $output = "<AggregateResult>";
+                        $output .= "<Type>count</Type>";
+                        $output .= "<Total>$count</Total>";
+                        $output .= "</AggregateResult>";
+
+                        $bs = new MgByteSource($output, strlen($output));
+                        $br = $bs->GetReader();
+                        if ($fmt === "json") {
+                            $this->OutputXmlByteReaderAsJson($br);
+                        } else {
+                            $this->app->response->header("Content-Type", MgMimeType::Xml);
+                            $this->OutputByteReader($br);
+                        }
+                    }
+                    break;
+                case "bbox":
+                    {
+                        $geomName = $this->app->request->get("property");
+                        $bounds = MgUtils::GetFeatureClassMBR($featSvc, $resId, $schemaName, $className, $geomName);
+                        $iterator = $bounds->extentGeometry->GetCoordinates();
+                        $csCode = $bounds->csCode;
+                        $csWkt = $bounds->coordinateSystem;
+                        $epsg = $bounds->epsg;
+                        $firstTime = true;
+                        $minX = null; $minY = null; $maxX = null; $maxY = null;
+                        while ($iterator->MoveNext())
+                        {
+                            $x = $iterator->GetCurrent()->GetX();
+                            $y = $iterator->GetCurrent()->GetY();
+                            if($firstTime)
+                            {
+                                $maxX = $x;
+                                $minX = $x;
+                                $maxY = $y;
+                                $minY = $y;
+                                $firstTime = false;
+                            }
+                            if($maxX<$x)
+                                $maxX = $x;
+                            if($minX>$x||$minX==0)
+                                $minX = $x;
+                            if($maxY<$y)
+                                $maxY = $y;
+                            if($minY>$y||$minY==0)
+                                $minY = $y;
+                        }
+                        $output = "<AggregateResult>";
+                        $output .= "<Type>bbox</Type>";
+                        $output .= "<BoundingBox>";
+                        $output .= "<CoordinateSystem>";
+                        $output .= "<Code>$csCode</Code><EPSG>$epsg</EPSG>";
+                        $output .= "</CoordinateSystem>";
+                        $output .= "<LowerLeft><X>$minX</X><Y>$minY</Y></LowerLeft>";
+                        $output .= "<UpperRight><X>$maxX</X><Y>$maxY</Y></UpperRight>";
+                        $output .= "</BoundingBox>";
+                        $output .= "</AggregateResult>";
+
+                        $bs = new MgByteSource($output, strlen($output));
+                        $br = $bs->GetReader();
+                        if ($fmt === "json") {
+                            $this->OutputXmlByteReaderAsJson($br);
+                        } else {
+                            $this->app->response->header("Content-Type", MgMimeType::Xml);
+                            $this->OutputByteReader($br);
+                        }
+                    }
+                    break;
+                case "distinctvalues":
+                    {
+                        $values = MgUtils::GetDistinctValues($featSvc, $resId, $schemaName, $className, $distinctPropName);
+                        $output = "<AggregateResult>";
+                        $output .= "<Type>distinctvalues</Type>";
+                        $output .= "<ValueList>";
+                        foreach ($values as $val) {
+                            $output .= "<Value>".MgUtils::EscapeXmlChars($val)."</Value>";
+                        }
+                        $output .= "</ValueList>";
+                        $output .= "</AggregateResult>";
+
+                        $bs = new MgByteSource($output, strlen($output));
+                        $br = $bs->GetReader();
+                        if ($fmt === "json") {
+                            $this->OutputXmlByteReaderAsJson($br);
+                        } else {
+                            $this->app->response->header("Content-Type", MgMimeType::Xml);
+                            $this->OutputByteReader($br);
+                        }
+                    }
+                    break;
+            }
+        } catch (MgException $ex) {
+            $mimeType = MgMimeType::Xml;
+            if ($fmt === "json")
+                $mimeType = MgMimeType::Json;
+            $this->OnException($ex, $mimeType);
+        }
+    }
+
     public function SelectFeatures($resId, $schemaName, $className, $format) {
         try {
             //Check for unsupported representations

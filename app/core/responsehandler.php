@@ -278,6 +278,20 @@ abstract class MgResponseHandler
         } while ($len > 0);
     }
 
+    protected function ValidateValueInDomain($value, $allowedValues = null) {
+        if ($allowedValues == null) {
+            return $value;
+        } else {
+            $fmt = strtolower($value);
+            foreach ($allowedValues as $vr) {
+                $rep = strtolower($vr);
+                if ($rep === $fmt)
+                    return $fmt;
+            }
+        }
+        $this->app->halt(400, "Unrecognised value: $value. Allowed values are (".implode(", ", $allowedValues).")"); //TODO: Localize
+    }
+
     protected function ValidateRepresentation($format, $validRepresentations = null) {
         if ($validRepresentations == null) {
             return $format;

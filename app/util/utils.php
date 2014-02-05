@@ -417,6 +417,243 @@ class MgUtils
         }
         return $transform;
     }
+
+    public static function GetProviderCapabilties($featSvc, $resSvc, $fsId) {
+        $content = $resSvc->GetResourceContent($fsId);
+        $doc = new DOMDocument();
+        $doc->loadXML($content->ToString());
+
+        $prvNode = $doc->getElementsByTagName("Provider");
+        if ($prvNode->length == 1) {
+            $capsBr = $featSvc->GetCapabilities($prvNode->item(0)->nodeValue);
+            return $capsBr->ToString();
+        }
+        return null;
+    }
+
+    public static function GetFeatureClassMBR($featureSrvc, $featuresId, $schemaName, $className, $geomName = null)
+    {
+        $extentGeometryAgg = null;
+        $extentGeometrySc = null;
+        $extentByteReader = null;
+        
+        $mbr = new stdClass();
+
+        $clsDef = $featureSrvc->GetClassDefinition($featuresId, $schemaName, $className);
+        $props = $clsDef->GetProperties();
+        if ($geomName == null) {
+            $geomName = $clsDef->GetDefaultGeometryPropertyName();
+        }
+        $geomProp = $props->GetItem($geomName);
+        if ($geomProp->GetPropertyType() != MgFeaturePropertyType::GeometricProperty)
+            throw new Exception("Not a geometry property: ".$geomName); //TODO: Localize
+
+        $spatialContext = $geomProp->GetSpatialContextAssociation();
+
+        // Finds the coordinate system
+        $agfReaderWriter = new MgAgfReaderWriter();
+        $spatialcontextReader = $featureSrvc->GetSpatialContexts($featuresId, false);
+        while ($spatialcontextReader->ReadNext())
+        {
+            if ($spatialcontextReader->GetName() == $spatialContext)
+            {
+                $mbr->coordinateSystem = $spatialcontextReader->GetCoordinateSystemWkt();
+                $csFactory = new MgCoordinateSystemFactory();
+                $mbr->csCode = $csFactory->ConvertWktToCoordinateSystemCode($mbr->coordinateSystem);
+                $mbr->epsg = $csFactory->ConvertWktToEpsgCode($mbr->coordinateSystem);
+                // Finds the extent
+                $extentByteReader = $spatialcontextReader->GetExtent();
+                break;
+            }
+        }
+        $spatialcontextReader->Close();
+        if ($extentByteReader != null)
+        {
+            // Get the extent geometry from the spatial context
+            $extentGeometrySc = $agfReaderWriter->Read($extentByteReader);
+        }
+
+        // Try to get the extents using the selectaggregate as sometimes the spatial context
+        // information is not set
+        $aggregateOptions = new MgFeatureAggregateOptions();
+        $featureProp = 'SPATIALEXTENTS("' . $geomName . '")';
+        $aggregateOptions->AddComputedProperty('EXTENTS', $featureProp);
+
+        try
+        {
+            $dataReader = $featureSrvc->SelectAggregate($featuresId, $className, $aggregateOptions);
+            if($dataReader->ReadNext())
+            {
+                // Get the extents information
+                $byteReader = $dataReader->GetGeometry('EXTENTS');
+                $extentGeometryAgg = $agfReaderWriter->Read($byteReader);
+            }
+            $dataReader->Close();
+        }
+        catch (MgException $e)
+        {
+            if ($extentGeometryAgg == null) 
+            {
+                //We do have one last hope. EXTENT() is an internal MapGuide custom function that's universally supported
+                //as it operates against an underlying select query result. This raw-spins the reader server-side so there
+                //is no server -> web tier transmission overhead involved.
+                try
+                {
+                    $aggregateOptions = new MgFeatureAggregateOptions();
+                    $aggregateOptions->AddComputedProperty("COMP_EXTENT", "EXTENT(".$geomName.")");
+                    
+                    $dataReader = $featureSrvc->SelectAggregate($featuresId, $className, $aggregateOptions);
+                    if($dataReader->ReadNext())
+                    {
+                        // Get the extents information
+                        $byteReader = $dataReader->GetGeometry('COMP_EXTENT');
+                        $extentGeometryAgg = $agfReaderWriter->Read($byteReader);
+                    }
+                    $dataReader->Close();
+                }
+                catch (MgException $e2) 
+                {
+                    
+                }
+            }
+        }
+        
+        $mbr->extentGeometry = null;
+        // Prefer SpatialExtents() of EXTENT() result over spatial context extent
+        if ($extentGeometryAgg != null)
+            $mbr->extentGeometry = $extentGeometryAgg;
+        if ($mbr->extentGeometry == null) { //Stil null? Now try spatial context
+            if ($extentGeometrySc != null)
+                $mbr->extentGeometry = $extentGeometrySc;
+        }
+        return $mbr;
+    }
+
+    public static function GetFeatureCount($featSvc, $featuresId, $schemaName, $className, $tryAggregate = true) {
+        //Try the SelectAggregate shortcut. This is faster than raw spinning a feature reader
+        //
+        //NOTE: If MapGuide supported scrollable readers like FDO, we'd have also tried 
+        //that as well.
+        $totalEntries = -1;
+        $featureName = $schemaName . ":" . $className;
+        $canCount = false;
+        $gotCount = false;
+        
+        if ($tryAggregate) {
+            $clsDef = $featSvc->GetClassDefinition($featuresId, $schemaName, $className);
+            $idProps = $clsDef->GetIdentityProperties();
+            if ($idProps->GetCount() > 0)
+            {
+                $pd = $idProps->GetItem(0);
+                $expr = "COUNT(" .$pd->GetName(). ")";
+                $query = new MgFeatureAggregateOptions();
+                $query->AddComputedProperty("TotalCount", $expr);
+                try 
+                {
+                    $dataReader = $featSvc->SelectAggregate($featuresId, $featureName, $query);
+                    if ($dataReader->ReadNext())
+                    {
+                        // When there is no data, the property will be null.
+                        if($dataReader->IsNull("TotalCount"))
+                        {
+                            $totalEntries = 0;
+                            $gotCount = true;
+                        }
+                        else
+                        {
+                            $ptype = $dataReader->GetPropertyType("TotalCount");
+                            switch ($ptype)
+                            {
+                                case MgPropertyType::Int32:
+                                    $totalEntries = $dataReader->GetInt32("TotalCount");
+                                    $gotCount = true;
+                                    break;
+                                case MgPropertyType::Int64:
+                                    $totalEntries = $dataReader->GetInt64("TotalCount");
+                                    $gotCount = true;
+                                    break;
+                            }
+                            $dataReader->Close();
+                        }
+                    }
+                }
+                catch (MgException $ex) //Some providers like OGR can lie
+                {
+                    $gotCount = false;
+                }
+            }
+        }
+        
+        if ($gotCount == false)
+        {
+            $featureReader = null;
+            try 
+            {
+                $featureReader = $featSvc->SelectFeatures($featuresId, $featureName, null);
+            }
+            catch (MgException $ex)
+            {
+                $totalEntries = -1; //Can't Count() or raw spin? Oh dear!
+            }
+            
+            if ($featureReader != null)
+            {
+                while($featureReader->ReadNext())
+                    $totalEntries++;
+                $featureReader->Close();
+            }
+        }
+        
+        return $totalEntries;
+    }
+
+    static function GetBasicValueFromReader($reader, $propName) {
+        $val = "";
+        if ($reader->IsNull($propName))
+            return "";
+        $propType = $reader->GetPropertyType($propName);
+        switch($propType) {
+            case MgPropertyType::Boolean:
+                $val = $reader->GetBoolean($propName)."";
+                break;
+            case MgPropertyType::Byte:
+                $val = $reader->GetByte($propName)."";
+                break;
+            case MgPropertyType::Decimal:
+            case MgPropertyType::Double:
+                $val = $reader->GetDouble($propName)."";
+                break;
+            case MgPropertyType::Int16:
+                $val = $reader->GetInt16($propName)."";
+                break;
+            case MgPropertyType::Int32:
+                $val = $reader->GetInt32($propName)."";
+                break;
+            case MgPropertyType::Int64:
+                $val = $reader->GetInt64($propName)."";
+                break;
+            case MgPropertyType::Single:
+                $val = $reader->GetSingle($propName)."";
+                break;
+            case MgPropertyType::String:
+                $val = $reader->GetString($propName);
+                break;
+        }
+        return $val;
+    }
+
+    public static function GetDistinctValues($featSvc, $fsId, $schemaName, $className, $distinctPropName) {
+        $values = array();
+
+        $query = new MgFeatureAggregateOptions();
+        $query->AddComputedProperty("RESULT", "UNIQUE($distinctPropName)");
+        $rdr = $featSvc->SelectAggregate($fsId, "$schemaName:$className", $query);
+        while ($rdr->ReadNext()) {
+            array_push($values, self::GetBasicValueFromReader($rdr, "RESULT"));
+        }
+
+        return $values;
+    }
 }
 
 ?>

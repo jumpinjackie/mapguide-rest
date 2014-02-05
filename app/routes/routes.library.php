@@ -176,6 +176,16 @@ $app->get("/library/:resourcePath+/features.:format/:schemaName/:className", fun
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->SelectFeatures($resId, $schemaName, $className, $format);
 });
+$app->get("/library/:resourcePath+/aggregates/:type/:schemaName/:className", function($resourcePath, $type, $schemaName, $className) use ($app) {
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->SelectAggregates($resId, $schemaName, $className, $type, "xml");
+});
+$app->get("/library/:resourcePath+/aggregates.:format/:type/:schemaName/:className", function($resourcePath, $format, $type, $schemaName, $className) use ($app) {
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->SelectAggregates($resId, $schemaName, $className, $type, $format);
+});
 // Resource Service APIs
 $app->get("/library/:resourcePath+/datalist", function($resourcePath) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
