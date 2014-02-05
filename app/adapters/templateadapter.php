@@ -451,7 +451,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
             $err = new stdClass();
             $err->code = get_class($ex);
             $err->message = $ex->GetExceptionMessage();
-            $err->stack = sprintf("======== MapGuide Stack Trace ========\n%s\n======== Begin PHP Stack Trace ========\n%s", $ex->GetStackTrace(), $ex->getTraceAsString());
+            $err->stack = sprintf("%s\n======== Native <-> PHP boundary ========\n\n%s", $ex->GetStackTrace(), $ex->getTraceAsString());
             $smarty->assign("error", $err);
             $this->app->response->write($smarty->fetch($this->errorViewPath));
         } catch (Exception $e) {
