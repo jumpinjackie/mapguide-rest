@@ -261,7 +261,12 @@ $app->delete("/library/:resourcePath+", function($resourcePath) use ($app) {
 $app->get("/library/:resourcePath+/tile/:groupName/:scaleIndex/:col/:row", function($resourcePath, $groupName, $scaleIndex, $col, $row) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgTileServiceController($app);
-    $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row);
+    $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, "img");
+});
+$app->get("/library/:resourcePath+/tile.:format/:groupName/:scaleIndex/:col/:row", function($resourcePath, $format, $groupName, $scaleIndex, $col, $row) use ($app) {
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgTileServiceController($app);
+    $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $format);
 });
 // Mapping Service APIs
 $app->get("/library/:resourcePath+.LayerDefinition/legend/:scale/:geomtype/:themecat/icon.:format", function($resourcePath, $scale, $geomtype, $themecat, $format) use ($app) {

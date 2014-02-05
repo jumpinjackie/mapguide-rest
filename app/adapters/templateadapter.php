@@ -336,6 +336,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
         $reader = null;
         $related = new MgRelatedFeaturesSet();
         $smarty = new Smarty();
+        $smarty->setCompileDir($this->app->config("Cache.RootDir")."/templates_c");
         //$smarty->setCaching(false);
         try {
             $output = "";

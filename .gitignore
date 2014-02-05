@@ -1,2 +1,5 @@
 /web.config
 /templates_c
+/cache/vectortile
+/cache/templates_c
+!/cache/readme.txt

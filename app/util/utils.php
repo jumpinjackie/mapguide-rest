@@ -388,7 +388,7 @@ class MgUtils
 
         return MgUtils::ParseSingleFeatureDocument($classDef, $doc, $featureNodeName, $propertyNodeName);
     }
-    
+
     public static function GetTransform($featSvc, $resId, $schemaName, $className, $transformto) {
         $transform = null;
         $factory = new MgCoordinateSystemFactory();

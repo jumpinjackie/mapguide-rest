@@ -21,6 +21,7 @@ return array(
     "GeoRest.ConfigPath" => "./conf/data",
     "MapGuide.PhysicalTilePath" => "C:/Program Files/OSGeo/MapGuide/Server/Repositories/TileCache",
     "MapGuide.TileImageFormat" => "png",
+    "Cache.RootDir" => "./cache",
     "Locale" => "en"
 );
 
