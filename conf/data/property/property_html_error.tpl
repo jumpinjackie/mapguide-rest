@@ -10,7 +10,12 @@
             <div class="alert alert-danger">
                 An unexpected error occured. Full error details below
             </div>
-            <pre>{$error->GetDetails()}</pre>
+            <p>Code</p>
+            <pre>{$error->code}</pre>
+            <p>Message</p>
+            <pre>{$error->message}</pre>
+            <p>Stack Trace</p>
+            <pre>{$error->stack}</pre>
         </div>
     </body>
 </html>

@@ -448,7 +448,18 @@ class MgTemplateRestAdapter extends MgRestAdapter
             $this->app->response->header("Content-Type", $this->mimeType);
             $this->app->response->write($output);
         } catch (MgException $ex) {
-            $smarty->assign("error", $ex);
+            $err = new stdClass();
+            $err->code = get_class($ex);
+            $err->message = $ex->GetExceptionMessage();
+            $err->stack = sprintf("======== MapGuide Stack Trace ========\n%s\n======== Begin PHP Stack Trace ========\n%s", $ex->GetStackTrace(), $ex->getTraceAsString());
+            $smarty->assign("error", $err);
+            $this->app->response->write($smarty->fetch($this->errorViewPath));
+        } catch (Exception $e) {
+            $err = new stdClass();
+            $err->code = get_class($e);
+            $err->message = $e->getMessage();
+            $err->stack = $e->getTraceAsString();
+            $smarty->assign("error", $err);
             $this->app->response->write($smarty->fetch($this->errorViewPath));
         }
         $related->Cleanup();
