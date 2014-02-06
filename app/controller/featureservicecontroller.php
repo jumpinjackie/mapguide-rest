@@ -631,24 +631,12 @@ class MgFeatureServiceController extends MgBaseController {
             $propList = $this->GetRequestParameter("properties", "");
             //$orderby = $this->GetRequestParameter("orderby", "");
             //$orderOptiosn = $this->GetRequestParameter("orderoption", "");
-            $spatialFilter = $this->GetRequestParameter("spatialfilter", "");
             $maxFeatures = $this->GetRequestParameter("maxfeatures", "");
             $transformto = $this->GetRequestParameter("transformto", "");
             $bbox = $this->GetRequestParameter("bbox", "");
 
-            $finalFilter = "";
             if ($filter !== "") {
-                $finalFilter = $filter;
-            }
-            if ($spatialFilter !== "") {
-                if ($finalFilter !== "") {
-                    $finalFilter .= " AND " . $spatialFilter;
-                } else {
-                    $finalFilter = $spatialFilter;
-                }
-            }
-            if ($finalFilter !== "") {
-                $query->SetFilter($finalFilter);
+                $query->SetFilter($filter);
             }
             $limit = -1;
             if ($maxFeatures !== "") {
