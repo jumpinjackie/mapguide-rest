@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Property Report - {$model->RPROPAD}</title>
-        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="{$helper->GetAssetPath('common/css/bootstrap.min.css')}" />
         <style type="text/css">
             .label-cell { font-weight: bolder; }
         </style>

@@ -3,7 +3,7 @@
 require_once "restadapter.php";
 
 /**
- * A set of lazy-loaded geometry formatters
+ * A set of lazy-loaded geometry and datetime formatters
  */
 class MgFormatterSet
 {
@@ -143,6 +143,9 @@ class MgFeatureModel
     }
 }
 
+/** 
+ * A feature model where any property access returns an empty string
+ */
 class MgNullFeatureModel
 {
     public function GeometryAsType($name, $formatterName) {
@@ -154,6 +157,9 @@ class MgNullFeatureModel
     }
 }
 
+/** 
+ * An iterator model that is empty
+ */
 class MgNullFeatureReaderModel
 {
     public function Next() { return false; }
@@ -163,6 +169,9 @@ class MgNullFeatureReaderModel
     public function Done() { }
 }
 
+/**
+ * A collection of related feature iterators
+ */
 class MgRelatedFeaturesSet
 {
     private $relations;
@@ -190,7 +199,8 @@ class MgRelatedFeaturesSet
     }
 }
 
-/** * Template model for "many" result templates
+/** 
+ * Template model for "many" result templates
  */
 class MgFeatureReaderModel
 {
@@ -228,6 +238,20 @@ class MgFeatureReaderModel
 
     public function Done() {
         $this->reader->Close();
+    }
+}
+
+class MgTemplateHelper
+{
+    private $app;
+
+    public function __construct($app) {
+        $this->app = $app;
+    }
+
+    public function GetAssetPath($relPath) {
+        $thisUrl = ($_SERVER['HTTPS'] === "off" ? "http://" : "https://") . $_SERVER['HTTP_HOST'] . $_SERVER["SCRIPT_NAME"];
+        return MgUtils::RelativeToAbsoluteUrl($thisUrl, "assets/$relPath");
     }
 }
 
@@ -386,10 +410,12 @@ class MgTemplateRestAdapter extends MgRestAdapter
                     }
                     $smarty->assign("model", new MgFeatureModel(new MgFormatterSet($this->app), $reader, $this->transform));
                     $smarty->assign("related", $related);
+                    $smarty->assign("helper", new MgTemplateHelper($this->app));
                     $output = $smarty->fetch($this->singleViewPath);
                 } else {
                     $this->app->response->setStatus(404);
                     $smarty->assign("ID", $this->featureId);
+                    $smarty->assign("helper", new MgTemplateHelper($this->app));
                     $output = $smarty->fetch($this->noneViewPath);
                 }
             } else {
@@ -443,6 +469,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
                             $smarty->assign("maxPages", 1);
                     }
                 }
+                $smarty->assign("helper", new MgTemplateHelper($this->app));
                 $output = $smarty->fetch($this->manyViewPath);
             }
             $this->app->response->header("Content-Type", $this->mimeType);
@@ -453,6 +480,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
             $err->message = $ex->GetExceptionMessage();
             $err->stack = sprintf("%s\n======== Native <-> PHP boundary ========\n\n%s", $ex->GetStackTrace(), $ex->getTraceAsString());
             $smarty->assign("error", $err);
+            $smarty->assign("helper", new MgTemplateHelper($this->app));
             $this->app->response->write($smarty->fetch($this->errorViewPath));
         } catch (Exception $e) {
             $err = new stdClass();
@@ -460,6 +488,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
             $err->message = $e->getMessage();
             $err->stack = $e->getTraceAsString();
             $smarty->assign("error", $err);
+            $smarty->assign("helper", new MgTemplateHelper($this->app));
             $this->app->response->write($smarty->fetch($this->errorViewPath));
         }
         $related->Cleanup();

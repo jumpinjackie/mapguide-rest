@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Property Results</title>
-        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="{$helper->GetAssetPath('common/css/bootstrap.min.css')}" />
         <script type="text/javascript">
 
             //NOTE: All representations in restcfg.json have been set up with the same maxcount and pagesize, ensuring

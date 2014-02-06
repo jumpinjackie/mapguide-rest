@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Property not found</title>
-        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="{$helper->GetAssetPath('common/css/bootstrap.min.css')}" />
     </head>
     <body>
         <div class="container">
