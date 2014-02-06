@@ -1821,6 +1821,46 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
+            test("Aggregates - bbox (with xform)", function() {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator" }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator" }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator", session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator", session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator", session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator", session: this.adminSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
             test("Aggregates - distinctvalues", function() {
                 api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") - Request should've required authentication");
@@ -3832,6 +3872,39 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Aggregates - bbox (with xform)", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });

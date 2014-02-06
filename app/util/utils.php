@@ -436,13 +436,14 @@ class MgUtils
         return null;
     }
 
-    public static function GetFeatureClassMBR($featureSrvc, $featuresId, $schemaName, $className, $geomName = null)
+    public static function GetFeatureClassMBR($featureSrvc, $featuresId, $schemaName, $className, $geomName = null, $transformToCsCode = null)
     {
         $extentGeometryAgg = null;
         $extentGeometrySc = null;
         $extentByteReader = null;
         
         $mbr = new stdClass();
+        $csFactory = new MgCoordinateSystemFactory();
 
         $clsDef = $featureSrvc->GetClassDefinition($featuresId, $schemaName, $className);
         $props = $clsDef->GetProperties();
@@ -463,7 +464,6 @@ class MgUtils
             if ($spatialcontextReader->GetName() == $spatialContext)
             {
                 $mbr->coordinateSystem = $spatialcontextReader->GetCoordinateSystemWkt();
-                $csFactory = new MgCoordinateSystemFactory();
                 $mbr->csCode = $csFactory->ConvertWktToCoordinateSystemCode($mbr->coordinateSystem);
                 $mbr->epsg = $csFactory->ConvertWktToEpsgCode($mbr->coordinateSystem);
                 // Finds the extent
@@ -531,6 +531,17 @@ class MgUtils
             if ($extentGeometrySc != null)
                 $mbr->extentGeometry = $extentGeometrySc;
         }
+
+        if ($transformToCsCode != null) {
+            $sourceCs = $csFactory->CreateFromCode($mbr->csCode);
+            $targetCs = $csFactory->CreateFromCode($transformToCsCode);
+            $xform = $csFactory->GetTransform($sourceCs, $targetCs);
+
+            $mbr->extentGeometry = $mbr->extentGeometry->Transform($xform);
+            $mbr->csCode = $targetCs->GetCsCode();
+            $mbr->epsg = $targetCs->GetEpsgCode();
+        }
+
         return $mbr;
     }
 

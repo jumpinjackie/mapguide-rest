@@ -529,7 +529,8 @@ class MgFeatureServiceController extends MgBaseController {
                 case "bbox":
                     {
                         $geomName = $this->app->request->get("property");
-                        $bounds = MgUtils::GetFeatureClassMBR($featSvc, $resId, $schemaName, $className, $geomName);
+                        $txTo = $this->app->request->get("transformto");
+                        $bounds = MgUtils::GetFeatureClassMBR($featSvc, $resId, $schemaName, $className, $geomName, $txTo);
                         $iterator = $bounds->extentGeometry->GetCoordinates();
                         $csCode = $bounds->csCode;
                         $csWkt = $bounds->coordinateSystem;
@@ -557,6 +558,7 @@ class MgFeatureServiceController extends MgBaseController {
                             if($minY>$y||$minY==0)
                                 $minY = $y;
                         }
+
                         $output = "<AggregateResult>";
                         $output .= "<Type>bbox</Type>";
                         $output .= "<BoundingBox>";
