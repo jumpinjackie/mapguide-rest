@@ -4,6 +4,9 @@ IIS configuration to enable URL rewriting. Requires the Application Request Rout
 -->
 <configuration>
     <system.webServer>
+        <staticContent>
+            <mimeMap fileExtension=".woff" mimeType="application/x-woff" />
+        </staticContent>
         <rewrite>
             <rules>
                 <rule name="some-name" patternSyntax="Wildcard">

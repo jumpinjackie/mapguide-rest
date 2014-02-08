@@ -33,6 +33,22 @@ if (array_key_exists("USERNAME", $_POST) && array_key_exists("PASSWORD", $_POST)
     $bs2 = new MgByteSource(dirname(__FILE__)."/SheboyganMixed.MapDefinition.xml");
     $br2 = $bs2->GetReader();
     $resSvc->SetResource($res2, $br2, null);
+
+    //Enable writeable parcels
+    $parcelsId = new MgResourceIdentifier("Library://Samples/Sheboygan/Data/Parcels.FeatureSource");
+    $writeParcelsId = new MgResourceIdentifier("Library://Samples/Sheboygan/Data/Parcels_Writeable.FeatureSource");
+    if ($resSvc->ResourceExists($parcelsId) && !$resSvc->ResourceExists($writeParcelsId)) {
+        $resSvc->CopyResource($parcelsId, $writeParcelsId, true);
+
+        $bsWriteable = new MgByteSource(dirname(__FILE__)."/Parcels_Writeable.FeatureSource.xml");
+        $brWriteable = $bsWriteable->GetReader();
+        $resSvc->SetResource($writeParcelsId, $brWriteable, null);
+    }
+
+    //Web Layout demonstrating intergration with REST-enabled published data
+    $bs3 = new MgByteSource(dirname(__FILE__)."/RESTWebLayout.mgp");
+    $br3 = $bs3->GetReader();
+    $resSvc->ApplyResourcePackage($br3);
 ?>
     <p>Sample resources required for OpenLayers integration samples loaded.</p>
     <p><a href="../index.php">Return to samples</a></p>

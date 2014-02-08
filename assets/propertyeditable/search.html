@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Property Search</title>
+        <link rel="stylesheet" href="../common/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="../fa/css/font-awesome.min.css" />
+        <script type="text/javascript" src="../common/js/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript">
+            var searchURL = "../../data/propertyeditable/.html";
+
+            function getViewer() {
+                return parent.parent;
+            }
+
+            $(document).ready(function() {
+                $("#btnSearchByOwner").click(function() {
+                    getViewer().GetTaskFrame().location.href = searchURL + "?filter=" + encodeURIComponent("RNAME LIKE '%" + $("#OWNER").val() + "%'");
+                });
+                $("#btnSearchByAddress").click(function() {
+                    getViewer().GetTaskFrame().location.href = searchURL + "?filter=" + encodeURIComponent("RPROPAD LIKE '%" + $("#ADDRESS").val() + "%'");
+                });
+                $("#btnDrawBBOX").click(function() {
+                    getViewer().GetMapFrame().DigitizeRectangle(function(rect) {
+                        $("#BBOX").val(rect.Point1.X + "," + rect.Point1.Y + "," + rect.Point2.X + "," + rect.Point2.Y);
+                    })
+                });
+                $("#btnSearchByBBOX").click(function() {
+                    var bbox = $("#BBOX").val();
+                    if ($.trim(bbox).length == 0) {
+                        alert("Please specify a bounding box by clicking the draw button and drawing the box on the map");
+                        return;
+                    }
+                    getViewer().GetTaskFrame().location.href = searchURL + "?bbox=" + bbox;
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h3>Property Search</h3>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    Search by owner
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" class="form-control input-sm" id="OWNER" name="OWNER" value="" />
+                            <span class="input-group-btn">
+                                <a title="Search" class="btn btn-success btn-sm btn-search" id="btnSearchByOwner"><i class="fa fa-search"></i></a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    Search by address
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" class="form-control input-sm" id="ADDRESS" name="ADDRESS" value="" />
+                            <span class="input-group-btn">
+                                <a title="Search" class="btn btn-success btn-sm btn-search" id="btnSearchByAddress"><i class="fa fa-search"></i></a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    Search by bounding box
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" class="form-control input-sm" id="BBOX" name="BBOX" readonly="readonly" value="" />
+                            <span class="input-group-btn">
+                                <a title="Search" class="btn btn-primary btn-sm btn-search" id="btnDrawBBOX"><i class="fa fa-pencil"></i></a>
+                                <a title="Search" class="btn btn-success btn-sm btn-search" id="btnSearchByBBOX"><i class="fa fa-search"></i></a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
