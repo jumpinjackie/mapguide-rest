@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>Consuming published data example</head>
+    <link rel="stylesheet" href="../../assets/common/js/theme/default/style.css" />
+    <style type="text/css">
+        body { font-family: Verdana; font-size: 0.9em; }
+        #error { color: red; }
+        #wrap { width: 900; }
+        #map1 { width: 650px; height: 500px; }
+        #details { width: 250; height: 500; overflow: auto; display: block-inline; float: left; }
+        #rootList { list-style-type: none; margin-left: -20px; }
+        #rootList li { list-style-type: none; }
+        .olControlMousePosition { background: #ffff66; font-size: 0.6em !important; padding: 2px; }
+    </style>
+    <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="../../assets/common/js/OpenLayers.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            $.getJSON("../../data/districts/.geojson", function(json) {
+                var map = new OpenLayers.Map("map1", { projection: "EPSG:4326" });
+                map.addLayer(new OpenLayers.Layer.WMS( "OpenLayers WMS", 
+                    "http://vmap0.tiles.osgeo.org/wms/vmap0",
+                    {layers: 'basic'} ));
+                var fmt = new OpenLayers.Format.GeoJSON();
+                var districts = new OpenLayers.Layer.Vector("Voting Districts", { projection: "EPSG:4326"});
+                map.addLayer(districts);
+                map.addLayer(new OpenLayers.Layer.GeoRSS("Sheboygan Properties","../../data/property/.georss"));
+                var features = fmt.read(json);
+                districts.addFeatures(features);
+                map.zoomToExtent(new OpenLayers.Bounds(-87.7649869909628, 43.6913981287878, -87.6955215108997, 43.7975200004803));
+            });
+        });
+
+    </script>
+    <body>
+        <p>This map consumes GeoJSON and GeoRSS feeds published by the RESTful data publishing framework</p>
+        <p>You can find the GeoJSON feed being used <a href="../../data/districts/.geojson">here</a></p>
+        <p>You can find the GeoRSS feed being used <a href="../../data/property/.georss">here</a></p>
+        <div id="error">
+        </div>
+        <div id="map1">
+        </div>
+    </body>
+</html>

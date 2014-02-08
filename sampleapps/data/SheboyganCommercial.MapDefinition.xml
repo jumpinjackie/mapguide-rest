@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<MapDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="MapDefinition-1.0.0.xsd">
+  <Name>Sheboygan Map</Name>
+  <CoordinateSystem>PROJCS["WGS84.PseudoMercator",GEOGCS["LL84",DATUM["WGS84",SPHEROID["WGS84",6378137.000,298.25722293]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Popular Visualisation Pseudo Mercator"],PARAMETER["false_easting",0.000],PARAMETER["false_northing",0.000],PARAMETER["central_meridian",0.00000000000000],UNIT["Meter",1.00000000000000]]</CoordinateSystem>
+  <Extents>
+    <MinX>-9769953.6613122653</MinX>
+    <MaxX>-9762220.7994439267</MaxX>
+    <MinY>5417808.8801717851</MinY>
+    <MaxY>5434161.2241863841</MaxY>
+  </Extents>
+  <BackgroundColor>ffcdbd9c</BackgroundColor>
+  <MapLayer>
+    <Name>Roads</Name>
+    <ResourceId>Library://Samples/Sheboygan/Layers/Roads.LayerDefinition</ResourceId>
+    <Selectable>false</Selectable>
+    <ShowInLegend>true</ShowInLegend>
+    <LegendLabel>Roads</LegendLabel>
+    <ExpandInLegend>true</ExpandInLegend>
+    <Visible>true</Visible>
+    <Group>Transportation</Group>
+  </MapLayer>
+  <MapLayer>
+    <Name>Rail Lines</Name>
+    <ResourceId>Library://Samples/Sheboygan/Layers/Tracks.LayerDefinition</ResourceId>
+    <Selectable>false</Selectable>
+    <ShowInLegend>true</ShowInLegend>
+    <LegendLabel>Rail Lines</LegendLabel>
+    <ExpandInLegend>true</ExpandInLegend>
+    <Visible>false</Visible>
+    <Group>Transportation</Group>
+  </MapLayer>
+  <MapLayer>
+    <Name>Districts</Name>
+    <ResourceId>Library://Samples/Sheboygan/Layers/Districts.LayerDefinition</ResourceId>
+    <Selectable>false</Selectable>
+    <ShowInLegend>true</ShowInLegend>
+    <LegendLabel>Districts</LegendLabel>
+    <ExpandInLegend>true</ExpandInLegend>
+    <Visible>true</Visible>
+    <Group>Municipal</Group>
+  </MapLayer>
+  <MapLayer>
+    <Name>Buildings</Name>
+    <ResourceId>Library://Samples/Sheboygan/Layers/Buildings.LayerDefinition</ResourceId>
+    <Selectable>false</Selectable>
+    <ShowInLegend>true</ShowInLegend>
+    <LegendLabel>Buildings</LegendLabel>
+    <ExpandInLegend>true</ExpandInLegend>
+    <Visible>true</Visible>
+    <Group>Municipal</Group>
+  </MapLayer>
+  <MapLayer>
+    <Name>Parcels</Name>
+    <ResourceId>Library://Samples/Sheboygan/Layers/Parcels.LayerDefinition</ResourceId>
+    <Selectable>true</Selectable>
+    <ShowInLegend>true</ShowInLegend>
+    <LegendLabel>Parcels</LegendLabel>
+    <ExpandInLegend>true</ExpandInLegend>
+    <Visible>true</Visible>
+    <Group>Municipal</Group>
+  </MapLayer>
+  <MapLayer>
+    <Name>Islands</Name>
+    <ResourceId>Library://Samples/Sheboygan/Layers/Islands.LayerDefinition</ResourceId>
+    <Selectable>false</Selectable>
+    <ShowInLegend>true</ShowInLegend>
+    <LegendLabel>Islands</LegendLabel>
+    <ExpandInLegend>true</ExpandInLegend>
+    <Visible>true</Visible>
+    <Group>Base Map</Group>
+  </MapLayer>
+  <MapLayer>
+    <Name>Hydrography</Name>
+    <ResourceId>Library://Samples/Sheboygan/Layers/Hydrography.LayerDefinition</ResourceId>
+    <Selectable>false</Selectable>
+    <ShowInLegend>true</ShowInLegend>
+    <LegendLabel>Hydrography</LegendLabel>
+    <ExpandInLegend>true</ExpandInLegend>
+    <Visible>true</Visible>
+    <Group>Base Map</Group>
+  </MapLayer>
+  <MapLayer>
+    <Name>CityLimits</Name>
+    <ResourceId>Library://Samples/Sheboygan/Layers/CityLimits.LayerDefinition</ResourceId>
+    <Selectable>false</Selectable>
+    <ShowInLegend>true</ShowInLegend>
+    <LegendLabel>CityLimits</LegendLabel>
+    <ExpandInLegend>true</ExpandInLegend>
+    <Visible>true</Visible>
+    <Group>Base Map</Group>
+  </MapLayer>
+  <MapLayerGroup>
+    <Name>Base Map</Name>
+    <Visible>true</Visible>
+    <ShowInLegend>true</ShowInLegend>
+    <ExpandInLegend>true</ExpandInLegend>
+    <LegendLabel>Base Map</LegendLabel>
+    <Group />
+  </MapLayerGroup>
+  <MapLayerGroup>
+    <Name>Municipal</Name>
+    <Visible>true</Visible>
+    <ShowInLegend>true</ShowInLegend>
+    <ExpandInLegend>true</ExpandInLegend>
+    <LegendLabel>Municipal</LegendLabel>
+    <Group />
+  </MapLayerGroup>
+  <MapLayerGroup>
+    <Name>Transportation</Name>
+    <Visible>true</Visible>
+    <ShowInLegend>true</ShowInLegend>
+    <ExpandInLegend>true</ExpandInLegend>
+    <LegendLabel>Transportation</LegendLabel>
+    <Group />
+  </MapLayerGroup>
+</MapDefinition>
