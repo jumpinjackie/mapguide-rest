@@ -232,7 +232,20 @@ class MgMappingServiceController extends MgBaseController {
         $xml .= "<DisplayDpi>$dpi</DisplayDpi>";
         // ---------------------- Icon MIME Type --------------------------- //
         if (($reqFeatures & self::REQUEST_LAYER_ICONS) == self::REQUEST_LAYER_ICONS) {
-            $xml .= "<IconMimeType>$iconFormat</IconMimeType>\n";
+            switch ($iconFormat) {
+                case "JPG":
+                    $xml .= "<IconMimeType>".MgMimeType::Jpeg."</IconMimeType>\n";
+                    break;
+                case "GIF":
+                    $xml .= "<IconMimeType>".MgMimeType::Gif."</IconMimeType>\n";
+                    break;
+                case "PNG8":
+                    $xml .= "<IconMimeType>".MgMimeType::Png."</IconMimeType>\n";
+                    break;
+                default:
+                    $xml .= "<IconMimeType>".MgMimeType::Png."</IconMimeType>\n";
+                    break;
+            }
         }
         // ---------------------- Coordinate System --------------------------- //
         $csFactory = new MgCoordinateSystemFactory();
@@ -307,7 +320,8 @@ class MgMappingServiceController extends MgBaseController {
 
                 $xml .= self::CreateLayerItem($reqFeatures, $iconsPerScaleRange, $iconFormat, $iconWidth, $iconHeight, $layer, $parent, $layerDoc, $mappingSvc);
             }
-        } else { //Base Layer Groups need to be outputted regardless, otherwise a client application doesn't have enough information to build GETTILEIMAGE requests
+        } else {
+            //Base Layer Groups need to be outputted regardless, otherwise a client application doesn't have enough information to build GETTILEIMAGE requests
             $groups = $map->GetLayerGroups();
             $groupCount = $groups->GetCount();
             for ($i = 0; $i < $groupCount; $i++) {
@@ -319,16 +333,18 @@ class MgMappingServiceController extends MgBaseController {
                 $parent = $group->GetGroup();
                 $xml .= self::CreateGroupItem($group, $parent);
             }
-            // ------------------------ Finite Display Scales (if any) ------------------------- //
-            $fsCount = $map->GetFiniteDisplayScaleCount();
-            if ($fsCount > 0) {
-                for ($i = 0; $i < $fsCount; $i++) {
-                    $xml .= "<FiniteDisplayScale>";
-                    $xml .= $map->GetFiniteDisplayScaleAt($i);
-                    $xml .= "</FiniteDisplayScale>";
-                }
+        }
+
+        // ------------------------ Finite Display Scales (if any) ------------------------- //
+        $fsCount = $map->GetFiniteDisplayScaleCount();
+        if ($fsCount > 0) {
+            for ($i = 0; $i < $fsCount; $i++) {
+                $xml .= "<FiniteDisplayScale>";
+                $xml .= $map->GetFiniteDisplayScaleAt($i);
+                $xml .= "</FiniteDisplayScale>";
             }
         }
+
         $xml .= "</RuntimeMap>";
 
         $bs = new MgByteSource($xml, strlen($xml));
