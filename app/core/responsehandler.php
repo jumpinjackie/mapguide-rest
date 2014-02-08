@@ -159,6 +159,7 @@ abstract class MgResponseHandler
     }
 
     protected function OutputUpdateFeaturesResult($commands, $result, $classDef) {
+        $bHasError = false;
         $output = "<UpdateFeaturesResult>";
         $ccount = $commands->GetCount();
         $rcount = $result->GetCount();
@@ -174,6 +175,7 @@ abstract class MgResponseHandler
                         $output .= "<InsertResult>";
                         if ($prop->GetPropertyType() == MgPropertyType::String) {
                             $output .= "<Error>".$prop->GetValue()."</Error>";
+                            $bHasError = true;
                         } else if ($prop->GetPropertyType() == MgPropertyType::Feature) {
                             $output .= "<FeatureSet><Features>";
                             $reader = $prop->GetValue();
@@ -235,6 +237,7 @@ abstract class MgResponseHandler
                         $output .= "<UpdateResult>";
                         if ($prop->GetPropertyType() == MgPropertyType::String) {
                             $output .= "<Error>".$prop->GetValue()."</Error>";
+                            $bHasError = true;
                         } else if ($prop->GetPropertyType() == MgPropertyType::Int32) {
                             $output .= "<ResultsAffected>".$prop->GetValue()."</ResultsAffected>";
                         }
@@ -246,6 +249,7 @@ abstract class MgResponseHandler
                         $output .= "<DeleteResult>";
                         if ($prop->GetPropertyType() == MgPropertyType::String) {
                             $output .= "<Error>".$prop->GetValue()."</Error>";
+                            $bHasError = true;
                         } else if ($prop->GetPropertyType() == MgPropertyType::Int32) {
                             $output .= "<ResultsAffected>".$prop->GetValue()."</ResultsAffected>";
                         }
@@ -255,6 +259,9 @@ abstract class MgResponseHandler
             }
         }
         $output .= "</UpdateFeaturesResult>";
+        if ($bHasError === true) {
+            $this->app->response->setStatus(500);
+        }
         $this->app->response->header("Content-Type", MgMimeType::Xml);
         $this->app->response->write($output);
     }
