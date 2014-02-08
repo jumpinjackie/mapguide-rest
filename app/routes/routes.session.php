@@ -51,6 +51,10 @@ $app->get("/session/:sessionId/:mapName.Map/layergroups", function($sessionId, $
     $ctrl = new MgMapController($app);
     $ctrl->EnumerateMapLayerGroups($sessionId, $mapName);
 });
+$app->put("/session/:sessionId/:mapName.Selection", function($sessionId, $mapName) use ($app) {
+    $ctrl = new MgMapController($app);
+    $ctrl->QueryMapFeatures($sessionId, $mapName);
+});
 $app->post("/session/:sessionId/:resName", function($sessionId, $resName) use($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
     if ($resId->GetResourceType() == MgResourceType::Map) {

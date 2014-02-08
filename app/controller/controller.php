@@ -118,7 +118,7 @@ class MgBaseController extends MgResponseHandler
             if ($session != null) {
                 $this->userInfo->SetMgSessionId($session);
             } else {
-                if ($nominatedSessionId !== "") {
+                if ($nominatedSessionId != null && $nominatedSessionId !== "") {
                     $this->userInfo->SetMgSessionId($nominatedSessionId);
                 } else {
                     $username = null;

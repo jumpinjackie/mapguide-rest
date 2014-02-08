@@ -82,15 +82,52 @@ class MgUtils
     }
 
     public static function EscapeXmlChars($str) {
-        $str = str_replace("&", "&amp;", $str);
-        $str = str_replace("'", "&apos;", $str);
-        $str = str_replace(">", "&gt;", $str);
-        $str = str_replace("<", "&lt;", $str);
-        $str = str_replace("\"", "&quot;", $str);
-        return $str;
+        $newStr = "";
+        $len = strlen($str);
+
+        for($i = 0; $i < $len; $i++)
+        {
+            switch($str[$i])
+            {
+                case '&' :
+                {
+                    $newStr .= "&amp;";
+                    break;
+                }
+                case '\'' :
+                {
+                    $newStr .= "&apos;";
+                    break;
+                }
+                case '>' :
+                {
+                    $newStr .= "&gt;";
+                    break;
+                }
+                case '<' :
+                {
+                    $newStr .= "&lt;";
+                    break;
+                }
+                case '"' :
+                {
+                    $newStr .= "&quot;";
+                    break;
+                }
+                default :
+                    $newStr .= $str[$i];
+            }
+        }
+        return $newStr;
     }
 
     private static function DomElementToJson($domElement) {
+
+        //Need to de-escape any escaped ' characters because an escaped ' is an illegal character under a double-quoted string in JSON
+        $deEscape = function($str) {
+            return str_replace("\\'", "'", $str);
+        };
+
         $result = '';
         if ($domElement->nodeType == XML_COMMENT_NODE) {
             return '';
@@ -100,7 +137,7 @@ class MgUtils
             $text = trim($domElement->textContent);
             $text = addslashes($text);
             if ($text != '') {
-                $result = '"'.$text.'"';
+                $result = '"'.$deEscape($text).'"';
             } else {
                 $text = '""';
             }
@@ -114,7 +151,7 @@ class MgUtils
                starting with @ */
             if ($domElement->hasAttributes()) {
                 foreach($domElement->attributes as $key => $attr) {
-                    $len = array_push($aValues, array('"'.$attr->value.'"'));
+                    $len = array_push($aValues, array('"'.$deEscape($attr->value).'"'));
                     $aChildren['@'.$key] = $len-1;
                 }
             }
@@ -131,7 +168,7 @@ class MgUtils
                         if ($text == '') {
                             continue;
                         }
-                        array_push($aValues, array('"'.$text.'"'));
+                        array_push($aValues, array('"'.$deEscape($text).'"'));
                     } else {
                         $childTag = $child->tagName;
                         $json = MgUtils::DomElementToJson($child);
@@ -174,11 +211,12 @@ class MgUtils
                         if (!$bIsObject) {
                             $result .= '{';
                         }
-                        $result .= '"'.$aChildren[$i].'":';
+                        $result .= '"'.$deEscape($aChildren[$i]).'":';
                     }
                     //if (count($aValue) > 1) {
                         $result .= '[';
-                        $result .= implode(',', $aValue);
+                        //Need to de-escape \' because an escaped ' is an illegal character under double-quoted strings in JSON
+                        $result .= $deEscape(implode(',', $aValue));
                         $result .= ']';
                     //} else {
                     //    $result .= $aValue[0];
@@ -623,7 +661,7 @@ class MgUtils
         return $totalEntries;
     }
 
-    static function GetBasicValueFromReader($reader, $propName) {
+    public static function GetBasicValueFromReader($reader, $propName) {
         $val = "";
         if ($reader->IsNull($propName))
             return "";
@@ -787,6 +825,47 @@ class MgUtils
         }
         
         return $absolute_path;
+    }
+
+    public static function ByteReaderToBase64($icon, $includeDataUriPrefix = false) {
+        $str = "";
+        $buffer = '';
+        $length = $icon->GetLength();
+        if ($icon->Read($buffer, $length) != 0)
+        {
+            $str .= base64_encode($buffer);
+        }
+
+        if ($includeDataUriPrefix === true)        
+            $str = "data:".$icon->GetMimeType().";base64,". $str;
+        return $str;
+    }
+
+    // GetLegendImageInline
+    //
+    // Returns a data URI containing the base64 encoded content of the specified legend icon
+    //
+    // Due to the fixed size (16x16 px), the generated data URI will easily fall under the data URI limit of most (if not all) web browsers that support it.
+    //
+    public static function GetLegendImageInline($mappingService, $layerDefinitionId, $scale, $geomType, $themeCategory, $iconWidth = 16, $iconHeight = 16, $iconFormat = MgImageFormats::Png, $includeDataUriPrefix = false)
+    {
+        $icon = $mappingService->GenerateLegendImage($layerDefinitionId, $scale, $iconWidth, $iconHeight, $iconFormat, $geomType, $themeCategory);
+        if ($icon != null)
+        {
+            $str = "";
+            $buffer = '';
+            $length = $icon->GetLength();
+            if ($icon->Read($buffer, $length) != 0)
+            {
+                $str .= base64_encode($buffer);
+            }
+    
+            if ($includeDataUriPrefix === true)        
+                $str = "data:".$icon->GetMimeType().";base64,". $str;
+            return $str;
+        }
+        //$styleObj->imageData = "http://localhost/mapguide/mapagent/mapagent.fcgi?OPERATION=GETLEGENDIMAGE&VERSION=1.0.0&SESSION=$sessionID&SCALE=$scaleVal&LAYERDEFINITION=".$resID->ToString()."&TYPE=".$styleObj->geometryType."&THEMECATEGORY=".$styleObj->categoryIndex;
+        return null;
     }
 }
 

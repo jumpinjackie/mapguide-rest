@@ -19,6 +19,7 @@
 
 require_once dirname(__FILE__)."/../controller/coordinatesystemcontroller.php";
 require_once dirname(__FILE__)."/../controller/resourceservicecontroller.php";
+require_once dirname(__FILE__)."/../controller/mappingservicecontroller.php";
 
 $app->post("/services/copyresource", function() use ($app) {
     $ctrl = new MgResourceServiceController($app);
@@ -31,6 +32,14 @@ $app->post("/services/moveresource", function() use ($app) {
 $app->post("/services/transformcoords", function() use ($app) {
     $ctrl = new MgCoordinateSystemController($app);
     $ctrl->TransformCoordinates();
+});
+$app->post("/services/createmap", function() use ($app) {
+    $ctrl = new MgMappingServiceController($app);
+    $ctrl->CreateRuntimeMap("xml");
+});
+$app->post("/services/createmap.:format", function($format) use ($app) {
+    $ctrl = new MgMappingServiceController($app);
+    $ctrl->CreateRuntimeMap($format);
 });
 
 ?>
