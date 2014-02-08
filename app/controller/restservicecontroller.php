@@ -24,6 +24,26 @@ class MgRestServiceController extends MgBaseController {
         parent::__construct($app);
     }
 
+    public function GetSessionTimeout($sessionId, $format) {
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
+        $siteConn = new MgSiteConnection();
+        $userInfo = new MgUserInformation($sessionId);
+        $siteConn->Open($userInfo);
+        $site = $siteConn->GetSite();
+        $timeout = $site->GetSessionTimeout();
+
+        $output = "<SessionTimeout><Value>$timeout</Value></SessionTimeout>";
+        $bs = new MgByteSource($output, strlen($output));
+        $bs->SetMimeType(MgMimeType::Xml);
+        $br = $bs->GetReader();
+        if ($fmt === "json") {
+            $this->OutputXmlByteReaderAsJson($br);
+        } else {
+            $this->OutputByteReader($br);
+        }
+    }
+
     public function CreateSession() {
         try {
             $this->EnsureAuthenticationForSite();

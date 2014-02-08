@@ -15,10 +15,11 @@
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
         <script type="text/javascript" src="../../assets/common/js/OpenLayers.js"></script>
         <script type="text/javascript" src="../../assets/common/js/legend.js"></script>
+        <script type="text/javascript" src="../libs/OpenLayers.Layer.MapGuideREST.js"></script>
         <script type="text/javascript">
         
-        //This sample is assumed to be hosted at http://servername/mapguide/ol2samples/untiled/index.html
-        var mapAgentUrl = "../../../mapagent/mapagent.fcgi";
+        //This sample is assumed to be hosted at http://servername/mapguide/rest/sampleapps/tiled/index.html
+        var restUrl = "../../../rest";
         
         //Various features you can include in the CREATERUNTIMEMAP response.
         var REQ_NONE = 0;                   //Nothing. This the default.
@@ -42,7 +43,7 @@
         
         function createMap(reqFeatures) {
             $.ajax({
-                url: "../../../rest/services/createmap.json",
+                url: restUrl + "/services/createmap.json",
                 method: "post",
                 data: {
                     "mapdefinition": "Library://Samples/Sheboygan/Maps/SheboyganMixed.MapDefinition",
@@ -138,10 +139,7 @@
                 buffer: 1,
                 useOverlay: true,
                 useAsyncOverlay: true,
-                singleTile: true
-            };
-
-            var params = {
+                singleTile: true,
                 mapname: rtMapInfo.RuntimeMap.Name[0],
                 session: rtMapInfo.RuntimeMap.SessionId[0],
                 selectioncolor: '0xFF000000',
@@ -171,10 +169,9 @@
             for (var i = rtMapInfo.RuntimeMap.Group.length - 1; i >= 0; i--) {
                 var group = rtMapInfo.RuntimeMap.Group[i];
                 if (group.Type[0] == "2") { //MgLayerGroupType.BaseMap
-                    var layer = new OpenLayers.Layer.MapGuide("MapGuide base layer group via CREATERUNTIMEMAP: " + group.Name[0], mapAgentUrl + "?USERNAME=Anonymous", {
+                    var layer = new OpenLayers.Layer.MapGuideREST("MapGuide base layer group via REST API: " + group.Name[0], restUrl, {
                         mapdefinition: rtMapInfo.RuntimeMap.MapDefinition[0],
-                        basemaplayergroupname: group.Name[0]
-                    }, {
+                        basemaplayergroupname: group.Name[0],
                         isBaseLayer: false,
                         singleTile: false
                     });
@@ -183,7 +180,7 @@
                 }
             }
             
-            mgLayer = new OpenLayers.Layer.MapGuide( "MapGuide (from CREATERUNTIMEMAP)", mapAgentUrl, params, options );
+            mgLayer = new OpenLayers.Layer.MapGuideREST( "MapGuide (from REST API)", restUrl, options );
             map.addLayer(mgLayer);
             
             map.zoomToMaxExtent();
@@ -206,13 +203,9 @@
         
         function startKeepAlive() {
             var keepAlive = function() {
-                $.get(mapAgentUrl, {
-                    "OPERATION": "GETSESSIONTIMEOUT",
-                    "VERSION": "1.0.0",
-                    "SESSION": sessionId
-                }, function(data, textStatus, jxXHR) {
+                $.getJSON(restUrl + "/session/" + sessionId + "/timeout.json", function(data, textStatus, jxXHR) {
                     $("#mgSession").html("MapGuide session ID: " + sessionId + " (last checked at: " + (new Date()) + ")");
-                    setTimeout(keepAlive, parseInt(data) * 1000);
+                    setTimeout(keepAlive, parseInt(data.SessionTimeout.Value[0]) * 1000);
                 });
             };
             keepAlive();
@@ -221,7 +214,7 @@
         </script>
     </head>
     <body>
-        <p>This example demonstrates loading a Map Definition with both tiled and untiled layers. The map is created with CREATERUNTIMEMAP</p>
+        <p>This example demonstrates loading a Map Definition with both tiled and untiled layers. The map is created with the MapGuide REST API</p>
         <p>Sample not loading? <a href="../data/load.php">Check that the required resources have been loaded</a></p>
         <div id="error">
         </div>

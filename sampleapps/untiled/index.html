@@ -15,10 +15,11 @@
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
         <script type="text/javascript" src="../../assets/common/js/OpenLayers.js"></script>
         <script type="text/javascript" src="../../assets/common/js/legend.js"></script>
+        <script type="text/javascript" src="../libs/OpenLayers.Layer.MapGuideREST.js"></script>
         <script type="text/javascript">
         
-        //This sample is assumed to be hosted at http://servername/mapguide/ol2samples/untiled/index.html
-        var mapAgentUrl = "../../../mapagent/mapagent.fcgi";
+        //This sample is assumed to be hosted at http://servername/mapguide/rest/sampleapps/tiled/index.html
+        var restUrl = "../../../rest";
         
         //Various features you can include in the CREATERUNTIMEMAP response.
         var REQ_NONE = 0;                   //Nothing. This the default.
@@ -42,7 +43,7 @@
         
         function createMap(reqFeatures) {
             $.ajax({
-                url: "../../../rest/services/createmap.json",
+                url: restUrl + "/services/createmap.json",
                 method: "post",
                 data: {
                     "mapdefinition": "Library://Samples/Sheboygan/Maps/Sheboygan.MapDefinition",
@@ -128,10 +129,7 @@
                 buffer: 1,
                 useOverlay: true,
                 useAsyncOverlay: true,
-                singleTile: true
-            };
-
-            var params = {
+                singleTile: true,
                 mapname: rtMapInfo.RuntimeMap.Name[0],
                 session: rtMapInfo.RuntimeMap.SessionId[0],
                 selectioncolor: '0xFF000000',
@@ -155,7 +153,7 @@
             OpenLayers.DOTS_PER_INCH = 96;
             
             map = new OpenLayers.Map('map', mapOptions );
-            mgLayer = new OpenLayers.Layer.MapGuide( "MapGuide (from CREATERUNTIMEMAP)", mapAgentUrl, params, options );
+            mgLayer = new OpenLayers.Layer.MapGuideREST( "MapGuide (from REST API)", restUrl, options);
             map.addLayer(mgLayer);
             map.zoomToMaxExtent();
             
@@ -176,13 +174,9 @@
         
         function startKeepAlive() {
             var keepAlive = function() {
-                $.get(mapAgentUrl, {
-                    "OPERATION": "GETSESSIONTIMEOUT",
-                    "VERSION": "1.0.0",
-                    "SESSION": sessionId
-                }, function(data, textStatus, jxXHR) {
+                $.getJSON(restUrl + "/session/" + sessionId + "/timeout.json", function(data, textStatus, jxXHR) {
                     $("#mgSession").html("MapGuide session ID: " + sessionId + " (last checked at: " + (new Date()) + ")");
-                    setTimeout(keepAlive, parseInt(data) * 1000);
+                    setTimeout(keepAlive, parseInt(data.SessionTimeout.Value[0]) * 1000);
                 });
             };
             keepAlive();
@@ -191,9 +185,7 @@
         </script>
     </head>
     <body>
-        <p>This map was created from the JSON response of the new CREATERUNTIMEMAP operation</p>
-        <p>No more hard-coding values or needing MapGuide Web Extensions API to provide missing values required by OpenLayers. CREATERUNTIMEMAP gives you all of this information</p>
-        <p>This is all pure OpenLayers and the mapagent. No .net/PHP/Java Web API glue was involved in creating this sample!</p>
+        <p>This map was created from the JSON response of the MapGuide REST API</p>
         <div id="error">
         </div>
         <div id="wrap">

@@ -35,6 +35,14 @@ $app->delete("/session/:sessionId", function($sessionId) use ($app) {
     $ctrl = new MgRestServiceController($app);
     $ctrl->DestroySession($sessionId);
 });
+$app->get("/session/:sessionId/timeout", function($sessionId) use ($app) {
+    $ctrl = new MgRestServiceController($app);
+    $ctrl->GetSessionTimeout($sessionId, "xml");
+});
+$app->get("/session/:sessionId/timeout.:format", function($sessionId, $format) use ($app) {
+    $ctrl = new MgRestServiceController($app);
+    $ctrl->GetSessionTimeout($sessionId, $format);
+});
 $app->get("/session/:sessionId/:mapName.Map/image.:format", function($sessionId, $mapName, $format) use ($app) {
     $ctrl = new MgRenderingServiceController($app);
     $ctrl->RenderRuntimeMap($sessionId, $mapName, $format);
