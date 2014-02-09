@@ -250,7 +250,7 @@ class MgTemplateHelper
     }
 
     public function GetAssetPath($relPath) {
-        $thisUrl = ($_SERVER['HTTPS'] === "off" ? "http://" : "https://") . $_SERVER['HTTP_HOST'] . $_SERVER["SCRIPT_NAME"];
+        $thisUrl = ((!array_key_exists("HTTPS", $_SERVER) || ($_SERVER['HTTPS'] === "off")) ? "http://" : "https://") . $_SERVER['HTTP_HOST'] . $_SERVER["SCRIPT_NAME"];
         return MgUtils::RelativeToAbsoluteUrl($thisUrl, "assets/$relPath");
     }
 }

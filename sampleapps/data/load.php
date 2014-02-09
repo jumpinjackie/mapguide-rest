@@ -37,7 +37,7 @@ if (array_key_exists("USERNAME", $_POST) && array_key_exists("PASSWORD", $_POST)
     //Enable writeable parcels
     $parcelsId = new MgResourceIdentifier("Library://Samples/Sheboygan/Data/Parcels.FeatureSource");
     $writeParcelsId = new MgResourceIdentifier("Library://Samples/Sheboygan/Data/Parcels_Writeable.FeatureSource");
-    if ($resSvc->ResourceExists($parcelsId) && !$resSvc->ResourceExists($writeParcelsId)) {
+    if ($resSvc->ResourceExists($parcelsId)) {
         $resSvc->CopyResource($parcelsId, $writeParcelsId, true);
 
         $bsWriteable = new MgByteSource(dirname(__FILE__)."/Parcels_Writeable.FeatureSource.xml");
