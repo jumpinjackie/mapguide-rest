@@ -253,6 +253,14 @@ class MgTemplateHelper
         $thisUrl = ((!array_key_exists("HTTPS", $_SERVER) || ($_SERVER['HTTPS'] === "off")) ? "http://" : "https://") . $_SERVER['HTTP_HOST'] . $_SERVER["SCRIPT_NAME"];
         return MgUtils::RelativeToAbsoluteUrl($thisUrl, "assets/$relPath");
     }
+
+    public function EscapeForXml($str) {
+        return MgUtils::EscapeXmlChars($str);
+    }
+
+    public function EscapeForJson($str) {
+        return MgUtils::EscapeJsonString($str);
+    }
 }
 
 class MgTemplateRestAdapter extends MgRestAdapter

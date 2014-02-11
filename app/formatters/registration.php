@@ -21,6 +21,8 @@ require_once "wktgeometryoutputformatter.php";
 require_once "kmlgeometryoutputformatter.php";
 require_once "gmlgeometryoutputformatter.php";
 require_once "georssgeometryoutputformatter.php";
+require_once "centroidcommaseparatedgeometryoutputformatter.php";
+require_once "envelopecommaseparatedgeometryoutputformatter.php";
 
 require_once "defaultdatetimeoutputformatter.php";
 
@@ -39,6 +41,12 @@ $app->container->GeomRSSGml = function() {
 };
 $app->container->GeomGml = function() {
     return new MgGmlGeometryOutputFormatter();
+};
+$app->container->EnvelopeCommaSeparated = function() {
+    return new MgEnvelopeCommaSeparatedGeometryOutputFormatter();
+};
+$app->container->CentroidCommaSeparated = function() {
+    return new MgCentroidCommaSeparatedGeometryOutputFormatter();
 };
 
 //Date formatters
