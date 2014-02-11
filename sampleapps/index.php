@@ -47,9 +47,7 @@ $hasOL2Samples = true;
         <div class="content-body">
             <p>Here you will find an assorted list of samples using the MapGuide REST API and its data publishing framework</p>
             <p><strong>NOTE: You should download the <a href="http://download.osgeo.org/mapguide/releases/2.0.0/samples/Sheboygan.mgp">Sheboygan Dataset</a> and load this in via the <a href="mapadmin/login.php">MapGuide Site Administrator</a> before running any of these samples</strong></p>
-            <? if ($hasOL2Samples) { ?>
-            <p><strong>NOTE: Some OpenLayers integration samples require some sample resources to be loaded. <a href="data/load.php">Click here</a> to load these resources</strong></p>
-            <? } ?>
+            <p><strong>NOTE: Some of these samples require some sample resources and data to be loaded. <a href="data/load.php">Click here</a> to load these resources</strong></p>
             <p>Click on a link below to go to that particular sample</p>
             <p class="sample-header">Published Data examples</p>
             <strong>Note: All examples below are configured to return 500 results maximum, at 100 results per page</strong>
@@ -71,7 +69,7 @@ $hasOL2Samples = true;
                 <li><a href="../data/property/.kml?bbox=-87.6,43.7,-87.7,43.8">KML Property Example - Properties intersecting (-87.6,43.7,-87.7,43.8)</a></li>
                 <li><a href="../data/property/.png?bbox=-87.6,43.7,-87.7,43.8">Map Image Property Example - Properties intersecting (-87.6,43.7,-87.7,43.8)</a></li>
             </ul>
-            <p class="sample-header"></p>
+            <p class="sample-header">Editable published data</p>
             <ul>
                 <li><a href="../../mapviewerajax/?WEBLAYOUT=Library://Samples/Sheboygan/Layouts/SheboyganREST.WebLayout&USERNAME=Anonymous">Sample Web Layout - Editable Properties</a></li>
             </ul>

@@ -29,7 +29,7 @@ Setup
 
  2. [OPTIONAL] Install and enable the [Application Request Routing module for IIS](http://www.iis.net/downloads/microsoft/application-request-routing). This allows for "cleaner" URLs. If you have installed the ARR module, you can rename the web.config.iis file to web.config to activate ARR for the REST extension. For Apache, you can use the provided .htaccess file for clean URLs and skip this step.
 
- 3. [OPTIONAL] On Linux, you may need to create a "templates_c" folder under the "rest" root directory and give it sufficient permissions for the Smarty template engine to save compiled templates to. See [Example 2.7 of the Smarty installation guide](http://www.smarty.net/docsv2/en/installing.smarty.basic.tpl) for more information. Additionally, Smarty may also complain about a default timezone not being set (this is raised as an exception). To avoid this exception, [set a default timezone in php.ini and restart Apache](http://au2.php.net/manual/en/datetime.configuration.php#ini.date.timezone)
+ 3. [OPTIONAL] On Linux, you may need to create a "templates_c" folder under the "cache" directory and give it sufficient permissions for the Smarty template engine to save compiled templates to. See [Example 2.7 of the Smarty installation guide](http://www.smarty.net/docsv2/en/installing.smarty.basic.tpl) for more information. Additionally, Smarty may also complain about a default timezone not being set (this is raised as an exception). To avoid this exception, [set a default timezone in php.ini and restart Apache](http://au2.php.net/manual/en/datetime.configuration.php#ini.date.timezone)
 
  4. You can now access the REST endpoint at:
  
