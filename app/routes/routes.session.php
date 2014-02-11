@@ -59,6 +59,30 @@ $app->get("/session/:sessionId/:mapName.Map/layergroups", function($sessionId, $
     $ctrl = new MgMapController($app);
     $ctrl->EnumerateMapLayerGroups($sessionId, $mapName);
 });
+$app->get("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $mapName) use ($app) {
+    $ctrl = new MgMapController($app);
+    $ctrl->GetSelectionXml($sessionId, $mapName);
+});
+$app->get("/session/:sessionId/:mapName.Selection/layers", function($sessionId, $mapName) use ($app) {
+    $ctrl = new MgMapController($app);
+    $ctrl->GetSelectionLayerNames($sessionId, $mapName, "xml");
+});
+$app->get("/session/:sessionId/:mapName.Selection/layers.:format", function($sessionId, $mapName, $format) use ($app) {
+    $ctrl = new MgMapController($app);
+    $ctrl->GetSelectionLayerNames($sessionId, $mapName, $format);
+});
+$app->get("/session/:sessionId/:mapName.Selection/features/:layerName", function($sessionId, $mapName, $layerName) use ($app) {
+    $ctrl = new MgMapController($app);
+    $ctrl->GetSelectedFeatures($sessionId, $mapName, $layerName, "xml");
+});
+$app->get("/session/:sessionId/:mapName.Selection/features.:format/:layerName", function($sessionId, $mapName, $format, $layerName) use ($app) {
+    $ctrl = new MgMapController($app);
+    $ctrl->GetSelectedFeatures($sessionId, $mapName, $layerName, $format);
+});
+$app->post("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $mapName) use ($app) {
+    $ctrl = new MgMapController($app);
+    $ctrl->UpdateSelectionFromXml($sessionId, $mapName);
+});
 $app->put("/session/:sessionId/:mapName.Selection", function($sessionId, $mapName) use ($app) {
     $ctrl = new MgMapController($app);
     $ctrl->QueryMapFeatures($sessionId, $mapName);

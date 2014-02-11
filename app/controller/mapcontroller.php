@@ -18,6 +18,7 @@
 //
 
 require_once "controller.php";
+require_once dirname(__FILE__)."/../util/readerchunkedresult.php";
 
 class MgMapController extends MgBaseController {
     public function __construct($app) {
@@ -332,6 +333,119 @@ class MgMapController extends MgBaseController {
         }
 
         $this->OutputMgStringCollection($groupNames);
+    }
+
+    public function GetSelectionXml($sessionId, $mapName) {
+        $this->EnsureAuthenticationForSite($sessionId);
+        $siteConn = new MgSiteConnection();
+        $siteConn->Open($this->userInfo);
+
+        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+
+        $map = new MgMap($siteConn);
+        $map->Open($mapName);
+        $selection = new MgSelection($map);
+        $selection->Open($resSvc, $mapName);
+
+        $this->app->response->header("Content-Type", MgMimeType::Xml);
+        $this->app->response->write($selection->ToXml());
+    }
+
+    public function GetSelectionLayerNames($sessionId, $mapName, $format) {
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $this->EnsureAuthenticationForSite($sessionId);
+        $siteConn = new MgSiteConnection();
+        $siteConn->Open($this->userInfo);
+
+        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+
+        $map = new MgMap($siteConn);
+        $map->Open($mapName);
+        $selection = new MgSelection($map);
+        $selection->Open($resSvc, $mapName);
+
+        $layers = $selection->GetLayers();
+
+        $output  = "<SelectedLayerCollection>";
+        if ($layers != null) {
+            $layerCount = $layers->GetCount();
+            for ($i = 0; $i < $layerCount; $i++) {
+                $layer = $layers->GetItem($i);
+                $name = $layer->GetName();
+                $count = $selection->GetSelectedFeaturesCount($layer, $layer->GetFeatureClassName());
+                $objId = $layer->GetObjectId();
+                $output .= "<SelectedLayer><Name>$name</Name><ObjectId>$objId</ObjectId><Count>$count</Count></SelectedLayer>";
+            }
+        }
+        $output .= "</SelectedLayerCollection>";
+        $bs = new MgByteSource($output, strlen($output));
+        $br = $bs->GetReader();
+        if ($fmt === "json") {
+            $this->OutputXmlByteReaderAsJson($br);
+        } else {
+            $this->app->response->header("Content-Type", MgMimeType::Xml);
+            $this->OutputByteReader($br);
+        }
+    }
+
+    public function GetSelectedFeatures($sessionId, $mapName, $layerName, $format) {
+        $fmt = $this->ValidateRepresentation($format, array("xml", "geojson"));
+        $this->EnsureAuthenticationForSite($sessionId);
+        $siteConn = new MgSiteConnection();
+        $siteConn->Open($this->userInfo);
+
+        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+        $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
+
+        $map = new MgMap($siteConn);
+        $map->Open($mapName);
+        $selection = new MgSelection($map);
+        $selection->Open($resSvc, $mapName);
+
+        $layers = $selection->GetLayers();
+        $lidx = -1;
+        $layerCount = $layers->GetCount();
+        for ($i = 0; $i < $layerCount; $i++) {
+            $currentlayer = $layers->GetItem($i);
+            if ($currentlayer->GetName() == $layerName) {
+                $lidx = $i;
+                break;
+            }
+        }
+        if ($lidx < 0) {
+            $this->app->halt(404, "Layer ($layerName) not found in selection"); //TODO: Localize
+        } else {
+            $layer = $layers->GetItem($lidx);
+            $bMapped = ($this->GetRequestParameter("mappedonly", 0) == 1);
+            $transformto = $this->GetRequestParameter("transformto", "");
+            $transform = null;
+            if ($transformto !== "") {
+                $resId = new MgResourceIdentifier($layer->GetFeatureSourceId());
+                $tokens = explode(":", $layer->GetFeatureClassName());
+                $transform = MgUtils::GetTransform($featSvc, $resId, $tokens[0], $tokens[1], $transformto);
+            }
+            $reader = $selection->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), $bMapped);
+            $result = new MgReaderChunkedResult($this->app, $featSvc, $reader, -1);
+            if ($transform != null)
+                $result->SetTransform($transform);
+            $result->Output($format);
+        }
+    }
+
+    public function UpdateSelectionFromXml($sessionId, $mapName) {
+        $this->EnsureAuthenticationForSite($sessionId);
+        $siteConn = new MgSiteConnection();
+        $siteConn->Open($this->userInfo);
+
+        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+
+        $map = new MgMap($siteConn);
+        $map->Open($mapName);
+        $xml = trim($this->app->request->getBody());
+        $selection = new MgSelection($map);
+        $selection->FromXml($xml);
+
+        $selection->Save($resSvc, $mapName);
     }
 }
 
