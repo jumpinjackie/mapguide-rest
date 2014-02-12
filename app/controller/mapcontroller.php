@@ -18,6 +18,7 @@
 //
 
 require_once "controller.php";
+require_once "mappingservicecontroller.php";
 require_once dirname(__FILE__)."/../util/readerchunkedresult.php";
 
 class MgMapController extends MgBaseController {
@@ -295,27 +296,113 @@ class MgMapController extends MgBaseController {
         }
     }
 
-    public function EnumerateMapLayers($sessionId, $mapName) {
+    public function EnumerateMapLayers($sessionId, $mapName, $format) {
         $userInfo = new MgUserInformation($sessionId);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($userInfo);
 
+        $reqFeatures = $this->app->request->params("requestedfeatures");
+        $iconFormat = $this->app->request->params("iconformat");
+        $iconWidth = $this->app->request->params("iconwidth");
+        $iconHeight = $this->app->request->params("iconheight");
+        $iconsPerScaleRange = $this->app->request->params("iconsperscalerange");
+        $groupName = $this->app->request->params("group");
+
+        //Assign default values or coerce existing ones to their expected types
+        if ($reqFeatures != null) {
+            $reqFeatures = intval($reqFeatures);
+        }
+
+        if ($iconFormat == null) {
+            $iconFormat = "PNG";
+        }
+
+        if ($iconWidth == null) {
+            $iconWidth = 16;
+        } else {
+            $iconWidth = intval($iconWidth);
+        }
+
+        if ($iconHeight == null) {
+            $iconHeight = 16;
+        } else {
+            $iconHeight = intval($iconHeight);
+        }
+
+        if ($iconsPerScaleRange == null) {
+            $iconsPerScaleRange = 25;
+        } else {
+            $iconsPerScaleRange = intval($iconsPerScaleRange);
+        }
+
+        if ($format == null) {
+            $format = "xml";
+        } else {
+            $format = strtolower($format);
+        }
+
         $map = new MgMap($siteConn);
         $map->Open($mapName);
 
-        $layerNames = new MgStringCollection();
         $layers = $map->GetLayers();
         $layerCount = $layers->GetCount();
 
+        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+        $mappingSvc = $siteConn->CreateService(MgServiceType::MappingService);
+
+        $output = "<LayerCollection>";
+        $layerDefinitionMap = array();
+        //Build our LayerDefinition map for code below that requires it
+        if (($reqFeatures & MgMappingServiceController::REQUEST_LAYER_ICONS) == MgMappingServiceController::REQUEST_LAYER_ICONS) {
+            $layerIds = new MgStringCollection();
+            for ($i = 0; $i < $layerCount; $i++) {
+                $layer = $layers->GetItem($i);
+                $parent = $layer->GetGroup();
+                if ($groupName != null && $parent != null && $parent->GetName() != $groupName)
+                    continue;
+                $ldfId = $layer->GetLayerDefinition();
+                $layerIds->Add($ldfId->ToString());
+            }
+
+            $layerContents = $resSvc->GetResourceContents($layerIds, null);
+            $layerIdCount = $layerIds->GetCount();
+            for ($i = 0; $i < $layerIdCount; $i++) {
+                $ldfId = $layerIds->GetItem($i);
+                $content = $layerContents->GetItem($i);
+                $layerDefinitionMap[$ldfId] = $content;
+            }
+        }
+        // ----------- Some pre-processing before we do groups/layers ------------- //
+        $doc = new DOMDocument();
         for ($i = 0; $i < $layerCount; $i++) {
             $layer = $layers->GetItem($i);
-            $layerNames->Add($layer->GetName());
-        }
+            $parent = $layer->GetGroup();
+            if ($groupName != null && $parent != null && $parent->GetName() != $groupName)
+                continue;
+            $ldf = $layer->GetLayerDefinition();
+            $layerId = $ldf->ToString();
 
-        $this->OutputMgStringCollection($layerNames);
+            $layerDoc = null;
+            if (array_key_exists($layerId, $layerDefinitionMap)) {
+                $doc->loadXML($layerDefinitionMap[$layerId]);
+                $layerDoc = $doc;
+            }
+
+            $output .= MgMappingServiceController::CreateLayerItem($reqFeatures, $iconsPerScaleRange, $iconFormat, $iconWidth, $iconHeight, $layer, $parent, $layerDoc, $mappingSvc);
+        }
+        $output .= "</LayerCollection>";
+
+        $bs = new MgByteSource($output, strlen($output));
+        $br = $bs->GetReader();
+        if ($format == "json") {
+            $this->OutputXmlByteReaderAsJson($br);
+        } else {
+            $this->app->response->header("Content-Type", MgMimeType::Xml);
+            $this->OutputByteReader($br);
+        }
     }
 
-    public function EnumerateMapLayerGroups($sessionId, $mapName) {
+    public function EnumerateMapLayerGroups($sessionId, $mapName, $format) {
         $userInfo = new MgUserInformation($sessionId);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($userInfo);
@@ -323,16 +410,25 @@ class MgMapController extends MgBaseController {
         $map = new MgMap($siteConn);
         $map->Open($mapName);
 
-        $groupNames = new MgStringCollection();
         $groups = $map->GetLayerGroups();
         $groupCount = $groups->GetCount();
 
+        $output = "<GroupCollection>";
         for ($i = 0; $i < $groupCount; $i++) {
             $group = $groups->GetItem($i);
-            $groupNames->Add($group->GetName());
+            $parent = $group->GetGroup();
+            $output .= MgMappingServiceController::CreateGroupItem($group, $parent);
         }
+        $output .= "</GroupCollection>";
 
-        $this->OutputMgStringCollection($groupNames);
+        $bs = new MgByteSource($output, strlen($output));
+        $br = $bs->GetReader();
+        if ($format == "json") {
+            $this->OutputXmlByteReaderAsJson($br);
+        } else {
+            $this->app->response->header("Content-Type", MgMimeType::Xml);
+            $this->OutputByteReader($br);
+        }
     }
 
     public function GetSelectionXml($sessionId, $mapName) {

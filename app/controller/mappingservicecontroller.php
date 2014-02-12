@@ -49,7 +49,7 @@ class MgMappingServiceController extends MgBaseController {
     const REQUEST_LAYER_ICONS = 2;
     const REQUEST_LAYER_FEATURE_SOURCE = 4;
 
-    private static function CreateGroupItem($group, $parent) {
+    public static function CreateGroupItem($group, $parent) {
         $xml  = "<Group>\n";
         $xml .= "<Name>".$group->GetName()."</Name>\n";
         $xml .= "<Type>".$group->GetLayerGroupType()."</Type>\n";
@@ -66,7 +66,7 @@ class MgMappingServiceController extends MgBaseController {
         return $xml;
     }
 
-    private static function CreateLayerItem($reqFeatures, $iconsPerScaleRange, $iconFormat, $iconWidth, $iconHeight, $layer, $parent, $xmldoc, $mappingService) {
+    public static function CreateLayerItem($reqFeatures, $iconsPerScaleRange, $iconFormat, $iconWidth, $iconHeight, $layer, $parent, $xmldoc, $mappingService) {
         $xml  = "<Layer>\n";
         $xml .= "<Name>".$layer->GetName()."</Name>\n";
         $xml .= "<Type>".$layer->GetLayerType()."</Type>\n";

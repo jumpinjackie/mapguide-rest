@@ -53,11 +53,19 @@ $app->get("/session/:sessionId/:mapName.Map/overlayimage.:format", function($ses
 });
 $app->get("/session/:sessionId/:mapName.Map/layers", function($sessionId, $mapName) use ($app) {
     $ctrl = new MgMapController($app);
-    $ctrl->EnumerateMapLayers($sessionId, $mapName);
+    $ctrl->EnumerateMapLayers($sessionId, $mapName, "xml");
+});
+$app->get("/session/:sessionId/:mapName.Map/layers.:format", function($sessionId, $mapName, $format) use ($app) {
+    $ctrl = new MgMapController($app);
+    $ctrl->EnumerateMapLayers($sessionId, $mapName, $format);
 });
 $app->get("/session/:sessionId/:mapName.Map/layergroups", function($sessionId, $mapName) use ($app) {
     $ctrl = new MgMapController($app);
-    $ctrl->EnumerateMapLayerGroups($sessionId, $mapName);
+    $ctrl->EnumerateMapLayerGroups($sessionId, $mapName, "xml");
+});
+$app->get("/session/:sessionId/:mapName.Map/layergroups.:format", function($sessionId, $mapName, $format) use ($app) {
+    $ctrl = new MgMapController($app);
+    $ctrl->EnumerateMapLayerGroups($sessionId, $mapName, $format);
 });
 $app->get("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $mapName) use ($app) {
     $ctrl = new MgMapController($app);
