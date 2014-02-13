@@ -50,7 +50,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
     <head>
         <title>MapGuide REST API Test Runner</title>
         <link rel="stylesheet" media="screen" href="qunit-1.10.0.css">
-        <script src="jquery-1.7.1.min.js" type="text/javascript"></script>
+        <script src="../assets/common/js/jquery-1.10.2.min.js" type="text/javascript"></script>
     </head>
     <body>
         <div id="qunit"></div>
