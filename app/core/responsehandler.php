@@ -273,6 +273,7 @@ abstract class MgResponseHandler
     }
 
     protected function OutputByteReader($byteReader, $chunkResult = false) {
+        $this->app->response->header("Content-Type", $byteReader->GetMimeType());
         $rdrLen = $byteReader->GetLength();
         do
         {

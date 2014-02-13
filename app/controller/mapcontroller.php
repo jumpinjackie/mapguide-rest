@@ -141,11 +141,11 @@ class MgMapController extends MgBaseController {
         $xml = $this->CollectQueryMapFeaturesResult($resSvc, $reqData, $featInfo, $selection, $bRequestAttributes, $inlineSelectionImg);
 
         $bs = new MgByteSource($xml, strlen($xml));
+        $bs->SetMimeType(MgMimeType::Xml);
         $br = $bs->GetReader();
         if ($format == "json") {
             $this->OutputXmlByteReaderAsJson($br);
         } else {
-            $this->app->response->header("Content-Type", MgMimeType::Xml);
             $this->OutputByteReader($br);
         }
     }
@@ -393,11 +393,11 @@ class MgMapController extends MgBaseController {
         $output .= "</LayerCollection>";
 
         $bs = new MgByteSource($output, strlen($output));
+        $bs->SetMimeType(MgMimeType::Xml);
         $br = $bs->GetReader();
         if ($format == "json") {
             $this->OutputXmlByteReaderAsJson($br);
         } else {
-            $this->app->response->header("Content-Type", MgMimeType::Xml);
             $this->OutputByteReader($br);
         }
     }
@@ -422,11 +422,11 @@ class MgMapController extends MgBaseController {
         $output .= "</GroupCollection>";
 
         $bs = new MgByteSource($output, strlen($output));
+        $bs->SetMimeType(MgMimeType::Xml);
         $br = $bs->GetReader();
         if ($format == "json") {
             $this->OutputXmlByteReaderAsJson($br);
         } else {
-            $this->app->response->header("Content-Type", MgMimeType::Xml);
             $this->OutputByteReader($br);
         }
     }
@@ -475,11 +475,11 @@ class MgMapController extends MgBaseController {
         }
         $output .= "</SelectedLayerCollection>";
         $bs = new MgByteSource($output, strlen($output));
+        $bs->SetMimeType(MgMimeType::Xml);
         $br = $bs->GetReader();
         if ($fmt === "json") {
             $this->OutputXmlByteReaderAsJson($br);
         } else {
-            $this->app->response->header("Content-Type", MgMimeType::Xml);
             $this->OutputByteReader($br);
         }
     }

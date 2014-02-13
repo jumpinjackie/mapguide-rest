@@ -517,11 +517,11 @@ class MgFeatureServiceController extends MgBaseController {
                         $output .= "</AggregateResult>";
 
                         $bs = new MgByteSource($output, strlen($output));
+                        $bs->SetMimeType(MgMimeType::Xml);
                         $br = $bs->GetReader();
                         if ($fmt === "json") {
                             $this->OutputXmlByteReaderAsJson($br);
                         } else {
-                            $this->app->response->header("Content-Type", MgMimeType::Xml);
                             $this->OutputByteReader($br);
                         }
                     }
@@ -571,11 +571,11 @@ class MgFeatureServiceController extends MgBaseController {
                         $output .= "</AggregateResult>";
 
                         $bs = new MgByteSource($output, strlen($output));
+                        $bs->SetMimeType(MgMimeType::Xml);
                         $br = $bs->GetReader();
                         if ($fmt === "json") {
                             $this->OutputXmlByteReaderAsJson($br);
                         } else {
-                            $this->app->response->header("Content-Type", MgMimeType::Xml);
                             $this->OutputByteReader($br);
                         }
                     }
@@ -593,11 +593,11 @@ class MgFeatureServiceController extends MgBaseController {
                         $output .= "</AggregateResult>";
 
                         $bs = new MgByteSource($output, strlen($output));
+                        $bs->SetMimeType(MgMimeType::Xml);
                         $br = $bs->GetReader();
                         if ($fmt === "json") {
                             $this->OutputXmlByteReaderAsJson($br);
                         } else {
-                            $this->app->response->header("Content-Type", MgMimeType::Xml);
                             $this->OutputByteReader($br);
                         }
                     }

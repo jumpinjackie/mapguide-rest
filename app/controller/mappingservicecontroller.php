@@ -429,7 +429,6 @@ class MgMappingServiceController extends MgBaseController {
         if ($format == "json") {
             $this->OutputXmlByteReaderAsJson($br);
         } else {
-            $this->app->response->header("Content-Type", MgMimeType::Xml);
             $this->OutputByteReader($br);
         }
     }

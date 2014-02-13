@@ -110,7 +110,6 @@ class MgSiteAdminController extends MgBaseController {
             if ($fmt === "json") {
                 $this->OutputXmlByteReaderAsJson($content);
             } else {
-                $this->app->response->header("Content-Type", $content->GetMimeType());
                 $this->OutputByteReader($content);
             }
         } catch (MgException $ex) {
