@@ -67,6 +67,14 @@ $app->get("/session/:sessionId/:mapName.Map/layergroups.:format", function($sess
     $ctrl = new MgMapController($app);
     $ctrl->EnumerateMapLayerGroups($sessionId, $mapName, $format);
 });
+$app->get("/session/:sessionId/:mapName.Map/plot", function($sessionId, $mapName) use ($app) {
+    $ctrl = new MgMappingServiceController($app);
+    $ctrl->GeneratePlot($sessionId, $mapName, "dwf");
+});
+$app->get("/session/:sessionId/:mapName.Map/plot.:format", function($sessionId, $mapName, $format) use ($app) {
+    $ctrl = new MgMappingServiceController($app);
+    $ctrl->GeneratePlot($sessionId, $mapName, $format);
+});
 $app->get("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $mapName) use ($app) {
     $ctrl = new MgMapController($app);
     $ctrl->GetSelectionXml($sessionId, $mapName);

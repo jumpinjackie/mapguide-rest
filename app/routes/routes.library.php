@@ -288,6 +288,24 @@ $app->get("/library/:resourcePath+.LayerDefinition/legend/:scale/:geomtype/:them
     $ctrl = new MgMappingServiceController($app);
     $ctrl->GenerateLegendImage($resId, $scale, $geomtype, $themecat, $format);
 });
+$app->get("/library/:resourcePath+.MapDefinition/plot", function($resourcePath) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgMappingServiceController($app);
+    $ctrl->GeneratePlotFromMapDefinition($resId, "dwf");
+});
+$app->get("/library/:resourcePath+.MapDefinition/plot.:format", function($resourcePath, $format) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgMappingServiceController($app);
+    $ctrl->GeneratePlotFromMapDefinition($resId, $format);
+});
 // Rendering Service APIs
 $app->get("/library/:resourcePath+.MapDefinition/image.:format", function($resourcePath, $format) use ($app) {
     $count = count($resourcePath);

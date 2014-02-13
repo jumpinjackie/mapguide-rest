@@ -432,6 +432,88 @@ class MgMappingServiceController extends MgBaseController {
             $this->OutputByteReader($br);
         }
     }
+
+    public function GeneratePlotFromMapDefinition($resId, $format) {
+        $fmt = $this->ValidateRepresentation($format, array("dwf"));
+        $x = $this->GetRequestParameter("x", "");
+        $y = $this->GetRequestParameter("y", "");
+        $scale = $this->GetRequestParameter("scale", "");
+
+        if ($x == "")
+            $this->app->halt(400, "Missing required parameter: x"); //TODO: Localize
+        if ($y == "")
+            $this->app->halt(400, "Missing required parameter: y"); //TODO: Localize
+        if ($scale == "")
+            $this->app->halt(400, "Missing required parameter: scale"); //TODO: Localize
+
+        $this->EnsureAuthenticationForSite();
+        $siteConn = new MgSiteConnection();
+        $siteConn->Open($this->userInfo);
+
+        $mappingSvc = $siteConn->CreateService(MgServiceType::MappingService);
+
+        $width = floatval($this->GetRequestParameter("pagewidth", 8.5));
+        $height = floatval($this->GetRequestParameter("pageheight", 11.0));
+        $marginLeft = floatval($this->GetRequestParameter("marginleft", 0.5));
+        $marginRight = floatval($this->GetRequestParameter("marginright", 0.5));
+        $marginTop = floatval($this->GetRequestParameter("margintop", 0.5));
+        $marginBottom = floatval($this->GetRequestParameter("marginbottom", 0.5));
+        $printLayoutStr = $this->GetRequestParameter("printlayout", null);
+        $title = $this->GetRequestParameter("title", "");
+
+        $geomFact = new MgGeometryFactory();
+        $center = $geomFact->CreateCoordinateXY(floatval($x), floatval($y));
+
+        $map = new MgMap($siteConn);
+        $map->Create($resId, "Plot");
+
+        $dwfVersion = new MgDwfVersion("6.01", "1.2");
+        $plotSpec = new MgPlotSpecification($width, $height, MgPageUnitsType::Inches);
+        $plotSpec->SetMargins($marginLeft, $marginTop, $marginRight, $marginBottom);
+
+        $layout = null;
+        if ($printLayoutStr != null) {
+            $layoutRes = new MgResourceIdentifier($printLayoutStr);
+            $layout = new MgLayout($layoutRes, $title, MgPageUnitsType::Inches);
+        }
+
+        $br = $mappingSvc->GeneratePlot($map, $center, floatval($scale), $plotSpec, $layout, $dwfVersion);
+        $this->OutputByteReader($br);
+    }
+
+    public function GeneratePlot($sessionId, $mapName, $format) {
+        $fmt = $this->ValidateRepresentation($format, array("dwf"));
+        $this->EnsureAuthenticationForSite($sessionId);
+        $siteConn = new MgSiteConnection();
+        $siteConn->Open($this->userInfo);
+
+        $map = new MgMap($siteConn);
+        $map->Open($mapName);
+
+        $mappingSvc = $siteConn->CreateService(MgServiceType::MappingService);
+
+        $width = floatval($this->GetRequestParameter("pagewidth", 8.5));
+        $height = floatval($this->GetRequestParameter("pageheight", 11.0));
+        $marginLeft = floatval($this->GetRequestParameter("marginleft", 0.5));
+        $marginRight = floatval($this->GetRequestParameter("marginright", 0.5));
+        $marginTop = floatval($this->GetRequestParameter("margintop", 0.5));
+        $marginBottom = floatval($this->GetRequestParameter("marginbottom", 0.5));
+        $printLayoutStr = $this->GetRequestParameter("printlayout", null);
+        $title = $this->GetRequestParameter("title", "");
+
+        $dwfVersion = new MgDwfVersion("6.01", "1.2");
+        $plotSpec = new MgPlotSpecification($width, $height, MgPageUnitsType::Inches);
+        $plotSpec->SetMargins($marginLeft, $marginTop, $marginRight, $marginBottom);
+
+        $layout = null;
+        if ($printLayoutStr != null) {
+            $layoutRes = new MgResourceIdentifier($printLayoutStr);
+            $layout = new MgLayout($layoutRes, $title, MgPageUnitsType::Inches);
+        }
+
+        $br = $mappingSvc->GeneratePlot($map, $plotSpec, $layout, $dwfVersion);
+        $this->OutputByteReader($br);
+    }
 }
 
 ?>
