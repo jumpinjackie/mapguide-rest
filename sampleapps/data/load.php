@@ -21,6 +21,7 @@ if (array_key_exists("USERNAME", $_POST) && array_key_exists("PASSWORD", $_POST)
     $siteConn->Open($userInfo);
     
     $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+    $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
     
     //Commercial sample
     $res1 = new MgResourceIdentifier("Library://Samples/Sheboygan/Maps/SheboyganCommercial.MapDefinition");
@@ -44,6 +45,57 @@ if (array_key_exists("USERNAME", $_POST) && array_key_exists("PASSWORD", $_POST)
         $brWriteable = $bsWriteable->GetReader();
         $resSvc->SetResource($writeParcelsId, $brWriteable, null);
     }
+    
+    //Set up comments data store
+    $commentsId = new MgResourceIdentifier("Library://Samples/Sheboygan/Data/ParcelComments.FeatureSource");
+    if ($resSvc->ResourceExists($commentsId)) {
+        $resSvc->DeleteResource($commentsId);
+    }
+    $schema = new MgFeatureSchema("Default", "Default schema");
+    $clsDef = new MgClassDefinition();
+    $clsDef->SetName("ParcelComments");
+    $props = $clsDef->GetProperties();
+    $idProps = $clsDef->GetIdentityProperties();
+    
+    $id = new MgDataPropertyDefinition("ID");
+    $id->SetDataType(MgPropertyType::Int32);
+    $id->SetNullable(false);
+    $id->SetAutoGeneration(true);
+    
+    $pid = new MgDataPropertyDefinition("ParcelID");
+    $pid->SetDataType(MgPropertyType::Int32);
+    $pid->SetNullable(false);
+    $pid->SetLength(255);
+    
+    $name = new MgDataPropertyDefinition("Name");
+    $name->SetDataType(MgPropertyType::String);
+    $name->SetNullable(true);
+    $name->SetLength(255);
+    
+    $comment = new MgDataPropertyDefinition("Comment");
+    $comment->SetDataType(MgPropertyType::String);
+    $comment->SetNullable(true);
+    $comment->SetLength(255);
+    
+    $recordedDate = new MgDataPropertyDefinition("RecordedDate");
+    $recordedDate->SetDataType(MgPropertyType::DateTime);
+    $recordedDate->SetNullable(false);
+     
+    $props->Add($id);
+    $idProps->Add($id);
+    
+    $props->Add($pid);
+    $props->Add($name);
+    $props->Add($comment);
+    $props->Add($recordedDate);
+    
+    $classes = $schema->GetClasses();
+    $classes->Add($clsDef);
+    
+    $createParams = new MgFileFeatureSourceParams("OSGeo.SDF");
+    $createParams->SetFeatureSchema($schema);
+    
+    $featSvc->CreateFeatureSource($commentsId, $createParams);
 
     //Web Layout demonstrating intergration with REST-enabled published data
     $bs3 = new MgByteSource(dirname(__FILE__)."/RESTWebLayout.mgp");

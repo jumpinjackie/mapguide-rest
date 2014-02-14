@@ -5,14 +5,17 @@
         <link rel="stylesheet" href="{$helper->GetAssetPath('common/css/bootstrap.min.css')}" />
         <link rel="stylesheet" href="{$helper->GetAssetPath('fa/css/font-awesome.min.css')}" />
         <style type="text/css">
-            #main { position: absolute; left: 0; top: 0; bottom: 0; right: 0; overflow-x: scroll; }
+            
         </style>
         <script type="text/javascript">
 
             var zoomScale = 500;
 
             function getViewer() {
-                return parent.parent;
+                if (typeof(opener) != 'undefined') //window.open()'d from Task Pane frame
+                    return opener.parent.parent;
+                else
+                    return parent.parent;
             }
 
             function zoomToProperty(x, y) {

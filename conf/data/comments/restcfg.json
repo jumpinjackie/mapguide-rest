@@ -1,0 +1,37 @@
+{
+    "Source": {
+        "Type": "MapGuide",
+        "FeatureSource": "Library://Samples/Sheboygan/Data/ParcelComments.FeatureSource",
+        "FeatureClass": "Default:ParcelComments"
+    },
+    "Representations": {
+        "xml": {
+            "Adapter": "FeatureSetXml",
+            "Methods": {
+                "GET": {
+                    "PageSize": 100,
+                    "MaxCount": 500
+                },
+                "POST": {},
+                "PUT": {},
+                "DELETE": {}
+            }
+        },
+        "html": {
+            "Adapter": "Template",
+            "Methods": {
+                "GET": {
+                    "PageSize": 100,
+                    "MaxCount": 500,
+                    "MimeType": "text/html",
+                    "Templates": {
+                        "Single": "property_html_single.tpl",
+                        "Many": "property_html_many.tpl",
+                        "None": "property_html_none.tpl",
+                        "Error": "property_html_error.tpl"
+                    }
+                }
+            }
+        }
+    }
+}

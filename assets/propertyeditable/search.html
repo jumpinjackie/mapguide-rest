@@ -11,13 +11,19 @@
             function getViewer() {
                 return parent.parent;
             }
+            
+            var win = null;
 
             $(document).ready(function() {
                 $("#btnSearchByOwner").click(function() {
-                    getViewer().GetTaskFrame().location.href = searchURL + "?filter=" + encodeURIComponent("RNAME LIKE '%" + $("#OWNER").val() + "%'");
+                    win = window.open(searchURL + "?filter=" + encodeURIComponent("RNAME LIKE '%" + $("#OWNER").val() + "%'"), "searchWin", "width=1024,height=600");
+                    if (win == null)
+                        alert("Do you have a popup blocker installed? Please turn it off for this site");
                 });
                 $("#btnSearchByAddress").click(function() {
-                    getViewer().GetTaskFrame().location.href = searchURL + "?filter=" + encodeURIComponent("RPROPAD LIKE '%" + $("#ADDRESS").val() + "%'");
+                    win = window.open(searchURL + "?filter=" + encodeURIComponent("RPROPAD LIKE '%" + $("#ADDRESS").val() + "%'"), "searchWin", "width=1024,height=600");
+                    if (win == null)
+                        alert("Do you have a popup blocker installed? Please turn it off for this site");
                 });
                 $("#btnDrawBBOX").click(function() {
                     getViewer().GetMapFrame().DigitizeRectangle(function(rect) {
@@ -30,7 +36,9 @@
                         alert("Please specify a bounding box by clicking the draw button and drawing the box on the map");
                         return;
                     }
-                    getViewer().GetTaskFrame().location.href = searchURL + "?bbox=" + bbox;
+                    win = window.open(searchURL + "?bbox=" + bbox, "searchWin", "width=1024,height=600");
+                    if (win == null)
+                        alert("Do you have a popup blocker installed? Please turn it off for this site");
                 });
             });
         </script>

@@ -311,7 +311,42 @@ class MgUtils
                             break;
                         case MgPropertyType::DateTime:
                             {
-                                throw new Exception("Case not supported yet: DateTime"); //TODO: Localize
+                                if ($bNull) {
+                                    $dtVal = new MgDateTimeProperty($name, null);
+                                    $dtVal>SetNull(true);
+                                } else {
+                                    //We're expecting this: YYYY-MM-DD HH:mm:ss
+                                    $dtMajorParts = explode(" ", $value);
+                                    if (count($dtMajorParts) != 2) {
+                                        throw new Exception("Invalid date string: $value"); //TODO: Localize
+                                    }
+                                    $dateComponents = explode("-", $dtMajorParts[0]);
+                                    $timeComponents = explode(":", $dtMajorParts[1]);
+                                    if (count($dateComponents) != 3) {
+                                        throw new Exception("Invalid date string: $value has invalid date component".$dtMajorParts[0]); //TODO: Localize
+                                    }
+                                    if (count($timeComponents) != 3) {
+                                        throw new Exception("Invalid date string: $value has invalid date component".$dtMajorParts[1]); //TODO: Localize
+                                    }
+                                    
+                                    $dt = new MgDateTime();
+                                    
+                                    $y = intval(ltrim($dateComponents[0], "0"));
+                                    $m = intval(ltrim($dateComponents[1], "0"));
+                                    $d = intval(ltrim($dateComponents[2], "0"));
+                                    $h = intval(ltrim($timeComponents[0], "0"));
+                                    $min = intval(ltrim($timeComponents[1], "0"));
+                                    $s = intval(ltrim($timeComponents[2], "0"));
+                                    
+                                    $dt->SetYear($y);
+                                    $dt->SetMonth($m);
+                                    $dt->SetDay($d);
+                                    $dt->SetHour($h);
+                                    $dt->SetMinute($min);
+                                    $dt->SetSecond($s);
+                                    $dtVal = new MgDateTimeProperty($name, $dt);
+                                }
+                                $props->Add($dtVal);
                             }
                             break;
                         case MgPropertyType::Decimal:
@@ -334,7 +369,7 @@ class MgUtils
                                 } else {
                                     $i16val = new MgInt16Property($name, intval($value));
                                 }
-                                $props->Add($i16prop);
+                                $props->Add($i16val);
                             }
                             break;
                         case MgPropertyType::Int32:
@@ -345,7 +380,7 @@ class MgUtils
                                 } else {
                                     $i32val = new MgInt32Property($name, intval($value));
                                 }
-                                $props->Add($i32prop);   
+                                $props->Add($i32val);   
                             }
                             break;
                         case MgPropertyType::Int64:
@@ -356,7 +391,7 @@ class MgUtils
                                 } else {
                                     $i64val = new MgInt64Property($name, intval($value));
                                 }
-                                $props->Add($i64prop);
+                                $props->Add($i64val);
                             }
                             break;
                         case MgPropertyType::Single:
