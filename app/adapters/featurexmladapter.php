@@ -257,9 +257,46 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
             $className = $tokens[1];
             $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
             $commands = new MgFeatureCommandCollection();
-            $filter = $this->app->request->params("filter");
-            if ($filter == null)
-                $filter = "";
+
+            if ($single === true) {
+                if ($this->featureId == null) {
+                    throw new Exception("No feature ID set"); //TODO: Localize
+                }
+                $idType = MgPropertyType::String;
+                $tokens = explode(":", $this->className);
+                $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $tokens[0], $tokens[1]);
+                if ($this->featureIdProp == null) {
+                    $idProps = $clsDef->GetIdentityProperties();
+                    if ($idProps->GetCount() == 0) {
+                        throw new Exception(sprintf("Cannot delete (%s) in %s by ID. Class has no identity properties", $this->className, $this->featureSourceId->ToString())); //TODO: Localize
+                    } else if ($idProps->GetCount() > 1) {
+                        throw new Exception(sprintf("Cannot delete (%s) in %s by ID. Class has more than one identity property", $this->className, $this->featureSourceId->ToString())); //TODO: Localize
+                    } else {
+                        $idProp = $idProps->GetItem(0);
+                        $this->featureIdProp = $idProp->GetName();
+                        $idType = $idProp->GetDataType();
+                    }
+                } else {
+                    $props = $clsDef->GetProperties();
+                    $iidx = $props->IndexOf($this->featureIdProp);
+                    if ($iidx >= 0) {
+                        $propDef = $props->GetItem($iidx);
+                        if ($propDef->GetPropertyType() != MgFeaturePropertyType::DataProperty)
+                            throw new Exception("Specified identity property ".$this->featureIdProp." is not a data property");
+                    } else {
+                        throw new Exception("Specified identity property ".$this->featureIdProp." not found in class definition");
+                    }
+                }
+                if ($idType == MgPropertyType::String)
+                    $filter = $this->featureIdProp." = '".$this->featureId."'";
+                else
+                    $filter = $this->featureIdProp." = ".$this->featureId;
+            } else {
+                $filter = $this->app->request->params("filter");
+                if ($filter == null)
+                    $filter = "";
+            }
+            
             $deleteCmd = new MgDeleteFeatures("$schemaName:$className", $filter);
             $commands->Add($deleteCmd);
 
