@@ -1,0 +1,376 @@
+<html>
+    <head>
+        <title>Sheboygan Map with the Kitchen Sink</title>
+        <link rel="stylesheet" href="../../assets/common/js/theme/default/style.css" />
+        <style type="text/css">
+            body { font-family: Verdana; font-size: 0.9em; }
+            #error { color: red; }
+            #wrap { width: 1150; }
+            #map { width: 650; height: 500; float: right; }
+            #details { width: 250; height: 500; overflow: auto; display: block-inline; float: left; }
+            #selInfo { width: 250; height: 500; overflow: auto; display: block-inline; float: right; }
+            #rootList { list-style-type: none; margin-left: -20px; }
+            #rootList li { list-style-type: none; }
+            #selInfoTree { list-style-type: none; margin-left: -20px; }
+            #selInfoTree li { list-style-type: none; margin-left: -20px; }
+            #selMessage { color: red; font-weight: bolder; }
+            .olControlMousePosition { background: #ffff66; font-size: 0.6em !important; padding: 2px; }
+        </style>
+        <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="../../assets/common/js/OpenLayers.js"></script>
+        <script type="text/javascript" src="../../assets/common/js/legend.js"></script>
+        <script type="text/javascript" src="../libs/OpenLayers.Layer.MapGuideREST.js"></script>
+        <script type="text/javascript">
+        
+        //This sample is assumed to be hosted at http://servername/mapguide/rest/sampleapps/tiled/index.html
+        var restUrl = "../../../rest";
+        
+        //Various features you can include in the CREATERUNTIMEMAP response.
+        var REQ_NONE = 0;                   //Nothing. This the default.
+        var REQ_LAYER_STRUCTURE = 1;        //Information about layers and groups (required for the mask values below to have any effect)
+        var REQ_LAYER_ICONS = 2;            //Icons for each layer (has no effect if REQ_LAYER_STRUCTURE is not in the bitmask)
+        var REQ_LAYER_FEATURE_SOURCE = 4;   //Feature Source information for each layer (has no effect if REQ_LAYER_STRUCTURE is not in the bitmask)
+        
+        var gMimeType = null;
+        var map = null;
+        var mgLayer = null;
+        var selLayer = null;
+        var selRectControl = null;
+        var sessionId = null;
+        var mapName = null;
+        var legend = null;
+        var ptBuffer = 2;
+        var bSelecting = false;
+        var navControl = null;
+        var zoomControl = null;
+        var wktFormat = null;
+        var selLayerNames = "";
+        
+        $(document).ready(function() {
+            OpenLayers.Control.DragPan.prototype.enableKinetic = false;
+            //Have a play with the bitmask values to see the differences in JSON payload size
+            //and to see how our legend control gracefully handles such situations
+            //createMap(REQ_NONE);
+            //createMap(REQ_LAYER_STRUCTURE);
+            createMap(REQ_LAYER_STRUCTURE | REQ_LAYER_FEATURE_SOURCE | REQ_LAYER_ICONS);
+        });
+        
+        function createMap(reqFeatures) {
+            $.ajax({
+                url: "../../../rest/services/createmap.json",
+                method: "post",
+                data: {
+                    "mapdefinition": "Library://Samples/Sheboygan/Maps/Sheboygan.MapDefinition",
+                    "requestedfeatures": reqFeatures,
+                    //Optional parameters you can specify and/or experiment with
+                    //"iconformat": "GIF",    //Uncomment to override desired image format (default: PNG)
+                    //"iconwidth": 32,         //Uncomment to override desired icon width (default: 16)
+                    //"iconheight": 32,        //Uncomment to override desired icon height (default: 16)
+                    //"iconsperscalerange": 3, //Uncomment to observe theme compression for themes exceeding this number of rules (default: 25)
+                    //"targetmapname": "MyRuntimeMapForOpenLayers", //Uncomment if you require a specific map name be given (default: inferred from Map Definition)
+                    "format": "json"
+                },
+                success: function(data, textStatus, jqXHR) {
+                    $("#jsonSize").html(jqXHR.responseText.length);
+                    loadMap(data);
+                }
+            }).error(function(jqXHR, textStatus, errorThrown) {
+                $("#error").html(jqXHR.responseText);
+            });
+        }
+        
+        function loadMap(rtMapInfo) {
+            var extent = new OpenLayers.Bounds(
+                parseFloat(rtMapInfo.RuntimeMap.Extents[0].LowerLeftCoordinate[0].X[0]),
+                parseFloat(rtMapInfo.RuntimeMap.Extents[0].LowerLeftCoordinate[0].Y[0]),
+                parseFloat(rtMapInfo.RuntimeMap.Extents[0].UpperRightCoordinate[0].X[0]),
+                parseFloat(rtMapInfo.RuntimeMap.Extents[0].UpperRightCoordinate[0].Y[0]));
+            
+            wktFormat = new OpenLayers.Format.WKT();
+            navControl = new OpenLayers.Control.Navigation();
+            zoomControl = new OpenLayers.Control.ZoomBox({alwaysZoom:true});
+            
+            OpenLayers.Control.CustomNavToolbar = OpenLayers.Class(OpenLayers.Control.Panel, {
+                /**
+                 * Constructor: OpenLayers.Control.NavToolbar 
+                 * Add our two mousedefaults controls.
+                 *
+                 * Parameters:
+                 * options - {Object} An optional object whose properties will be used
+                 *     to extend the control.
+                 */
+                initialize: function(options) {
+                    OpenLayers.Control.Panel.prototype.initialize.apply(this, [options]);
+                    this.addControls([
+                      navControl,
+                      //Here it come
+                      zoomControl
+                    ]);
+                    // To make the custom navtoolbar use the regular navtoolbar style
+                    this.displayClass = 'olControlNavToolbar'
+                },            
+                /**
+                 * Method: draw 
+                 * calls the default draw, and then activates mouse defaults.
+                 */
+                draw: function() {
+                    var div = OpenLayers.Control.Panel.prototype.draw.apply(this, arguments);
+                    this.defaultControl = this.controls[0];
+                    return div;
+                }
+            });
+            var mapOptions = {
+                theme: null,
+                allOverlays: true,
+                maxExtent: extent,
+                maxResolution: 'auto',
+                controls: [
+                    new OpenLayers.Control.Navigation(),
+                    new OpenLayers.Control.Attribution(),
+                    new OpenLayers.Control.Zoom(),
+                    new OpenLayers.Control.ScaleLine(),
+                    new OpenLayers.Control.MousePosition(),
+                    new OpenLayers.Control.CustomNavToolbar({alwaysZoom:true})
+                ]
+            };
+            
+            if (rtMapInfo.RuntimeMap.CoordinateSystem[0].EpsgCode[0].length > 0) {
+                mapOptions.projection = "EPSG:" + rtMapInfo.RuntimeMap.CoordinateSystem[0].EpsgCode[0];
+            }
+
+            mapName = rtMapInfo.RuntimeMap.Name[0];
+            sessionId = rtMapInfo.RuntimeMap.SessionId[0];
+            
+            var options = {
+                transitionEffect: "resize",
+                buffer: 1,
+                useOverlay: true,
+                useAsyncOverlay: true,
+                singleTile: true,
+                mapname: mapName,
+                session: sessionId,
+                behavior: 2
+            };
+            var selOptions = {
+                transitionEffect: "resize",
+                buffer: 1,
+                useOverlay: true,
+                useAsyncOverlay: true,
+                singleTile: true,
+                mapname: mapName,
+                session: sessionId,
+                selectioncolor: '0xFF000000',
+                behavior: 5
+            };
+
+            //Adjust the scale assumptions for MapGuide layers
+            //Tiled layers MUST use a DPI value of 96, untiled layers can use a 
+            //different DPI value which will be passed to the server as a parameter.
+            //Tiled and untiled layers must adjust the OL INCHES_PER_UNIT values
+            //for any degree-based projections.
+            
+            //You'll still need to do these adjustments manually, but CREATERUNTIMEMAP
+            //now provides the necessary meters-per-unit value for you to do this.
+            var metersPerUnit = parseFloat(rtMapInfo.RuntimeMap.CoordinateSystem[0].MetersPerUnit[0]);
+            var inPerUnit = OpenLayers.INCHES_PER_UNIT.m * metersPerUnit;
+            OpenLayers.INCHES_PER_UNIT["dd"] = inPerUnit;
+            OpenLayers.INCHES_PER_UNIT["degrees"] = inPerUnit;
+            OpenLayers.DOTS_PER_INCH = 96;
+            
+            map = new OpenLayers.Map('map', mapOptions );
+            mgLayer = new OpenLayers.Layer.MapGuideREST( "MapGuide (from REST API)", restUrl, options );
+            selLayer = new OpenLayers.Layer.MapGuideREST( "MapGuide Selection Overlay (from REST API)", restUrl, selOptions );
+            map.addLayer(mgLayer);
+            map.addLayer(selLayer);
+            
+            var selectionShapeLayer = new OpenLayers.Layer.Vector("Selection Rectangles");
+            map.addLayer(selectionShapeLayer);
+            selRectControl = new OpenLayers.Control.DrawFeature(selectionShapeLayer,
+                OpenLayers.Handler.RegularPolygon, {
+                    handlerOptions: {
+                        sides: 4,
+                        irregular: true
+                    }
+                }
+            );
+            selPolyControl = new OpenLayers.Control.DrawFeature(selectionShapeLayer, OpenLayers.Handler.Polygon);
+            
+            selectionShapeLayer.events.register("beforefeatureadded", this, onSelShapeAdded);
+            
+            map.addControl(selRectControl);
+            map.addControl(selPolyControl);
+            
+            map.zoomToMaxExtent();
+            
+            legend = new Legend({
+                legendSelector: "#rootList",
+                stdIconRoot: "../../../stdicons",
+                runtimeMap: rtMapInfo,
+                map: map,
+                mgLayerOL: mgLayer
+            });
+            legend.update();
+            
+            $("div.olMap").css("background-color", "#" + rtMapInfo.RuntimeMap.BackgroundColor[0].substring(2));
+            $(".olMapViewport").append($("<img class='selOverlay' />"));
+            map.events.register("click", this, onMapClick);
+            writeRestUrls(mapName, sessionId);
+            startKeepAlive();
+        }
+        
+        function doSelectPointOrRect() {
+            setSelectionState(true, "point_rect");
+            navControl.deactivate();
+            zoomControl.deactivate();
+            selRectControl.activate();
+        }
+        
+        function doSelectPolygon() {
+            setSelectionState(true, "polygon");
+            selPolyControl.activate();
+        }
+        
+        function onSelShapeAdded(e) {
+            sendSelectionQuery(e.feature.geometry);
+            return false;
+        }
+        
+        function getImageUri(mimeType, imgBase64) {
+            return "data:" + mimeType + ";base64," + imgBase64;
+        }
+        
+        function onMapClick(e) {
+            if (bSelecting) {
+                var llPt = map.getLonLatFromViewPortPx({ x: e.xy.x - ptBuffer, y: e.xy.y - ptBuffer });
+                var urPt = map.getLonLatFromViewPortPx({ x: e.xy.x + ptBuffer, y: e.xy.y + ptBuffer });
+                var box = new OpenLayers.Bounds();
+                box.extend(llPt);
+                box.extend(urPt);
+                sendSelectionQuery(box);
+                navControl.activate();
+                zoomControl.deactivate();
+            }
+        }
+        
+        function sendSelectionQuery(geom) {
+            var reqQueryFeatures = 2 | 4 | 8; //No attributes
+            var wkt = wktFormat.extractGeometry(geom);
+            
+            $.ajax({
+                url: "../../../rest/session/" + sessionId + "/" + mapName + ".Selection",
+                method: "post",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-HTTP-Method-Override", "PUT");
+                },
+                data: {
+                    "layernames": selLayerNames,
+                    "geometry": wkt,
+                    "selectionvariant": "INTERSECTS",
+                    "requestdata": reqQueryFeatures,
+                    "selectioncolor": "0xFF000000",
+                    "selectionformat": "PNG",
+                    "maxfeatures": -1,
+                    "persist": 1,
+                    "format": "json"
+                },
+                success: function(data, textStatus, jqXHR) {
+                    selLayer.redraw(true);
+                    setSelectionState(false);
+                }
+            }).error(function(jqXHR, textStatus, errorThrown) {
+                $("#error").html(jqXHR.responseText);
+            });
+        }
+        
+        function getPromptForType(type) {
+            if (type == "polygon")
+                return "Trace a polygon on the map. Double click to finish.";
+            else if (type == "point_rect")
+                return "Click or drag a selection rectangle on the map";
+            return "";
+        }
+        
+        function setSelectionState(sel, type) {
+            bSelecting = sel;
+            if (bSelecting) {
+                $("#selMessage").html("Selection mode active. " + getPromptForType(type));
+            } else {
+                selRectControl.deactivate();
+                selPolyControl.deactivate();
+                $("#selMessage").html("");
+            }
+        }
+        
+        function startKeepAlive() {
+            var keepAlive = function() {
+                $.getJSON(restUrl + "/session/" + sessionId + "/timeout.json", function(data, textStatus, jxXHR) {
+                    $("#mgSession").html("MapGuide session ID: " + sessionId + " (last checked at: " + (new Date()) + ")");
+                    setTimeout(keepAlive, parseInt(data.SessionTimeout.Value[0]) * 1000);
+                });
+            };
+            keepAlive();
+        }
+
+        function writeRestUrls(mapName, sessionId) {
+            var root = restUrl + "/session/" + sessionId + "/" + mapName;
+            var html = "";
+            var selectionUrls = [
+                { label: "View Selection XML", url: root + ".Selection/xml" },
+                { label: "View Selection Layer Names (XML)", url: root + ".Selection/layers.xml" },
+                { label: "View Selection Layer Names (json)", url: root + ".Selection/layers.json" },
+                { label: "View Selected Features (Parcels - XML)", url: root + ".Selection/features.xml/Parcels" },
+                { label: "View Selected Features (Parcels - GeoJSON)", url: root + ".Selection/features.geojson/Parcels" },
+                { label: "View Selected Features (Parcels - XML - xformed to web mercator)", url: root + ".Selection/features.xml/Parcels?transformto=WGS84.PseudoMercator" },
+                { label: "View Selected Features (Parcels - GeoJSON - xformed to web mercator)", url: root + ".Selection/features.geojson/Parcels?transformto=WGS84.PseudoMercator" }
+            ];
+            for (var i = 0; i < selectionUrls.length; i++) {
+                html += "<li><a href='" + selectionUrls[i].url + "' target='_blank'>" + selectionUrls[i].label + "</a></li>";
+            }
+            $("#selectionUrls").append(html);
+            html = "";
+            var mapUrls = [
+                { label: "Current map plot (DWF)", url: root + ".Map/plot.dwf" },
+                { label: "Current map plot with print layout (DWF)", url: root + ".Map/plot.dwf?printlayout=Library://Samples/Sheboygan/Layouts/SheboyganMap.PrintLayout" },
+                { label: "Current map image (PNG)", url: root + ".Map/image.png" },
+                { label: "Current map layers (XML)", url: root + ".Map/layers.xml" },
+                { label: "Current map layers (JSON)", url: root + ".Map/layers.json" },
+                { label: "Current map layer groups (XML)", url: root + ".Map/layergroups.xml" },
+                { label: "Current map layer groups (JSON)", url: root + ".Map/layergroups.json" }
+            ];
+            for (var i = 0; i < mapUrls.length; i++) {
+                html += "<li><a href='" + mapUrls[i].url + "' target='_blank'>" + mapUrls[i].label + "</a></li>";
+            }
+            $("#mapUrls").append(html);
+        }
+        
+        </script>
+    </head>
+    <body>
+        <p>This example demonstrates map/selection URLs provided by the REST API. This map was created from the JSON response of the MapGuide REST API. Note that selected features urls do not work if you haven't selected any features</p>
+        <div id="error">
+        </div>
+        <button onclick="doSelectPointOrRect()">Select Point/Rectangle</button>
+        <button onclick="doSelectPolygon()">Select By Polygon</button>
+        <span id="selMessage"></span>
+        <div id="wrap">
+            <div id="details">
+                <strong>Layer and Groups</strong>
+                <ul id="rootList">
+                </ul>
+            </div>
+            <div id="selInfo">
+                <strong>Selection URLs (opens in new window)</strong>
+                <ul id="selectionUrls">
+
+                </ul>
+                <strong>Map URLs (opens in new window)</strong>
+                <ul id="mapUrls">
+
+                </ul>
+            </div>
+            <div id="map">
+            </div>
+        </div>
+        <p><span id="selCount">0</span> features selected</p>
+    </body>
+</html>

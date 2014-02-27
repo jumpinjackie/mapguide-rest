@@ -82,6 +82,7 @@ $hasOL2Samples = true;
                 <li><a href="mixed/index.html">Basic Sheboygan mixed map (tiled and untiled) example</a></li>
                 <li><a href="commercial/index.html">Sheboygan map with Google/OSM layers</a></li>
                 <li><a href="restsources/index.html">OpenLayers map consuming published data</a></li>
+                <li><a href="kitchensink/index.html">Sheboygan map with every possible map/selection RESTful URL available</a></li>
             </ul>
             <? } ?>
         </div>

@@ -478,7 +478,13 @@ class MgMapController extends MgBaseController {
         $bs->SetMimeType(MgMimeType::Xml);
         $br = $bs->GetReader();
         if ($fmt === "json") {
-            $this->OutputXmlByteReaderAsJson($br);
+            if ($layers == null) {
+                //HACK: Bug (?) in how xml2json processes empty tags
+                $this->app->response->header("Content-Type", MgMimeType::Json);
+                $this->app->response->write('{ "SelectedLayerCollection": [] }');
+            } else {
+                $this->OutputXmlByteReaderAsJson($br);
+            }
         } else {
             $this->OutputByteReader($br);
         }
