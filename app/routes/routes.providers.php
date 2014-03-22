@@ -20,18 +20,91 @@
 require_once dirname(__FILE__)."/../controller/featureservicecontroller.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
+/**
+ * @SWG\Resource(
+ *      apiVersion="0.5",
+ *      swaggerVersion="1.2",
+ *      description="FDO Provider Registry",
+ *      resourcePath="/providers"
+ * )
+ */
+
+/**
+ * @SWG\Api(
+ *     path="/providers",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetFeatureProviders",
+ *        summary="Gets all registered FDO providers",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/providers", function() use ($app) {
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetFeatureProviders("xml");
 });
+/**
+ * @SWG\Api(
+ *     path="/providers.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetFeatureProviders",
+ *        summary="Gets all registered FDO providers",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/providers.:format", function($format) use ($app) {
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetFeatureProviders($format);
 });
+/**
+ * @SWG\Api(
+ *     path="/providers/{providerName}/capabilities",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetProviderCapabilities",
+ *        summary="Gets the capabilities of the given FDO provider",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="providerName", paramType="path", required=true, type="string", description="The FDO Provider")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/providers/:providerName/capabilities", function($providerName) use ($app) {
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetProviderCapabilities($providerName, "xml");
 });
+/**
+ * @SWG\Api(
+ *     path="/providers/{providerName}/capabilities.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetProviderCapabilities",
+ *        summary="Gets the capabilities of the given FDO provider",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="providerName", paramType="path", required=true, type="string", description="The FDO Provider"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/providers/:providerName/capabilities.:format", function($providerName, $format) use ($app) {
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetProviderCapabilities($providerName, $format);

@@ -24,7 +24,33 @@ require_once dirname(__FILE__)."/../controller/mappingservicecontroller.php";
 require_once dirname(__FILE__)."/../controller/renderingservicecontroller.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
-// Feature Service APIs
+/**
+ * @SWG\Resource(
+ *      apiVersion="0.5",
+ *      swaggerVersion="1.2",
+ *      description="Site Repository",
+ *      resourcePath="/library"
+ * )
+ */
+
+//======================== Feature Service APIs =======================================
+
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/spatialcontexts",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetSpatialContexts",
+ *        summary="Gets spatial contexts of a feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.FeatureSource/spatialcontexts", function($resourcePath) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -34,6 +60,23 @@ $app->get("/library/:resourcePath+.FeatureSource/spatialcontexts", function($res
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetSpatialContexts($resId, "xml");
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/spatialcontexts.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetSpatialContexts",
+ *        summary="Gets spatial contexts of a feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.FeatureSource/spatialcontexts.:format", function($resourcePath, $format) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -43,6 +86,22 @@ $app->get("/library/:resourcePath+.FeatureSource/spatialcontexts.:format", funct
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetSpatialContexts($resId, $format);
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/schemas",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetSchemaNames",
+ *        summary="Gets the schema names of a feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.FeatureSource/schemas", function($resourcePath) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -52,6 +111,23 @@ $app->get("/library/:resourcePath+.FeatureSource/schemas", function($resourcePat
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetSchemaNames($resId, "xml");
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/schemas.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetSchemaNames",
+ *        summary="Gets the schema names of a feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.FeatureSource/schemas.:format", function($resourcePath, $format) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -61,6 +137,23 @@ $app->get("/library/:resourcePath+.FeatureSource/schemas.:format", function($res
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetSchemaNames($resId, $format);
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/schema/{schemaName}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="DescribeSchema",
+ *        summary="Gets the schema names of a feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.FeatureSource/schema/:schemaName", function($resourcePath, $schemaName) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -70,6 +163,24 @@ $app->get("/library/:resourcePath+.FeatureSource/schema/:schemaName", function($
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->DescribeSchema($resId, $schemaName, "xml");
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/schema.{type}/{schemaName}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="DescribeSchema",
+ *        summary="Gets the schema names of a feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.FeatureSource/schema.:format/:schemaName", function($resourcePath, $format, $schemaName) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -79,6 +190,23 @@ $app->get("/library/:resourcePath+.FeatureSource/schema.:format/:schemaName", fu
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->DescribeSchema($resId, $schemaName, $format);
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/classes/{schemaName}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetClassNames",
+ *        summary="Gets the class names of the given schema for a feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.FeatureSource/classes/:schemaName", function($resourcePath, $schemaName) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -88,6 +216,24 @@ $app->get("/library/:resourcePath+.FeatureSource/classes/:schemaName", function(
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetClassNames($resId, $schemaName, "xml");
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/classes.{type}/{schemaName}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetClassNames",
+ *        summary="Gets the class names of the given schema for a feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.FeatureSource/classes.:format/:schemaName", function($resourcePath, $format, $schemaName) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -97,6 +243,24 @@ $app->get("/library/:resourcePath+.FeatureSource/classes.:format/:schemaName", f
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetClassNames($resId, $schemaName, $format);
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/classdef/{schemaName}/{className}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetClassDefinition",
+ *        summary="Gets a class definition of the specified name from the feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
+ *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.FeatureSource/classdef/:schemaName/:className", function($resourcePath, $schemaName, $className) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -106,6 +270,25 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef/:schemaName/:className
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetClassDefinition($resId, $schemaName, $className, "xml");
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/classdef.{type}/{schemaName}/{className}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetClassDefinition",
+ *        summary="Gets a class definition of the specified name from the feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
+ *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -115,6 +298,23 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:schemaName/:c
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetClassDefinition($resId, $schemaName, $className, $format);
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/classdef/{qualifiedClassName}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetClassDefinition",
+ *        summary="Gets a class definition of the specified name from the feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="qualifiedClassName", paramType="path", required=true, type="string", description="The qualified class name")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.FeatureSource/classdef/:qualifiedClassName", function($resourcePath, $qualifiedClassName) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -133,6 +333,24 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef/:qualifiedClassName", 
     }
     $ctrl->GetClassDefinition($resId, $schemaName, $className, "xml");
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/classdef.{type}/{qualifiedClassName}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetClassDefinition",
+ *        summary="Gets a class definition of the specified name from the feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="qualifiedClassName", paramType="path", required=true, type="string", description="The qualified class name"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:qualifiedClassName", function($resourcePath, $format, $qualifiedClassName) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -166,27 +384,106 @@ $app->delete("/library/:resourcePath+/features/:schemaName/:className", function
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->DeleteFeatures($resId, $schemaName, $className);
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/features/{schemaName}/{className}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="SelectFeatures",
+ *        summary="Queries features from the specified feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
+ *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+/features/:schemaName/:className", function($resourcePath, $schemaName, $className) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->SelectFeatures($resId, $schemaName, $className, "xml");
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/features.{type}/{schemaName}/{className}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="SelectFeatures",
+ *        summary="Queries features from the specified feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
+ *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','geojson']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->SelectFeatures($resId, $schemaName, $className, $format);
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/aggregates/{aggregateType}/{schemaName}/{className}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="SelectFeatures",
+ *        summary="Queries features from the specified feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
+ *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
+ *          @SWG\parameter(name="aggregateType", paramType="path", required=true, type="string", description="aggregate type", enum="['count','bbox','distinctvalues']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+/aggregates/:type/:schemaName/:className", function($resourcePath, $type, $schemaName, $className) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->SelectAggregates($resId, $schemaName, $className, $type, "xml");
 });
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/aggregates.{type}/{aggregateType}/{schemaName}/{className}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="SelectFeatures",
+ *        summary="Queries features from the specified feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
+ *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
+ *          @SWG\parameter(name="aggregateType", paramType="path", required=true, type="string", description="aggregate type", enum="['count','bbox','distinctvalues']"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+/aggregates.:format/:type/:schemaName/:className", function($resourcePath, $format, $type, $schemaName, $className) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->SelectAggregates($resId, $schemaName, $className, $type, $format);
 });
-// Resource Service APIs
+
+//================================== Resource Service APIs ======================================================
+
+
 $app->get("/library/:resourcePath+/datalist", function($resourcePath) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgResourceServiceController($app);
@@ -267,7 +564,7 @@ $app->delete("/library/:resourcePath+", function($resourcePath) use ($app) {
     $ctrl = new MgResourceServiceController($app);
     $ctrl->DeleteResource($resId); 
 });
-// Tile Service APIs
+//============================== Tile Service APIs ============================================
 $app->get("/library/:resourcePath+/tile/:groupName/:scaleIndex/:col/:row", function($resourcePath, $groupName, $scaleIndex, $col, $row) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgTileServiceController($app);
@@ -278,7 +575,7 @@ $app->get("/library/:resourcePath+/tile.:format/:groupName/:scaleIndex/:col/:row
     $ctrl = new MgTileServiceController($app);
     $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $format);
 });
-// Mapping Service APIs
+//============================== Mapping Service APIs ==========================================
 $app->get("/library/:resourcePath+.LayerDefinition/legend/:scale/:geomtype/:themecat/icon.:format", function($resourcePath, $scale, $geomtype, $themecat, $format) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -306,7 +603,7 @@ $app->get("/library/:resourcePath+.MapDefinition/plot.:format", function($resour
     $ctrl = new MgMappingServiceController($app);
     $ctrl->GeneratePlotFromMapDefinition($resId, $format);
 });
-// Rendering Service APIs
+//================================= Rendering Service APIs ==================================
 $app->get("/library/:resourcePath+.MapDefinition/image.:format", function($resourcePath, $format) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {

@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+SRC_DIR="`pwd`"
+cd "`dirname "$0"`"
+cd "../zircote/swagger-php/bin"
+BIN_TARGET="`pwd`/swagger"
+cd "$SRC_DIR"
+"$BIN_TARGET" "$@"

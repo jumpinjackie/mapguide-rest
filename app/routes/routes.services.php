@@ -21,6 +21,15 @@ require_once dirname(__FILE__)."/../controller/coordinatesystemcontroller.php";
 require_once dirname(__FILE__)."/../controller/resourceservicecontroller.php";
 require_once dirname(__FILE__)."/../controller/mappingservicecontroller.php";
 
+/**
+ * @SWG\Resource(
+ *      apiVersion="0.5",
+ *      swaggerVersion="1.2",
+ *      description="Additional Services",
+ *      resourcePath="/services"
+ * )
+ */
+
 $app->post("/services/copyresource", function() use ($app) {
     $ctrl = new MgResourceServiceController($app);
     $ctrl->CopyResource();

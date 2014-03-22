@@ -41,6 +41,7 @@ include "app/routes/routes.providers.php";
 include "app/routes/routes.site.php";
 include "app/routes/routes.admin.php";
 include "app/routes/routes.services.php";
+include "app/routes/routes.doc.php";
 /*
 $app->get("/", function() {
     echo "Hello World";

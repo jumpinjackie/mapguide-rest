@@ -1,6 +1,7 @@
 {
     "require": {
         "slim/slim": "2.x",
-        "smarty/smarty": "3.*"
+        "smarty/smarty": "3.*",
+        "zircote/swagger-php": "*"
     }
 }

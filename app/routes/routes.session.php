@@ -27,6 +27,15 @@ require_once dirname(__FILE__)."/../controller/mappingservicecontroller.php";
 require_once dirname(__FILE__)."/../controller/renderingservicecontroller.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
+/**
+ * @SWG\Resource(
+ *      apiVersion="0.5",
+ *      swaggerVersion="1.2",
+ *      description="Session Repository",
+ *      resourcePath="/session"
+ * )
+ */
+
 $app->post("/session", function() use ($app) {
     $ctrl = new MgRestServiceController($app);
     $ctrl->CreateSession();
