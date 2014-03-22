@@ -2,6 +2,7 @@
     "require": {
         "slim/slim": "2.x",
         "smarty/smarty": "3.*",
-        "zircote/swagger-php": "*"
+        "zircote/swagger-php": "*",
+        "phing/phing": "*"
     }
 }

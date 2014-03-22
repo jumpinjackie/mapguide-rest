@@ -2,4 +2,7 @@
 /templates_c
 /cache/vectortile
 /cache/templates_c
+/doc/data
+/build
+/dist
 !/cache/readme.txt

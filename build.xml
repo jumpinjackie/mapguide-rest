@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="mapguide-rest" default="dist">
+    <property name="app.version" value="master" />
+    <property name="apidoc.basepath" value="http://localhost/mapguide/rest" />
+
+    <!-- ============================================  -->
+    <!-- Target: prepare                               -->
+    <!-- ============================================  -->
+    <target name="prepare">
+        <mkdir dir="./build" />
+        <mkdir dir="./dist" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: clean                                 -->
+    <!-- ============================================  -->
+    <target name="clean">
+        <echo msg="Cleaning build directory..." />
+        <delete dir="./build" includeemptydirs="true" />
+        <delete dir="./dist" includeemptydirs="true" />
+        <delete dir="./doc/data" includeemptydirs="true" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: docgen                                -->
+    <!-- ============================================  -->
+    <target name="docgen">
+        <!-- NOTE: Window-ism. Can't use '/' here. Ugh! -->
+        <exec command="vendor\bin\swagger .\app\routes -o .\doc\data --default-base-path ${apidoc.basepath}" dir="." checkReturn="true" level="debug" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: build                                 -->
+    <!-- ============================================  -->
+    <target name="build" depends="prepare">
+        <echo msg="Copying files to build directory..." />
+
+        <copy todir="./build/app" overwrite="true">
+            <fileset dir="./app">
+                <include name="**/*.*" />
+                <include name="*" />
+            </fileset>
+        </copy>
+        <copy todir="./build/assets" overwrite="true">
+            <fileset dir="./assets">
+                <include name="**/*.*" />
+                <include name="*" />
+            </fileset>
+        </copy>
+        <copy todir="./build/cache" overwrite="true">
+            <fileset dir="./cache">
+                <include name="**/*.*" />
+                <include name="*" />
+            </fileset>
+        </copy>
+        <copy todir="./build/doc" overwrite="true">
+            <fileset dir="./doc">
+                <include name="**/*.*" />
+                <include name="*" />
+            </fileset>
+        </copy>
+        <copy todir="./build/sampleapps" overwrite="true">
+            <fileset dir="./sampleapps">
+                <include name="**/*.*" />
+                <include name="*" />
+            </fileset>
+        </copy>
+        <copy todir="./build/vendor" overwrite="true">
+            <fileset dir="./vendor">
+                <include name="**/*" />
+                <include name="**/*.*" />
+                <include name="*" />
+            </fileset>
+        </copy>
+        <copy file=".htaccess" tofile="./build/.htaccess" overwrite="true" />
+        <copy file="index.php" tofile="./build/index.php" overwrite="true" />
+        <copy file="LICENSE" tofile="./build/LICENSE" overwrite="true" />
+        <copy file="README.md" tofile="./build/README.md" overwrite="true" />
+        <copy file="web.config.iis" tofile="./build/web.config" overwrite="true" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- (DEFAULT)  Target: dist                       --> 
+    <!-- ============================================  -->
+    <target name="dist" depends="build">
+        <echo msg="Creating dist archive..." />
+
+        <zip destfile="./dist/mapguide-rest-${app.version}.zip">
+            <fileset dir="./build">
+                <include name="**/*.*" />
+                <include name="*" />
+            </fileset>
+        </zip>
+    </target>
+</project>
