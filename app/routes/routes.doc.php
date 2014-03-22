@@ -22,11 +22,23 @@
 // php vendor\zircote\swagger-php\bin\swagger "%CD%\app\routes" -o "%CD%\doc" --default-base-path http://localhost/mapguide/rest
 //
 // TODO: We should try to dynamically build this at runtime so that the base path can be inferred instead of specified up-front
+// TODO: If dynamically building, it should save the build output to cache where permissions are assumed to be properly set up
 
 $app->get("/apidoc/", function() use ($app) {
     $path = $app->config("AppRootDir")."/doc/api-docs.json";
+
+    //HACK: swagger-php doesn't seem to support annotations for describing the API
+    //So we'll intercept the api-docs.json request via this route to inject that
+    //information
+    $doc = json_decode(file_get_contents($path));
+    $doc->info = new stdClass();
+    $doc->info->title = "mapguide-rest";
+    $doc->info->description = "mapguide-rest is a RESTful web extension for MapGuide Open Source and Autodesk Infrastructure Map Server";
+    $doc->info->license = "LGPL 2.1";
+    $doc->info->licenseUrl = "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html";
+    
     $app->response->header("Content-Type", "application/json");
-    $app->response->setBody(file_get_contents($path));
+    $app->response->setBody(json_encode($doc));
 });
 $app->get("/apidoc/:file", function($file) use ($app) {
     $path = $app->config("AppRootDir")."/doc/$file";
