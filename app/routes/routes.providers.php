@@ -109,18 +109,86 @@ $app->get("/providers/:providerName/capabilities.:format", function($providerNam
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetProviderCapabilities($providerName, $format);
 });
+/**
+ * @SWG\Api(
+ *     path="/providers/{providerName}/datastores",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="EnumerateDataStores",
+ *        summary="Enumerates the available data stores for this provider with the current connection string specified as additional key=value querystring pairs (NOT INVOKABLE FROM THIS API REFERENCE)",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="providerName", paramType="path", required=true, type="string", description="The FDO Provider")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/providers/:providerName/datastores", function($providerName) use ($app) {
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->EnumerateDataStores($providerName, "xml");
 });
+/**
+ * @SWG\Api(
+ *     path="/providers/{providerName}/datastores.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="EnumerateDataStores",
+ *        summary="Enumerates the available data stores for this provider with the current connection string specified as additional key=value querystring pairs (NOT INVOKABLE FROM THIS API REFERENCE)",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="providerName", paramType="path", required=true, type="string", description="The FDO Provider"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/providers/:providerName/datastores.:format", function($providerName, $format) use ($app) {
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->EnumerateDataStores($providerName, $format);
 });
+/**
+ * @SWG\Api(
+ *     path="/providers/{providerName}/connectvalues/{propName}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetConnectPropertyValues",
+ *        summary="Enumerates the available values for a given connection property. Any partial connection string is specified as additional key=value querystring pairs (NOT INVOKABLE FROM THIS API REFERENCE IF PARTIAL CONNECTION STRING IS REQUIRED)",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="providerName", paramType="path", required=true, type="string", description="The FDO Provider"),
+ *          @SWG\parameter(name="propName", paramType="path", required=true, type="string", description="The FDO Provider")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/providers/:providerName/connectvalues/:propName", function($providerName, $propName) use ($app) {
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetConnectPropertyValues($providerName, $propName, "xml");
 });
+/**
+ * @SWG\Api(
+ *     path="/providers/{providerName}/connectvalues.{type}/{propName}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetConnectPropertyValues",
+ *        summary="Enumerates the available values for a given connection property. Any partial connection string is specified as additional key=value querystring pairs (NOT INVOKABLE FROM THIS API REFERENCE IF PARTIAL CONNECTION STRING IS REQUIRED)",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="providerName", paramType="path", required=true, type="string", description="The FDO Provider"),
+ *          @SWG\parameter(name="propName", paramType="path", required=true, type="string", description="The FDO Provider"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/providers/:providerName/connectvalues.:format/:propName", function($providerName, $format, $propName) use ($app) {
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetConnectPropertyValues($providerName, $propName, $format);
