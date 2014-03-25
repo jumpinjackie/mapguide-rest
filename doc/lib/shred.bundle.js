@@ -1139,12 +1139,26 @@ var createRequest = function(request) {
   request.log.debug("Creating request ..");
   request.log.debug(request);
 
+  // Pragmatism trumps idealism. Just ask IIS, which 405s PUT and DELETE by default
+  var h = request.getHeaders();
+  var headers = {};
+  for (var name in h) {
+    headers[name] = h[name];
+  }
+  if (request.method == "DELETE") {
+    request.method = "POST";
+    headers["X-HTTP-Method-Override"] = "DELETE";
+  } else if (request.method == "PUT") {
+    request.method = "PUT";
+    headers["X-HTTP-Method-Override"] = "PUT";
+  }
+
   var reqParams = {
     host: request.host,
     port: request.port,
     method: request.method,
     path: request.path + (request.query ? '?'+request.query : ""),
-    headers: request.getHeaders(),
+    headers: headers,
     // Node's HTTP/S modules will ignore this, but we are using the
     // browserify-http module in the browser for both HTTP and HTTPS, and this
     // is how you differentiate the two.
