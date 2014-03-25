@@ -29,6 +29,15 @@ class MgBaseController extends MgResponseHandler
         $this->userInfo = null;
     }
 
+    public function GetBooleanRequestParameter($name, $defaultValue) {
+        $val = strtolower($this->GetRequestParameter($name, $defaultValue));
+        if ($val == "true")
+            $val = "1";
+        else if ($val == "false")
+            $val = "0";
+        return $val;
+    }
+
     protected function EnsureAuthenticationForHttp($callback, $allowAnonymous = false, $agentUri = "", $nominatedSessionId = "") {
         //agent URI is only required if responses must contain a reference
         //back to the mapagent. This is not the case for most, if not all

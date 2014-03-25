@@ -196,7 +196,7 @@ class MgResourceServiceController extends MgBaseController {
             $param->AddParameter("OPERATION", "ENUMERATERESOURCES");
             $param->AddParameter("VERSION", "1.0.0");
             $param->AddParameter("TYPE", $that->GetRequestParameter("type"));
-            $param->AddParameter("COMPUTECHILDREN", $that->GetRequestParameter("computechildren", "0"));
+            $param->AddParameter("COMPUTECHILDREN", $that->GetBooleanRequestParameter("computechildren", "0"));
             //Default the depth to 1 if not specified (think of the MapGuide Server!)
             $param->AddParameter("DEPTH", $that->GetRequestParameter("depth", "1"));
             if ($fmt === "json") {
@@ -220,7 +220,7 @@ class MgResourceServiceController extends MgBaseController {
             $param->AddParameter("SOURCE", $that->GetRequestParameter("source"));
             $param->AddParameter("DESTINATION", $that->GetRequestParameter("destination"));
             //Default the depth to 1 if not specified (think of the MapGuide Server!)
-            $param->AddParameter("OVERWRITE", $that->GetRequestParameter("overwrite", "0"));
+            $param->AddParameter("OVERWRITE", $that->GetBooleanRequestParameter("overwrite", "0"));
             $that->ExecuteHttpRequest($req);
         });
     }
@@ -233,8 +233,8 @@ class MgResourceServiceController extends MgBaseController {
             $param->AddParameter("SOURCE", $that->GetRequestParameter("source"));
             $param->AddParameter("DESTINATION", $that->GetRequestParameter("destination"));
             //Default the depth to 1 if not specified (think of the MapGuide Server!)
-            $param->AddParameter("OVERWRITE", $that->GetRequestParameter("overwrite", "0"));
-            $param->AddParameter("OVERWRITE", $that->GetRequestParameter("cascade", "1"));
+            $param->AddParameter("OVERWRITE", $that->GetBooleanRequestParameter("overwrite", "0"));
+            $param->AddParameter("OVERWRITE", $that->GetBooleanRequestParameter("cascade", "1"));
             $that->ExecuteHttpRequest($req);
         });
     }

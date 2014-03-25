@@ -73,7 +73,7 @@ class MgMapController extends MgBaseController {
         if ($persist == null)
             $persist = true;
         else
-            $persist = ($persist == "1");
+            $persist = ($persist == "1" || $persist == "true");
 
         if ($reqData == null)
             $reqData = 0;
@@ -518,7 +518,7 @@ class MgMapController extends MgBaseController {
             $this->app->halt(404, "Layer ($layerName) not found in selection"); //TODO: Localize
         } else {
             $layer = $layers->GetItem($lidx);
-            $bMapped = ($this->GetRequestParameter("mappedonly", 0) == 1);
+            $bMapped = ($this->GetBooleanRequestParameter("mappedonly", "0") == "1");
             $transformto = $this->GetRequestParameter("transformto", "");
             $transform = null;
             if ($transformto !== "") {

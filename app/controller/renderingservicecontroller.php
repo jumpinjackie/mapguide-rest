@@ -96,7 +96,7 @@ class MgRenderingServiceController extends MgBaseController {
             $param->AddParameter("MAPDEFINITION", $resIdStr);
             $param->AddParameter("FORMAT", strtoupper($format));
 
-            $keepSelection = $that->GetRequestParameter("keepselection", null);
+            $keepSelection = $that->GetBooleanRequestParameter("keepselection", null);
             if ($keepSelection != null)
                 $param->AddParameter("KEEPSELECTION", $keepSelection);
 
