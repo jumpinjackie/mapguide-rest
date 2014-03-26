@@ -25,6 +25,7 @@ MgInitializeWebTier($webConfigPath);
 
 $config = require_once dirname(__FILE__)."/app/config.php";
 $app = new \Slim\Slim($config);
+$app->config("SelfUrl", $app->request->getUrl() . $app->request->getRootUri());
 
 //Register known REST adapters and geom formatters to our DI container
 include dirname(__FILE__)."/app/adapters/registration.php";

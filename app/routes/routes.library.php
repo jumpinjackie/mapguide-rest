@@ -143,7 +143,7 @@ $app->get("/library/:resourcePath+.FeatureSource/schemas.:format", function($res
  *     @SWG\Operation(
  *        method="GET",
  *        nickname="DescribeSchema",
- *        summary="Gets the schema names of a feature source",
+ *        summary="Gets the full description of the specified schema",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
@@ -169,7 +169,7 @@ $app->get("/library/:resourcePath+.FeatureSource/schema/:schemaName", function($
  *     @SWG\Operation(
  *        method="GET",
  *        nickname="DescribeSchema",
- *        summary="Gets the schema names of a feature source",
+ *        summary="Gets the full description of the specified schema",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
@@ -452,7 +452,12 @@ $app->delete("/library/:resourcePath+/features/:schemaName/:className", function
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
- *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name")
+ *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
+ *          @SWG\parameter(name="filter", paramType="query", required=false, type="string", description="The FDO filter to apply"),
+ *          @SWG\parameter(name="properties", paramType="query", required=false, type="string", description="A comma-separated list of proprety names"),
+ *          @SWG\parameter(name="maxfeatures", paramType="query", required=false, type="string", description="The maximum number of features to restrict this response to"),
+ *          @SWG\parameter(name="transformto", paramType="query", required=false, type="string", description="The CS-Map coordinate system code to transform the resulting features into"),
+ *          @SWG\parameter(name="bbox", paramType="query", required=false, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
@@ -476,6 +481,11 @@ $app->get("/library/:resourcePath+/features/:schemaName/:className", function($r
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
+ *          @SWG\parameter(name="filter", paramType="query", required=false, type="string", description="The FDO filter to apply"),
+ *          @SWG\parameter(name="properties", paramType="query", required=false, type="string", description="A comma-separated list of proprety names"),
+ *          @SWG\parameter(name="maxfeatures", paramType="query", required=false, type="string", description="The maximum number of features to restrict this response to"),
+ *          @SWG\parameter(name="transformto", paramType="query", required=false, type="string", description="The CS-Map coordinate system code to transform the resulting features into"),
+ *          @SWG\parameter(name="bbox", paramType="query", required=false, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','geojson']")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
@@ -797,7 +807,7 @@ $app->post("/library/:resourcePath+/content", function($resourcePath) use ($app)
  *        summary="Gets the specified resource content for the given resource ID",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID")
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID (including extension)")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
@@ -883,7 +893,7 @@ $app->get("/library/:resourcePath+/references.:format", function($resourcePath, 
  *        summary="Deletes the given resource",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID")
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID (including extension)")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
@@ -1031,7 +1041,7 @@ $app->get("/library/:resourcePath+.MapDefinition/plot", function($resourcePath) 
  *     @SWG\Operation(
  *        method="GET",
  *        nickname="GeneratePlotFromMapDefinition",
- *        summary="Plot the map to the specified using the center and scale from the map",
+ *        summary="Plot the map to the specified type using the center and scale from the map",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the Map Definition"),

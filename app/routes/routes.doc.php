@@ -24,6 +24,8 @@
 // TODO: Perhaps we should try to dynamically build this at runtime so that the base path can be inferred instead of specified up-front or we find a way to rewrite this at runtime
 // TODO: If dynamically building, it should save the build output to cache where permissions are assumed to be properly set up
 
+require_once dirname(__FILE__)."/../util/utils.php";
+
 $app->get("/apidoc/", function() use ($app) {
     $path = $app->config("AppRootDir")."/doc/data/api-docs.json";
 
@@ -33,19 +35,30 @@ $app->get("/apidoc/", function() use ($app) {
     $doc = json_decode(file_get_contents($path));
     $doc->info = new stdClass();
     $doc->info->title = "mapguide-rest";
-    $doc->info->description = "mapguide-rest is a RESTful web extension for MapGuide Open Source and Autodesk Infrastructure Map Server";
+    $doc->info->description = "mapguide-rest is a RESTful web extension for MapGuide Open Source and Autodesk Infrastructure Map Server.<br/><br/><strong>NOTE:</strong> Using non-ascii characters in any path parameter in any of the examples below may crash PHP on IIS. See: <a target='_blank' href='https://github.com/jumpinjackie/mapguide-rest/issues/32'>https://github.com/jumpinjackie/mapguide-rest/issues/32</a>";
     $doc->info->license = "LGPL 2.1";
     $doc->info->licenseUrl = "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html";
     
+    //Scrub out the .json extensions
+    foreach ($doc->apis as $api) {
+        $api->path = str_replace(".json", "", $api->path);
+    }
+
     $app->response->header("Content-Type", "application/json");
     $app->response->setBody(json_encode($doc));
 });
 $app->get("/apidoc/:file", function($file) use ($app) {
-    $path = $app->config("AppRootDir")."/doc/data/$file";
+    if (MgUtils::StringEndsWith($file, ".json"))
+        $file = str_replace(".json", "", $file);
+
+    $path = $app->config("AppRootDir")."/doc/data/$file.json";
 
     //HACK/TODO: Overwrite whatever basepath we get from the JSON with the self-URL to index.php
     //There should be something in $app that lets us do this.
     $doc = json_decode(file_get_contents($path));
+    $doc->basePath = $app->config("SelfUrl");
+    $doc->swaggerVersion = "1.2";
+    $doc->apiVersion = "0.6";
 
     $app->response->header("Content-Type", "application/json");
     $app->response->setBody(json_encode($doc));
