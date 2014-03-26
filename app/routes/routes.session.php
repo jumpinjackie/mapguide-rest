@@ -1218,7 +1218,7 @@ $app->delete("/session/:sessionId/:resName", function($sessionId, $resName) use 
  *   )
  */
 $app->get("/session/:sessionId/:resName.MapDefinition/tile/:groupName/:scaleIndex/:col/:row", function($sessionId, $resName, $groupName, $scaleIndex, $col, $row) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
     $ctrl = new MgTileServiceController($app);
     $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, "img");
 });
@@ -1244,7 +1244,7 @@ $app->get("/session/:sessionId/:resName.MapDefinition/tile/:groupName/:scaleInde
  *   )
  */
 $app->get("/session/:sessionId/:resName.MapDefinition/tile.:format/:groupName/:scaleIndex/:col/:row", function($sessionId, $resName, $format, $groupName, $scaleIndex, $col, $row) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
     $ctrl = new MgTileServiceController($app);
     $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $format);
 });
