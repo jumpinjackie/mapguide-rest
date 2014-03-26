@@ -33,7 +33,7 @@
     <!-- ============================================  -->
     <!-- Target: build                                 -->
     <!-- ============================================  -->
-    <target name="build" depends="prepare">
+    <target name="build" depends="prepare, docgen">
         <echo msg="Copying files to build directory..." />
 
         <copy todir="./build/app" overwrite="true">
@@ -50,6 +50,12 @@
         </copy>
         <copy todir="./build/cache" overwrite="true">
             <fileset dir="./cache">
+                <include name="**/*.*" />
+                <include name="*" />
+            </fileset>
+        </copy>
+        <copy todir="./build/conf" overwrite="true">
+            <fileset dir="./conf">
                 <include name="**/*.*" />
                 <include name="*" />
             </fileset>
