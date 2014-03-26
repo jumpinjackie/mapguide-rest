@@ -77,7 +77,8 @@ $app->get("/providers.:format", function($format) use ($app) {
  *        summary="Gets the capabilities of the given FDO provider",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="providerName", paramType="path", required=true, type="string", description="The FDO Provider")
+ *          @SWG\parameter(name="providerName", paramType="path", required=true, type="string", description="The FDO Provider"),
+ *          @SWG\parameter(name="connection", paramType="query", required=true, type="string", description="The partial connection string")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
@@ -98,6 +99,7 @@ $app->get("/providers/:providerName/capabilities", function($providerName) use (
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="providerName", paramType="path", required=true, type="string", description="The FDO Provider"),
+ *          @SWG\parameter(name="connection", paramType="query", required=true, type="string", description="The partial connection string"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
@@ -115,10 +117,11 @@ $app->get("/providers/:providerName/capabilities.:format", function($providerNam
  *     @SWG\Operation(
  *        method="GET",
  *        nickname="EnumerateDataStores",
- *        summary="Enumerates the available data stores for this provider with the current connection string specified as additional key=value querystring pairs (NOT INVOKABLE FROM THIS API REFERENCE)",
+ *        summary="Enumerates the available data stores for this provider with the current connection string",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="providerName", paramType="path", required=true, type="string", description="The FDO Provider")
+ *          @SWG\parameter(name="providerName", paramType="path", required=true, type="string", description="The FDO Provider"),
+ *          @SWG\parameter(name="connection", paramType="query", required=true, type="string", description="The partial connection string")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
@@ -135,10 +138,11 @@ $app->get("/providers/:providerName/datastores", function($providerName) use ($a
  *     @SWG\Operation(
  *        method="GET",
  *        nickname="EnumerateDataStores",
- *        summary="Enumerates the available data stores for this provider with the current connection string specified as additional key=value querystring pairs (NOT INVOKABLE FROM THIS API REFERENCE)",
+ *        summary="Enumerates the available data stores for this provider with the current connection string",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="providerName", paramType="path", required=true, type="string", description="The FDO Provider"),
+ *          @SWG\parameter(name="connection", paramType="query", required=true, type="string", description="The partial connection string"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
@@ -156,11 +160,12 @@ $app->get("/providers/:providerName/datastores.:format", function($providerName,
  *     @SWG\Operation(
  *        method="GET",
  *        nickname="GetConnectPropertyValues",
- *        summary="Enumerates the available values for a given connection property. Any partial connection string is specified as additional key=value querystring pairs (NOT INVOKABLE FROM THIS API REFERENCE IF PARTIAL CONNECTION STRING IS REQUIRED)",
+ *        summary="Enumerates the available values for a given connection property.",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="providerName", paramType="path", required=true, type="string", description="The FDO Provider"),
- *          @SWG\parameter(name="propName", paramType="path", required=true, type="string", description="The FDO Provider")
+ *          @SWG\parameter(name="propName", paramType="path", required=true, type="string", description="The FDO Provider"),
+ *          @SWG\parameter(name="connection", paramType="query", required=false, type="string", description="The partial connection string")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
@@ -177,11 +182,12 @@ $app->get("/providers/:providerName/connectvalues/:propName", function($provider
  *     @SWG\Operation(
  *        method="GET",
  *        nickname="GetConnectPropertyValues",
- *        summary="Enumerates the available values for a given connection property. Any partial connection string is specified as additional key=value querystring pairs (NOT INVOKABLE FROM THIS API REFERENCE IF PARTIAL CONNECTION STRING IS REQUIRED)",
+ *        summary="Enumerates the available values for a given connection property.",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="providerName", paramType="path", required=true, type="string", description="The FDO Provider"),
  *          @SWG\parameter(name="propName", paramType="path", required=true, type="string", description="The FDO Provider"),
+ *          @SWG\parameter(name="connection", paramType="query", required=false, type="string", description="The partial connection string"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),

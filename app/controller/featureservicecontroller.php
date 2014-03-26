@@ -30,29 +30,12 @@ class MgFeatureServiceController extends MgBaseController {
     public function __construct($app) {
         parent::__construct($app);
     }
-
-    private function GetConnectionStringFromRequestParameters() {
-        $params = $this->app->request->get();
-        $partialConnStr = "";
-        foreach ($params as $key => $value) {
-            //HACK: In the very infinitsimally small case that there is an FDO connection property named "session", this will obviously break down
-            if (strtolower($key) === "session")
-                continue;
-
-            if ($partialConnStr === "") {
-                $partialConnStr = $key."=".$value;
-            } else {
-                $partialConnStr .= ";".$key."=".$value;
-            }
-        }
-        return $partialConnStr;
-    }
-
+    
     public function GetConnectPropertyValues($providerName, $propName, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
-        $partialConnStr = $this->GetConnectionStringFromRequestParameters();
+        $partialConnStr = $this->GetRequestParameter("connection", "");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $providerName, $propName, $partialConnStr) {
@@ -75,7 +58,7 @@ class MgFeatureServiceController extends MgBaseController {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
-        $partialConnStr = $this->GetConnectionStringFromRequestParameters();
+        $partialConnStr = $this->GetRequestParameter("connection", "");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $providerName, $partialConnStr) {
@@ -97,7 +80,7 @@ class MgFeatureServiceController extends MgBaseController {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
-        $partialConnStr = $this->GetConnectionStringFromRequestParameters();
+        $partialConnStr = $this->GetRequestParameter("connection", "");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $providerName, $partialConnStr) {
