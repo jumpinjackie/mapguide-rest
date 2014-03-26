@@ -552,6 +552,29 @@ $app->get("/library/:resourcePath+/aggregates.:format/:type/:schemaName/:classNa
 
 /**
  * @SWG\Api(
+ *     path="/library",
+ *     @SWG\Operation(
+ *        method="POST",
+ *        nickname="ApplyResourcePackage",
+ *        summary="Loads the specified package into the Site Repository",
+ *        @SWG\consumes("multipart/form-data"),
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="MAX_FILE_SIZE", paramType="form", required=true, type="integer", description="Maximum file size"),
+ *          @SWG\parameter(name="package", paramType="form", required=true, type="file", description="The package file to load")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->post("/library", function() use ($app) {
+    $ctrl = new MgResourceServiceController($app);
+    $ctrl->ApplyResourcePackage();
+});
+
+/**
+ * @SWG\Api(
  *     path="/library/{resourcePath}/datalist",
  *     @SWG\Operation(
  *        method="GET",

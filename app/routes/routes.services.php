@@ -32,6 +32,50 @@ require_once dirname(__FILE__)."/../controller/mappingservicecontroller.php";
 
 /**
  * @SWG\Api(
+ *     path="/services/getschemamapping",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetSchemaMapping",
+ *        summary="Gets schema mapping of a feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="provider", paramType="query", required=true, type="string", description="The FDO Provider"),
+ *          @SWG\parameter(name="connection", paramType="query", required=true, type="string", description="The partial connection string")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/services/getschemamapping", function() use ($app) {
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->GetSchemaMapping("xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/services/getschemamapping.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetSchemaMapping",
+ *        summary="Gets schema mapping of a feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="provider", paramType="query", required=true, type="string", description="The FDO Provider"),
+ *          @SWG\parameter(name="connection", paramType="query", required=true, type="string", description="The partial connection string"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/services/getschemamapping.:format", function($format) use ($app) {
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->GetSchemaMapping($format);
+});
+
+/**
+ * @SWG\Api(
  *     path="/services/copyresource",
  *     @SWG\Operation(
  *        method="POST",

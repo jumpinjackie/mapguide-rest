@@ -135,6 +135,27 @@ class MgFeatureServiceController extends MgBaseController {
         });
     }
 
+    public function GetSchemaMapping($format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $provider = $this->GetRequestParameter("provider", "");
+        $connStr = $this->GetRequestParameter("connection", "");
+        $sessionId = $this->app->request->params("session");
+
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $provider, $connStr) {
+            $param->AddParameter("OPERATION", "GETSCHEMAMAPPING");
+            $param->AddParameter("VERSION", "1.0.0");
+            if ($fmt === "json")
+                $param->AddParameter("FORMAT", MgMimeType::Json);
+            else
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+            $param->AddParameter("PROVIDER", $provider);
+            $param->AddParameter("CONNECTIONSTRING", $connStr);
+            $that->ExecuteHttpRequest($req);
+        }, false, "", $sessionId);
+    }
+
     public function GetSpatialContexts($resId, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
@@ -341,7 +362,7 @@ class MgFeatureServiceController extends MgBaseController {
             if ($sessionId === "") {
                 if ($perms->allowInsert === false) {
                     $e = new Exception();
-                    $this->OutputException("Forbidden", "Operation not allowed", "The resource ".$resId->ToString()." is not configured to allow feature updates", $e->getTraceAsString(), 403, MgMimeType::Xml);
+                    $this->OutputException("Forbidden", "Operation not allowed", "The resource ".$resId->ToString()." is not configured to allow feature updates", $e->getTraceAsString(), 403, MgMimeType::Xml); //TODO: Localize
                 }
             }
 

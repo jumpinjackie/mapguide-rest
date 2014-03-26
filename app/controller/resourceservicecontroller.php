@@ -24,6 +24,26 @@ class MgResourceServiceController extends MgBaseController {
         parent::__construct($app);
     }
 
+    public function ApplyResourcePackage() {
+        if (!array_key_exists("package", $_FILES))
+            $this->app->halt(400, "Missing required file parameter: package"); //TODO: Localize
+        
+        $this->EnsureAuthenticationForSite();
+        $siteConn = new MgSiteConnection();
+        $siteConn->Open($this->userInfo);
+
+        $err = $_FILES["package"]["error"];
+        if ($err == 0) {
+            $source = new MgByteSource($_FILES["package"]["tmp_name"]);
+            $reader = $source->GetReader();
+
+            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+            $resSvc->ApplyResourcePackage($reader);
+        } else {
+            $this->app->response->setBody("File upload error (code: $err). See <a href='http://www.php.net/manual/en/features.file-upload.errors.php'>http://www.php.net/manual/en/features.file-upload.errors.php</a> for more information");
+        }
+    }
+
     public function DeleteResource($resId) {
         $resIdStr = $resId->ToString();
         $sessionId = "";
