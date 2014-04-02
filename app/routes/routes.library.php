@@ -371,7 +371,7 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:qualifiedClas
 });
 /**
  * @SWG\Api(
- *     path="/library/{resourcePath}.FeatureSource/classdef/{schemaName}/{className}",
+ *     path="/library/{resourcePath}.FeatureSource/features/{schemaName}/{className}",
  *     @SWG\Operation(
  *        method="POST",
  *        nickname="InsertFeatures",
@@ -396,7 +396,7 @@ $app->post("/library/:resourcePath+/features/:schemaName/:className", function($
 });
 /**
  * @SWG\Api(
- *     path="/library/{resourcePath}.FeatureSource/classdef/{schemaName}/{className}",
+ *     path="/library/{resourcePath}.FeatureSource/features/{schemaName}/{className}",
  *     @SWG\Operation(
  *        method="PUT",
  *        nickname="UpdateFeatures",
@@ -421,7 +421,7 @@ $app->put("/library/:resourcePath+/features/:schemaName/:className", function($r
 });
 /**
  * @SWG\Api(
- *     path="/library/{resourcePath}.FeatureSource/classdef/{schemaName}/{className}",
+ *     path="/library/{resourcePath}.FeatureSource/features/{schemaName}/{className}",
  *     @SWG\Operation(
  *        method="DELETE",
  *        nickname="DeleteFeatures",
@@ -513,7 +513,8 @@ $app->get("/library/:resourcePath+/features.:format/:schemaName/:className", fun
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
- *          @SWG\parameter(name="aggregateType", paramType="path", required=true, type="string", description="aggregate type", enum="['count','bbox','distinctvalues']")
+ *          @SWG\parameter(name="aggregateType", paramType="path", required=true, type="string", description="aggregate type", enum="['count','bbox','distinctvalues']"),
+ *          @SWG\parameter(name="property", paramType="query", required=false, type="string", description="The property name to get distinct values of. Only applies if aggregate type is 'distinctvalues'")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
@@ -538,6 +539,7 @@ $app->get("/library/:resourcePath+/aggregates/:type/:schemaName/:className", fun
  *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
  *          @SWG\parameter(name="aggregateType", paramType="path", required=true, type="string", description="aggregate type", enum="['count','bbox','distinctvalues']"),
+ *          @SWG\parameter(name="property", paramType="query", required=false, type="string", description="The property name to get distinct values of. Only applies if aggregate type is 'distinctvalues'"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),

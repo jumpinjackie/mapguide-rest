@@ -1149,7 +1149,7 @@ var createRequest = function(request) {
     request.method = "POST";
     headers["X-HTTP-Method-Override"] = "DELETE";
   } else if (request.method == "PUT") {
-    request.method = "PUT";
+    request.method = "POST";
     headers["X-HTTP-Method-Override"] = "PUT";
   }
 
