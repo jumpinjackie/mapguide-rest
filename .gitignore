@@ -6,3 +6,10 @@
 /build
 /dist
 !/cache/readme.txt
+/conf/data/test_wfsuser
+/conf/data/test_wmsuser
+/conf/data/test_administrator
+/conf/data/test_anonymous
+/conf/data/test_author
+/conf/data/test_group
+/conf/data/test_mixed
