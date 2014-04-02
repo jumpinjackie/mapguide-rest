@@ -42,6 +42,7 @@ require_once dirname(__FILE__)."/../controller/mappingservicecontroller.php";
  *          @SWG\parameter(name="provider", paramType="query", required=true, type="string", description="The FDO Provider"),
  *          @SWG\parameter(name="connection", paramType="query", required=true, type="string", description="The partial connection string")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -64,6 +65,7 @@ $app->get("/services/getschemamapping", function() use ($app) {
  *          @SWG\parameter(name="connection", paramType="query", required=true, type="string", description="The partial connection string"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -86,6 +88,7 @@ $app->get("/services/getschemamapping.:format", function($format) use ($app) {
  *          @SWG\parameter(name="destination", paramType="form", required=true, type="string", description="The Target Resource ID"),
  *          @SWG\parameter(name="overwrite", paramType="form", required=false, type="boolean", description="Indicates whether to overwrite the target resource if it exists")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -108,6 +111,7 @@ $app->post("/services/copyresource", function() use ($app) {
  *          @SWG\parameter(name="overwrite", paramType="form", required=false, type="boolean", description="Indicates whether to overwrite the target resource if it exists"),
  *          @SWG\parameter(name="cascade", paramType="form", required=false, type="boolean", description="Indicates whether to cascade any reference changes in related documents as a result of this change")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -130,6 +134,7 @@ $app->post("/services/moveresource", function() use ($app) {
  *          @SWG\parameter(name="coords", paramType="form", required=true, type="string", description="A comma-delimited list of space-delimited coordinate pairs"),
  *          @SWG\parameter(name="format", paramType="form", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -156,6 +161,7 @@ $app->post("/services/transformcoords", function() use ($app) {
  *          @SWG\parameter(name="iconheight", paramType="form", required=false, type="integer", description="The desired height of generated icons if icons are requested"),
  *          @SWG\parameter(name="iconsperscalerange", paramType="form", required=false, type="integer", description="The number of icons to generate per scale range if icons are requested")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -183,6 +189,7 @@ $app->post("/services/createmap", function() use ($app) {
  *          @SWG\parameter(name="iconsperscalerange", paramType="form", required=false, type="integer", description="The number of icons to generate per scale range if icons are requested"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )

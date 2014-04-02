@@ -46,6 +46,7 @@ require_once dirname(__FILE__)."/../util/utils.php";
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -72,6 +73,7 @@ $app->get("/library/:resourcePath+.FeatureSource/spatialcontexts", function($res
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -97,6 +99,7 @@ $app->get("/library/:resourcePath+.FeatureSource/spatialcontexts.:format", funct
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -123,6 +126,7 @@ $app->get("/library/:resourcePath+.FeatureSource/schemas", function($resourcePat
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -149,6 +153,7 @@ $app->get("/library/:resourcePath+.FeatureSource/schemas.:format", function($res
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -176,6 +181,7 @@ $app->get("/library/:resourcePath+.FeatureSource/schema/:schemaName", function($
  *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -202,6 +208,7 @@ $app->get("/library/:resourcePath+.FeatureSource/schema.:format/:schemaName", fu
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -229,6 +236,7 @@ $app->get("/library/:resourcePath+.FeatureSource/classes/:schemaName", function(
  *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -256,6 +264,7 @@ $app->get("/library/:resourcePath+.FeatureSource/classes.:format/:schemaName", f
  *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -284,6 +293,7 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef/:schemaName/:className
  *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -310,6 +320,7 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:schemaName/:c
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="qualifiedClassName", paramType="path", required=true, type="string", description="The qualified class name")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -346,6 +357,7 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef/:qualifiedClassName", 
  *          @SWG\parameter(name="qualifiedClassName", paramType="path", required=true, type="string", description="The qualified class name"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -377,12 +389,13 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:qualifiedClas
  *        nickname="InsertFeatures",
  *        summary="Inserts one or more features into the given feature class for the specified feature source. The Feature Source in question must have _MgRestAllowInsert=1 in its resource header otherwise inserts will be forbidden. If _MgRestUseTransaction=1 in the resource header, transactions will be used.",
  *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
  *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The Feature Set XML describing the features to be inserted")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=403, message="Feature Source is not configured to allow inserts"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
@@ -402,12 +415,13 @@ $app->post("/library/:resourcePath+/features/:schemaName/:className", function($
  *        nickname="UpdateFeatures",
  *        summary="Updates one or more features into the given feature class for the specified feature source. The Feature Source in question must have _MgRestAllowUpdate=1 in its resource header otherwise updates will be forbidden. If _MgRestUseTransaction=1 in the resource header, transactions will be used.",
  *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
  *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The XML envelope describing the features to be update")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=403, message="Feature Source is not configured to allow updates"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
@@ -427,12 +441,13 @@ $app->put("/library/:resourcePath+/features/:schemaName/:className", function($r
  *        nickname="DeleteFeatures",
  *        summary="Deletes one or more features from the given feature class for the specified feature source. The Feature Source in question must have _MgRestAllowDelete=1 in its resource header otherwise deletes will be forbidden. If _MgRestUseTransaction=1 in the resource header, transactions will be used.",
  *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
  *          @SWG\parameter(name="filter", paramType="form", required=true, type="string", description="The FDO filter determining what features to delete")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=403, message="Feature Source is not configured to allow deletes"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
@@ -462,6 +477,7 @@ $app->delete("/library/:resourcePath+/features/:schemaName/:className", function
  *          @SWG\parameter(name="transformto", paramType="query", required=false, type="string", description="The CS-Map coordinate system code to transform the resulting features into"),
  *          @SWG\parameter(name="bbox", paramType="query", required=false, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -491,6 +507,7 @@ $app->get("/library/:resourcePath+/features/:schemaName/:className", function($r
  *          @SWG\parameter(name="bbox", paramType="query", required=false, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','geojson']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -516,6 +533,7 @@ $app->get("/library/:resourcePath+/features.:format/:schemaName/:className", fun
  *          @SWG\parameter(name="aggregateType", paramType="path", required=true, type="string", description="aggregate type", enum="['count','bbox','distinctvalues']"),
  *          @SWG\parameter(name="property", paramType="query", required=false, type="string", description="The property name to get distinct values of. Only applies if aggregate type is 'distinctvalues'")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -542,6 +560,7 @@ $app->get("/library/:resourcePath+/aggregates/:type/:schemaName/:className", fun
  *          @SWG\parameter(name="property", paramType="query", required=false, type="string", description="The property name to get distinct values of. Only applies if aggregate type is 'distinctvalues'"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -568,6 +587,7 @@ $app->get("/library/:resourcePath+/aggregates.:format/:type/:schemaName/:classNa
  *          @SWG\parameter(name="MAX_FILE_SIZE", paramType="form", required=true, type="integer", description="Maximum file size"),
  *          @SWG\parameter(name="package", paramType="form", required=true, type="file", description="The package file to load")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -589,6 +609,7 @@ $app->post("/library", function() use ($app) {
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -611,6 +632,7 @@ $app->get("/library/:resourcePath+/datalist", function($resourcePath) use ($app)
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -634,6 +656,7 @@ $app->get("/library/:resourcePath+/datalist.:format", function($resourcePath, $f
  *          @SWG\parameter(name="computechildren", paramType="query", required=false, type="boolean", description="Indicates if data about children should be computed"),
  *          @SWG\parameter(name="type", paramType="query", required=false, type="string", description="An optional resource type to filter on", enum="['Folder','FeatureSource','LayerDefinition','MapDefinition','WebLayout','ApplicationDefinition','LoadProcedure','DrawingSource','SymbolLibrary','PrintLayout','SymbolDefinition']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -658,6 +681,7 @@ $app->get("/library/list", function() use ($app) {
  *          @SWG\parameter(name="type", paramType="query", required=false, type="string", description="An optional resource type to filter on", enum="['Folder','FeatureSource','LayerDefinition','MapDefinition','WebLayout','ApplicationDefinition','LoadProcedure','DrawingSource','SymbolLibrary','PrintLayout','SymbolDefinition']"),
  *          @SWG\parameter(name="dataType", paramType="path", required=true, type="string", description="xml, json or html", enum="['xml','json','html']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -682,6 +706,7 @@ $app->get("/library/list.:format", function($format) use ($app) {
  *          @SWG\parameter(name="computechildren", paramType="query", required=false, type="boolean", description="Indicates if data about children should be computed"),
  *          @SWG\parameter(name="type", paramType="query", required=false, type="string", description="An optional resource type to filter on", enum="['Folder','FeatureSource','LayerDefinition','MapDefinition','WebLayout','ApplicationDefinition','LoadProcedure','DrawingSource','SymbolLibrary','PrintLayout','SymbolDefinition']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -707,6 +732,7 @@ $app->get("/library/:resourcePath+/list", function($resourcePath) use ($app) {
  *          @SWG\parameter(name="type", paramType="query", required=false, type="string", description="An optional resource type to filter on", enum="['Folder','FeatureSource','LayerDefinition','MapDefinition','WebLayout','ApplicationDefinition','LoadProcedure','DrawingSource','SymbolLibrary','PrintLayout','SymbolDefinition']"),
  *          @SWG\parameter(name="dataType", paramType="path", required=true, type="string", description="xml, json or html", enum="['xml','json','html']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -729,6 +755,7 @@ $app->get("/library/:resourcePath+/list.:format", function($resourcePath, $forma
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="dataName", paramType="path", required=true, type="string", description="The name of the resource data to retrieve")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -751,6 +778,7 @@ $app->get("/library/:resourcePath+/data/:dataName", function($resourcePath, $dat
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The resource XML header")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -772,6 +800,7 @@ $app->post("/library/:resourcePath+/header", function($resourcePath) use ($app) 
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -794,6 +823,7 @@ $app->get("/library/:resourcePath+/header", function($resourcePath) use ($app) {
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -816,6 +846,7 @@ $app->get("/library/:resourcePath+/header.:format", function($resourcePath, $for
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The resource XML content")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -837,6 +868,7 @@ $app->post("/library/:resourcePath+/content", function($resourcePath) use ($app)
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID (including extension)")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -859,6 +891,7 @@ $app->get("/library/:resourcePath+/content", function($resourcePath) use ($app) 
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -880,6 +913,7 @@ $app->get("/library/:resourcePath+/content.:format", function($resourcePath, $fo
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -902,6 +936,7 @@ $app->get("/library/:resourcePath+/references", function($resourcePath) use ($ap
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -923,6 +958,7 @@ $app->get("/library/:resourcePath+/references.:format", function($resourcePath, 
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID (including extension)")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -950,6 +986,8 @@ $app->delete("/library/:resourcePath+", function($resourcePath) use ($app) {
  *          @SWG\parameter(name="col", paramType="path", required=true, type="integer", description="The column of the tile to fetch"),
  *          @SWG\parameter(name="row", paramType="path", required=true, type="integer", description="The row of the tile to fetch")
  *        ),
+ *        @SWG\ResponseMessage(code=304, message="This tile has not been modified. Your previously fetched tile is still the current one"),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -980,6 +1018,8 @@ $app->get("/library/:resourcePath+.MapDefinition/tile/:groupName/:scaleIndex/:co
  *          @SWG\parameter(name="row", paramType="path", required=true, type="integer", description="The row of the tile to fetch"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="The tile type", enum="['img']")
  *        ),
+ *        @SWG\ResponseMessage(code=304, message="This tile has not been modified. Your previously fetched tile is still the current one"),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -1013,6 +1053,7 @@ $app->get("/library/:resourcePath+.MapDefinition/tile.:format/:groupName/:scaleI
  *          @SWG\parameter(name="height", paramType="query", required=true, type="integer", description="The requested image height in pixels"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="The icon image type", enum="['PNG','PNG8','JPG','GIF']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -1049,6 +1090,7 @@ $app->get("/library/:resourcePath+.LayerDefinition/legend/:scale/:geomtype/:them
  *          @SWG\parameter(name="printlayout", paramType="query", required=false, type="string", description="The PrintLayout resource to use for plotting"),
  *          @SWG\parameter(name="title", paramType="query", required=false, type="string", description="The title to put in the plot")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -1086,6 +1128,7 @@ $app->get("/library/:resourcePath+.MapDefinition/plot", function($resourcePath) 
  *          @SWG\parameter(name="title", paramType="query", required=false, type="string", description="The title to put in the plot"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="The plot type", enum="['dwf']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
@@ -1122,6 +1165,7 @@ $app->get("/library/:resourcePath+.MapDefinition/plot.:format", function($resour
  *          @SWG\parameter(name="dpi", paramType="query", required=false, type="integer", description="The display DPI. If not specified, defaults to 96"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="The image type", enum="['PNG','PNG8','JPG','GIF']")
  *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
