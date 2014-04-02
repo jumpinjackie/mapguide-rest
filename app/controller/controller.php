@@ -23,10 +23,14 @@ require_once dirname(__FILE__)."/../core/responsehandler.php";
 class MgBaseController extends MgResponseHandler
 {
     protected $userInfo;
+    protected $userName;
+    protected $sessionId;
 
     protected function __construct($app) {
         parent::__construct($app);
         $this->userInfo = null;
+        $this->userName = null;
+        $this->sessionId = null;
     }
 
     public function GetBooleanRequestParameter($name, $defaultValue) {
@@ -126,11 +130,13 @@ class MgBaseController extends MgResponseHandler
             $session = $this->app->request->params("session");
             if ($session != null) {
                 $this->userInfo->SetMgSessionId($session);
+                $this->sessionId = $session;
             } else {
                 if ($nominatedSessionId != null && $nominatedSessionId !== "") {
                     $this->userInfo->SetMgSessionId($nominatedSessionId);
+                    $this->sessionId = $nominatedSessionId;
                 } else {
-                    $username = null;
+                    $this->userName = null;
                     $password = "";
 
                     // Username/password extraction logic ripped from PHP implementation of the MapGuide AJAX viewer
@@ -167,17 +173,18 @@ class MgBaseController extends MgResponseHandler
                     // parameters.
                     if (isset($_SERVER['PHP_AUTH_USER']) && strlen($_SERVER['PHP_AUTH_USER']) > 0)
                     {
-                        $username = $_SERVER['PHP_AUTH_USER'];
+                        $this->userName = $_SERVER['PHP_AUTH_USER'];
                         if (isset($_SERVER['PHP_AUTH_PW']) && strlen($_SERVER['PHP_AUTH_PW']) > 0)
                             $password = $_SERVER['PHP_AUTH_PW'];
                     }
 
                     //If we have everything we need, put it into the MgUserInformation
-                    if ($username != null) {
-                        $this->userInfo->SetMgUsernamePassword($username, $password);
+                    if ($this->userName != null) {
+                        $this->userInfo->SetMgUsernamePassword($this->userName, $password);
                     } else {
                         if ($allowAnonymous === true) {
                             $this->userInfo->SetMgUsernamePassword("Anonymous", "");
+                            $this->userName = "Anonymous";
                         } else {
                             $this->Unauthorized();
                         }

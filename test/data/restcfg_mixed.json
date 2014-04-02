@@ -1,0 +1,32 @@
+{
+    "Source": {
+        "Type": "MapGuide",
+        "FeatureSource": "Library://Samples/Sheboygan/Data/Parcels.FeatureSource",
+        "FeatureClass": "SHP_Schema:Parcels"
+    },
+    "Representations": {
+        "xml": {
+            "Adapter": "FeatureSetXml",
+            "Methods": {
+                "GET": {
+                    "PageSize": 100,
+                    "MaxCount": 500,
+                    "AllowUsers": ["Administrator", "Author"],
+                    "AllowGroups": ["RestUsers"]
+                },
+                "POST": {
+                    "AllowUsers": ["Administrator", "Author"],
+                    "AllowGroups": ["RestUsers"]
+                },
+                "PUT": {
+                    "AllowUsers": ["Administrator", "Author"],
+                    "AllowGroups": ["RestUsers"]
+                },
+                "DELETE": {
+                    "AllowUsers": ["Administrator", "Author"],
+                    "AllowGroups": ["RestUsers"]
+                }
+            }
+        }
+    }
+}

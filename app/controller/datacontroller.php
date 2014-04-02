@@ -108,9 +108,47 @@ class MgDataController extends MgBaseController {
         $this->HandleMethodSingle($uriParts, $id, $extension, "DELETE");
     }
 
+    private function ValidateAcl($siteConn, $config) {
+        $site = $siteConn->GetSite();
+        if ($this->userName == null && $this->sessionId != null) {
+            $this->userName = $site->GetUserForSession();
+        }
+        $groups = array();
+        $doc = new DOMDocument();
+        $br = $site->EnumerateGroups($this->userName);
+        $doc->loadXML($br->ToString());
+        $groupNodes = $doc->getElementsByTagName("Name");
+        for ($i = 0; $i < $groupNodes->length; $i++) {
+            $groupName = $groupNodes->item($i)->nodeValue;
+            $groups[$groupName] = $groupName;
+        }
+
+        // If the user is in the AllowUsers list, or their group is in the AllowGroups list
+        // let them through, otherwise 403 them
+
+        //
+        if (array_key_exists("AllowUsers", $config)) {
+            $count = count($config["AllowUsers"]);
+            for ($i = 0; $i < $count; $i++) {
+                $user = $config["AllowUsers"][$i];
+                if ($user == $this->userName)
+                    return true;
+            }
+        }
+        //
+        if (array_key_exists("AllowGroups", $config)) {
+            $count = count($config["AllowGroups"]);
+            for ($i = 0; $i < $count; $i++) {
+                $group = $config["AllowGroups"][$i];
+                if (array_key_exists($group, $groups))
+                    return true;
+            }
+        }
+        return false;
+    }
+
     private function HandleMethod($uriParts, $extension, $method) {
         $uriPath = implode("/", $uriParts);
-        $this->EnsureAuthenticationForSite("", true);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
             $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
@@ -120,22 +158,33 @@ class MgDataController extends MgBaseController {
             if (!$this->app->container->has($result->adapterName)) {
                 throw new Exception("Adapter (".$result->adapterName.") not defined or registered"); //TODO: Localize
             }
-            $siteConn = new MgSiteConnection();
-            $siteConn->Open($this->userInfo);
-            $this->app->MgSiteConnection = $siteConn;
-            $this->app->FeatureSource = $result->resId;
-            $this->app->AdapterConfig = $result->config;
-            $this->app->FeatureClass = $result->className;
-            $this->app->ConfigPath = dirname($path);
-            $this->app->IdentityProperty = $result->IdentityProperty;
-            $adapter = $this->app->container[$result->adapterName];
-            $adapter->HandleMethod($method, false);
+            $bAllowAnonymous = false;
+            if (array_key_exists("AllowAnonymous", $result->config) && $result->config["AllowAnonymous"] == true)
+                $bAllowAnonymous = true;
+            try {
+                $this->EnsureAuthenticationForSite($this->app->request->params("session"), $bAllowAnonymous);
+                $siteConn = new MgSiteConnection();
+                $siteConn->Open($this->userInfo);
+                if ($this->ValidateAcl($siteConn, $result->config)) {
+                    $this->app->MgSiteConnection = $siteConn;
+                    $this->app->FeatureSource = $result->resId;
+                    $this->app->AdapterConfig = $result->config;
+                    $this->app->FeatureClass = $result->className;
+                    $this->app->ConfigPath = dirname($path);
+                    $this->app->IdentityProperty = $result->IdentityProperty;
+                    $adapter = $this->app->container[$result->adapterName];
+                    $adapter->HandleMethod($method, false);
+                } else {
+                    $this->app->halt(403, "You are not authorized to access this resource"); //TODO: Localize
+                }
+            } catch (MgException $ex) {
+                $this->OnException($ex);
+            }
         }
     }
 
     private function HandleMethodSingle($uriParts, $id, $extension, $method) {
         $uriPath = implode("/", $uriParts);
-        $this->EnsureAuthenticationForSite("", true);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
             $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
@@ -145,17 +194,29 @@ class MgDataController extends MgBaseController {
             if (!$this->app->container->has($result->adapterName)) {
                 throw new Exception("Adapter (".$result->adapterName.") not defined or registered"); //TODO: Localize
             }
-            $siteConn = new MgSiteConnection();
-            $siteConn->Open($this->userInfo);
-            $this->app->MgSiteConnection = $siteConn;
-            $this->app->FeatureSource = $result->resId;
-            $this->app->AdapterConfig = $result->config;
-            $this->app->FeatureClass = $result->className;
-            $this->app->ConfigPath = dirname($path);
-            $this->app->IdentityProperty = $result->IdentityProperty;
-            $adapter = $this->app->container[$result->adapterName];
-            $adapter->SetFeatureId($id);
-            $adapter->HandleMethod($method, true);
+            $bAllowAnonymous = false;
+            if (array_key_exists("AllowAnonymous", $result->config) && $result->config["AllowAnonymous"] == true)
+                $bAllowAnonymous = true;
+            try {
+                $this->EnsureAuthenticationForSite($this->app->request->params("session"), $bAllowAnonymous);
+                $siteConn = new MgSiteConnection();
+                $siteConn->Open($this->userInfo);
+                if ($this->ValidateAcl($siteConn, $result->config)) {
+                    $this->app->MgSiteConnection = $siteConn;
+                    $this->app->FeatureSource = $result->resId;
+                    $this->app->AdapterConfig = $result->config;
+                    $this->app->FeatureClass = $result->className;
+                    $this->app->ConfigPath = dirname($path);
+                    $this->app->IdentityProperty = $result->IdentityProperty;
+                    $adapter = $this->app->container[$result->adapterName];
+                    $adapter->SetFeatureId($id);
+                    $adapter->HandleMethod($method, true);
+                } else {
+                    $this->app->halt(403, "You are not authorized to access this resource"); //TODO: Localize
+                }
+            } catch (MgException $ex) {
+                $this->OnException($ex);
+            }
         }
     }
 }
