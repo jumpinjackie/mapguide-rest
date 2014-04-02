@@ -981,8 +981,8 @@ function program2(depth0,data) {
 
 function program4(depth0,data) {
   
-  
-  return "\n  <option value=\"application/json\">application/json</option>\n";
+  //For mapguide-rest
+  return "\n  <option value=\"text/xml\">text/xml</option>\n";
   }
 
   buffer += "<label for=\"parameterContentType\"></label>\n<select name=\"parameterContentType\">\n";

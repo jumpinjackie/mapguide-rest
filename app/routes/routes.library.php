@@ -375,7 +375,7 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:qualifiedClas
  *     @SWG\Operation(
  *        method="POST",
  *        nickname="InsertFeatures",
- *        summary="Inserts one or more features into the given feature class for th specified feature source",
+ *        summary="Inserts one or more features into the given feature class for the specified feature source. The Feature Source in question must have _MgRestAllowInsert=1 in its resource header otherwise inserts will be forbidden. If _MgRestUseTransaction=1 in the resource header, transactions will be used.",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
@@ -384,6 +384,7 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:qualifiedClas
  *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The Feature Set XML describing the features to be inserted")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=403, message="Feature Source is not configured to allow inserts"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
  *   )
@@ -399,7 +400,7 @@ $app->post("/library/:resourcePath+/features/:schemaName/:className", function($
  *     @SWG\Operation(
  *        method="PUT",
  *        nickname="UpdateFeatures",
- *        summary="Updates one or more features into the given feature class for th specified feature source",
+ *        summary="Updates one or more features into the given feature class for the specified feature source. The Feature Source in question must have _MgRestAllowUpdate=1 in its resource header otherwise updates will be forbidden. If _MgRestUseTransaction=1 in the resource header, transactions will be used.",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
@@ -408,6 +409,7 @@ $app->post("/library/:resourcePath+/features/:schemaName/:className", function($
  *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The XML envelope describing the features to be update")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=403, message="Feature Source is not configured to allow updates"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
  *   )
@@ -423,7 +425,7 @@ $app->put("/library/:resourcePath+/features/:schemaName/:className", function($r
  *     @SWG\Operation(
  *        method="DELETE",
  *        nickname="DeleteFeatures",
- *        summary="Deletes one or more features from the given feature class for th specified feature source",
+ *        summary="Deletes one or more features from the given feature class for the specified feature source. The Feature Source in question must have _MgRestAllowDelete=1 in its resource header otherwise deletes will be forbidden. If _MgRestUseTransaction=1 in the resource header, transactions will be used.",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
@@ -432,6 +434,7 @@ $app->put("/library/:resourcePath+/features/:schemaName/:className", function($r
  *          @SWG\parameter(name="filter", paramType="form", required=true, type="string", description="The FDO filter determining what features to delete")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=403, message="Feature Source is not configured to allow deletes"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
  *     )
  *   )

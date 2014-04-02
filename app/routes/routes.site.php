@@ -137,7 +137,7 @@ $app->get("/site/groups.:format", function($format) use ($app) {
  *        summary="Lists the users for the specified group",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="groupName", paramType="path", required=false, type="string", description="The group name")
+ *          @SWG\parameter(name="groupName", paramType="path", required=true, type="string", description="The group name")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
@@ -157,7 +157,7 @@ $app->get("/site/groups/:groupName/users", function($groupName) use ($app) {
  *        summary="Lists the users for the specified group",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="groupName", paramType="path", required=false, type="string", description="The group name"),
+ *          @SWG\parameter(name="groupName", paramType="path", required=true, type="string", description="The group name"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
@@ -178,7 +178,7 @@ $app->get("/site/groups/:groupName/users.:format", function($groupName, $format)
  *        summary="Lists the groups for the specified user",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="userName", paramType="path", required=false, type="string", description="The user name")
+ *          @SWG\parameter(name="userName", paramType="path", required=true, type="string", description="The user name")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
@@ -198,7 +198,7 @@ $app->get("/site/user/:userName/groups", function($userName) use ($app) {
  *        summary="Lists the groups for the specified user",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="userName", paramType="path", required=false, type="string", description="The user name"),
+ *          @SWG\parameter(name="userName", paramType="path", required=true, type="string", description="The user name"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
@@ -219,7 +219,7 @@ $app->get("/site/user/:userName/groups.:format", function($userName, $format) us
  *        summary="Lists the roles for the specified user",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="userName", paramType="path", required=false, type="string", description="The user name")
+ *          @SWG\parameter(name="userName", paramType="path", required=true, type="string", description="The user name")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
@@ -239,7 +239,7 @@ $app->get("/site/user/:userName/roles", function($userName) use ($app) {
  *        summary="Lists the roles for the specified user",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="userName", paramType="path", required=false, type="string", description="The user name"),
+ *          @SWG\parameter(name="userName", paramType="path", required=true, type="string", description="The user name"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
