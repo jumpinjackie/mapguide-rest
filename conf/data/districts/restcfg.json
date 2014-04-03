@@ -9,7 +9,9 @@
             "Adapter": "FeatureSetXml",
             "Methods": {
                 "GET": {
-                    "MaxCount": 500
+                    "MaxCount": 500,
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 }
             }
         },
@@ -17,7 +19,9 @@
             "Adapter": "FeatureSetGeoJson",
             "Methods": {
                 "GET": {
-                    "MaxCount": 500
+                    "MaxCount": 500,
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 }
             }
         }

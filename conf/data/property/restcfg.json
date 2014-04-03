@@ -10,7 +10,9 @@
             "Methods": {
                 "GET": {
                     "PageSize": 100,
-                    "MaxCount": 500
+                    "MaxCount": 500,
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 }
             }
         },
@@ -19,7 +21,9 @@
             "Methods": {
                 "GET": {
                     "PageSize": 100,
-                    "MaxCount": 500
+                    "MaxCount": 500,
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 }
             }
         },
@@ -36,7 +40,9 @@
                         "Many": "property_georss_many.tpl",
                         "None": "property_georss_none.tpl",
                         "Error": "property_georss_error.tpl"
-                    }
+                    },
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 }
             }
         },
@@ -53,7 +59,9 @@
                         "Many": "property_atom_many.tpl",
                         "None": "property_atom_none.tpl",
                         "Error": "property_atom_error.tpl"
-                    }
+                    },
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 }
             }
         },
@@ -70,7 +78,9 @@
                         "Many": "property_kml_many.tpl",
                         "None": "property_kml_none.tpl",
                         "Error": "property_kml_error.tpl"
-                    }
+                    },
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 }
             }
         },
@@ -86,7 +96,9 @@
                         "Many": "property_html_many.tpl",
                         "None": "property_html_none.tpl",
                         "Error": "property_html_error.tpl"
-                    }
+                    },
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 }
             }
         },
@@ -97,7 +109,9 @@
                     "MapDefinition": "Library://Samples/Sheboygan/Maps/Sheboygan.MapDefinition",
                     "SelectionLayer": "Parcels",
                     "PageSize": 100,
-                    "MaxCount": 500
+                    "MaxCount": 500,
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 }
             }
         },
@@ -109,7 +123,9 @@
                     "SelectionLayer": "Parcels",
                     "PageSize": 100,
                     "MaxCount": 500,
-                    "ImageFormat": "PNG8"
+                    "ImageFormat": "PNG8",
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 }
             }
         },
@@ -121,7 +137,9 @@
                     "SelectionLayer": "Parcels",
                     "PageSize": 100,
                     "MaxCount": 500,
-                    "ImageFormat": "GIF"
+                    "ImageFormat": "GIF",
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 }
             }
         },
@@ -133,7 +151,9 @@
                     "SelectionLayer": "Parcels",
                     "PageSize": 100,
                     "MaxCount": 500,
-                    "ImageFormat": "JPG"
+                    "ImageFormat": "JPG",
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 }
             }
         },
@@ -157,7 +177,9 @@
                     ],
                     "ComputedProperties": {
                         "DATE_NOW": "CurrentDate()"
-                    }
+                    },
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 }
             }
         }

@@ -10,11 +10,19 @@
             "Methods": {
                 "GET": {
                     "PageSize": 100,
-                    "MaxCount": 500
+                    "MaxCount": 500,
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 },
-                "POST": {},
-                "PUT": {},
-                "DELETE": {}
+                "POST": {
+                    "AllowGroups": ["Authors"]
+                },
+                "PUT": {
+                    "AllowGroups": ["Authors"]
+                },
+                "DELETE": {
+                    "AllowGroups": ["Authors"]
+                }
             }
         },
         "html": {
@@ -29,7 +37,9 @@
                         "Many": "property_html_many.tpl",
                         "None": "property_html_none.tpl",
                         "Error": "property_html_error.tpl"
-                    }
+                    },
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
                 }
             }
         }
