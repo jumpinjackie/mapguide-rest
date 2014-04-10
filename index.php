@@ -17,6 +17,16 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+// See this link for why we are doing this:
+// http://q.nett.gr/wordpress-3-x-on-iis-7-x-with-unicode-permalinks-problem-solved/comment-page-1/
+//
+// Or if that link 404s or you're lazy:
+//
+// This is to ensure URLs with unicode characters do not get trashed by the IIS URL rewriting module
+// which in turn will crash php-cgi.exe when this processed URL goes through the Slim router
+//
+$_SERVER['REQUEST_URI'] = $_SERVER['UNENCODED_URL'];
+
 require 'vendor/autoload.php';
 include dirname(__FILE__)."/../mapadmin/constants.php";
 
