@@ -35,7 +35,7 @@ $app->get("/apidoc/", function() use ($app) {
     $doc = json_decode(file_get_contents($path));
     $doc->info = new stdClass();
     $doc->info->title = "mapguide-rest";
-    $doc->info->description = "mapguide-rest is a RESTful web extension for MapGuide Open Source and Autodesk Infrastructure Map Server.<br/><br/><strong>NOTE:</strong> Using non-ascii characters in any path parameter in any of the examples below may crash PHP on IIS. See: <a target='_blank' href='https://github.com/jumpinjackie/mapguide-rest/issues/32'>https://github.com/jumpinjackie/mapguide-rest/issues/32</a>";
+    $doc->info->description = "mapguide-rest is a RESTful web extension for MapGuide Open Source and Autodesk Infrastructure Map Server.<br/><br/><strong>NOTE:</strong> Basic HTTP authentication credentials will generally be cached by the web browser for a short period should you choose to use this method instead of passing in session ids";
     $doc->info->license = "LGPL 2.1";
     $doc->info->licenseUrl = "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html";
     
