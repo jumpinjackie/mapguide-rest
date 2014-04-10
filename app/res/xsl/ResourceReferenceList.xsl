@@ -9,9 +9,10 @@
     <xsl:template match="/">
         <html>
             <head>
+                <title>Resource References: <xsl:value-of select="$RESOURCENAME"/></title>
             </head>
             <body>
-                <h3>Resource Data: <xsl:value-of select="$RESOURCENAME"/></h3>
+                <h3>Resource References: <xsl:value-of select="$RESOURCENAME"/></h3>
                 <ul class="list-group">
                 <xsl:apply-templates select="//ResourceReferenceList" />
                 </ul>

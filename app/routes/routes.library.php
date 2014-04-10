@@ -22,6 +22,7 @@ require_once dirname(__FILE__)."/../controller/featureservicecontroller.php";
 require_once dirname(__FILE__)."/../controller/tileservicecontroller.php";
 require_once dirname(__FILE__)."/../controller/mappingservicecontroller.php";
 require_once dirname(__FILE__)."/../controller/renderingservicecontroller.php";
+require_once dirname(__FILE__)."/../controller/viewercontroller.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
 /**
@@ -1179,6 +1180,65 @@ $app->get("/library/:resourcePath+.MapDefinition/image.:format", function($resou
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgRenderingServiceController($app);
     $ctrl->RenderMapDefinition($resId, $format);
+});
+
+// ----------------------------- Viewer Launchers ----------------------------- //
+
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.WebLayout/viewer",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="LaunchAJAXViewer",
+ *        summary="Launch the AJAX Viewer for the specified Web Layout",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the Web Layout")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/library/:resourcePath+.WebLayout/viewer", function($resourcePath) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".WebLayout";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgViewerController($app);
+    $ctrl->LaunchAjaxViewer($resId);
+});
+
+// ----------------------------- Viewer Launchers ----------------------------- //
+
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.ApplicationDefinition/{template}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="LaunchFusionViewer",
+ *        summary="Launch the Fusion Viewer for the specified ApplicationDefinition using the given template",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the Application Definition"),
+ *          @SWG\parameter(name="template", paramType="path", required=true, type="string", description="The fusion template to invoke")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/library/:resourcePath+.ApplicationDefinition/:template", function($resourcePath, $template) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".ApplicationDefinition";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgViewerController($app);
+    $ctrl->LaunchFusionViewer($resId, $template);
 });
 
 ?>

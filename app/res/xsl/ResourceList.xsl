@@ -12,12 +12,16 @@
     <xsl:template match="/">
         <html>
             <head>
+                <xsl:if test="string-length($FOLDERPATH) > 0">
+                <title>Site Repository: <xsl:value-of select="$FOLDERPATH"/></title>
+                </xsl:if>
                 <link rel="stylesheet" href="{$ASSETPATH}/common/css/bootstrap.min.css" />
                 <link rel="stylesheet" href="{$ASSETPATH}/fa/css/font-awesome.min.css" />
                 <script type="text/javascript" src="{$ASSETPATH}/common/js/jquery-1.10.2.min.js"></script>
                 <style type="text/css">
-                    #resourcePane { width: 60%; height: 80%; border: none; position: fixed; margin-top: 70px; }
+                    #resourcePane { width: 65%; height: 80%; border: none; position: fixed; margin-top: 70px; }
                     .fullwidthandheight { width: 100%; height: 100%; }
+                    .borderless { border: none; }
                     ul.itemlist { margin-top: 70px; }
                 </style>
                 <script type="text/javascript">
@@ -30,6 +34,12 @@
                         $("a.pageload").click(function(e) {
                             e.preventDefault();
                             $("#resourcePane").empty().load($(this).attr("href"));
+                        });
+                        $("a.iframeload").click(function(e) {
+                            e.preventDefault();
+                            var url = $(this).attr("href");
+                            $("#resourcePane").empty().append('<iframe class="fullwidthandheight borderless"></iframe>');
+                            $("iframe.fullwidthandheight").attr("src", url);
                         });
                     });
                 </script>
@@ -44,7 +54,7 @@
                 </div>
                 <div class="container">
                     <div class="row">
-                        <div class="col-xs-4">
+                        <div class="col-xs-3">
                             <ul class="itemlist list-group">
                             <xsl:if test="string-length($PARENTPATHROOT) > 0">
                                 <li class="list-group-item"><a href="{$PARENTPATHROOT}/list.html"><i class="fa fa-arrow-up" />&#160;Parent</a></li>
@@ -57,7 +67,7 @@
                             </xsl:apply-templates>
                             </ul>
                         </div>
-                        <div class="col-xs-8">
+                        <div class="col-xs-9">
                             <div id="resourcePane" name="resourcePane">
                             </div>
                         </div>
@@ -103,11 +113,45 @@
             <a class="pageload" href="{$root}{$resName}/datalist.html">
                 <i class="fa fa-files-o" />&#160;Data
             </a>
-            &#160;
             <xsl:if test="substring($resName, (string-length($resName) - string-length('FeatureSource')) + 1) = 'FeatureSource'">
+                <hr/>
                 <!-- Options for feature source -->
                 <a class="pageload" href="{$root}{$resName}/schemas.html">
                     <i class="fa fa-sitemap" />&#160;Schema
+                </a>
+            </xsl:if>
+            <xsl:if test="substring($resName, (string-length($resName) - string-length('WebLayout')) + 1) = 'WebLayout'">
+                <hr/>
+                <!-- Options for Web Layout -->
+                <a class="iframeload" href="{$root}{$resName}/viewer">
+                    <i class="fa fa-globe" />&#160;AJAX Viewer
+                </a>
+            </xsl:if>
+            <xsl:if test="substring($resName, (string-length($resName) - string-length('ApplicationDefinition')) + 1) = 'ApplicationDefinition'">
+                <hr/>
+                <!-- Options for Application Definition -->
+                <a class="iframeload" href="{$root}{$resName}/slate">
+                    <i class="fa fa-globe" />&#160;Fusion - Slate
+                </a>
+                &#160;
+                <!-- Options for Application Definition -->
+                <a class="iframeload" href="{$root}{$resName}/aqua">
+                    <i class="fa fa-globe" />&#160;Fusion - Aqua
+                </a>
+                &#160;
+                <!-- Options for Application Definition -->
+                <a class="iframeload" href="{$root}{$resName}/maroon">
+                    <i class="fa fa-globe" />&#160;Fusion - Maroon
+                </a>
+                &#160;
+                <!-- Options for Application Definition -->
+                <a class="iframeload" href="{$root}{$resName}/limegold">
+                    <i class="fa fa-globe" />&#160;Fusion - LimeGold
+                </a>
+                &#160;
+                <!-- Options for Application Definition -->
+                <a class="iframeload" href="{$root}{$resName}/turquoiseyellow">
+                    <i class="fa fa-globe" />&#160;Fusion - TurquoiseYellow
                 </a>
             </xsl:if>
         </li>

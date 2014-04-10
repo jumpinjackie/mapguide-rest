@@ -104,8 +104,9 @@ class MgResourceServiceController extends MgBaseController {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
         $resIdStr = $resId->ToString();
+        $resName = $resId->GetName().".".$resId->GetResourceType();
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr) {
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr, $resName) {
             $param->AddParameter("OPERATION", "ENUMERATERESOURCEREFERENCES");
             $param->AddParameter("VERSION", "1.0.0");
             if ($fmt === "json") {
@@ -115,6 +116,7 @@ class MgResourceServiceController extends MgBaseController {
             } else if ($fmt === "html") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
                 $param->AddParameter("XSLSTYLESHEET", "ResourceReferenceList.xsl");
+                $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);

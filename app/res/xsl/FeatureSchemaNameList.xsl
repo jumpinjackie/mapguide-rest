@@ -10,6 +10,7 @@
     <xsl:template match="/">
         <html>
             <head>
+                <title>Schema Names: <xsl:value-of select="$RESOURCENAME"/></title>
             </head>
             <body>
                 <h3>Schema Names: <xsl:value-of select="$RESOURCENAME"/></h3>
