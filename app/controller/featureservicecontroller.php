@@ -171,8 +171,11 @@ class MgFeatureServiceController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
         }
         $resIdStr = $resId->ToString();
+        $resName = $resId->GetName().".".$resId->GetResourceType();
+        $pathInfo = $this->app->request->getPathInfo();
+        $selfUrl = $this->app->config("SelfUrl");
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr) {
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr, $resName, $selfUrl, $pathInfo) {
             $param->AddParameter("OPERATION", "GETSCHEMAS");
             $param->AddParameter("VERSION", "1.0.0");
             if ($fmt === "json") {
@@ -180,8 +183,13 @@ class MgFeatureServiceController extends MgBaseController {
             } else if ($fmt === "xml") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             } else if ($fmt === "html") {
+                $thisUrl = $selfUrl.$pathInfo;
+                //Chop off the schemas.html
+                $rootPath = substr($thisUrl, 0, strlen($thisUrl) - strlen("schemas.html"));
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
                 $param->AddParameter("XSLSTYLESHEET", "FeatureSchemaNameList.xsl");
+                $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
+                $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);

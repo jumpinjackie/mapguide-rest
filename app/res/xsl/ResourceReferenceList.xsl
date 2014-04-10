@@ -5,15 +5,14 @@
                 xmlns:str="http://exslt.org/strings"
                 extension-element-prefixes="str">
     <xsl:output method='html'/>
-
+    <xsl:param name="RESOURCENAME" />
     <xsl:template match="/">
         <html>
             <head>
             </head>
             <body>
-                <h1>Resource References</h1>
-                <a href="javascript:history.go(-1)">Back</a>
-                <ul>
+                <h3>Resource Data: <xsl:value-of select="$RESOURCENAME"/></h3>
+                <ul class="list-group">
                 <xsl:apply-templates select="//ResourceReferenceList" />
                 </ul>
             </body>
@@ -21,7 +20,7 @@
     </xsl:template>
 
     <xsl:template match="ResourceReferenceList">
-        <li>
+        <li class="list-group-item">
             <xsl:variable name="resId" select="ResourceId" />
             <xsl:value-of select="$resId" />
         </li>

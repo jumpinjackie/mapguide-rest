@@ -80,8 +80,9 @@ class MgResourceServiceController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
         }
         $resIdStr = $resId->ToString();
+        $resName = $resId->GetName().".".$resId->GetResourceType();
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr) {
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr, $resName) {
             $param->AddParameter("OPERATION", "ENUMERATERESOURCEDATA");
             $param->AddParameter("VERSION", "1.0.0");
             if ($fmt === "json") {
@@ -91,6 +92,7 @@ class MgResourceServiceController extends MgBaseController {
             } else if ($fmt === "html") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
                 $param->AddParameter("XSLSTYLESHEET", "ResourceDataList.xsl");
+                $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
@@ -237,6 +239,7 @@ class MgResourceServiceController extends MgBaseController {
                     $parentPath = implode("/", $tokens);
                     $param->AddParameter("XSLPARAM.PARENTPATHROOT", $selfUrl.$parentPath);
                 }
+                $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
                 $param->AddParameter("XSLPARAM.FOLDERPATH", $folderPath);
                 $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
 

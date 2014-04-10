@@ -5,43 +5,46 @@
                 xmlns:str="http://exslt.org/strings"
                 extension-element-prefixes="str">
     <xsl:output method='html'/>
-
+    <xsl:param name="ROOTPATH" />
+    <xsl:param name="RESOURCENAME" />
     <xsl:template match="/">
         <html>
             <head>
             </head>
             <body>
-                <h1>Schema Names</h1>
-                <a href="javascript:history.go(-1)">Back</a>
-                <ul>
-                <xsl:apply-templates select="//StringCollection" />
+                <h3>Schema Names: <xsl:value-of select="$RESOURCENAME"/></h3>
+                <ul class="list-group">
+                <xsl:apply-templates select="//StringCollection">
+                    <xsl:with-param name="root" select="$ROOTPATH" />
+                </xsl:apply-templates>
                 </ul>
             </body>
         </html>
     </xsl:template>
 
     <xsl:template match="StringCollection">
-        <li>
+        <xsl:param name="root" />
+        <li class="list-group-item">
             <xsl:variable name="schemaName" select="Item" />
             <xsl:value-of select="$schemaName" />
             &#160;
-            <a href="schema.xml/{$schemaName}">
-                [XML]
+            <a href="{$root}schema.xml/{$schemaName}">
+                <i class='fa fa-file-o' />&#160;XML
             </a>
             &#160;
-            <a href="schema.json/{$schemaName}">
-                [json]
+            <a href="{$root}schema.json/{$schemaName}">
+                <i class='fa fa-file-o' />&#160;json
             </a>
             &#160;
-            <a href="schema.html/{$schemaName}">
-                [HTML]
+            <a href="{$root}schema.html/{$schemaName}">
+                <i class='fa fa-file-o' />&#160;HTML
             </a>
             &#160;
-            <a href="classes.xml/{$schemaName}">Classes (XML)</a>
+            <a href="{$root}classes.xml/{$schemaName}"><i class='fa fa-file-o' />&#160;Classes (XML)</a>
             &#160;
-            <a href="classes.json/{$schemaName}">Classes (JSON)</a>
+            <a href="{$root}classes.json/{$schemaName}"><i class='fa fa-file-o' />&#160;Classes (JSON)</a>
             &#160;
-            <a href="classes.html/{$schemaName}">Classes (HTML)</a>
+            <a href="{$root}classes.html/{$schemaName}"><i class='fa fa-file-o' />&#160;Classes (HTML)</a>
         </li>
     </xsl:template>
 </xsl:stylesheet>
