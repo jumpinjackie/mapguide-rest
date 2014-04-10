@@ -209,10 +209,11 @@ class MgResourceServiceController extends MgBaseController {
     public function EnumerateResources($resId, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
-
         $resIdStr = $resId->ToString();
+        $pathInfo = $this->app->request->getPathInfo();
+        $selfUrl = $this->app->config("SelfUrl");
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr) {
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr, $selfUrl, $pathInfo) {
             $param->AddParameter("OPERATION", "ENUMERATERESOURCES");
             $param->AddParameter("VERSION", "1.0.0");
             $param->AddParameter("TYPE", $that->GetRequestParameter("type"));
@@ -224,6 +225,21 @@ class MgResourceServiceController extends MgBaseController {
             } else if ($fmt === "xml") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             } else if ($fmt === "html") {
+                $thisUrl = $selfUrl.$pathInfo;
+                //Chop off the list.html
+                $rootPath = substr($thisUrl, 0, strlen($thisUrl) - strlen("list.html"));
+                $folderPath = substr($pathInfo, 0, strlen($pathInfo) - strlen("list.html"));
+                $tokens = explode("/", $pathInfo);
+                if (count($tokens) > 3) {
+                    //Pop off list.html and current folder name
+                    array_pop($tokens);
+                    array_pop($tokens);
+                    $parentPath = implode("/", $tokens);
+                    $param->AddParameter("XSLPARAM.PARENTPATHROOT", $selfUrl.$parentPath);
+                }
+                $param->AddParameter("XSLPARAM.FOLDERPATH", $folderPath);
+                $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
+
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
                 $param->AddParameter("XSLSTYLESHEET", "ResourceList.xsl");
             }
