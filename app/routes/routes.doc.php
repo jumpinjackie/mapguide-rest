@@ -34,6 +34,7 @@ $app->get("/apidoc/", function() use ($app) {
     //information
     $doc = json_decode(file_get_contents($path));
     $doc->info = new stdClass();
+    //TODO: Localize
     $doc->info->title = "mapguide-rest";
     $doc->info->description = "mapguide-rest is a RESTful web extension for MapGuide Open Source and Autodesk Infrastructure Map Server.<br/><br/><strong>NOTE:</strong> Basic HTTP authentication credentials will generally be cached by the web browser for a short period should you choose to use this method instead of passing in session ids";
     $doc->info->license = "LGPL 2.1";
@@ -46,6 +47,21 @@ $app->get("/apidoc/", function() use ($app) {
 
     $app->response->header("Content-Type", "application/json");
     $app->response->setBody(json_encode($doc));
+});
+$app->get("/doc/index.html", function() use ($app) {
+    $docUrl = $app->config("SelfUrl")."/apidoc";
+    $assetUrlRoot = $app->config("SelfUrl")."/doc";
+    $docTpl = $app->config("AppRootDir")."/assets/doc/viewer.tpl";
+
+    $smarty = new Smarty();
+    $smarty->setCompileDir($app->config("Cache.RootDir")."/templates_c");
+    $smarty->assign("title", "mapguide-rest API Reference"); //TODO: Localize
+    $smarty->assign("docUrl", $docUrl);
+    $smarty->assign("docAssetRoot", $assetUrlRoot);
+
+    $output = $smarty->fetch($docTpl);
+    $app->response->header("Content-Type", "text/html");
+    $app->response->setBody($output);
 });
 $app->get("/apidoc/:file", function($file) use ($app) {
     if (MgUtils::StringEndsWith($file, ".json"))
