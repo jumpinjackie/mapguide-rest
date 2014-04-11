@@ -20,6 +20,41 @@
 require_once "restadapter.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
+class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
+    protected function GetAdditionalParameters($bSingle, $method) {
+        $params = parent::GetAdditionalParameters($bSingle, $method);
+        if ($method == "POST") {
+            $pPostBody = new stdClass();
+            $pPostBody->paramType = "body";
+            $pPostBody->name = "body";
+            $pPostBody->type = "string";
+            $pPostBody->required = true;
+            $pPostBody->description = "The XML envelope describing the features to be inserted";
+
+            array_push($params, $pPostBody);
+        } else if ($method == "PUT") {
+            $pPutBody = new stdClass();
+            $pPutBody->paramType = "body";
+            $pPutBody->name = "body";
+            $pPutBody->type = "string";
+            $pPutBody->required = true;
+            $pPutBody->description = "The XML envelope describing the features to be updated";
+
+            array_push($params, $pPutBody);
+        } else if ($method == "DELETE") {
+            $pFilter = new stdClass();
+            $pFilter->paramType = "form";
+            $pFilter->name = "filter";
+            $pFilter->type = "string";
+            $pFilter->required = false;
+            $pFilter->description = "The FDO Filter string that will determine what features are deleted";
+
+            array_push($params, $pFilter);
+        }
+        return $params;
+    }
+}
+
 class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     private $agfRw;
     private $wktRw;
@@ -318,6 +353,13 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
                 $trans->Rollback();
             $this->OnException($ex);
         }
+    }
+
+    /**
+     * Returns the documentor for this adapter
+     */
+    public static function GetDocumentor() {
+        return new MgFeatureXmlRestAdapterDocumentor();
     }
 }
 

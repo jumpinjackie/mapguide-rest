@@ -19,6 +19,10 @@
 
 require_once "restadapter.php";
 
+class MgCsvRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
+    
+}
+
 class MgCsvRestAdapter extends MgFeatureRestAdapter
 {
     private $agfRw;
@@ -129,6 +133,13 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
      */
     protected function GetResponseEnd($reader) {
 
+    }
+
+    /**
+     * Returns the documentor for this adapter
+     */
+    public static function GetDocumentor() {
+        return new MgCsvRestAdapterDocumentor();
     }
 }
 

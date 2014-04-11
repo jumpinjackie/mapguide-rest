@@ -19,6 +19,47 @@
 
 require_once "restadapter.php";
 
+class MgMapImageRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
+    protected function GetAdditionalParameters($bSingle, $method) {
+        $params = parent::GetAdditionalParameters($bSingle, $method);
+        if ($method == "GET") {
+            $pWidth = new stdClass();
+            $pWidth->paramType = "query";
+            $pWidth->name = "width";
+            $pWidth->type = "integer";
+            $pWidth->required = false;
+            $pWidth->description = "The width of the image";
+
+            $pHeight = new stdClass();
+            $pHeight->paramType = "query";
+            $pHeight->name = "height";
+            $pHeight->type = "integer";
+            $pHeight->required = false;
+            $pHeight->description = "The height of the image";
+
+            $pDpi = new stdClass();
+            $pDpi->paramType = "query";
+            $pDpi->name = "dpi";
+            $pDpi->type = "integer";
+            $pDpi->required = false;
+            $pDpi->description = "The dpi of the image";
+
+            $pScale = new stdClass();
+            $pScale->paramType = "query";
+            $pScale->name = "scale";
+            $pScale->type = "integer";
+            $pScale->required = false;
+            $pScale->description = "The scale of the image";
+
+            array_push($params, $pWidth);
+            array_push($params, $pHeight);
+            array_push($params, $pDpi);
+            array_push($params, $pScale);
+        }
+        return $params;
+    }
+}
+
 class MgMapImageRestAdapter extends MgRestAdapter {
     private $mapDefId;
     private $map;
@@ -215,6 +256,13 @@ class MgMapImageRestAdapter extends MgRestAdapter {
         } catch (MgException $ex) {
             $this->OnException($ex);
         }
+    }
+
+    /**
+     * Returns the documentor for this adapter
+     */
+    public static function GetDocumentor() {
+        return new MgMapImageRestAdapterDocumentor();
     }
 }
 

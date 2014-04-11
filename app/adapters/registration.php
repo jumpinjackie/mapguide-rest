@@ -17,6 +17,9 @@ $app->container->FeatureSetXml = function() use ($app) {
         $app->container->ConfigPath,
         $app->container->IdentityProperty);
 };
+$app->container->FeatureSetXmlDoc = function() use ($app) {
+    return MgFeatureXmlRestAdapter::GetDocumentor();
+};
 $app->container->FeatureSetGeoJson = function() use ($app) {
     return new MgGeoJsonRestAdapter(
         $app, 
@@ -26,6 +29,9 @@ $app->container->FeatureSetGeoJson = function() use ($app) {
         $app->container->AdapterConfig,
         $app->container->ConfigPath,
         $app->container->IdentityProperty);
+};
+$app->container->FeatureSetGeoJsonDoc = function() use ($app) {
+    return MgGeoJsonRestAdapter::GetDocumentor();
 };
 $app->container->MapImage = function() use ($app) {
     return new MgMapImageRestAdapter(
@@ -37,6 +43,9 @@ $app->container->MapImage = function() use ($app) {
         $app->container->ConfigPath,
         $app->container->IdentityProperty);
 };
+$app->container->MapImageDoc = function() use ($app) {
+    return MgMapImageRestAdapter::GetDocumentor();
+};
 $app->container->Template = function() use ($app) {
     return new MgTemplateRestAdapter(
         $app, 
@@ -47,6 +56,9 @@ $app->container->Template = function() use ($app) {
         $app->container->ConfigPath,
         $app->container->IdentityProperty);
 };
+$app->container->TemplateDoc = function() use ($app) {
+    return MgTemplateRestAdapter::GetDocumentor();
+};
 $app->container->FeatureSetCsv = function() use ($app) {
     return new MgCsvRestAdapter(
         $app, 
@@ -56,6 +68,9 @@ $app->container->FeatureSetCsv = function() use ($app) {
         $app->container->AdapterConfig,
         $app->container->ConfigPath,
         $app->container->IdentityProperty);
+};
+$app->container->FeatureSetCsvDoc = function() use ($app) {
+    return MgCsvRestAdapter::GetDocumentor();
 };
 
 ?>

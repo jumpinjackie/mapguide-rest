@@ -2,6 +2,10 @@
 
 require_once "restadapter.php";
 
+class MgTemplateRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
+    
+}
+
 /**
  * A set of lazy-loaded geometry and datetime formatters
  */
@@ -502,6 +506,13 @@ class MgTemplateRestAdapter extends MgRestAdapter
         $related->Cleanup();
         if ($reader != null)
             $reader->Close();
+    }
+
+    /**
+     * Returns the documentor for this adapter
+     */
+    public static function GetDocumentor() {
+        return new MgTemplateRestAdapterDocumentor();
     }
 }
 

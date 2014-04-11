@@ -36,6 +36,99 @@ class MgDataController extends MgBaseController {
         }
     }
 
+    public function GetApiDocViewer($uriParts) {
+        $uriPath = implode("/", $uriParts);
+        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
+        if ($path === false) {
+            $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
+        } else {
+            $docUrl = $this->app->config("SelfUrl")."/data/$uriPath/apidoc";
+            $assetUrlRoot = $this->app->config("SelfUrl")."/doc";
+            $docTpl = $this->app->config("AppRootDir")."/assets/doc/viewer.tpl";
+
+            $smarty = new Smarty();
+            $smarty->setCompileDir($this->app->config("Cache.RootDir")."/templates_c");
+            $smarty->assign("title", $uriParts[count($uriParts)-1]." API Reference"); //TODO: Localize
+            $smarty->assign("docUrl", $docUrl);
+            $smarty->assign("docAssetRoot", $assetUrlRoot);
+
+            $output = $smarty->fetch($docTpl);
+            $this->app->response->header("Content-Type", "text/html");
+            $this->app->response->setBody($output);
+        }
+    }
+
+    public function GetApiDoc($uriParts) {
+        $uriPath = implode("/", $uriParts);
+        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
+        if ($path === false) {
+            $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
+        } else {
+            $config = json_decode(file_get_contents($path), true);
+            
+            $urlRoot = "/data/$uriPath";
+
+            $apidoc = new stdClass();
+            $apidoc->basePath = $this->app->config("SelfUrl");
+            $apidoc->swaggerVersion = "1.2";
+            $apidoc->apiVersion = "0.6";
+            $apidoc->resourcePath = $urlRoot;
+            $apidoc->apis = array();
+
+            if (array_key_exists("Representations", $config)) {
+                $reps = $config["Representations"];
+                foreach ($reps as $extension => $adapterConfig) {
+                    if (array_key_exists("Methods", $adapterConfig) && array_key_exists("Adapter", $adapterConfig)) {
+
+                        $adapterName = $adapterConfig["Adapter"];
+                        //Resolve documentor
+                        $documentor = $this->app->container[$adapterName."Doc"];
+
+                        $multiConf = new stdClass();
+                        $multiConf->url = "$urlRoot/.$extension";
+                        $multiConf->single = false;
+                        $multiConf->extraParams = array();
+
+                        $singleConf = new stdClass();
+                        $singleConf->url = "$urlRoot/{id}.$extension";
+                        $singleConf->single = true;
+                        $singleConf->extraParams = array();
+
+                        $pId = new stdClass();
+                        $pId->paramType = "path";
+                        $pId->name = "id";
+                        $pId->type = "string";
+                        $pId->required = true;
+                        $pId->description = "The ID of the feature to return";
+
+                        array_push($singleConf->extraParams, $pId);
+
+                        $confs = array($multiConf, $singleConf);
+                        foreach ($confs as $conf) {
+                            $repDoc = new stdClass();
+                            $repDoc->path = $conf->url;
+                            $ops = array();
+
+                            $methodsConf = $adapterConfig["Methods"];
+                            foreach ($methodsConf as $method => $methodOptions) {
+                                $op = $documentor->DocumentOperation($method, $extension, $conf->single);
+                                foreach ($conf->extraParams as $extraParam) {
+                                    array_push($op->parameters, $extraParam);
+                                }
+                                array_push($ops, $op);
+                            }
+                            $repDoc->operations = $ops;
+                            array_push($apidoc->apis, $repDoc);
+                        }
+                    }
+                }
+            }
+
+            $this->app->response->header("Content-Type", "application/json");
+            $this->app->response->setBody(json_encode($apidoc));
+        }
+    }
+
     private function ValidateConfiguration($config, $extension, $method) {
         if (!array_key_exists("Source", $config))
             throw new Exception("Missing root property 'Source' in configuration"); //TODO: Localize

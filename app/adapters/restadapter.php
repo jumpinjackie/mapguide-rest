@@ -314,4 +314,82 @@ abstract class MgFeatureRestAdapter extends MgRestAdapter {
     }
 }
 
+interface IAdapterDocumentor {
+    public function DocumentOperation($method, $extension, $bSingle);
+}
+
+abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
+
+    private function DescribeMethodSummary($method, $extension) {
+        return "Returns data as $extension";
+    }
+
+    private function GetMethodNickname($method, $extension) {
+        $str = ucwords(strtolower($method)." Features $extension");
+        return implode("", explode(" ", $str));
+    }
+
+    protected function GetAdditionalParameters($bSingle, $method) {
+        return array();
+    }
+
+    public function DocumentOperation($method, $extension, $bSingle) {
+        $op = new stdClass();
+        $op->method = $method;
+        $op->summary = $this->DescribeMethodSummary($method, $extension);
+        $op->nickname = $this->GetMethodNickname($method, $extension);
+        $op->parameters = array();
+        if ($bSingle) {
+
+        } else {
+            if ($method == "GET") {
+                //filter
+                $pFilter = new stdClass();
+                $pFilter->paramType = "query";
+                $pFilter->name = "filter";
+                $pFilter->type = "string";
+                $pFilter->required = false;
+                $pFilter->description = "The url-encoded FDO filter string";
+                
+                //bbox
+                $pbbox = new stdClass();
+                $pbbox->paramType = "query";
+                $pbbox->name = "bbox";
+                $pbbox->type = "string";
+                $pbbox->required = false;
+                $pbbox->description = "A quartet of x1,y1,x2,y2";
+
+                array_push($op->parameters, $pFilter);
+                array_push($op->parameters, $pbbox);
+            }
+        }
+        $extraParams = $this->GetAdditionalParameters($bSingle, $method);
+        foreach ($extraParams as $p) {
+            array_push($op->parameters, $p);
+        }
+        
+        return $op;
+    }
+}
+
+abstract class MgFeatureRestAdapterDocumentor extends MgRestAdapterDocumentor {
+    protected function GetAdditionalParameters($bSingle, $method) {
+        $params = parent::GetAdditionalParameters($bSingle, $method);
+        if (!$bSingle) {
+            if ($method == "GET") {
+                //page
+                $pPage = new stdClass();
+                $pPage->paramType = "query";
+                $pPage->name = "page";
+                $pPage->type = "integer";
+                $pPage->required = false;
+                $pPage->description = "The page number to switch to. Only applies if pagination is configured for the data source";
+
+                array_push($params, $pPage);
+            }
+        }
+        return $params;
+    }
+}
+
 ?>

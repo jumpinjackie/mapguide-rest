@@ -24,6 +24,14 @@ $app->get("/data/:args+/config", function($args) use ($app) {
     $ctrl = new MgDataController($app);
     $ctrl->GetDataConfiguration($args);
 });
+$app->get("/data/:args+/doc/index.html", function($args) use ($app) {
+    $ctrl = new MgDataController($app);
+    $ctrl->GetApiDocViewer($args);
+});
+$app->get("/data/:args+/apidoc", function($args) use ($app) {
+    $ctrl = new MgDataController($app);
+    $ctrl->GetApiDoc($args);
+});
 $app->get("/data/:args+/:filename", function($args, $filename) use ($app) {
     $tokens = explode(".", $filename);
     $ctrl = new MgDataController($app);

@@ -21,6 +21,10 @@ require_once "restadapter.php";
 require_once dirname(__FILE__)."/../util/geojsonwriter.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
+class MgGeoJsonRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
+    
+}
+
 class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
     private $agfRw;
 
@@ -135,6 +139,13 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
      */
     protected function GetResponseEnd($reader) {
         $this->app->response->write("]}");
+    }
+
+    /**
+     * Returns the documentor for this adapter
+     */
+    public static function GetDocumentor() {
+        return new MgGeoJsonRestAdapterDocumentor();
     }
 }
 
