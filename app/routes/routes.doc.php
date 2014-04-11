@@ -24,6 +24,7 @@
 // TODO: Perhaps we should try to dynamically build this at runtime so that the base path can be inferred instead of specified up-front or we find a way to rewrite this at runtime
 // TODO: If dynamically building, it should save the build output to cache where permissions are assumed to be properly set up
 
+require_once dirname(__FILE__)."/../version.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
 $app->get("/apidoc/", function() use ($app) {
@@ -33,6 +34,8 @@ $app->get("/apidoc/", function() use ($app) {
     //So we'll intercept the api-docs.json request via this route to inject that
     //information
     $doc = json_decode(file_get_contents($path));
+    $doc->apiVersion = MG_REST_API_VERSION;
+    $doc->swaggerVersion = SWAGGER_API_VERSION;
     $doc->info = new stdClass();
     //TODO: Localize
     $doc->info->title = "mapguide-rest";
@@ -73,8 +76,8 @@ $app->get("/apidoc/:file", function($file) use ($app) {
     //There should be something in $app that lets us do this.
     $doc = json_decode(file_get_contents($path));
     $doc->basePath = $app->config("SelfUrl");
-    $doc->swaggerVersion = "1.2";
-    $doc->apiVersion = "0.6";
+    $doc->swaggerVersion = SWAGGER_API_VERSION;
+    $doc->apiVersion = MG_REST_API_VERSION;
 
     $app->response->header("Content-Type", "application/json");
     $app->response->setBody(json_encode($doc));

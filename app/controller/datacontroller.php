@@ -17,6 +17,7 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+require_once dirname(__FILE__)."/../version.php";
 require_once "controller.php";
 
 class MgDataController extends MgBaseController {
@@ -70,8 +71,8 @@ class MgDataController extends MgBaseController {
 
             $apidoc = new stdClass();
             $apidoc->basePath = $this->app->config("SelfUrl");
-            $apidoc->swaggerVersion = "1.2";
-            $apidoc->apiVersion = "0.6";
+            $apidoc->swaggerVersion = SWAGGER_API_VERSION;
+            $apidoc->apiVersion = MG_REST_API_VERSION;
             $apidoc->resourcePath = $urlRoot;
             $apidoc->apis = array();
 
