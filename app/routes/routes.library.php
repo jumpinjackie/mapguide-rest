@@ -1182,7 +1182,7 @@ $app->get("/library/:resourcePath+.MapDefinition/image.:format", function($resou
     $ctrl->RenderMapDefinition($resId, $format);
 });
 
-// ----------------------------- Viewer Launchers ----------------------------- //
+// ----------------------------- Viewer/Preview Launchers ----------------------------- //
 
 /**
  * @SWG\Api(
@@ -1211,8 +1211,6 @@ $app->get("/library/:resourcePath+.WebLayout/viewer", function($resourcePath) us
     $ctrl->LaunchAjaxViewer($resId);
 });
 
-// ----------------------------- Viewer Launchers ----------------------------- //
-
 /**
  * @SWG\Api(
  *     path="/library/{resourcePath}.ApplicationDefinition/{template}",
@@ -1239,6 +1237,56 @@ $app->get("/library/:resourcePath+.ApplicationDefinition/viewer/:template", func
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchFusionViewer($resId, $template);
+});
+
+$app->get("/library/:resourcePath+.FeatureSource/preview", function($resourcePath) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgViewerController($app);
+    $ctrl->LaunchResourcePreview($resId);
+});
+
+$app->get("/library/:resourcePath+.LayerDefinition/preview", function($resourcePath) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgViewerController($app);
+    $ctrl->LaunchResourcePreview($resId);
+});
+
+$app->get("/library/:resourcePath+.MapDefinition/preview", function($resourcePath) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgViewerController($app);
+    $ctrl->LaunchResourcePreview($resId);
+});
+
+$app->get("/library/:resourcePath+.SymbolDefinition/preview", function($resourcePath) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".SymbolDefinition";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgViewerController($app);
+    $ctrl->LaunchResourcePreview($resId);
+});
+
+$app->get("/library/:resourcePath+.WatermarkDefinition/preview", function($resourcePath) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".WatermarkDefinition";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgViewerController($app);
+    $ctrl->LaunchResourcePreview($resId);
 });
 
 ?>

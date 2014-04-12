@@ -119,6 +119,33 @@
                 <a class="pageload" href="{$root}{$resName}/schemas.html">
                     <i class="fa fa-sitemap" />&#160;Schema
                 </a>
+                <a class="iframeload" href="{$root}{$resName}/preview">
+                    <i class="fa fa-search" />&#160;Preview
+                </a>
+            </xsl:if>
+            <xsl:if test="substring($resName, (string-length($resName) - string-length('LayerDefinition')) + 1) = 'LayerDefinition'">
+                <hr/>
+                <a class="iframeload" href="{$root}{$resName}/preview">
+                    <i class="fa fa-search" />&#160;Preview
+                </a>
+            </xsl:if>
+            <xsl:if test="substring($resName, (string-length($resName) - string-length('MapDefinition')) + 1) = 'MapDefinition'">
+                <hr/>
+                <a class="iframeload" href="{$root}{$resName}/preview">
+                    <i class="fa fa-search" />&#160;Preview
+                </a>
+            </xsl:if>
+            <xsl:if test="substring($resName, (string-length($resName) - string-length('SymbolDefinition')) + 1) = 'SymbolDefinition'">
+                <hr/>
+                <a class="iframeload" href="{$root}{$resName}/preview">
+                    <i class="fa fa-search" />&#160;Preview
+                </a>
+            </xsl:if>
+            <xsl:if test="substring($resName, (string-length($resName) - string-length('WatermarkDefinition')) + 1) = 'WatermarkDefinition'">
+                <hr/>
+                <a class="iframeload" href="{$root}{$resName}/preview">
+                    <i class="fa fa-search" />&#160;Preview
+                </a>
             </xsl:if>
             <xsl:if test="substring($resName, (string-length($resName) - string-length('WebLayout')) + 1) = 'WebLayout'">
                 <hr/>

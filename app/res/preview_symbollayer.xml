@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<LayerDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="2.4.0" xsi:noNamespaceSchemaLocation="LayerDefinition-2.4.0.xsd">
+  <VectorLayerDefinition>
+    <ResourceId />
+    <Watermarks />
+    <FeatureName />
+    <FeatureNameType>FeatureClass</FeatureNameType>
+    <Geometry />
+    <ToolTip />
+    <VectorScaleRange>
+      <CompositeTypeStyle>
+        <CompositeRule>
+          <LegendLabel />
+          <CompositeSymbolization>
+            <SymbolInstance>
+              <ResourceId>%s</ResourceId>
+              <ParameterOverrides />
+            </SymbolInstance>
+          </CompositeSymbolization>
+        </CompositeRule>
+      </CompositeTypeStyle>
+    </VectorScaleRange>
+  </VectorLayerDefinition>
+</LayerDefinition>

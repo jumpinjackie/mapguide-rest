@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<MapDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="2.4.0" xsi:noNamespaceSchemaLocation="MapDefinition-2.4.0.xsd">
+  <Name />
+  <CoordinateSystem>%s</CoordinateSystem>
+  <Extents>
+    <MinX>%s</MinX>
+    <MaxX>%s</MaxX>
+    <MinY>%s</MinY>
+    <MaxY>%s</MaxY>
+  </Extents>
+  <BackgroundColor>ffffffff</BackgroundColor>
+  %s
+  %s
+</MapDefinition>
