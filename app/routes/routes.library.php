@@ -1231,7 +1231,7 @@ $app->get("/library/:resourcePath+.WebLayout/viewer", function($resourcePath) us
  *     )
  *   )
  */
-$app->get("/library/:resourcePath+.ApplicationDefinition/:template", function($resourcePath, $template) use ($app) {
+$app->get("/library/:resourcePath+.ApplicationDefinition/viewer/:template", function($resourcePath, $template) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".ApplicationDefinition";

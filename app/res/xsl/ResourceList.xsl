@@ -130,27 +130,27 @@
             <xsl:if test="substring($resName, (string-length($resName) - string-length('ApplicationDefinition')) + 1) = 'ApplicationDefinition'">
                 <hr/>
                 <!-- Options for Application Definition -->
-                <a class="iframeload" href="{$root}{$resName}/slate">
+                <a class="iframeload" href="{$root}{$resName}/viewer/slate">
                     <i class="fa fa-globe" />&#160;Fusion - Slate
                 </a>
                 &#160;
                 <!-- Options for Application Definition -->
-                <a class="iframeload" href="{$root}{$resName}/aqua">
+                <a class="iframeload" href="{$root}{$resName}/viewer/aqua">
                     <i class="fa fa-globe" />&#160;Fusion - Aqua
                 </a>
                 &#160;
                 <!-- Options for Application Definition -->
-                <a class="iframeload" href="{$root}{$resName}/maroon">
+                <a class="iframeload" href="{$root}{$resName}/viewer/maroon">
                     <i class="fa fa-globe" />&#160;Fusion - Maroon
                 </a>
                 &#160;
                 <!-- Options for Application Definition -->
-                <a class="iframeload" href="{$root}{$resName}/limegold">
+                <a class="iframeload" href="{$root}{$resName}/viewer/limegold">
                     <i class="fa fa-globe" />&#160;Fusion - LimeGold
                 </a>
                 &#160;
                 <!-- Options for Application Definition -->
-                <a class="iframeload" href="{$root}{$resName}/turquoiseyellow">
+                <a class="iframeload" href="{$root}{$resName}/viewer/turquoiseyellow">
                     <i class="fa fa-globe" />&#160;Fusion - TurquoiseYellow
                 </a>
             </xsl:if>
