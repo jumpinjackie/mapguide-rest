@@ -1361,4 +1361,168 @@ $app->get("/session/:sessionId/:resName.MapDefinition/image.:format", function($
     $ctrl->RenderMapDefinition($resId, $format);
 });
 
+// ----------------------------- Viewer/Preview Launchers ----------------------------- //
+
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{resName}.WebLayout/viewer",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="LaunchAJAXViewer",
+ *        summary="Launch the AJAX Viewer for the specified Web Layout",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The name of the Map Definition")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:resName.WebLayout/viewer", function($sessionId, $resName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.WebLayout");
+    $ctrl = new MgViewerController($app);
+    $ctrl->LaunchAjaxViewer($resId);
+});
+
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{resName}.ApplicationDefinition/viewer/{template}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="LaunchFusionViewer",
+ *        summary="Launch the Fusion Viewer for the specified ApplicationDefinition using the given template",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The name of the Map Definition"),
+ *          @SWG\parameter(name="template", paramType="path", required=true, type="string", description="The fusion template to invoke")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:resName.ApplicationDefinition/viewer/:template", function($sessionId, $resName, $template) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.ApplicationDefinition");
+    $ctrl = new MgViewerController($app);
+    $ctrl->LaunchFusionViewer($resId, $template);
+});
+
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{resName}.FeatureSource/preview",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="PreviewFeatureSource",
+ *        summary="Launches the schema report preview for the given Feature Source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The name of the Map Definition")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:resName.FeatureSource/preview", function($sessionId, $resName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+    $ctrl = new MgViewerController($app);
+    $ctrl->LaunchResourcePreview($resId);
+});
+
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{resName}.LayerDefinition/preview",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="PreviewLayerDefinition",
+ *        summary="Launches the AJAX viewer preview for the given Layer Definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The name of the Map Definition")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:resName.LayerDefinition/preview", function($sessionId, $resName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
+    $ctrl = new MgViewerController($app);
+    $ctrl->LaunchResourcePreview($resId);
+});
+
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{resName}.MapDefinition/preview",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="PreviewMapDefinition",
+ *        summary="Launches the AJAX viewer preview for the given Map Definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The name of the Map Definition")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:resName.MapDefinition/preview", function($sessionId, $resName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
+    $ctrl = new MgViewerController($app);
+    $ctrl->LaunchResourcePreview($resId);
+});
+
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{resName}.SymbolDefinition/preview",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="PreviewSymbolDefinition",
+ *        summary="Launches the AJAX viewer preview for the given Symbol Definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The name of the Map Definition")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:resName.SymbolDefinition/preview", function($sessionId, $resName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.SymbolDefinition");
+    $ctrl = new MgViewerController($app);
+    $ctrl->LaunchResourcePreview($resId);
+});
+
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{resName}.WatermarkDefinition/preview",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="PreviewWatermarkDefinition",
+ *        summary="Launches the AJAX viewer preview for the given Watermark Definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The name of the Map Definition")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:resName.WatermarkDefinition/preview", function($sessionId, $resName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.WatermarkDefinition");
+    $ctrl = new MgViewerController($app);
+    $ctrl->LaunchResourcePreview($resId);
+});
+
 ?>

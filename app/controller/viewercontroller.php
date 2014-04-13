@@ -25,13 +25,23 @@ class MgViewerController extends MgBaseController {
     }
 
     public function LaunchAjaxViewer($resId) {
+        $sessionPart = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+            $sessionPart = "&SESSION=$sessionId";
+        }
         $selfUrl = $this->app->config("SelfUrl");
-        $this->app->redirect("$selfUrl/../mapviewerajax/?WEBLAYOUT=".$resId->ToString());
+        $this->app->redirect("$selfUrl/../mapviewerajax/?WEBLAYOUT=".$resId->ToString().$sessionPart);
     }
 
     public function LaunchFusionViewer($resId, $template) {
+        $sessionPart = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+            $sessionPart = "&session=$sessionId";
+        }
         $selfUrl = $this->app->config("SelfUrl");
-        $this->app->redirect("$selfUrl/../fusion/templates/mapguide/$template/index.html?ApplicationDefinition=".$resId->ToString());
+        $this->app->redirect("$selfUrl/../fusion/templates/mapguide/$template/index.html?ApplicationDefinition=".$resId->ToString().$sessionPart);
     }
 
     private function GetFeatureClassMBR($featuresId, $className, $geomProp, $featureSrvc)
@@ -188,7 +198,12 @@ class MgViewerController extends MgBaseController {
     const XY_COORDSYS = 'LOCAL_CS["Non-Earth (Meter)",LOCAL_DATUM["Local Datum",0],UNIT["Meter", 1],AXIS["X",EAST],AXIS["Y",NORTH]]';
 
     public function LaunchResourcePreview($resId) {
-        $sessionId = $this->app->request->params("session");
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        } else {
+            $sessionId = $this->app->request->params("session");
+        }
         $this->EnsureAuthenticationForSite($sessionId, true);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);

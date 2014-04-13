@@ -1239,6 +1239,23 @@ $app->get("/library/:resourcePath+.ApplicationDefinition/viewer/:template", func
     $ctrl->LaunchFusionViewer($resId, $template);
 });
 
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/preview",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="PreviewFeatureSource",
+ *        summary="Launches the schema report preview for the given Feature Source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the Feature Source")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.FeatureSource/preview", function($resourcePath) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -1249,6 +1266,23 @@ $app->get("/library/:resourcePath+.FeatureSource/preview", function($resourcePat
     $ctrl->LaunchResourcePreview($resId);
 });
 
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.LayerDefinition/preview",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="PreviewLayerDefinition",
+ *        summary="Launches the AJAX viewer preview for the given Layer Definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the Layer Definition")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.LayerDefinition/preview", function($resourcePath) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -1259,6 +1293,23 @@ $app->get("/library/:resourcePath+.LayerDefinition/preview", function($resourceP
     $ctrl->LaunchResourcePreview($resId);
 });
 
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.MapDefinition/preview",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="PreviewMapDefinition",
+ *        summary="Launches the AJAX viewer preview for the given Map Definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the Map Definition")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.MapDefinition/preview", function($resourcePath) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -1269,6 +1320,23 @@ $app->get("/library/:resourcePath+.MapDefinition/preview", function($resourcePat
     $ctrl->LaunchResourcePreview($resId);
 });
 
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.SymbolDefinition/preview",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="PreviewSymbolDefinition",
+ *        summary="Launches the AJAX viewer preview for the given Symbol Definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the Symbol Definition")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.SymbolDefinition/preview", function($resourcePath) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
@@ -1279,6 +1347,23 @@ $app->get("/library/:resourcePath+.SymbolDefinition/preview", function($resource
     $ctrl->LaunchResourcePreview($resId);
 });
 
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.WatermarkDefinition/preview",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="PreviewWatermarkDefinition",
+ *        summary="Launches the AJAX viewer preview for the given Watermark Definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the Watermark Definition")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
 $app->get("/library/:resourcePath+.WatermarkDefinition/preview", function($resourcePath) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
