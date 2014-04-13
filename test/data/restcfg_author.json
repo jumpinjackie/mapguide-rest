@@ -1,7 +1,7 @@
 {
     "Source": {
         "Type": "MapGuide",
-        "FeatureSource": "Library://Samples/Sheboygan/Data/Parcels.FeatureSource",
+        "FeatureSource": "Library://RestUnitTests/Parcels.FeatureSource",
         "FeatureClass": "SHP_Schema:Parcels"
     },
     "Representations": {

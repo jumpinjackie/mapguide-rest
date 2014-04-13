@@ -81,6 +81,14 @@ try {
     $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
     $resSvc->ApplyResourcePackage($br);
 
+    $srcId = new MgResourceIdentifier("Library://Samples/Sheboygan/Data/Parcels.FeatureSource");
+    $dstId = new MgResourceIdentifier("Library://RestUnitTests/Parcels.FeatureSource");
+    $resSvc->CopyResource($srcId, $dstId, true);
+
+    $bsWriteable = new MgByteSource(dirname(__FILE__)."/data/Parcels_Writeable.FeatureSource.xml");
+    $brWriteable = $bsWriteable->GetReader();
+    $resSvc->SetResource($dstId, $brWriteable, null);
+
     $rdsdfsource = new MgByteSource(dirname(__FILE__)."/data/RedlineLayer.sdf");
     $rdsdfrdr = $rdsdfsource->GetReader();
     $resId = new MgResourceIdentifier("Library://RestUnitTests/RedlineLayer.FeatureSource");
@@ -470,7 +478,8 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 function createUpdateXml(filter, text, geom) {
                     var xml = "<UpdateOperation>";
-                    xml += "<Filter>" + filter + "</Filter>";
+                    if (filter != null && filter != "")
+                        xml += "<Filter>" + filter + "</Filter>";
                     xml += "<UpdateProperties>";
                     xml += "<Property><Name>RNAME</Name><Value>" + text + "</Value></Property>";
                     xml += "<Property><Name>SHPGEOM</Name><Value>" + geom + "</Value></Property>";
@@ -478,6 +487,10 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     xml += "</UpdateOperation>";
                     return xml;
                 }
+
+                var testID1 = 42;
+                var testID2 = 43;
+                var testID3 = 1234;
 
                 api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "GET", {}, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") Expected denial");
@@ -526,49 +539,218 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 //Single access
-                api_test_with_credentials(rest_root_url + "/data/test_anonymous/45.xml", "GET", {}, "Foo", "Bar", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", {}, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") Expected denial");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_anonymous/45.xml", "GET", {}, "Anonymous", "", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", {}, "Anonymous", "", function(status, result) {
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_anonymous/45.xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_anonymous/45.xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_anonymous/45.xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_anonymous/45.xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_anonymous/45.xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_anonymous/45.xml", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_anonymous/45.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                api_test(rest_root_url + "/data/test_anonymous/45.xml", "GET", { session: this.wfsSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", { session: this.wfsSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_anonymous/45.xml", "GET", { session: this.wmsSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", { session: this.wmsSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_anonymous/45.xml", "GET", { session: this.authorSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", { session: this.authorSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_anonymous/45.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", { session: this.adminSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_anonymous/45.xml", "GET", { session: this.user1SessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", { session: this.user1SessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_anonymous/45.xml", "GET", { session: this.user2SessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+
+                //Insert
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "POST", createInsertXml("invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "POST", createInsertXml("anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "POST", createInsertXml("admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "POST", createInsertXml("wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "POST", createInsertXml("wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "POST", createInsertXml("author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "POST", createInsertXml("user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "POST", createInsertXml("user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                /*
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "POST", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "POST", { session: this.wfsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "POST", { session: this.wmsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "POST", { session: this.authorSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "POST", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "POST", { session: this.user1SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "POST", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                */
+                //Update
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                //Update - single access
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".xml", "PUT", createUpdateXml("", "invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".xml", "PUT", createUpdateXml("", "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".xml", "PUT", createUpdateXml("", "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".xml", "PUT", createUpdateXml("", "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".xml", "PUT", createUpdateXml("", "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".xml", "PUT", createUpdateXml("", "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".xml", "PUT", createUpdateXml("", "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".xml", "PUT", createUpdateXml("", "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                /*
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "PUT", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "PUT", { session: this.wfsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "PUT", { session: this.wmsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "PUT", { session: this.authorSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "PUT", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "PUT", { session: this.user1SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "PUT", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                */
+
+                //Delete
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Anonymous", "", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { session: this.anonymousSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { session: this.wfsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { session: this.wmsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { session: this.authorSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { session: this.adminSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { session: this.user1SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { session: this.user2SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
             });
@@ -583,7 +765,8 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 function createUpdateXml(filter, text, geom) {
                     var xml = "<UpdateOperation>";
-                    xml += "<Filter>" + filter + "</Filter>";
+                    if (filter != null && filter != "")
+                        xml += "<Filter>" + filter + "</Filter>";
                     xml += "<UpdateProperties>";
                     xml += "<Property><Name>RNAME</Name><Value>" + text + "</Value></Property>";
                     xml += "<Property><Name>SHPGEOM</Name><Value>" + geom + "</Value></Property>";
@@ -591,6 +774,10 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     xml += "</UpdateOperation>";
                     return xml;
                 }
+
+                var testID1 = 52;
+                var testID2 = 53;
+                var testID3 = 1234;
 
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "GET", {}, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") Expected denial");
@@ -639,49 +826,218 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 //Single access
-                api_test_with_credentials(rest_root_url + "/data/test_administrator/45.xml", "GET", {}, "Foo", "Bar", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", {}, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") Expected denial");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_administrator/45.xml", "GET", {}, "Anonymous", "", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", {}, "Anonymous", "", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_administrator/45.xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_administrator/45.xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_administrator/45.xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_administrator/45.xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_administrator/45.xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_administrator/45.xml", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_administrator/45.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_administrator/45.xml", "GET", { session: this.wfsSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", { session: this.wfsSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_administrator/45.xml", "GET", { session: this.wmsSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", { session: this.wmsSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_administrator/45.xml", "GET", { session: this.authorSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", { session: this.authorSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_administrator/45.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", { session: this.adminSessionId }, function(status, result) {
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                api_test(rest_root_url + "/data/test_administrator/45.xml", "GET", { session: this.user1SessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", { session: this.user1SessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_administrator/45.xml", "GET", { session: this.user2SessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+
+                //Insert
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "POST", createInsertXml("invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "POST", createInsertXml("anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "POST", createInsertXml("admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "POST", createInsertXml("wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "POST", createInsertXml("wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "POST", createInsertXml("author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "POST", createInsertXml("user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "POST", createInsertXml("user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                /*
+                api_test(rest_root_url + "/data/test_administrator/.xml", "POST", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "POST", { session: this.wfsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "POST", { session: this.wmsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "POST", { session: this.authorSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "POST", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "POST", { session: this.user1SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "POST", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                */
+                //Update
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                //Update - single access
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID2 + ".xml", "PUT", createUpdateXml("", "invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID2 + ".xml", "PUT", createUpdateXml("", "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID2 + ".xml", "PUT", createUpdateXml("", "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID2 + ".xml", "PUT", createUpdateXml("", "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID2 + ".xml", "PUT", createUpdateXml("", "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID2 + ".xml", "PUT", createUpdateXml("", "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID2 + ".xml", "PUT", createUpdateXml("", "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID2 + ".xml", "PUT", createUpdateXml("", "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                /*
+                api_test(rest_root_url + "/data/test_administrator/.xml", "PUT", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "PUT", { session: this.wfsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "PUT", { session: this.wmsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "PUT", { session: this.authorSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "PUT", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "PUT", { session: this.user1SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "PUT", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                */
+
+                //Delete
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "DELETE", { session: this.anonymousSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "DELETE", { session: this.wfsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "DELETE", { session: this.wmsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "DELETE", { session: this.authorSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "DELETE", { session: this.adminSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "DELETE", { session: this.user1SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_administrator/.xml", "DELETE", { session: this.user2SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
             });
@@ -696,7 +1052,8 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 function createUpdateXml(filter, text, geom) {
                     var xml = "<UpdateOperation>";
-                    xml += "<Filter>" + filter + "</Filter>";
+                    if (filter != null && filter != "")
+                        xml += "<Filter>" + filter + "</Filter>";
                     xml += "<UpdateProperties>";
                     xml += "<Property><Name>RNAME</Name><Value>" + text + "</Value></Property>";
                     xml += "<Property><Name>SHPGEOM</Name><Value>" + geom + "</Value></Property>";
@@ -704,6 +1061,10 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     xml += "</UpdateOperation>";
                     return xml;
                 }
+
+                var testID1 = 62;
+                var testID2 = 63;
+                var testID3 = 1234;
 
                 api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "GET", {}, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") Expected denial");
@@ -752,49 +1113,218 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 //Single access
-                api_test_with_credentials(rest_root_url + "/data/test_author/45.xml", "GET", {}, "Foo", "Bar", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", {}, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") Expected denial");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_author/45.xml", "GET", {}, "Anonymous", "", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", {}, "Anonymous", "", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_author/45.xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_author/45.xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_author/45.xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_author/45.xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_author/45.xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_author/45.xml", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_author/45.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_author/45.xml", "GET", { session: this.wfsSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", { session: this.wfsSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_author/45.xml", "GET", { session: this.wmsSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", { session: this.wmsSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_author/45.xml", "GET", { session: this.authorSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", { session: this.authorSessionId }, function(status, result) {
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                api_test(rest_root_url + "/data/test_author/45.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", { session: this.adminSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_author/45.xml", "GET", { session: this.user1SessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", { session: this.user1SessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_author/45.xml", "GET", { session: this.user2SessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+
+                //Insert
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "POST", createInsertXml("invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "POST", createInsertXml("anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "POST", createInsertXml("admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "POST", createInsertXml("wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "POST", createInsertXml("wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "POST", createInsertXml("author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "POST", createInsertXml("user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "POST", createInsertXml("user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                /*
+                api_test(rest_root_url + "/data/test_author/.xml", "POST", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "POST", { session: this.wfsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "POST", { session: this.wmsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "POST", { session: this.authorSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "POST", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "POST", { session: this.user1SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "POST", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                */
+                //Update
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                //Update - single access
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID2 + ".xml", "PUT", createUpdateXml("", "invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID2 + ".xml", "PUT", createUpdateXml("", "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID2 + ".xml", "PUT", createUpdateXml("", "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID2 + ".xml", "PUT", createUpdateXml("", "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID2 + ".xml", "PUT", createUpdateXml("", "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID2 + ".xml", "PUT", createUpdateXml("", "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID2 + ".xml", "PUT", createUpdateXml("", "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/" + testID2 + ".xml", "PUT", createUpdateXml("", "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                /*
+                api_test(rest_root_url + "/data/test_author/.xml", "PUT", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "PUT", { session: this.wfsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "PUT", { session: this.wmsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "PUT", { session: this.authorSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "PUT", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "PUT", { session: this.user1SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "PUT", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                */
+
+                //Delete
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "DELETE", { session: this.anonymousSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "DELETE", { session: this.wfsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "DELETE", { session: this.wmsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "DELETE", { session: this.authorSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "DELETE", { session: this.adminSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "DELETE", { session: this.user1SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_author/.xml", "DELETE", { session: this.user2SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
             });
@@ -809,7 +1339,8 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 function createUpdateXml(filter, text, geom) {
                     var xml = "<UpdateOperation>";
-                    xml += "<Filter>" + filter + "</Filter>";
+                    if (filter != null && filter != "")
+                        xml += "<Filter>" + filter + "</Filter>";
                     xml += "<UpdateProperties>";
                     xml += "<Property><Name>RNAME</Name><Value>" + text + "</Value></Property>";
                     xml += "<Property><Name>SHPGEOM</Name><Value>" + geom + "</Value></Property>";
@@ -817,6 +1348,10 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     xml += "</UpdateOperation>";
                     return xml;
                 }
+
+                var testID1 = 72;
+                var testID2 = 73;
+                var testID3 = 1234;
 
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "GET", {}, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") Expected denial");
@@ -865,49 +1400,218 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 //Single access
-                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/45.xml", "GET", {}, "Foo", "Bar", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", {}, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") Expected denial");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/45.xml", "GET", {}, "Anonymous", "", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", {}, "Anonymous", "", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/45.xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/45.xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/45.xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/45.xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/45.xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/45.xml", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_wfsuser/45.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_wfsuser/45.xml", "GET", { session: this.wfsSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", { session: this.wfsSessionId }, function(status, result) {
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                api_test(rest_root_url + "/data/test_wfsuser/45.xml", "GET", { session: this.wmsSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", { session: this.wmsSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_wfsuser/45.xml", "GET", { session: this.authorSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", { session: this.authorSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_wfsuser/45.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", { session: this.adminSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_wfsuser/45.xml", "GET", { session: this.user1SessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", { session: this.user1SessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_wfsuser/45.xml", "GET", { session: this.user2SessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+
+                //Insert
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "POST", createInsertXml("invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "POST", createInsertXml("anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "POST", createInsertXml("admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "POST", createInsertXml("wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "POST", createInsertXml("wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "POST", createInsertXml("author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "POST", createInsertXml("user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "POST", createInsertXml("user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                /*
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "POST", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "POST", { session: this.wfsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "POST", { session: this.wmsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "POST", { session: this.authorSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "POST", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "POST", { session: this.user1SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "POST", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                */
+                //Update
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                //Update - single access
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                /*
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "PUT", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "PUT", { session: this.wfsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "PUT", { session: this.wmsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "PUT", { session: this.authorSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "PUT", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "PUT", { session: this.user1SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "PUT", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                */
+
+                //Delete
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { session: this.anonymousSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { session: this.wfsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { session: this.wmsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { session: this.authorSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { session: this.adminSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { session: this.user1SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { session: this.user2SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
             });
@@ -922,7 +1626,8 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 function createUpdateXml(filter, text, geom) {
                     var xml = "<UpdateOperation>";
-                    xml += "<Filter>" + filter + "</Filter>";
+                    if (filter != null && filter != "")
+                        xml += "<Filter>" + filter + "</Filter>";
                     xml += "<UpdateProperties>";
                     xml += "<Property><Name>RNAME</Name><Value>" + text + "</Value></Property>";
                     xml += "<Property><Name>SHPGEOM</Name><Value>" + geom + "</Value></Property>";
@@ -930,6 +1635,10 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     xml += "</UpdateOperation>";
                     return xml;
                 }
+
+                var testID1 = 82;
+                var testID2 = 83;
+                var testID3 = 1234;
 
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "GET", {}, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") Expected denial");
@@ -978,49 +1687,218 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 //Single access
-                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/45.xml", "GET", {}, "Foo", "Bar", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", {}, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") Expected denial");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/45.xml", "GET", {}, "Anonymous", "", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", {}, "Anonymous", "", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/45.xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/45.xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/45.xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/45.xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/45.xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/45.xml", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_wmsuser/45.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_wmsuser/45.xml", "GET", { session: this.wfsSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", { session: this.wfsSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_wmsuser/45.xml", "GET", { session: this.wmsSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", { session: this.wmsSessionId }, function(status, result) {
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                api_test(rest_root_url + "/data/test_wmsuser/45.xml", "GET", { session: this.authorSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", { session: this.authorSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_wmsuser/45.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", { session: this.adminSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_wmsuser/45.xml", "GET", { session: this.user1SessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", { session: this.user1SessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_wmsuser/45.xml", "GET", { session: this.user2SessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+
+                //Insert
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "POST", createInsertXml("invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "POST", createInsertXml("anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "POST", createInsertXml("admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "POST", createInsertXml("wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "POST", createInsertXml("wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "POST", createInsertXml("author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "POST", createInsertXml("user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "POST", createInsertXml("user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                /*
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "POST", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "POST", { session: this.wfsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "POST", { session: this.wmsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "POST", { session: this.authorSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "POST", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "POST", { session: this.user1SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "POST", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                */
+                //Update
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                //Update - single access
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                /*
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "PUT", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "PUT", { session: this.wfsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "PUT", { session: this.wmsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "PUT", { session: this.authorSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "PUT", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "PUT", { session: this.user1SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "PUT", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                */
+
+                //Delete
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { session: this.anonymousSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { session: this.wfsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { session: this.wmsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { session: this.authorSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { session: this.adminSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { session: this.user1SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { session: this.user2SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
             });
@@ -1036,7 +1914,8 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 function createUpdateXml(filter, text, geom) {
                     var xml = "<UpdateOperation>";
-                    xml += "<Filter>" + filter + "</Filter>";
+                    if (filter != null && filter != "")
+                        xml += "<Filter>" + filter + "</Filter>";
                     xml += "<UpdateProperties>";
                     xml += "<Property><Name>RNAME</Name><Value>" + text + "</Value></Property>";
                     xml += "<Property><Name>SHPGEOM</Name><Value>" + geom + "</Value></Property>";
@@ -1044,6 +1923,10 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     xml += "</UpdateOperation>";
                     return xml;
                 }
+
+                var testID1 = 92;
+                var testID2 = 93;
+                var testID3 = 1234;
 
                 api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "GET", {}, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") Expected denial");
@@ -1092,49 +1975,218 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 //Single access
-                api_test_with_credentials(rest_root_url + "/data/test_group/45.xml", "GET", {}, "Foo", "Bar", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", {}, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") Expected denial");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_group/45.xml", "GET", {}, "Anonymous", "", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", {}, "Anonymous", "", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_group/45.xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_group/45.xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_group/45.xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_group/45.xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_group/45.xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                api_test_with_credentials(rest_root_url + "/data/test_group/45.xml", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                api_test(rest_root_url + "/data/test_group/45.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_group/45.xml", "GET", { session: this.wfsSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", { session: this.wfsSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_group/45.xml", "GET", { session: this.wmsSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", { session: this.wmsSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_group/45.xml", "GET", { session: this.authorSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", { session: this.authorSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_group/45.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", { session: this.adminSessionId }, function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                api_test(rest_root_url + "/data/test_group/45.xml", "GET", { session: this.user1SessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", { session: this.user1SessionId }, function(status, result) {
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                api_test(rest_root_url + "/data/test_group/45.xml", "GET", { session: this.user2SessionId }, function(status, result) {
+                api_test(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+
+                //Insert
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "POST", createInsertXml("invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "POST", createInsertXml("anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "POST", createInsertXml("admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "POST", createInsertXml("wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "POST", createInsertXml("wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "POST", createInsertXml("author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "POST", createInsertXml("user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "POST", createInsertXml("user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                /*
+                api_test(rest_root_url + "/data/test_group/.xml", "POST", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "POST", { session: this.wfsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "POST", { session: this.wmsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "POST", { session: this.authorSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "POST", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "POST", { session: this.user1SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "POST", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                */
+                //Update
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                //Update - single access
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID2 + ".xml", "PUT", createUpdateXml("", "invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID2 + ".xml", "PUT", createUpdateXml("", "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID2 + ".xml", "PUT", createUpdateXml("", "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID2 + ".xml", "PUT", createUpdateXml("", "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID2 + ".xml", "PUT", createUpdateXml("", "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID2 + ".xml", "PUT", createUpdateXml("", "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID2 + ".xml", "PUT", createUpdateXml("", "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/" + testID2 + ".xml", "PUT", createUpdateXml("", "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                /*
+                api_test(rest_root_url + "/data/test_group/.xml", "PUT", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "PUT", { session: this.wfsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "PUT", { session: this.wmsSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "PUT", { session: this.authorSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "PUT", { session: this.adminSessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "PUT", { session: this.user1SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "PUT", { session: this.user2SessionId }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                */
+
+                //Delete
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Anonymous", "", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "DELETE", { session: this.anonymousSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "DELETE", { session: this.wfsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "DELETE", { session: this.wmsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "DELETE", { session: this.authorSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "DELETE", { session: this.adminSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "DELETE", { session: this.user1SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                });
+                api_test(rest_root_url + "/data/test_group/.xml", "DELETE", { session: this.user2SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
                     ok(status == 200, "(" + status + ") Expected success");
                 });
             });
