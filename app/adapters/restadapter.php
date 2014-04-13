@@ -318,6 +318,24 @@ interface IAdapterDocumentor {
     public function DocumentOperation($method, $extension, $bSingle);
 }
 
+interface ISessionIDExtractor {
+    /**
+     * Tries to return the session id based on the given method. This is for methods that could accept a session id in places
+     * other than the query string, url path or form parameter. If no session id is found, null is returned.
+     */
+    public function TryGetSessionId($app, $method);
+}
+
+class MgSessionIDExtractor implements ISessionIDExtractor {
+    /**
+     * Tries to return the session id based on the given method. This is for methods that could accept a session id in places
+     * other than the query string, url path or form parameter. If no session id is found, null is returned.
+     */
+    public function TryGetSessionId($app, $method) {
+        return null;
+    }
+}
+
 abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
 
     private function DescribeMethodSummary($method, $extension) {

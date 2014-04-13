@@ -20,6 +20,9 @@ $app->container->FeatureSetXml = function() use ($app) {
 $app->container->FeatureSetXmlDoc = function() use ($app) {
     return MgFeatureXmlRestAdapter::GetDocumentor();
 };
+$app->container->FeatureSetXmlSessionID = function() use ($app) {
+    return new MgFeatureXmlSessionIDExtractor();
+};
 $app->container->FeatureSetGeoJson = function() use ($app) {
     return new MgGeoJsonRestAdapter(
         $app, 

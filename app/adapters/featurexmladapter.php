@@ -55,12 +55,35 @@ class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
     }
 }
 
+class MgFeatureXmlSessionIDExtractor extends MgSessionIDExtractor {
+    /**
+     * Tries to return the session id based on the given method. This is for methods that could accept a session id in places
+     * other than the query string, url path or form parameter. If no session id is found, null is returned.
+     */
+    public function TryGetSessionId($app, $method) {
+        if ($method == "POST" || $method == "PUT") {
+            $doc = new DOMDocument();
+            $doc->loadXML($app->request->getBody());
+
+            //Stash for adapter to grab
+            $app->REQUEST_BODY_DOCUMENT = $doc;
+
+            $sesNodes = $doc->getElementsByTagName("SessionID");
+            if ($sesNodes->length == 1)
+                return $sesNodes->item(0)->nodeValue;
+        }
+        return null;
+    }
+}
+
 class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     private $agfRw;
     private $wktRw;
+    private $requestDoc;
 
     public function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
         parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
+        $this->requestDoc = null;
     }
 
     /**
@@ -198,7 +221,10 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
             $className = $tokens[1];
             $commands = new MgFeatureCommandCollection();
             $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
-            $batchProps = MgUtils::ParseMultiFeatureXml($classDef, $this->app->request->getBody());
+            if ($this->app->REQUEST_BODY_DOCUMENT != null)
+                $batchProps = MgUtils::ParseMultiFeatureDocument($classDef, $this->app->REQUEST_BODY_DOCUMENT);
+            else    
+                $batchProps = MgUtils::ParseMultiFeatureXml($classDef, $this->app->request->getBody());
             $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
             $commands->Add($insertCmd);
 
@@ -231,8 +257,13 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
             $tokens = explode(":", $this->className);
             $schemaName = $tokens[0];
             $className = $tokens[1];
-            $doc = new DOMDocument();
-            $doc->loadXML($this->app->request->getBody());
+
+            if ($this->app->REQUEST_BODY_DOCUMENT == null) {
+                $doc = new DOMDocument();
+                $doc->loadXML($this->app->request->getBody());
+            } else {
+                $doc = $this->app->REQUEST_BODY_DOCUMENT;
+            }
 
             $commands = new MgFeatureCommandCollection();
 

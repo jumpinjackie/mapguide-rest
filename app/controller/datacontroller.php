@@ -256,7 +256,16 @@ class MgDataController extends MgBaseController {
             if (array_key_exists("AllowAnonymous", $result->config) && $result->config["AllowAnonymous"] == true)
                 $bAllowAnonymous = true;
             try {
-                $this->EnsureAuthenticationForSite($this->app->request->params("session"), $bAllowAnonymous);
+                $session = null;
+                $extractorName = $result->adapterName."SessionID";
+                if ($this->app->container->has($extractorName)) {
+                    $extractor = $this->app->container[$extractorName];
+                    $session = $extractor->TryGetSessionId($this->app, $method);
+                }
+                if ($session == null)
+                    $session = $this->app->request->params("session");
+
+                $this->EnsureAuthenticationForSite($session, $bAllowAnonymous);
                 $siteConn = new MgSiteConnection();
                 $siteConn->Open($this->userInfo);
                 if ($this->ValidateAcl($siteConn, $result->config)) {
@@ -292,7 +301,16 @@ class MgDataController extends MgBaseController {
             if (array_key_exists("AllowAnonymous", $result->config) && $result->config["AllowAnonymous"] == true)
                 $bAllowAnonymous = true;
             try {
-                $this->EnsureAuthenticationForSite($this->app->request->params("session"), $bAllowAnonymous);
+                $session = null;
+                $extractorName = $result->adapterName."SessionID";
+                if ($this->app->container->has($extractorName)) {
+                    $extractor = $this->app->container[$extractorName];
+                    $session = $extractor->TryGetSessionId($this->app, $method);
+                }
+                if ($session == null)
+                    $session = $this->app->request->params("session");
+
+                $this->EnsureAuthenticationForSite($session, $bAllowAnonymous);
                 $siteConn = new MgSiteConnection();
                 $siteConn->Open($this->userInfo);
                 if ($this->ValidateAcl($siteConn, $result->config)) {
