@@ -82,6 +82,7 @@
         <copy file=".htaccess" tofile="./build/.htaccess" overwrite="true" />
         <copy file="index.php" tofile="./build/index.php" overwrite="true" />
         <copy file="LICENSE" tofile="./build/LICENSE" overwrite="true" />
+        <copy file="changelog.txt" tofile="./build/changelog.txt" overwrite="true" />
         <copy file="README.md" tofile="./build/README.md" overwrite="true" />
         <copy file="web.config.iis" tofile="./build/web.config" overwrite="true" />
     </target>
