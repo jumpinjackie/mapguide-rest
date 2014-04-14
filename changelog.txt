@@ -1,0 +1,30 @@
+0.7
+===
+
+ - New Access Control List support for published data sources
+ - Published data sources now have automatic API documentation that's accessible via /doc/index.html for that particular URI
+ - Improved HTML representation for resource listings
+ - Session IDs can now be embedded into XML envelopes for inserting/updating features allowing you to do such operations without having to supply credentials
+ - New REST API routes:
+    - GET /library/{resourcePath}.WebLayout/viewer (Load the given Web Layout into the AJAX viewer)
+    - GET /library/{resourcePath}.ApplicationDefinition/viewer/{template} (Load the given Flexible Layout in Fusion with the given template)
+    - POST /library (Load a package file into the repository)
+    - GET /services/getschemamapping.{type} (Get the schema mapping for a given FDO provider and partial connection string)
+    - GET /library/{resourcePath}.FeatureSource/preview (Launch a schema report preview on the given Feature Source)
+    - GET /library/{resourcePath}.LayerDefinition/preview (Launch a AJAX viewer preview of the given Layer Definition)
+    - GET /library/{resourcePath}.MapDefinition/preview (Launch a AJAX viewer preview of the given Map Definition)
+    - GET /library/{resourcePath}.SymbolDefinition/preview (Render a preview of the given Symbol Definition)
+    - GET /library/{resourcePath}.WatermarkDefinition/preview (Launch a AJAX viewer preview of the given Watermark Definition)
+    - GET /session/{sessionId}/{resourceName}.WebLayout/viewer (Load the given Web Layout into the AJAX viewer)
+    - GET /session/{sessionId}/{resourceName}.ApplicationDefinition/viewer/{template} (Load the given Flexible Layout in Fusion with the given template)
+    - GET /session/{sessionId}/{resourceName}.FeatureSource/preview (Launch a schema report preview on the given Feature Source)
+    - GET /session/{sessionId}/{resourceName}.LayerDefinition/preview (Launch a AJAX viewer preview of the given Layer Definition)
+    - GET /session/{sessionId}/{resourceName}.MapDefinition/preview (Launch a AJAX viewer preview of the given Map Definition)
+    - GET /session/{sessionId}/{resourceName}.SymbolDefinition/preview (Render a preview of the given Symbol Definition)
+    - GET /session/{sessionId}/{resourceName}.WatermarkDefinition/preview (Launch a AJAX viewer preview of the given Watermark Definition)
+ - Fix: PHP crash on IIS for routes with unicode characters
+
+0.6
+===
+
+First public release
