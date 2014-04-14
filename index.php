@@ -25,7 +25,9 @@
 // This is to ensure URLs with unicode characters do not get trashed by the IIS URL rewriting module
 // which in turn will crash php-cgi.exe when this processed URL goes through the Slim router
 //
-$_SERVER['REQUEST_URI'] = $_SERVER['UNENCODED_URL'];
+// Only do this for IIS though, as this will screw up Apache httpd
+if (strpos($_SERVER['SERVER_SOFTWARE'], "IIS") !== FALSE)
+    $_SERVER['REQUEST_URI'] = $_SERVER['UNENCODED_URL'];
 
 require 'vendor/autoload.php';
 include dirname(__FILE__)."/../mapadmin/constants.php";
