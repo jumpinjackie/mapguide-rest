@@ -15,13 +15,13 @@
                     "AllowGroups": ["Everyone"]
                 },
                 "POST": {
-                    "AllowGroups": ["Authors"]
+                    "AllowUsers": ["Author"]
                 },
                 "PUT": {
-                    "AllowGroups": ["Authors"]
+                    "AllowUsers": ["Author"]
                 },
                 "DELETE": {
-                    "AllowGroups": ["Authors"]
+                    "AllowUsers": ["Author"]
                 }
             }
         },

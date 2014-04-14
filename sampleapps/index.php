@@ -71,7 +71,7 @@ $hasOL2Samples = true;
             </ul>
             <p class="sample-header">Editable published data</p>
             <ul>
-                <li><a href="../../mapviewerajax/?WEBLAYOUT=Library://Samples/Sheboygan/Layouts/SheboyganREST.WebLayout&USERNAME=Anonymous">Sample Web Layout - Editable Properties</a></li>
+                <li><a href="../../mapviewerajax/?WEBLAYOUT=Library://Samples/Sheboygan/Layouts/SheboyganREST.WebLayout">Sample Web Layout - Editable Properties</a> <strong>NOTE: You must login as Author (default pwd: author) for property insert/update/delete operations to work</strong></li>
             </ul>
             <? if ($hasOL2Samples) { ?>
             <p class="sample-header">MapGuide REST API with <a href="http://www.openlayers.org">OpenLayers</a></p>

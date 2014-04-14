@@ -25,11 +25,13 @@
 
             function deleteProperty(id) {
                 if (confirm("Are you sure you want to delete property (" + id + ")?")) {
+                    var session = getViewer().GetMapFrame().GetSessionId();
                     var urlWithoutQuery = window.location.href.split("?")[0];
                     var deleteUrl = urlWithoutQuery.replace(".html", id + ".xml");
                     var promise = $.ajax({
                         method: "post",
                         url: deleteUrl,
+                        data: { session: session },
                         headers: {
                             "X-HTTP-Method-Override": "DELETE"
                         },
@@ -45,7 +47,10 @@
                     var errNode = xml.getElementsByTagName("Error").item(0);
                     alert("Failed to delete property.\n\n" + errNode.textContent);
                 } catch (e) {
-                    alert("Failed to delete property");
+                    if (data.status == 403)
+                        alert("Failed to delete property. You have no permission to delete properties");
+                    else
+                        alert("Failed to delete property");
                 }
             }
 

@@ -20,8 +20,10 @@
                     alert("A geometry is required for this property. Please draw one");
                     return;
                 }
-
-                var xml = "<FeatureSet><Features><Feature>";
+                var session = getViewer().GetMapFrame().GetSessionId();
+                var xml = "<FeatureSet>";
+                xml += "<SessionID>" + session + "</SessionID>";
+                xml += "<Features><Feature>";
                 var editedFields = $("input.form-control[data-edited=true]");
                 for (var i = 0; i < editedFields.length; i++) {
                     var inputEl = $(editedFields[i]);
@@ -47,7 +49,10 @@
                     var errNode = xml.getElementsByTagName("Error").item(0);
                     alert("Failed to add property.\n\n" + errNode.textContent);
                 } catch (e) {
-                    alert("Failed to add property");
+                    if (data.status == 403)
+                        alert("Failed to add property. You have no permission to add new properties");
+                    else
+                        alert("Failed to add property");
                 }
                 $("#btnSave").removeClass("disabled");
             }
