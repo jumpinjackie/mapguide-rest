@@ -414,22 +414,54 @@ class MgMappingServiceController extends MgBaseController {
             $format = strtolower($format);
         }
 
-        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-        $mappingSvc = $siteConn->CreateService(MgServiceType::MappingService);
+        $admin = new MgServerAdmin();
+        $admin->Open($this->userInfo);
+        $version = explode(".", $admin->GetSiteVersion());
+        $bCanUseNative = false;
+        if (intval($version[0]) > 2) { //3.0 or greater
+            $bCanUseNative = true;
+        } else if (intval($version[0]) == 2 && intval($version[1]) >= 6) { //2.6 or greater
+            $bCanUseNative = true;
+        }
 
-        $map = new MgMap($siteConn);
-        $map->Create($mdfId, $mapName);
-        $mapStateId = new MgResourceIdentifier("Session:$session//$mapName.Map");
-        $sel = new MgSelection($map);
+        if ($bCanUseNative) {
+            $req = new MgHttpRequest("");
+            $param = $req->GetRequestParam();
 
-        $sel->Save($resSvc, $mapName);
-        $map->Save($resSvc, $mapStateId);
+            $param->AddParameter("OPERATION", "CREATERUNTIMEMAP");
+            $param->AddParameter("VERSION", "2.6.0");
+            $param->AddParameter("SESSION", $session);
+            $param->AddParameter("MAPDEFINITION", $mapDefIdStr);
+            $param->AddParameter("TARGETMAPNAME", $mapName);
+            $param->AddParameter("REQUESTEDFEATURES", $reqFeatures);
+            $param->AddParameter("ICONSPERSCALERANGE", $iconsPerScaleRange);
+            $param->AddParameter("ICONFORMAT", $iconFormat);
+            $param->AddParameter("ICONWIDTH", $iconWidth);
+            $param->AddParameter("ICONHEIGHT", $iconHeight);
 
-        $br = $this->DescribeRuntimeMapXml($mapDefIdStr, $map, $session, $mapName, $iconFormat, $iconWidth, $iconHeight, $reqFeatures, $iconsPerScaleRange, $resSvc, $mappingSvc);
-        if ($format == "json") {
-            $this->OutputXmlByteReaderAsJson($br);
-        } else {
-            $this->OutputByteReader($br);
+            if ($format === "json")
+                $param->AddParameter("FORMAT", MgMimeType::Json);
+            else
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+            $this->ExecuteHttpRequest($req);
+        } else { //Shim the response
+            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+            $mappingSvc = $siteConn->CreateService(MgServiceType::MappingService);
+
+            $map = new MgMap($siteConn);
+            $map->Create($mdfId, $mapName);
+            $mapStateId = new MgResourceIdentifier("Session:$session//$mapName.Map");
+            $sel = new MgSelection($map);
+
+            $sel->Save($resSvc, $mapName);
+            $map->Save($resSvc, $mapStateId);
+
+            $br = $this->DescribeRuntimeMapXml($mapDefIdStr, $map, $session, $mapName, $iconFormat, $iconWidth, $iconHeight, $reqFeatures, $iconsPerScaleRange, $resSvc, $mappingSvc);
+            if ($format == "json") {
+                $this->OutputXmlByteReaderAsJson($br);
+            } else {
+                $this->OutputByteReader($br);
+            }
         }
     }
 
