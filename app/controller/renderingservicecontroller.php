@@ -210,6 +210,29 @@ class MgRenderingServiceController extends MgBaseController {
 
         $this->ExecuteHttpRequest($req);
     }
+
+    public function RenderRuntimeMapLegend($sessionId, $mapName, $format) {
+        $req = new MgHttpRequest("");
+        $param = $req->GetRequestParam();
+        $param->AddParameter("SESSION", $sessionId);
+        $param->AddParameter("LOCALE", $this->app->config("Locale"));
+        $param->AddParameter("CLIENTAGENT", "MapGuide REST Extension");
+        $param->AddParameter("CLIENTIP", $this->GetClientIp());
+        $param->AddParameter("OPERATION", "GETMAPLEGENDIMAGE");
+        $param->AddParameter("VERSION", "1.0.0");
+        $param->AddParameter("MAPNAME", $mapName);
+        $param->AddParameter("FORMAT", strtoupper($format));
+
+        $width = $this->GetRequestParameter("width", null);
+        if ($width != null)
+            $param->AddParameter("WIDTH", $width);
+
+        $height = $this->GetRequestParameter("height", null);
+        if ($height != null)
+            $param->AddParameter("HEIGHT", $height);
+
+        $this->ExecuteHttpRequest($req);
+    }
 }
 
 ?>

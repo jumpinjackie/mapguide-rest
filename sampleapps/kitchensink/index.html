@@ -314,6 +314,18 @@
         function writeRestUrls(mapName, sessionId) {
             var root = restUrl + "/session/" + sessionId + "/" + mapName;
             var html = "";
+            var outputUrls = [
+                { label: "DWF Plot", url: root + ".Map/plot" },
+                { label: "Legend Image (JPG, 200x600)", url: root + ".Map/legendimage.jpg?width=200&height=600" },
+                { label: "Legend Image (PNG, 200x600)", url: root + ".Map/legendimage.png?width=200&height=600" },
+                { label: "Legend Image (PNG8, 200x600)", url: root + ".Map/legendimage.png8?width=200&height=600" },
+                { label: "Legend Image (GIF, 200x600)", url: root + ".Map/legendimage.gif?width=200&height=600" }
+            ];
+            for (var i = 0; i < outputUrls.length; i++) {
+                html += "<li><a href='" + outputUrls[i].url + "' target='_blank'>" + outputUrls[i].label + "</a></li>";
+            }
+            $("#outputList").append(html);
+            html = "";
             var selectionUrls = [
                 { label: "View Selection XML", url: root + ".Selection/xml" },
                 { label: "View Selection Layer Names (XML)", url: root + ".Selection/layers.xml" },
@@ -359,6 +371,9 @@
                 </ul>
             </div>
             <div id="selInfo">
+                <strong>Output URLs</strong>
+                <ul id="outputList">
+                </ul>
                 <strong>Selection URLs (opens in new window)</strong>
                 <ul id="selectionUrls">
 

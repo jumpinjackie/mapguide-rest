@@ -185,6 +185,30 @@ $app->get("/session/:sessionId/:mapName.Map/overlayimage.:format", function($ses
 });
 /**
  * @SWG\Api(
+ *     path="/session/{session}/{mapName}.Map/legendimage.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetMapLegendImage",
+ *        summary="Renders a legend image of the specified runtime map",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map"),
+ *          @SWG\parameter(name="width", paramType="query", required=false, type="integer", description="The width of the image"),
+ *          @SWG\parameter(name="height", paramType="query", required=false, type="integer", description="The height of the image"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="The image type", enum="['PNG','PNG8','JPG','GIF']")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:mapName.Map/legendimage.:format", function($sessionId, $mapName, $format) use ($app) {
+    $ctrl = new MgRenderingServiceController($app);
+    $ctrl->RenderRuntimeMapLegend($sessionId, $mapName, $format);
+});
+/**
+ * @SWG\Api(
  *     path="/session/{session}/{mapName}.Map/layers",
  *     @SWG\Operation(
  *        method="GET",
