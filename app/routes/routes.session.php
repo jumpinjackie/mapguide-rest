@@ -336,6 +336,59 @@ $app->get("/session/:sessionId/:mapName.Map/plot.:format", function($sessionId, 
 });
 /**
  * @SWG\Api(
+ *     path="/session/{session}/{mapName}.Map/description",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="DescribeRuntimeMap",
+ *        summary="Describe an existing MgMap instance from the specified mapname and session id and returns detailed information about its layer/group structure if requested",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=false, type="string", description="Your MapGuide Session ID. If none specified you must pass the basic http authentication challenge"),
+ *          @SWG\parameter(name="mapName", paramType="path", required=false, type="string", description="The map name used to identify the MgMap instance"),
+ *          @SWG\parameter(name="requestedfeatures", paramType="query", required=false, type="integer", description="A bitmask of the information about the Runtime Map that you would like returned. 1=Layer/Group structure, 2=icons, 4=Feature Source Information"),
+ *          @SWG\parameter(name="iconformat", paramType="query", required=false, type="string", description="The desired icon image format if icons are requested", enum="['PNG','JPG','PNG8','GIF']"),
+ *          @SWG\parameter(name="iconwidth", paramType="query", required=false, type="integer", description="The desired width of generated icons if icons are requested"),
+ *          @SWG\parameter(name="iconheight", paramType="query", required=false, type="integer", description="The desired height of generated icons if icons are requested"),
+ *          @SWG\parameter(name="iconsperscalerange", paramType="query", required=false, type="integer", description="The number of icons to generate per scale range if icons are requested")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:mapName.Map/description", function($sessionId, $mapName) use ($app) {
+    $ctrl = new MgMappingServiceController($app);
+    $ctrl->DescribeRuntimeMap($sessionId, $mapName, "xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{mapName}.Map/description.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="DescribeRuntimeMap",
+ *        summary="Describe an existing MgMap instance from the specified mapname and session id and returns detailed information about its layer/group structure if requested",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=false, type="string", description="Your MapGuide Session ID. If none specified you must pass the basic http authentication challenge"),
+ *          @SWG\parameter(name="mapName", paramType="path", required=false, type="string", description="The map name used to identify the MgMap instance"),
+ *          @SWG\parameter(name="requestedfeatures", paramType="query", required=false, type="integer", description="A bitmask of the information about the Runtime Map that you would like returned. 1=Layer/Group structure, 2=icons, 4=Feature Source Information"),
+ *          @SWG\parameter(name="iconformat", paramType="query", required=false, type="string", description="The desired icon image format if icons are requested", enum="['PNG','JPG','PNG8','GIF']"),
+ *          @SWG\parameter(name="iconwidth", paramType="query", required=false, type="integer", description="The desired width of generated icons if icons are requested"),
+ *          @SWG\parameter(name="iconheight", paramType="query", required=false, type="integer", description="The desired height of generated icons if icons are requested"),
+ *          @SWG\parameter(name="iconsperscalerange", paramType="query", required=false, type="integer", description="The number of icons to generate per scale range if icons are requested"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:mapName.Map/description.:format", function($sessionId, $mapName, $format) use ($app) {
+    $ctrl = new MgMappingServiceController($app);
+    $ctrl->DescribeRuntimeMap($sessionId, $mapName, $format);
+});
+/**
+ * @SWG\Api(
  *     path="/session/{session}/{mapName}.Selection/xml",
  *     @SWG\Operation(
  *        method="GET",
