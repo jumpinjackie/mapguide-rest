@@ -119,7 +119,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
         $clsDef = $reader->GetClassDefinition();
         $classes->Add($clsDef);
 
-        $output = "<FeatureSet>";
+        $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?><FeatureSet>";
         $classXml = $this->featSvc->SchemaToXml($schemas);
         $classXml = substr($classXml, strpos($classXml, "<xs:schema"));
 

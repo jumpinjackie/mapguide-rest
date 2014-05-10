@@ -54,6 +54,8 @@ class MgCoordinateSystemController extends MgBaseController {
                 $param->AddParameter("FORMAT", MgMimeType::Json);
             } else if ($fmt === "xml") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+                //HACK: This API doesn't put XML prolog
+                $param->AddParameter("X-PREPEND-XML-PROLOG", "true");
             } else if ($fmt === "html") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
                 $param->AddParameter("XSLSTYLESHEET", "CoordinateSystemList.xsl");
@@ -130,7 +132,7 @@ class MgCoordinateSystemController extends MgBaseController {
             $trans = $factory->GetTransform($sourceCs, $targetCs);
             $coords = explode(",",$coordList);
 
-            $output = "<CoordinateCollection>";
+            $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?><CoordinateCollection>";
             foreach ($coords as $coordPair) {
                 $tokens = explode(" ", trim($coordPair));
                 $tokenCount = count($tokens);

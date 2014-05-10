@@ -2,6 +2,8 @@
 
 include dirname(__FILE__)."/../../mapadmin/constants.php";
 
+$prolog = "<?xml";
+
 //If you changed this, change it here too
 $adminUser = "Administrator";
 $adminPass = "admin";
@@ -244,6 +246,8 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     window.xml2json = xml2json;
                 }
             })();
+
+            var XML_PROLOG = "<?= $prolog ?>";
 
             //NOTES:
             //
@@ -504,6 +508,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 401, "(" + status + ") Expected denial");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "GET", {}, "Anonymous", "", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
@@ -525,6 +530,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_anonymous/.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_anonymous/.xml", "GET", { session: this.wfsSessionId }, function(status, result) {
@@ -551,6 +557,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 401, "(" + status + ") Expected denial");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", {}, "Anonymous", "", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
@@ -572,6 +579,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".xml", "GET", { session: this.wfsSessionId }, function(status, result) {
@@ -598,6 +606,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 401, "(" + status + ") Expected denial");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "POST", createInsertXml("anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "POST", createInsertXml("admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
@@ -620,6 +629,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 api_test(rest_root_url + "/data/test_anonymous/.xml", "POST", createInsertXml("anonymous session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.anonymousSessionId), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_anonymous/.xml", "POST", createInsertXml("admin session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.adminSessionId), function(status, result) {
@@ -646,6 +656,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 401, "(" + status + ") Expected denial");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
@@ -671,6 +682,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 401, "(" + status + ") Expected denial");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".xml", "PUT", createUpdateXml("", "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".xml", "PUT", createUpdateXml("", "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
@@ -693,6 +705,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 api_test(rest_root_url + "/data/test_anonymous/" + testID2 + ".xml", "PUT", createUpdateXml("", "anonymous session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.anonymousSessionId), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_anonymous/" + testID2 + ".xml", "PUT", createUpdateXml("", "admin session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.adminSessionId), function(status, result) {
@@ -719,6 +732,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 401, "(" + status + ") Expected denial");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Anonymous", "", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
@@ -740,6 +754,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { session: this.anonymousSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_anonymous/.xml", "DELETE", { session: this.wfsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
@@ -801,6 +816,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
@@ -831,6 +847,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_administrator/.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_administrator/.xml", "GET", { session: this.user1SessionId }, function(status, result) {
@@ -848,6 +865,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
@@ -878,6 +896,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_administrator/" + testID3 + ".xml", "GET", { session: this.user1SessionId }, function(status, result) {
@@ -895,6 +914,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "POST", createInsertXml("admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "POST", createInsertXml("wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
@@ -917,6 +937,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_administrator/.xml", "POST", createInsertXml("admin session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.adminSessionId), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_administrator/.xml", "POST", createInsertXml("wfsuser session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.wfsSessionId), function(status, result) {
@@ -943,6 +964,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
@@ -968,6 +990,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID2 + ".xml", "PUT", createUpdateXml("", "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID2 + ".xml", "PUT", createUpdateXml("", "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
@@ -990,6 +1013,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_administrator/" + testID2 + ".xml", "PUT", createUpdateXml("", "admin session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.adminSessionId), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_administrator/" + testID2 + ".xml", "PUT", createUpdateXml("", "wfsuser session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.wfsSessionId), function(status, result) {
@@ -1016,6 +1040,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
@@ -1046,6 +1071,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_administrator/.xml", "DELETE", { session: this.adminSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_administrator/.xml", "DELETE", { session: this.user1SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
@@ -1104,6 +1130,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
@@ -1122,6 +1149,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_author/.xml", "GET", { session: this.authorSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_author/.xml", "GET", { session: this.adminSessionId }, function(status, result) {
@@ -1151,6 +1179,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
@@ -1169,6 +1198,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", { session: this.authorSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_author/" + testID3 + ".xml", "GET", { session: this.adminSessionId }, function(status, result) {
@@ -1198,6 +1228,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "POST", createInsertXml("author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "POST", createInsertXml("user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
@@ -1220,6 +1251,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_author/.xml", "POST", createInsertXml("author session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.authorSessionId), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_author/.xml", "POST", createInsertXml("user1 session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.user1SessionId), function(status, result) {
@@ -1246,6 +1278,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
@@ -1271,6 +1304,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_author/" + testID2 + ".xml", "PUT", createUpdateXml("", "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_author/" + testID2 + ".xml", "PUT", createUpdateXml("", "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
@@ -1293,6 +1327,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_author/" + testID2 + ".xml", "PUT", createUpdateXml("", "author session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.authorSessionId), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_author/" + testID2 + ".xml", "PUT", createUpdateXml("", "user1 session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.user1SessionId), function(status, result) {
@@ -1319,6 +1354,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
@@ -1337,6 +1373,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_author/.xml", "DELETE", { session: this.authorSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_author/.xml", "DELETE", { session: this.adminSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
@@ -1392,6 +1429,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
@@ -1410,6 +1448,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_wfsuser/.xml", "GET", { session: this.wfsSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_wfsuser/.xml", "GET", { session: this.wmsSessionId }, function(status, result) {
@@ -1439,6 +1478,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
@@ -1457,6 +1497,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", { session: this.wfsSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_wfsuser/" + testID3 + ".xml", "GET", { session: this.wmsSessionId }, function(status, result) {
@@ -1486,6 +1527,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "POST", createInsertXml("wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "POST", createInsertXml("wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
@@ -1508,6 +1550,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_wfsuser/.xml", "POST", createInsertXml("wfsuser session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.wfsSessionId), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_wfsuser/.xml", "POST", createInsertXml("wmsuser session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.wmsSessionId), function(status, result) {
@@ -1534,6 +1577,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
@@ -1559,6 +1603,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
@@ -1581,6 +1626,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_wfsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "wfsuser session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.wfsSessionId), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_wfsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "wmsuser session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.wmsSessionId), function(status, result) {
@@ -1607,6 +1653,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
@@ -1625,6 +1672,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { session: this.wfsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_wfsuser/.xml", "DELETE", { session: this.wmsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
@@ -1689,6 +1737,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
@@ -1707,6 +1756,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_wmsuser/.xml", "GET", { session: this.wmsSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_wmsuser/.xml", "GET", { session: this.authorSessionId }, function(status, result) {
@@ -1736,6 +1786,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
@@ -1754,6 +1805,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", { session: this.wmsSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_wmsuser/" + testID3 + ".xml", "GET", { session: this.authorSessionId }, function(status, result) {
@@ -1783,6 +1835,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "POST", createInsertXml("wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "POST", createInsertXml("author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
@@ -1805,6 +1858,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_wmsuser/.xml", "POST", createInsertXml("wmsuser session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.wmsSessionId), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_wmsuser/.xml", "POST", createInsertXml("author session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.authorSessionId), function(status, result) {
@@ -1831,6 +1885,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
@@ -1856,6 +1911,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
@@ -1878,6 +1934,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_wmsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "wmsuser session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.wmsSessionId), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_wmsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "author session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.authorSessionId), function(status, result) {
@@ -1904,6 +1961,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result) {
@@ -1922,6 +1980,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { session: this.wmsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_wmsuser/.xml", "DELETE", { session: this.authorSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
@@ -1990,9 +2049,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_group/.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
@@ -2011,9 +2072,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_group/.xml", "GET", { session: this.user1SessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_group/.xml", "GET", { session: this.user2SessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
 
@@ -2037,9 +2100,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
@@ -2058,9 +2123,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", { session: this.user1SessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_group/" + testID3 + ".xml", "GET", { session: this.user2SessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
 
@@ -2084,9 +2151,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "POST", createInsertXml("user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "POST", createInsertXml("user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 
@@ -2106,9 +2175,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_group/.xml", "POST", createInsertXml("user1 session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.user1SessionId), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_group/.xml", "POST", createInsertXml("user2 session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.user2SessionId), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
 
@@ -2132,9 +2203,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "PUT", createUpdateXml("Autogenerated_SDF_ID = " + testID1, "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 //Update - single access
@@ -2157,9 +2230,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_group/" + testID2 + ".xml", "PUT", createUpdateXml("", "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_group/" + testID2 + ".xml", "PUT", createUpdateXml("", "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 
@@ -2179,9 +2254,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_group/" + testID2 + ".xml", "PUT", createUpdateXml("", "user1 session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.user1SessionId), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_group/" + testID2 + ".xml", "PUT", createUpdateXml("", "user2 session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.user2SessionId), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
 
@@ -2205,9 +2282,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test_with_credentials(rest_root_url + "/data/test_group/.xml", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_group/.xml", "DELETE", { session: this.anonymousSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
@@ -2226,9 +2305,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
                 api_test(rest_root_url + "/data/test_group/.xml", "DELETE", { session: this.user1SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
                 api_test(rest_root_url + "/data/test_group/.xml", "DELETE", { session: this.user2SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
             });
@@ -2321,57 +2402,73 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/list", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got a list back");
                 });
                 api_test_anon(rest_root_url + "/library/Samples/list", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got a list back");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/list", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got a list back");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/list", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got a list back");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/list", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got a list back");
                 });
                 api_test(rest_root_url + "/library/Samples/list", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got a list back");
                 });
                 api_test(rest_root_url + "/library/Samples/list", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got a list back");
                 });
                 api_test(rest_root_url + "/library/Samples/list", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got a list back");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/list.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got an xml list back");
                 });
                 api_test_anon(rest_root_url + "/library/Samples/list.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got an xml list back");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/list.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got an xml list back");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/list.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got an xml list back");
                 });
 
                 //With session id
                 api_test_anon(rest_root_url + "/library/Samples/list.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got an xml list back");
                 });
                 api_test_anon(rest_root_url + "/library/Samples/list.xml", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got an xml list back");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/list.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got an xml list back");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/list.xml", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got an xml list back");
                 });
 
@@ -2453,57 +2550,73 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.xml", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.xml", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
 
@@ -2572,43 +2685,55 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource header back");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource header back");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource header back");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource header back");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
                 });
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header.xml", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header.xml", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource header back as xml");
                 });
 
@@ -2669,57 +2794,73 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
 
@@ -2802,57 +2943,73 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
 
@@ -2969,33 +3126,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -3029,33 +3194,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -3105,33 +3278,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -3181,33 +3362,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -3257,49 +3446,61 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef.xml/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef.xml/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef.xml/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef.xml/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -3349,49 +3550,61 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef.xml/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef.xml/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef.xml/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef.xml/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -3441,33 +3654,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/providers", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/providers", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/providers", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/providers", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/providers.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/providers.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/providers.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/providers.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -3517,33 +3738,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/providers/OSGeo.SDF/capabilities.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/providers/OSGeo.SDF/capabilities.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -3578,33 +3807,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/providers/OSGeo.SDF/connectvalues.xml/ReadOnly", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/providers/OSGeo.SDF/connectvalues.xml/ReadOnly", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues.xml/ReadOnly", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues.xml/ReadOnly", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -3642,17 +3879,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -3682,17 +3923,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -3722,17 +3967,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator", session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator", session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -3794,17 +4043,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, property: "RTYPE" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, property: "RTYPE" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -3831,17 +4084,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
@@ -3873,17 +4130,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
@@ -3915,17 +4176,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
@@ -3957,17 +4222,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
@@ -4074,9 +4343,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("anon credential insert", "POINT (0 0)"), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Expect anon insert success");
                 });
                 api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("admin credential insert", "POINT (1 1)"), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Expect admin insert success");
                 });
                 api_test(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
@@ -4117,9 +4388,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Expect anon update success");
                 });
                 api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Expect admin update success");
                 });
                 api_test(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
@@ -4160,6 +4433,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Expect admin delete success");
                 });
                 api_test(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
@@ -4169,6 +4443,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(gj.features[0].properties.ID == 1, "expected feature ID 2 to be deleted");
                 });
                 api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Expect anon delete success");
                 });
                 api_test(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
@@ -4254,11 +4529,13 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_admin(rest_root_url + "/site/groups", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/site/groups", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -4271,20 +4548,24 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 401, "(" + status + ") - Request should've required authentication");
                 });
                 api_test_anon(rest_root_url + "/site/user/Anonymous/roles", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_admin(rest_root_url + "/site/user/Anonymous/roles", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/site/user/Anonymous/roles", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 //TODO: Review. Should anonymous be allowed to snoop its own groups and roles?
                 api_test(rest_root_url + "/site/user/Anonymous/roles", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
@@ -4298,11 +4579,13 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_admin(rest_root_url + "/site/user/Administrator/roles", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/site/user/Administrator/roles", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/site/user/Administrator/roles", "GET", { session: this.anonymousSessionId }, function(status, result) {
@@ -4314,20 +4597,24 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 401, "(" + status + ") - Request should've required authentication");
                 });
                 api_test_anon(rest_root_url + "/site/user/Anonymous/groups", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_admin(rest_root_url + "/site/user/Anonymous/groups", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/site/user/Anonymous/groups", "GET", { session: this.adminSessionId }, function(status, result) {
-                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                   ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 //TODO: Review. Should anonymous be allowed to snoop its own groups and roles?
                 api_test(rest_root_url + "/site/user/Anonymous/groups", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
@@ -4341,11 +4628,13 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_admin(rest_root_url + "/site/user/Administrator/groups", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/site/user/Administrator/groups", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/site/user/Administrator/groups", "GET", { session: this.anonymousSessionId }, function(status, result) {
@@ -4362,11 +4651,13 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_admin(rest_root_url + "/site/groups/Everyone/users", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/site/groups/Everyone/users", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/site/groups/Everyone/users", "GET", { session: this.anonymousSessionId }, function(status, result) {
@@ -4437,6 +4728,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 401, "(" + status + ") copy operation should've been denied");
                 });
                 api_test(rest_root_url + "/session/" + this.adminSessionId + "/Parcels.LayerDefinition/content", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - the parcels layerdef should exist");
                 });
                 api_test(rest_root_url + "/session/" + this.adminSessionId + "/Parcels2.LayerDefinition/content", "GET", { session: this.adminSessionId }, function(status, result) {
@@ -4461,9 +4753,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") copy operation should've succeeded");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/content", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - the parcels layerdef should exist");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels2.LayerDefinition/content", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - the parcels2 layerdef should exist");
                 });
             });
@@ -4485,6 +4779,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 401, "(" + status + ") move operation should've been denied");
                 });
                 api_test(rest_root_url + "/library/RestUnitTests/Parcels2.LayerDefinition/content", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - the parcels2 layerdef should exist");
                 });
                 api_test(rest_root_url + "/library/RestUnitTests/Parcels.LayerDefinition/content", "GET", { session: this.anonymousSessionId }, function(status, result) {
@@ -4540,57 +4835,73 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.xml", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource content back as xml");
                 });
 
@@ -4753,57 +5064,73 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
 
@@ -4886,57 +5213,73 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Should've got resource data list back as xml");
                 });
 
@@ -5005,9 +5348,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 201, "(" + status + ") - Should've saved resource by admin");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource/content", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Empty fs should exist");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource/content", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Empty2 fs should exist");
                 });
                 //Even if admin saved it, controller always uses session id as first priority so this should be a delete on anon's behalf
@@ -5069,33 +5414,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -5125,33 +5478,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -5197,33 +5558,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -5269,33 +5638,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -5341,49 +5718,61 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -5429,49 +5818,61 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema:Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -5517,33 +5918,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/providers", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/providers", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/providers", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/providers", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/providers.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/providers.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/providers.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/providers.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -5589,33 +5998,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/providers/OSGeo.SDF/capabilities.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/providers/OSGeo.SDF/capabilities.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -5646,33 +6063,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/providers/OSGeo.SDF/connectvalues.xml/ReadOnly", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/providers/OSGeo.SDF/connectvalues.xml/ReadOnly", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues.xml/ReadOnly", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues.xml/ReadOnly", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -5703,17 +6128,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
             test("Aggregates - count", function() {
                                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -5736,17 +6165,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
             test("Aggregates - bbox", function() {
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -5769,17 +6202,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
             test("Aggregates - bbox (with xform)", function() {
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -5834,17 +6271,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -5867,17 +6308,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
             test("Select 100 Parcels", function() {
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
@@ -5901,17 +6346,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
             test("Parcels owned by SCHMITT", function() {
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
@@ -5935,17 +6384,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
             test("Select 100 Parcels with projected property list", function() {
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
@@ -5969,17 +6422,21 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
             test("Select 100 Parcels (xformed to WGS84.PseudoMercator)", function() {
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
@@ -6023,9 +6480,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("anon credential insert", "POINT (0 0)"), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Expect anon insert success");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("admin credential insert", "POINT (1 1)"), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Expect admin insert success");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
@@ -6041,9 +6500,11 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     }
                 });
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Expect anon update success");
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Expect admin update success");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
@@ -6059,6 +6520,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     }
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Expect admin delete success");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
@@ -6068,6 +6530,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(gj.features[0].properties.ID == 1, "expected feature ID 2 to be deleted");
                 });
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Expect admin delete success");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
@@ -6218,28 +6681,36 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 });
 
                 api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", params, "Anonymous", "", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
                 });
                 api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", params, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
                 });
                 api_test_anon(rest_root_url + "/services/transformcoords", "POST", params, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
                 });
                 api_test_admin(rest_root_url + "/services/transformcoords", "POST", params, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
                 });
 
                 api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", paramsWithPadding, "Anonymous", "", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
                 });
                 api_test_with_credentials(rest_root_url + "/services/transformcoords", "POST", paramsWithPadding, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
                 });
                 api_test_anon(rest_root_url + "/services/transformcoords", "POST", paramsWithPadding, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
                 });
                 api_test_admin(rest_root_url + "/services/transformcoords", "POST", paramsWithPadding, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status+ ") - Expected success with list of transformed coordinates");
                 });
 
@@ -6296,33 +6767,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/coordsys/categories", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/coordsys/categories", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/coordsys/categories", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/coordsys/categories", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/coordsys/categories.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/coordsys/categories.xml", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/coordsys/categories.xml", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/coordsys/categories.xml", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
@@ -6372,33 +6851,41 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/coordsys/category/Australia", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/coordsys/category/Australia", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/coordsys/category/Australia", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/coordsys/category/Australia", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With raw credentials
                 api_test_anon(rest_root_url + "/coordsys/category.xml/Australia", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test_admin(rest_root_url + "/coordsys/category.xml/Australia", "GET", null, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
                 api_test(rest_root_url + "/coordsys/category.xml/Australia", "GET", { session: this.anonymousSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/coordsys/category.xml/Australia", "GET", { session: this.adminSessionId }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 

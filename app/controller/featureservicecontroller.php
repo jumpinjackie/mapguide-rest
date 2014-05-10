@@ -523,7 +523,7 @@ class MgFeatureServiceController extends MgBaseController {
                 case "count":
                     {
                         $count = MgUtils::GetFeatureCount($featSvc, $resId, $schemaName, $className, $supportsCount);
-                        $output = "<AggregateResult>";
+                        $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?><AggregateResult>";
                         $output .= "<Type>count</Type>";
                         $output .= "<Total>$count</Total>";
                         $output .= "</AggregateResult>";
@@ -571,7 +571,7 @@ class MgFeatureServiceController extends MgBaseController {
                                 $minY = $y;
                         }
 
-                        $output = "<AggregateResult>";
+                        $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?><AggregateResult>";
                         $output .= "<Type>bbox</Type>";
                         $output .= "<BoundingBox>";
                         $output .= "<CoordinateSystem>";
@@ -595,7 +595,7 @@ class MgFeatureServiceController extends MgBaseController {
                 case "distinctvalues":
                     {
                         $values = MgUtils::GetDistinctValues($featSvc, $resId, $schemaName, $className, $distinctPropName);
-                        $output = "<AggregateResult>";
+                        $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?><AggregateResult>";
                         $output .= "<Type>distinctvalues</Type>";
                         $output .= "<ValueList>";
                         foreach ($values as $val) {

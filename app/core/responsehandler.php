@@ -61,7 +61,7 @@ abstract class MgResponseHandler
                             $this->app->response->header("Content-Type", MgMimeType::Html);
                             $this->app->response->setBody(MgUtils::XslTransformByteReader($resultObj, $param->GetParameterValue("XSLSTYLESHEET"), $this->CollectXslParameters($param)));
                         } else {
-                            $this->OutputByteReader($resultObj, $chunkResult);
+                            $this->OutputByteReader($resultObj, $chunkResult, ($param->GetParameterValue("X-PREPEND-XML-PROLOG") === "true"));
                         }
                     }
                 } else if ($resultObj instanceof MgStringCollection) {
@@ -160,7 +160,7 @@ abstract class MgResponseHandler
 
     protected function OutputUpdateFeaturesResult($commands, $result, $classDef) {
         $bHasError = false;
-        $output = "<UpdateFeaturesResult>";
+        $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?><UpdateFeaturesResult>";
         $ccount = $commands->GetCount();
         $rcount = $result->GetCount();
         //Should be equal, but just in case ...
@@ -272,16 +272,21 @@ abstract class MgResponseHandler
         $this->app->response->write($content);
     }
 
-    protected function OutputByteReader($byteReader, $chunkResult = false) {
-        $this->app->response->header("Content-Type", $byteReader->GetMimeType());
+    protected function OutputByteReader($byteReader, $chunkResult = false, $bPrependXmlProlog = false) {
+        $mimeType = $byteReader->GetMimeType();
+        $this->app->response->header("Content-Type", $mimeType);
         $rdrLen = $byteReader->GetLength();
+        if ($mimeType == MgMimeType::Xml && $bPrependXmlProlog) {
+            $this->app->response->write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+        }
         do
         {
             $data = str_pad("\0", 50000, "\0");
             $len = $byteReader->Read($data, 50000);
             if ($len > 0)
             {
-                $this->app->response->write(substr($data, 0, $len));
+                $str = substr($data, 0, $len);
+                $this->app->response->write($str);
             }
         } while ($len > 0);
     }
@@ -317,7 +322,7 @@ abstract class MgResponseHandler
     }
 
     protected function OutputMgPropertyCollection($props, $mimeType = MgMimeType::Xml) {
-        $content = "<PropertyCollection />";
+        $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PropertyCollection />";
         $count = $props->GetCount();
         $agfRw = null;
         $wktRw = null;
@@ -401,11 +406,11 @@ abstract class MgResponseHandler
     }
 
     protected function OutputMgStringCollection($strCol, $mimeType = MgMimeType::Xml) {
-        $content = "<StringCollection />";
+        $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?><StringCollection />";
         if ($strCol != null) {
             // MgStringCollection::ToXml() doesn't seem to be reliable in PHP (bug?), so do this manually
             $count = $strCol->GetCount();
-            $content = "<StringCollection>";
+            $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?><StringCollection>";
             for ($i = 0; $i < $count; $i++) {
                 $value = MgUtils::EscapeXmlChars($strCol->GetItem($i));
                 $content .= "<Item>$value</Item>";
