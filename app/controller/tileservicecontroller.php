@@ -156,75 +156,48 @@ class MgTileServiceController extends MgBaseController {
         return false;
     }
 
-    private static function GetVectorTilePath($app, $resId, $groupName, $scaleIndex, $row, $col) {
-        $relPath = "/".$resId->GetPath()."/".$resId->GetName()."/$groupName/$scaleIndex/$row/$col.json";
-        $path = $app->config("AppRootDir")."/".$app->config("Cache.RootDir")."/vectortile".$relPath;
+    private static function GetTilePath($app, $resId, $groupName, $z, $x, $y, $type) {
+        $relPath = "/".$resId->GetPath()."/".$resId->GetName()."/$groupName/$x/$x/$y.$type";
+        $path = $app->config("AppRootDir")."/".$app->config("Cache.RootDir")."/tile.$type".$relPath;
         return $path;
     }
 
-    private function GetGeoJsonVectorTile($resId, $groupName, $scaleIndex, $row, $col) {
-
-        $path = self::GetVectorTilePath($this->app, $resId, $groupName, $scaleIndex, $row, $col);
-        if (file_exists($path)) {
-            $this->app->lastModified(filemtime($path));
-        }
-
-        $this->EnsureAuthenticationForSite("", true);
-        $siteConn = new MgSiteConnection();
-        $siteConn->Open($this->userInfo);
-
-        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-        $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
-        $tileSvc = $siteConn->CreateService(MgServiceType::TileService);
-        $map = new MgMap($siteConn);
-        $map->Create($resId, "VectorTileMap");
-
-        $scale = $map->GetFiniteDisplayScaleAt($scaleIndex);
-        $layerGroups = $map->GetLayerGroups();
-        $baseGroup = $layerGroups->GetItem($groupName);
-
-        $factory = new MgCoordinateSystemFactory();
-        $mapCsWkt = $map->GetMapSRS();
-        $mapCs = $factory->Create($mapCsWkt);
-        
-        $mapExtent = $map->GetMapExtent();
-        $mapExLL = $mapExtent->GetLowerLeftCoordinate();
-        $mapExUR = $mapExtent->GetUpperRightCoordinate();
-
-        $metersPerUnit = $mapCs->ConvertCoordinateSystemUnitsToMeters(1.0);
+    private static function GetScaleFromBounds($map, $devW, $devH, $metersPerUnit, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY) {
+        $mcsW = $boundsMaxX - $boundsMinX;
+        $mcsH = $boundsMaxY - $boundsMinY;
         $metersPerPixel = 0.0254 / $map->GetDisplayDpi();
+        if ($devH * $mcsW > $devW * $mcsH)
+            return $mcsW * $metersPerUnit / ($devW * $metersPerPixel); // width-limited
+        else
+            return $mcsH * $metersPerUnit / ($devH * $metersPerPixel); // height-limited
+    }
 
-        $tileWidthMCS = $tileSvc->GetDefaultTileSizeX() * $metersPerPixel * $scale / $metersPerUnit;
-        $tileHeightMCS = $tileSvc->GetDefaultTileSizeY() * $metersPerPixel * $scale / $metersPerUnit;
-
-        $tileMinX = $mapExLL->GetX() + ($col       * $tileWidthMCS);  //left edge
-        $tileMaxX = $mapExLL->GetX() + (($col + 1) * $tileWidthMCS);  //right edge 
-        $tileMinY = $mapExUR->GetY() - (($row + 1) * $tileHeightMCS); //bottom edge
-        $tileMaxY = $mapExUR->GetY() - ($row       * $tileHeightMCS); //top edge
-
+    private function PutVectorTileXYZ($map, $groupName, $siteConn, $metersPerUnit, $csFactory, $path, $boundsMinx, $boundsMinY, $boundsMaxX, $boundsMaxY) {
         $wktRw = new MgWktReaderWriter();
         $agfRw = new MgAgfReaderWriter();
 
+        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+        $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
+        $mapCsWkt = $map->GetMapSRS();
         $layers = $map->GetLayers();
+        $groups = $map->GetLayerGroups();
+        $baseGroup = $groups->GetItem($groupName);
         $layerCount = $layers->GetCount();
         $firstFeature = true;
 
-        $dir = dirname($path);
-        if (!is_dir($dir))
-            mkdir($dir, 0777, true);
+        $scale = self::GetScaleFromBounds($map, self::XYZ_TILE_WIDTH, self::XYZ_TILE_HEIGHT, $metersPerUnit, $boundsMinx, $boundsMinY, $boundsMaxX, $boundsMaxY);
         $fp = fopen($path, "w");
 
-        $this->app->response->header("Content-Type", MgMimeType::Json);
         //$this->app->response->write('{ "Type": "FeatureCollection", "features": [');
         fwrite($fp, '{ "type": "FeatureCollection", "features": [');
         for ($i = 0; $i < $layerCount; $i++) {
             $layer = $layers->GetItem($i);
-            if (!self::IsLayerVisibleAtScale($layer, $resSvc, $scale))
-                continue;
             $parentGroup = $layer->GetGroup();
             if ($parentGroup != null && $parentGroup->GetObjectId() == $baseGroup->GetObjectId()) {
-                $wktPoly = MgUtils::MakeWktPolygon(
-                    $tileMinX, $tileMinY, $tileMaxX, $tileMaxY);
+                if (!self::IsLayerVisibleAtScale($layer, $resSvc, $scale))
+                    continue;
+
+                $wktPoly = MgUtils::MakeWktPolygon($boundsMinx, $boundsMinY, $boundsMaxX, $boundsMaxY);
                 
                 $geom = $wktRw->Read($wktPoly);
                 $clsDef = $layer->GetClassDefinition();
@@ -232,13 +205,13 @@ class MgTileServiceController extends MgBaseController {
                 
                 //Set up forward and inverse transforms. Inverse for transforming map bounding box
                 //Forward for transforming source geometries to map space
-                $xform = self::GetTransform($featSvc, $fsId, $clsDef, $mapCsWkt, $factory);
+                $xform = self::GetTransform($featSvc, $fsId, $clsDef, $mapCsWkt, $csFactory);
                 $query = new MgFeatureQueryOptions();
                 $geomName = $layer->GetFeatureGeometryName();
                 if ($xform != null) {
                     $sourceCs = $xform->GetSource();
                     $targetCs = $xform->GetTarget();
-                    $invXform = $factory->GetTransform($targetCs, $sourceCs);
+                    $invXform = $csFactory->GetTransform($targetCs, $sourceCs);
                     $txgeom = $geom->Transform($invXform);
                     $query->SetSpatialFilter($geomName, $txgeom, MgFeatureSpatialOperations::EnvelopeIntersects);
                 } else {
@@ -259,7 +232,59 @@ class MgTileServiceController extends MgBaseController {
                             $fgeom = $agfRw->Read($agf, $xform);
                             $geomJson = MgGeoJsonWriter::ToGeoJson($fgeom);
                             //$this->app->response->write('{ "Type": "Feature", "_layer": "'.$layer->GetName().'", '.$geomJson.'}');
-                            fwrite($fp, '{ "type": "Feature", "_layer": "'.$layer->GetName().'", '.$geomJson.'}');
+                            $propsJson = '"properties": {';
+                            $propsJson .= '"_layer": "'.$layer->GetName().'",';
+                            $propsJson .= '"_selectable": '.($layer->GetSelectable()?"true":"false").',';
+                            $propsJson .= '"_displayIndex": '.($layerCount - $i);
+                            for ($j = 0; $j < $reader->GetPropertyCount(); $j++) {
+                                $pname = $reader->GetPropertyName($j);
+                                $ptype = $reader->GetPropertyType($j);
+                                switch($ptype) {
+                                    case MgPropertyType::Boolean:
+                                        $val = $reader->IsNull($j) ? "null" : ($reader->GetBoolean($j) ? "true" : "false");
+                                        $propsJson .= ',"'.$pname.'": '.$val;
+                                        break;
+                                    case MgPropertyType::Byte:
+                                        $val = $reader->IsNull($j) ? "null" : $reader->GetByte($j);
+                                        $propsJson .= ',"'.$pname.'": '.$val;
+                                        break;
+                                    case MgPropertyType::DateTime:
+                                        $val = "null";
+                                        if (!$reader->IsNull($j)) {
+                                            $dt = $reader->GetDateTime($j);
+                                            $val = sprintf("%d-%02d-%02d %02d:%02d:%02d", $dt->GetYear(), $dt->GetMonth(), $dt->GetDay(), $dt->GetHour(), $dt->GetMinute(), $dt->GetSecond());
+                                        }
+                                        $propsJson .= ',"'.$pname.'": "'.$val.'"';
+                                        break;
+                                    case MgPropertyType::Decimal:
+                                    case MgPropertyType::Double:
+                                        $val = $reader->IsNull($j) ? "null" : $reader->GetDouble($j);
+                                        $propsJson .= ',"'.$pname.'": '.$val;
+                                        break;
+                                    case MgPropertyType::Int16:
+                                        $val = $reader->IsNull($j) ? "null" : $reader->GetInt16($j);
+                                        $propsJson .= ',"'.$pname.'": '.$val;
+                                        break;
+                                    case MgPropertyType::Int32:
+                                        $val = $reader->IsNull($j) ? "null" : $reader->GetInt32($j);
+                                        $propsJson .= ',"'.$pname.'": '.$val;
+                                        break;
+                                    case MgPropertyType::Int64:
+                                        $val = $reader->IsNull($j) ? "null" : $reader->GetInt64($j);
+                                        $propsJson .= ',"'.$pname.'": '.$val;
+                                        break;
+                                    case MgPropertyType::Single:
+                                        $val = $reader->IsNull($j) ? "null" : $reader->GetSingle($j);
+                                        $propsJson .= ',"'.$pname.'": '.$val;
+                                        break;
+                                    case MgPropertyType::String:
+                                        $val = $reader->IsNull($j) ? "null" : $reader->GetString($j);
+                                        $propsJson .= ',"'.$pname.'": "'.$val.'"';
+                                        break;
+                                }
+                            }
+                            $propsJson .= '}';
+                            fwrite($fp, '{ "type": "Feature", '.$propsJson.', '.$geomJson.'}');
                             $firstFeature = false;
                         } catch (MgException $ex) {
 
@@ -273,16 +298,151 @@ class MgTileServiceController extends MgBaseController {
         fwrite($fp, ']}');
         fclose($fp);
 
-        $this->app->lastModified(filemtime($path));
-        $this->app->response->setBody(file_get_contents($path));
+        return $path;
+    }
+
+    private function PutTileImageXYZ($map, $groupName, $siteConn, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY) {
+        //We don't use RenderTile (as it uses key parameters that are locked to serverconfig.ini), we use RenderMap instead
+        $renderSvc = $siteConn->CreateService(MgServiceType::RenderingService);
+        $env = new MgEnvelope($boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY);
+        $strColor = $map->GetBackgroundColor();
+        //Make sure the alpha component is transparent
+        if (strlen($strColor) == 8) {
+            $strColor = substr($strColor, 2)."00";
+        } else if (strlen($strColor) == 6) {
+            $strColor = $strColor."00";
+        }
+        $bgColor = new MgColor($strColor);
+        $tileImg = $renderSvc->RenderMap($map, null, $env, self::XYZ_TILE_WIDTH, self::XYZ_TILE_HEIGHT, $bgColor, $format, false);
+        $sink = new MgByteSink($tileImg);
+        $sink->ToFile($path);
     }
 
     public function GetTile($resId, $groupName, $scaleIndex, $row, $col, $format) {
         $fmt = $this->ValidateRepresentation($format, array("img")); //, "json"));
         if ($fmt === "img")
             $this->GetTileImage($resId, $groupName, $scaleIndex, $row, $col, $format);
-        else if ($fmt === "json")
-            $this->GetGeoJsonVectorTile($resId, $groupName, $scaleIndex, $row, $col, $format);
+    }
+
+    const XYZ_TILE_WIDTH = 256;
+    const XYZ_TILE_HEIGHT = 256;
+
+    public function GetTileXYZ($resId, $groupName, $x, $y, $z, $type) {
+        $fmt = $this->ValidateRepresentation($type, array("json", "png", "png8", "jpg", "gif"));
+
+        $path = self::GetTilePath($this->app, $resId, $groupName, $z, $x, $y, $type);
+        if (file_exists($path)) {
+            $this->app->lastModified(filemtime($path));
+        } else {
+            $dir = dirname($path);
+            if (!is_dir($dir)) {
+                try {
+                    mkdir($dir, 0777, true);
+                } catch (Exception $e) { //Another tile request may have already created this since
+
+                }
+            }
+        }
+
+        $this->EnsureAuthenticationForSite("", true);
+        $siteConn = new MgSiteConnection();
+        $siteConn->Open($this->userInfo);
+
+        $map = new MgMap($siteConn);
+        $map->Create($resId, "VectorTileMap");
+
+        $layerGroups = $map->GetLayerGroups();
+        $baseGroup = $layerGroups->GetItem($groupName);
+
+        $factory = new MgCoordinateSystemFactory();
+        $mapCsWkt = $map->GetMapSRS();
+        $mapCs = $factory->Create($mapCsWkt);
+        
+        $mapExtent = $map->GetMapExtent();
+        $mapExLL = $mapExtent->GetLowerLeftCoordinate();
+        $mapExUR = $mapExtent->GetUpperRightCoordinate();
+
+        $metersPerUnit = $mapCs->ConvertCoordinateSystemUnitsToMeters(1.0);
+
+        //XYZ to lat/lon math. From this we can convert to the bounds in the map's CS
+        //
+        //Source: http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+        $n = pow(2, $z);
+        $lonMin = $x / $n * 360.0 - 180.0;
+        $latMin = rad2deg(atan(sinh(pi() * (1 - 2 * $y / $n))));
+        $lonMax = ($x + 1) / $n * 360.0 - 180.0;
+        $latMax = rad2deg(atan(sinh(pi() * (1 - 2 * ($y + 1) / $n))));
+
+        $boundsMinX = $lonMin;
+        $boundsMinY = $latMin;
+        $boundsMaxX = $lonMax;
+        $boundsMaxY = $latMax;
+
+        if ($mapCs->GetCsCode() != "LL84") {
+            $llCs = $factory->CreateFromCode("LL84");
+            $trans = $factory->GetTransform($llCs, $mapCs);
+
+            $ul = $trans->Transform($lonMin, $latMin);
+            $lr = $trans->Transform($lonMax, $latMax);
+
+            $boundsMinX = min($lr->GetX(), $ul->GetX());
+            $boundsMinY = min($lr->GetY(), $ul->GetY());
+            $boundsMaxX = max($lr->GetX(), $ul->GetX());
+            $boundsMaxY = max($lr->GetY(), $ul->GetY());
+        }
+
+        //Set all layers under group to be visible
+        $layers = $map->GetLayers();
+        $groups = $map->GetLayerGroups();
+        $layerCount = $layers->GetCount();
+
+        if ($groups->IndexOf($groupName) < 0) {
+            throw new Exception("Group not found: $groupName"); //TODO: Localize
+        } else {
+            $grp = $groups->GetItem($groupName);
+            $grp->SetVisible(true);
+        }
+
+        for ($i = 0; $i < $layerCount; $i++) {
+            $layer = $layers->GetItem($i);
+            $group = $layer->GetGroup();
+            if (null == $group) {
+                continue;
+            }
+            if ($group->GetName() != $groupName) {
+                $layer->SetVisible(false);
+                continue;
+            }
+            if ($layer->GetLayerType() == MgLayerType::Dynamic)
+                $layer->SetVisible(true);
+        }
+
+        if ($type == "json") {
+            $this->PutVectorTileXYZ($map, $groupName, $siteConn, $metersPerUnit, $factory, $path, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY);
+            $this->app->response->header("Content-Type", MgMimeType::Json);
+        } else {
+            $format = strtoupper($type);
+            $mimeType = "";
+            switch ($format) {
+                case "PNG": //MgImageFormats::Png:
+                    $mimeType = MgMimeType::Png;
+                    break;
+                case "PNG8": //MgImageFormats::Png8:
+                    $mimeType = MgMimeType::Png;
+                    break;
+                case "GIF": //MgImageFormats::Gif:
+                    $mimeType = MgMimeType::Gif;
+                    break;
+                case "JPG": //MgImageFormats::Jpeg:
+                    $mimeType = MgMimeType::Jpeg;
+                    break;
+            }
+            $this->PutTileImageXYZ($map, $groupName, $siteConn, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY);
+            $this->app->response->header("Content-Type", $mimeType);
+        }
+
+        $this->app->lastModified(filemtime($path));
+        $this->app->response->setBody(file_get_contents($path));
     }
 }
 

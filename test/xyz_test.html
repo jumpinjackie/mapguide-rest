@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="" />
+    <title>OpenLayers Basic ESRI Map Cache Example</title>
+    <style>
+      .olImageLoadError {
+          display: none;
+      }
+      #map { width: 500px; height: 300px; }
+    </style>
+    <script src="../assets/common/js/OpenLayers.js"></script>
+    <script type="text/javascript">
+        var map, layer;
+        function init(){
+            var layerExtent = new OpenLayers.Bounds( -9770571.93250815, 5416573.69002144, -9755615.48593707, 5436091.17493748 );
+            map = new OpenLayers.Map( 'map', { theme: null, 'restrictedExtent': layerExtent} );
+            layer = new OpenLayers.Layer.XYZ( "ESRI",
+                    "http://localhost/mapguide/rest/library/Samples/Sheboygan/MapsTiled/SheboyganCommercial.MapDefinition/xyz/Base Layer Group/${z}/${x}/${y}/tile.png",
+                    {sphericalMercator: true} );
+            map.addLayer(layer);
+            map.zoomToExtent(map.restrictedExtent);
+        }
+    </script>
+  </head>
+  <body onload="init()">
+    <h1 id="title">Basic mapguide-rest XYZ Example</h1>
+
+    <div id="tags">
+        XYZ, layer, tile
+    </div>
+
+    <div id="shortdesc">Shows a Simple XYZ tiled map using the mapguide-rest API</a>. </div>
+
+    <div id="map" class="smallmap"></div>
+
+    <div id="docs">
+       <p>Show the use of the XYZ layer to access a tiled map definition using the mapguide-rest API</p>
+    </div>
+  </body>
+</html>

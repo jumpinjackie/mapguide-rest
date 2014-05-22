@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <title>Sheboygan map as XYZ layer</title>
+        <link rel="stylesheet" href="../../assets/common/js/theme/default/style.css" />
+        <style type="text/css">
+            body { font-family: Verdana; font-size: 0.9em; }
+            #error { color: red; }
+            #wrap { width: 900; }
+            #map { width: 400; height: 300; float: left; }
+            .olControlMousePosition { background: #ffff66; font-size: 0.6em !important; padding: 2px; }
+        </style>
+        <script type="text/javascript" src="../../assets/common/js/OpenLayers.js"></script>
+        <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript">
+        
+        //This sample is assumed to be hosted at http://servername/mapguide/rest/sampleapps/tiled/index.html
+        var restUrl = "../../../rest";
+        
+        $(document).ready(function() {
+            OpenLayers.Control.DragPan.prototype.enableKinetic = false;
+            
+            var layerExtent = new OpenLayers.Bounds( -9770571.93250815, 5416573.69002144, -9755615.48593707, 5436091.17493748 );
+            var map = new OpenLayers.Map('map', { 
+                theme: null, 
+                'restrictedExtent': layerExtent,
+                controls: [
+                    new OpenLayers.Control.Navigation(),
+                    new OpenLayers.Control.Attribution(),
+                    new OpenLayers.Control.Zoom(),
+                    new OpenLayers.Control.ScaleLine(),
+                    new OpenLayers.Control.MousePosition()
+                ]
+            });
+            var layer = new OpenLayers.Layer.XYZ( "mapguide-rest",
+                    "http://localhost/mapguide/rest/library/Samples/Sheboygan/MapsTiled/SheboyganCommercial.MapDefinition/xyz/Base Layer Group/${z}/${x}/${y}/tile.png",
+                    {sphericalMercator: true} );
+            map.addLayer(layer);
+            map.zoomToExtent(map.restrictedExtent);
+        });
+        
+        </script>
+    </head>
+    <body>
+        <p>This example demonstrates a Map Definition being consumed as an XYZ layer via the MapGuide REST API.</p>
+        <p>The Map Definition is in WGS84.PseudoMercator</p>
+        <p>Sample not loading? <a href="../data/load.php">Check that the required resources have been loaded</a></p>
+        <div id="error">
+        </div>
+        <div id="wrap">
+            <div id="map">
+            </div>
+        </div>
+    </body>
+</html>

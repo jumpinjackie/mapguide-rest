@@ -81,10 +81,16 @@ $hasOL2Samples = true;
                 <li><a href="selection/index.html">Basic Sheboygan un-tiled map example with selection</a></li>
                 <li><a href="mixed/index.html">Basic Sheboygan mixed map (tiled and untiled) example</a></li>
                 <li><a href="commercial/index.html">Sheboygan map with Google/OSM layers</a></li>
+                <li><a href="xyz/index.html">Sheboygan map as an XYZ tile layer</a></li>
+                <li><a href="vector/index.html">Sheboygan map as a vector tile layer</a></li>
                 <li><a href="restsources/index.html">OpenLayers map consuming published data</a></li>
                 <li><a href="kitchensink/index.html">Sheboygan map with every possible map/selection RESTful URL available</a></li>
             </ul>
             <? } ?>
+            <p class="sample-header">MapGuide REST API with <a href="http://leafletjs.com/">Leaflet</a></p>
+            <ul>
+                <li><a href="leaflet_xyz/index.html">Sheboygan map as an XYZ tile layer</a></li>
+            </ul>
         </div>
     </body>
 </html>

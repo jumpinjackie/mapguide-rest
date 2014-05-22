@@ -13,3 +13,5 @@
 /conf/data/test_author
 /conf/data/test_group
 /conf/data/test_mixed
+/cache/tile.png
+/cache/tile.json
