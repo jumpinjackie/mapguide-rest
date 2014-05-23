@@ -279,7 +279,7 @@ class MgTileServiceController extends MgBaseController {
                                         break;
                                     case MgPropertyType::String:
                                         $val = $reader->IsNull($j) ? "null" : $reader->GetString($j);
-                                        $propsJson .= ',"'.$pname.'": "'.$val.'"';
+                                        $propsJson .= ',"'.$pname.'": "'.MgUtils::EscapeJsonString($val).'"';
                                         break;
                                 }
                             }
