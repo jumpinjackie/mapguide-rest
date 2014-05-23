@@ -27,16 +27,21 @@
         $(document).ready(function() {
             var layerStyleCache = {};
             var defaultStyle;
+
+            //NOTE: Your map definition can be in any coordinate system as long as it it transformable to LL84
+            //
+            //But the ol3 tile layer must remain as EPSG:3857
+
             var tileLayer = new ol.layer.Vector({
               source: new ol.source.TileVector({
                 format: new ol.format.GeoJSON({
-                  defaultProjection: 'EPSG:3857'
+                  defaultProjection: 'EPSG:4326'
                 }),
                 projection: 'EPSG:3857',
                 tileGrid: new ol.tilegrid.XYZ({
                   maxZoom: 19
                 }),
-                url: restUrl + '/library/Samples/Sheboygan/MapsTiled/SheboyganCommercial.MapDefinition/xyz/Base Layer Group/{z}/{x}/{y}/tile.json'
+                url: restUrl + '/library/Samples/Sheboygan/MapsTiled/SheboyganNoWatermark.MapDefinition/xyz/Base Layer Group/{z}/{x}/{y}/tile.json'
               }),
               style: function(feature, resolution) {
                 //These styles have been painfully hand written from what's specified in the Layer Definitions

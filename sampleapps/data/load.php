@@ -24,8 +24,8 @@ if (array_key_exists("USERNAME", $_POST) && array_key_exists("PASSWORD", $_POST)
     $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
     
     //Commercial sample
-    $res1 = new MgResourceIdentifier("Library://Samples/Sheboygan/Maps/SheboyganCommercial.MapDefinition");
-    $bs1 = new MgByteSource(dirname(__FILE__)."/SheboyganCommercial.MapDefinition.xml");
+    $res1 = new MgResourceIdentifier("Library://Samples/Sheboygan/MapsTiled/SheboyganNoWatermark.MapDefinition");
+    $bs1 = new MgByteSource(dirname(__FILE__)."/SheboyganNoWatermark.MapDefinition.xml");
     $br1 = $bs1->GetReader();
     $resSvc->SetResource($res1, $br1, null);
     

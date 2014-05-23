@@ -2,7 +2,7 @@
     "Source": {
         "Type": "MapGuide",
         "FeatureSource": "Library://Samples/Sheboygan/Data/VotingDistricts.FeatureSource",
-        "FeatureClass": "SDF_2_Schema:VotingDistricts"
+        "FeatureClass": "Default:VotingDistricts"
     },
     "Representations": {
         "xml": {

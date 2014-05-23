@@ -373,10 +373,10 @@ class MgTileServiceController extends MgBaseController {
         $lonMax = ($x + 1) / $n * 360.0 - 180.0;
         $latMax = rad2deg(atan(sinh(pi() * (1 - 2 * ($y + 1) / $n))));
 
-        $boundsMinX = $lonMin;
-        $boundsMinY = $latMin;
-        $boundsMaxX = $lonMax;
-        $boundsMaxY = $latMax;
+        $boundsMinX = min($lonMin, $lonMax);
+        $boundsMinY = min($latMin, $latMax);
+        $boundsMaxX = max($lonMax, $lonMin);
+        $boundsMaxY = max($latMax, $latMin);
 
         if ($mapCs->GetCsCode() != "LL84") {
             $llCs = $factory->CreateFromCode("LL84");
