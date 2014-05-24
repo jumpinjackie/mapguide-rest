@@ -345,26 +345,26 @@ class MgTileServiceController extends MgBaseController {
         $lockPath = "$dir/lock.lck";
         $fpLockFile = fopen($lockPath, "a+");
 
-        $requestId = rand();
-        error_log("($requestId) Checking if $path exists");
+        //$requestId = rand();
+        //error_log("($requestId) Checking if $path exists");
 
         if (!file_exists($path)) {
 
-            error_log("($requestId) $path does not exist. Locking for writing");
+            //error_log("($requestId) $path does not exist. Locking for writing");
 
             $bLocked = false;
             flock($fpLockFile, LOCK_EX);
             fwrite($fpLockFile, ".");
             $bLocked = true;
 
-            error_log("($requestId) Acquired lock for $path. Checking if path exists again.");
+            //error_log("($requestId) Acquired lock for $path. Checking if path exists again.");
 
             //check once more to see if the cache file was created while waiting for
             //the lock
             clearstatcache();
             if (!file_exists($path)) {
                 try {
-                    error_log("($requestId) Rendering tile to $path");
+                    //error_log("($requestId) Rendering tile to $path");
 
                     $this->EnsureAuthenticationForSite("", true);
                     $siteConn = new MgSiteConnection();
@@ -386,7 +386,7 @@ class MgTileServiceController extends MgBaseController {
 
                     $metersPerUnit = $mapCs->ConvertCoordinateSystemUnitsToMeters(1.0);
 
-                    error_log("($requestId) Calc bounds from XYZ");
+                    //error_log("($requestId) Calc bounds from XYZ");
                     //XYZ to lat/lon math. From this we can convert to the bounds in the map's CS
                     //
                     //Source: http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
@@ -441,16 +441,16 @@ class MgTileServiceController extends MgBaseController {
                     }
 
                     if ($type == "json") {
-                        error_log("($requestId) Render vector tile");
+                        //error_log("($requestId) Render vector tile");
                         $this->PutVectorTileXYZ($map, $groupName, $siteConn, $metersPerUnit, $factory, $path, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY);
                     } else {
                         $format = strtoupper($type);
-                        error_log("($requestId) Render image tile");
+                        //error_log("($requestId) Render image tile");
                         $this->PutTileImageXYZ($map, $groupName, $siteConn, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY);
                     }
                 } catch (MgException $ex) {
                     if ($bLocked) {
-                        error_log("($requestId) MgException caught ".$ex->GetExceptionMessage().". Releasing lock for $path");
+                        //error_log("($requestId) MgException caught ".$ex->GetExceptionMessage().". Releasing lock for $path");
                         flock($fpLockFile, LOCK_UN);
                         $bLocked = false;
                     }
@@ -459,7 +459,7 @@ class MgTileServiceController extends MgBaseController {
                     }
                 } catch (Exception $ex) {
                     if ($bLocked) {
-                        error_log("($requestId) Exception caught. Releasing lock for $path");
+                        //error_log("($requestId) Exception caught. Releasing lock for $path");
                         flock($fpLockFile, LOCK_UN);
                         $bLocked = false;
                     }
@@ -467,7 +467,7 @@ class MgTileServiceController extends MgBaseController {
             }
 
             if ($bLocked) {
-                error_log("($requestId) Releasing lock for $path");
+                //error_log("($requestId) Releasing lock for $path");
                 flock($fpLockFile, LOCK_UN);
                 $bLocked = false;
             }
@@ -476,12 +476,12 @@ class MgTileServiceController extends MgBaseController {
         $modTime = filemtime($path);
         $this->app->lastModified($modTime);
 
-        error_log("($requestId) Acquiring shared lock for $path");
+        //error_log("($requestId) Acquiring shared lock for $path");
         //acquire shared lock for reading to prevent a problem that could occur
         //if a tile exists but is only partially generated.
         flock($fpLockFile, LOCK_SH);
 
-        error_log("($requestId) Outputting $path");
+        //error_log("($requestId) Outputting $path");
 
         $ext = strtoupper(pathinfo($path, PATHINFO_EXTENSION));
         $mimeType = "";
@@ -505,7 +505,7 @@ class MgTileServiceController extends MgBaseController {
         $this->app->response->header("Cache-Control", "max-age=31536000, must-revalidate");
         $this->app->response->setBody(file_get_contents($path));
 
-        error_log("($requestId) Releasing shared lock for $path");
+        //error_log("($requestId) Releasing shared lock for $path");
 
         //Release lock
         flock($fpLockFile, LOCK_UN);
