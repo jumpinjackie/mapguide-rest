@@ -342,8 +342,11 @@ class MgTileServiceController extends MgBaseController {
 
             }
         }
-        $lockPath = "$dir/lock.lck";
+        $lockPath = "$dir/lock_".$y.".lck";
         $fpLockFile = fopen($lockPath, "a+");
+
+        //Message of any exception caught will be set to this variable
+        $tileError = null;
 
         //$requestId = rand();
         //error_log("($requestId) Checking if $path exists");
@@ -451,6 +454,7 @@ class MgTileServiceController extends MgBaseController {
                 } catch (MgException $ex) {
                     if ($bLocked) {
                         //error_log("($requestId) MgException caught ".$ex->GetExceptionMessage().". Releasing lock for $path");
+                        $tileError = $ex->GetExceptionMessage();
                         flock($fpLockFile, LOCK_UN);
                         $bLocked = false;
                     }
@@ -459,6 +463,7 @@ class MgTileServiceController extends MgBaseController {
                     }
                 } catch (Exception $ex) {
                     if ($bLocked) {
+                        $tileError = $ex->getMessage();
                         //error_log("($requestId) Exception caught. Releasing lock for $path");
                         flock($fpLockFile, LOCK_UN);
                         $bLocked = false;
@@ -471,6 +476,17 @@ class MgTileServiceController extends MgBaseController {
                 flock($fpLockFile, LOCK_UN);
                 $bLocked = false;
             }
+        }
+
+        //An exception occurred, try to clean up lock before bailing
+        if ($tileError != null) {
+            try {
+                fclose($fpLockFile);
+                unlink($lockPath);
+            } catch (Exception $ex) {
+                //error_log("($requestId) Failed to delete lock file. Perhaps another concurrent request to the same tile is happening?");
+            }
+            throw new Exception($tileError);
         }
 
         $modTime = filemtime($path);
@@ -509,7 +525,13 @@ class MgTileServiceController extends MgBaseController {
 
         //Release lock
         flock($fpLockFile, LOCK_UN);
-        fclose($fpLockFile);
+        //Try to delete the lock file
+        try {
+            fclose($fpLockFile);
+            unlink($lockPath);
+        } catch (Exception $ex) {
+            //error_log("($requestId) Failed to delete lock file. Perhaps another concurrent request to the same tile is happening?");
+        }
     }
 }
 
