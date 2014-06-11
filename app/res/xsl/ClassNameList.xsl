@@ -20,8 +20,9 @@
     </xsl:template>
 
     <xsl:template match="StringCollection">
+        <xsl:for-each select="Item">
         <li>
-            <xsl:variable name="className" select="Item" />
+            <xsl:variable name="className" select="text()" />
             <xsl:value-of select="$className" />
             &#160;
             <a href="../classdef.xml/{$className}">
@@ -32,5 +33,6 @@
                 [json]
             </a>
         </li>
+        </xsl:for-each>
     </xsl:template>
 </xsl:stylesheet>

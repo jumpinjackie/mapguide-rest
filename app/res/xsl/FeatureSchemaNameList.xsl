@@ -25,8 +25,9 @@
 
     <xsl:template match="StringCollection">
         <xsl:param name="root" />
+        <xsl:for-each select="Item">
         <li class="list-group-item">
-            <xsl:variable name="schemaName" select="Item" />
+            <xsl:variable name="schemaName" select="text()" />
             <xsl:value-of select="$schemaName" />
             &#160;
             <a href="{$root}schema.xml/{$schemaName}">
@@ -47,5 +48,6 @@
             &#160;
             <a href="{$root}classes.html/{$schemaName}"><i class='fa fa-file-o' />&#160;Classes (HTML)</a>
         </li>
+        </xsl:for-each>
     </xsl:template>
 </xsl:stylesheet>
