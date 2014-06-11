@@ -11,7 +11,7 @@
         <script type="text/javascript" src="../../assets/common/js/ol-whitespace.js"></script>
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
         <script type="text/javascript">
-        
+
         //This sample is assumed to be hosted at http://servername/mapguide/rest/sampleapps/tiled/index.html
         var restUrl = "../../../rest";
 
@@ -23,7 +23,7 @@
                 return "";
             }
         }
-        
+
         $(document).ready(function() {
             var layerStyleCache = {};
             var defaultStyle;
@@ -188,7 +188,7 @@
                           })
                         ];
                     }
-                    
+
                   } else if (layer == "CityLimits") {
                     if (resolution <= 4.5) {
                         styleArray = [
@@ -293,19 +293,18 @@
 
             var map = new ol.Map({
               layers: [
-                /*
                 new ol.layer.Tile({
                   source: new ol.source.OSM({
                     attributions: [
                       new ol.Attribution({
-                        html: 'Tiles &copy; <a href="http://www.opencyclemap.org/">' +
-                            'OpenCycleMap</a>'
+                        html: 'Tiles &copy; <a href="http://www.openstreetmap.org/">' +
+                            'OpenStreetMap</a>'
                       }),
                       ol.source.OSM.DATA_ATTRIBUTION
                     ],
-                    url: 'http://{a-c}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png'
+                    url: 'http://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
                   })
-                }),*/
+                }),
                 tileLayer
               ],
               renderer: 'canvas',
@@ -317,7 +316,7 @@
                 zoom: 12
               })
             });
-            
+
             var highlightStyleCache = {};
             var featureOverlay = new ol.FeatureOverlay({
               map: map,
@@ -378,12 +377,12 @@
               }
             });
         });
-        
+
         </script>
     </head>
     <body>
         <p>This example demonstrates a Map Definition being consumed as a <strong>tiled vector layer</strong> via the MapGuide REST API with <a href="http://ol3js.org/">OpenLayers 3</a>.</p>
-        <p>The Map Definition is in WGS84.PseudoMercator</p>
+        <p>An OpenStreetMap layer is included as a backdrop for context</p>
         <p>Sample not loading? <a href="../data/load.php">Check that the required resources have been loaded</a></p>
         <div id="error">
         </div>
