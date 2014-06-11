@@ -13,7 +13,7 @@
         <script type="text/javascript">
 
         //This sample is assumed to be hosted at http://servername/mapguide/rest/sampleapps/tiled/index.html
-        var restUrl = "../../../rest";
+        var restUrl = "../..";
 
         $(document).ready(function() {
             //NOTE: Your map definition can be in any coordinate system as long as it it transformable to LL84
@@ -35,7 +35,7 @@
                   })
                 }),
                 new ol.layer.Tile({
-                  source: new ol.source.OSM({
+                  source: new ol.source.XYZ({
                     attributions: [
                       new ol.Attribution({
                         html: 'Powered by <a href="https://github.com/jumpinjackie/mapguide-rest">mapguide-rest</a>'

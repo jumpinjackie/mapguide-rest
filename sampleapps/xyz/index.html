@@ -12,16 +12,16 @@
         <script type="text/javascript" src="../../assets/common/js/OpenLayers.js"></script>
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
         <script type="text/javascript">
-        
+
         //This sample is assumed to be hosted at http://servername/mapguide/rest/sampleapps/tiled/index.html
-        var restUrl = "../../../rest";
-        
+        var restUrl = "../..";
+
         $(document).ready(function() {
             OpenLayers.Control.DragPan.prototype.enableKinetic = false;
-            
+
             var layerExtent = new OpenLayers.Bounds( -9770571.93250815, 5416573.69002144, -9755615.48593707, 5436091.17493748 );
-            var map = new OpenLayers.Map('map', { 
-                theme: null, 
+            var map = new OpenLayers.Map('map', {
+                theme: null,
                 'restrictedExtent': layerExtent,
                 controls: [
                     new OpenLayers.Control.Navigation(),
@@ -32,12 +32,12 @@
                 ]
             });
             var layer = new OpenLayers.Layer.XYZ( "mapguide-rest",
-                    "http://localhost/mapguide/rest/library/Samples/Sheboygan/MapsTiled/SheboyganNoWatermark.MapDefinition/xyz/Base Layer Group/${z}/${x}/${y}/tile.png",
+                    restUrl + "/library/Samples/Sheboygan/MapsTiled/SheboyganNoWatermark.MapDefinition/xyz/Base Layer Group/${z}/${x}/${y}/tile.png",
                     {sphericalMercator: true} );
             map.addLayer(layer);
             map.zoomToExtent(map.restrictedExtent);
         });
-        
+
         </script>
     </head>
     <body>
