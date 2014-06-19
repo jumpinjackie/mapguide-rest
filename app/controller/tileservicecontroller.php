@@ -158,7 +158,10 @@ class MgTileServiceController extends MgBaseController {
     }
 
     private static function GetTilePath($app, $resId, $groupName, $z, $x, $y, $type) {
-        $relPath = "/".$resId->GetPath()."/".$resId->GetName()."/$groupName/$z/$x/$y.$type";
+        $ext = $type;
+        if (strtolower($type) == "png8")
+            $ext = substr($type, 0, 3); //png8 -> png
+        $relPath = "/".$resId->GetPath()."/".$resId->GetName()."/$groupName/$z/$x/$y.$ext";
         $path = $app->config("AppRootDir")."/".$app->config("Cache.RootDir")."/tile.$type".$relPath;
         return $path;
     }
