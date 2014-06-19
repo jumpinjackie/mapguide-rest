@@ -51,7 +51,7 @@ class MgTileServiceController extends MgBaseController {
         $tileCacheName = str_replace("Library://", "", $mapDefIdStr);
         $tileCacheName = str_replace(".MapDefinition", "", $tileCacheName);
         $tileCacheName = str_replace("/", "_", $tileCacheName);
-        $path = sprintf("%s/%s/S%s/%s/%s/%s/%s_%s.%s", 
+        $path = sprintf("%s/%s/S%s/%s/%s/%s/%s_%s.%s",
                         $this->app->config("MapGuide.PhysicalTilePath"),
                         $tileCacheName,
                         $scaleIndex,
@@ -199,11 +199,11 @@ class MgTileServiceController extends MgBaseController {
                     continue;
 
                 $wktPoly = MgUtils::MakeWktPolygon($boundsMinx, $boundsMinY, $boundsMaxX, $boundsMaxY);
-                
+
                 $geom = $wktRw->Read($wktPoly);
                 $clsDef = $layer->GetClassDefinition();
                 $fsId = new MgResourceIdentifier($layer->GetFeatureSourceId());
-                
+
                 //Set up forward and inverse transforms. Inverse for transforming map bounding box
                 //Forward for transforming source geometries to map space
                 $xform = self::GetTransform($featSvc, $fsId, $clsDef, $mapCsWkt, $csFactory);
@@ -328,6 +328,8 @@ class MgTileServiceController extends MgBaseController {
     const XYZ_TILE_WIDTH = 256;
     const XYZ_TILE_HEIGHT = 256;
 
+    const MAX_RETRY_ATTEMPTS = 10;
+
     public function GetTileXYZ($resId, $groupName, $x, $y, $z, $type) {
         $fmt = $this->ValidateRepresentation($type, array("json", "png", "png8", "jpg", "gif"));
 
@@ -335,14 +337,23 @@ class MgTileServiceController extends MgBaseController {
         clearstatcache();
 
         $dir = dirname($path);
-        if (!@is_dir($dir)) {
+        $lockPath = "$dir/lock_".$y.".lck";
+        $attempts = 0;
+        while (!@is_dir($dir)) {
             try {
                 mkdir($dir, 0777, true);
             } catch (Exception $e) { //Another tile request may have already created this since
-
+                $attempts++;
+                //Bail after MAX_RETRY_ATTEMPTS
+                if ($attempts >= self::MAX_RETRY_ATTEMPTS)
+                    $this->halt(500, "Failed to create directory after $attempts attempts");
             }
         }
-        $lockPath = "$dir/lock_".$y.".lck";
+
+        //If there's a dangling lock file, attempt to remove it
+        if (file_exists($lockPath))
+            unlink($lockPath);
+
         $fpLockFile = fopen($lockPath, "a+");
 
         //Message of any exception caught will be set to this variable
@@ -351,7 +362,12 @@ class MgTileServiceController extends MgBaseController {
         //$requestId = rand();
         //error_log("($requestId) Checking if $path exists");
 
-        if (!file_exists($path)) {
+        $attempts = 0;
+        while (!file_exists($path)) {
+            //Bail after MAX_RETRY_ATTEMPTS
+            if ($attempts >= self::MAX_RETRY_ATTEMPTS)
+                $this->halt(500, "Failed to generate tile after $attempts attempts");
+            $attempts++;
 
             //error_log("($requestId) $path does not exist. Locking for writing");
 
@@ -382,7 +398,7 @@ class MgTileServiceController extends MgBaseController {
                     $factory = new MgCoordinateSystemFactory();
                     $mapCsWkt = $map->GetMapSRS();
                     $mapCs = $factory->Create($mapCsWkt);
-                    
+
                     $mapExtent = $map->GetMapExtent();
                     $mapExLL = $mapExtent->GetLowerLeftCoordinate();
                     $mapExUR = $mapExtent->GetUpperRightCoordinate();
