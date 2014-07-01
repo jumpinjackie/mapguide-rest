@@ -24,8 +24,257 @@
             }
         }
 
+        var layerStyleCache = {};
+
+
+        function styleFunc(feature, resolution) {
+            //These styles have been painfully hand written from what's specified in the Layer Definitions
+            //
+            //Wouldn't it be nice if there was a way to translate these styles automatically? ;-)
+            var layer = feature.get("_layer");
+            var sort_key = feature.get("_displayIndex");
+            var styleName = "default";
+            if (layer == "Parcels") {
+                styleName = "parcel_" + feature.get("RTYPE");
+            } else if (layer == "CityLimits") {
+                styleName = "citylimits_" + (resolution <= 4.5) ? "low" : "high";
+            }
+            var styleKey = layer + "/" + styleName + "/" + sort_key;
+            var styleArray = layerStyleCache[styleKey];
+            if (!styleArray) {
+              if (layer == "Districts") {
+                styleArray = [
+                  new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                      color: '#A68B53',
+                      width: 1
+                    }),
+                    zIndex: sort_key
+                  })
+                ];
+              } else if (layer == "Buildings") {
+                styleArray = [
+                  new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                      color: '#DDDDDD',
+                      width: 1
+                    }),
+                    fill: new ol.style.Fill({
+                      color: '#808080'
+                    }),
+                    zIndex: sort_key
+                  })
+                ];
+              } else if (layer == "Parcels") {
+                var type = feature.get("RTYPE");
+                if (type == "AGR") {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#808080',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#C19E6A'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else if (type == "EXM") {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#808080',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#B9A670'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else if (type == "MER") {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#808080',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#B2AE77'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else if (type == "MFG") {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#808080',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#ABB67E'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else if (type == "RES") {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#808080',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#A4BE85'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else if (type == "S&W") {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#808080',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#9DC68C'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else if (type == "WTC") {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#ABC7E9',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#96CE93'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else { //Other
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#000',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#D4D4D4'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                }
+
+              } else if (layer == "CityLimits") {
+                if (resolution <= 4.5) {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#C0C0C0',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#C0C0C0'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#D5C8AC',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#D5C8AC'
+                        }),/*
+                        text: new ol.style.Text({
+                          text: 'District',
+                          stroke: new ol.style.Stroke({
+                            color: '#C0C0C0',
+                            width: 1
+                          }),
+                          fill: new ol.style.Fill({
+                            color: '#C0C0C0'
+                          })
+                        }),*/
+                        zIndex: sort_key
+                      })
+                    ];
+                }
+              } else if (layer == "Hydrography") {
+                styleArray = [
+                  new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                      color: '#ABC7E9',
+                      width: 1
+                    }),
+                    fill: new ol.style.Fill({
+                      color: '#ABC7E9'
+                    }),
+                    zIndex: sort_key
+                  })
+                ];
+              } else if (layer == "Islands") {
+                styleArray = [
+                  new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                      color: '#D5C8AC',
+                      width: 1
+                    }),
+                    fill: new ol.style.Fill({
+                      color: '#D5C8AC'
+                    }),
+                    zIndex: sort_key
+                  })
+                ];
+              } else if (layer == "Roads") {
+                styleArray = [
+                  new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                      color: '#646464',
+                      width: 1.5
+                    }),
+                    zIndex: sort_key
+                  })
+                ];
+              } else if (layer == "Tracks") {
+                styleArray = [
+                  new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                      color: '#808080',
+                      width: 1.5
+                    }),
+                    zIndex: sort_key
+                  })
+                ];
+              } else {
+                styleArray = [new ol.style.Style({
+                  stroke: new ol.style.Stroke({
+                    color: '#000',
+                    width: 1
+                  }),
+                  zIndex: sort_key
+                })];
+              }
+
+              if (styleArray) {
+                layerStyleCache[styleKey] = styleArray;
+              }
+            }
+            return styleArray;
+        }
+
         $(document).ready(function() {
-            var layerStyleCache = {};
             var defaultStyle;
 
             //NOTE: Your map definition can be in any coordinate system as long as it it transformable to LL84
@@ -43,252 +292,7 @@
                 }),
                 url: restUrl + '/library/Samples/Sheboygan/MapsTiled/SheboyganNoWatermark.MapDefinition/xyz/Base Layer Group/{z}/{x}/{y}/tile.json'
               }),
-              style: function(feature, resolution) {
-                //These styles have been painfully hand written from what's specified in the Layer Definitions
-                //
-                //Wouldn't it be nice if there was a way to translate these styles automatically? ;-)
-                var layer = feature.get("_layer");
-                var sort_key = feature.get("_displayIndex");
-                var styleName = "default";
-                if (layer == "Parcels") {
-                    styleName = "parcel_" + feature.get("RTYPE");
-                } else if (layer == "CityLimits") {
-                    styleName = "citylimits_" + (resolution <= 4.5) ? "low" : "high";
-                }
-                var styleKey = layer + "/" + styleName + "/" + sort_key;
-                var styleArray = layerStyleCache[styleKey];
-                if (!styleArray) {
-                  if (layer == "Districts") {
-                    styleArray = [
-                      new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                          color: '#A68B53',
-                          width: 1
-                        }),
-                        zIndex: sort_key
-                      })
-                    ];
-                  } else if (layer == "Buildings") {
-                    styleArray = [
-                      new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                          color: '#DDDDDD',
-                          width: 1
-                        }),
-                        fill: new ol.style.Fill({
-                          color: '#808080'
-                        }),
-                        zIndex: sort_key
-                      })
-                    ];
-                  } else if (layer == "Parcels") {
-                    var type = feature.get("RTYPE");
-                    if (type == "AGR") {
-                        styleArray = [
-                          new ol.style.Style({
-                            stroke: new ol.style.Stroke({
-                              color: '#808080',
-                              width: 1
-                            }),
-                            fill: new ol.style.Fill({
-                              color: '#C19E6A'
-                            }),
-                            zIndex: sort_key
-                          })
-                        ];
-                    } else if (type == "EXM") {
-                        styleArray = [
-                          new ol.style.Style({
-                            stroke: new ol.style.Stroke({
-                              color: '#808080',
-                              width: 1
-                            }),
-                            fill: new ol.style.Fill({
-                              color: '#B9A670'
-                            }),
-                            zIndex: sort_key
-                          })
-                        ];
-                    } else if (type == "MER") {
-                        styleArray = [
-                          new ol.style.Style({
-                            stroke: new ol.style.Stroke({
-                              color: '#808080',
-                              width: 1
-                            }),
-                            fill: new ol.style.Fill({
-                              color: '#B2AE77'
-                            }),
-                            zIndex: sort_key
-                          })
-                        ];
-                    } else if (type == "MFG") {
-                        styleArray = [
-                          new ol.style.Style({
-                            stroke: new ol.style.Stroke({
-                              color: '#808080',
-                              width: 1
-                            }),
-                            fill: new ol.style.Fill({
-                              color: '#ABB67E'
-                            }),
-                            zIndex: sort_key
-                          })
-                        ];
-                    } else if (type == "RES") {
-                        styleArray = [
-                          new ol.style.Style({
-                            stroke: new ol.style.Stroke({
-                              color: '#808080',
-                              width: 1
-                            }),
-                            fill: new ol.style.Fill({
-                              color: '#A4BE85'
-                            }),
-                            zIndex: sort_key
-                          })
-                        ];
-                    } else if (type == "S&W") {
-                        styleArray = [
-                          new ol.style.Style({
-                            stroke: new ol.style.Stroke({
-                              color: '#808080',
-                              width: 1
-                            }),
-                            fill: new ol.style.Fill({
-                              color: '#9DC68C'
-                            }),
-                            zIndex: sort_key
-                          })
-                        ];
-                    } else if (type == "WTC") {
-                        styleArray = [
-                          new ol.style.Style({
-                            stroke: new ol.style.Stroke({
-                              color: '#ABC7E9',
-                              width: 1
-                            }),
-                            fill: new ol.style.Fill({
-                              color: '#96CE93'
-                            }),
-                            zIndex: sort_key
-                          })
-                        ];
-                    } else { //Other
-                        styleArray = [
-                          new ol.style.Style({
-                            stroke: new ol.style.Stroke({
-                              color: '#000',
-                              width: 1
-                            }),
-                            fill: new ol.style.Fill({
-                              color: '#D4D4D4'
-                            }),
-                            zIndex: sort_key
-                          })
-                        ];
-                    }
-
-                  } else if (layer == "CityLimits") {
-                    if (resolution <= 4.5) {
-                        styleArray = [
-                          new ol.style.Style({
-                            stroke: new ol.style.Stroke({
-                              color: '#C0C0C0',
-                              width: 1
-                            }),
-                            fill: new ol.style.Fill({
-                              color: '#C0C0C0'
-                            }),
-                            zIndex: sort_key
-                          })
-                        ];
-                    } else {
-                        styleArray = [
-                          new ol.style.Style({
-                            stroke: new ol.style.Stroke({
-                              color: '#D5C8AC',
-                              width: 1
-                            }),
-                            fill: new ol.style.Fill({
-                              color: '#D5C8AC'
-                            }),/*
-                            text: new ol.style.Text({
-                              text: 'District',
-                              stroke: new ol.style.Stroke({
-                                color: '#C0C0C0',
-                                width: 1
-                              }),
-                              fill: new ol.style.Fill({
-                                color: '#C0C0C0'
-                              })
-                            }),*/
-                            zIndex: sort_key
-                          })
-                        ];
-                    }
-                  } else if (layer == "Hydrography") {
-                    styleArray = [
-                      new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                          color: '#ABC7E9',
-                          width: 1
-                        }),
-                        fill: new ol.style.Fill({
-                          color: '#ABC7E9'
-                        }),
-                        zIndex: sort_key
-                      })
-                    ];
-                  } else if (layer == "Islands") {
-                    styleArray = [
-                      new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                          color: '#D5C8AC',
-                          width: 1
-                        }),
-                        fill: new ol.style.Fill({
-                          color: '#D5C8AC'
-                        }),
-                        zIndex: sort_key
-                      })
-                    ];
-                  } else if (layer == "Roads") {
-                    styleArray = [
-                      new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                          color: '#646464',
-                          width: 1.5
-                        }),
-                        zIndex: sort_key
-                      })
-                    ];
-                  } else if (layer == "Tracks") {
-                    styleArray = [
-                      new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                          color: '#808080',
-                          width: 1.5
-                        }),
-                        zIndex: sort_key
-                      })
-                    ];
-                  } else {
-                    styleArray = [new ol.style.Style({
-                      stroke: new ol.style.Stroke({
-                        color: '#000',
-                        width: 1
-                      }),
-                      zIndex: sort_key
-                    })];
-                  }
-
-                  if (styleArray) {
-                    layerStyleCache[styleKey] = styleArray;
-                  }
-                }
-                return styleArray;
-              }
+              style: styleFunc
             });
 
             var map = new ol.Map({
