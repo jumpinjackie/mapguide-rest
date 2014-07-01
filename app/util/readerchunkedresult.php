@@ -48,6 +48,12 @@ class MgReaderChunkedResult
 
         $output = '{ "type": "FeatureCollection", "features": ['."\n";
 
+        $clsDef = $this->reader->GetClassDefinition();
+        $clsIdProps = $clsDef->GetIdentityProperties();
+        $idProp = NULL;
+        if ($clsIdProps->GetCount() == 1) {
+            $idProp = $clsIdProps->GetItem(0);
+        }
         $propCount = $this->reader->GetPropertyCount();
         $firstFeature = true;
         while ($this->reader->ReadNext()) {
@@ -58,63 +64,96 @@ class MgReaderChunkedResult
             if (!$firstFeature) {
                 $output .= ",";
             }
+            $idVal = NULL;
             $propVals = array();
             $geomJson = "";
             for ($i = 0; $i < $propCount; $i++) {
                 $name = $this->reader->GetPropertyName($i);
                 $propType = $this->reader->GetPropertyType($i);
-
                 if (!$this->reader->IsNull($i)) {
-                    switch($propType) {
-                        case MgPropertyType::Boolean:
-                            array_push($propVals, '"'.$name.'": '.$this->reader->GetBoolean($i));
-                            break;
-                        case MgPropertyType::Byte:
-                            array_push($propVals, '"'.$name.'": '.$this->reader->GetByte($i));
-                            break;
-                        case MgPropertyType::DateTime:
-                            $dt = $this->reader->GetDateTime($i);
-                            array_push($propVals, '"'.$name.'": "'.$dt->ToString().'"');
-                            break;
-                        case MgPropertyType::Decimal:
-                        case MgPropertyType::Double:
-                            array_push($propVals, '"'.$name.'": '.$this->reader->GetDouble($i));
-                            break;
-                        case MgPropertyType::Geometry:
-                            {
-                                try {
-                                    $agf = $this->reader->GetGeometry($i);
-                                    $geom = ($this->transform != null) ? $agfRw->Read($agf, $this->transform) : $agfRw->Read($agf);
-                                    $geomJson = MgGeoJsonWriter::ToGeoJson($geom);
-                                } catch (MgException $ex) {
-                                    $geomJson = '"geometry": null';
+                    if ($idProp != NULL && $idProp->GetName() == $name) {
+                        switch($propType) {
+                            case MgPropertyType::DateTime:
+                                $dt = $this->reader->GetDateTime($i);
+                                $idVal = '"'.$dt->ToString().'"';
+                                break;
+                            case MgPropertyType::Double:
+                                $idVal = $this->reader->GetDouble($i);
+                                break;
+                            case MgPropertyType::Int16:
+                                $idVal = $this->reader->GetInt16($i);
+                                break;
+                            case MgPropertyType::Int32:
+                                $idVal = $this->reader->GetInt32($i);
+                                break;
+                            case MgPropertyType::Int64:
+                                $idVal = $this->reader->GetInt64($i);
+                                break;
+                            case MgPropertyType::Single:
+                                $idVal = $this->reader->GetSingle($i);
+                                break;
+                            case MgPropertyType::String:
+                                $idVal = '"'.MgUtils::EscapeJsonString($this->reader->GetString($i)).'"';
+                                break;
+                        }
+                    } else {
+                        switch($propType) {
+                            case MgPropertyType::Boolean:
+                                array_push($propVals, '"'.$name.'": '.$this->reader->GetBoolean($i));
+                                break;
+                            case MgPropertyType::Byte:
+                                array_push($propVals, '"'.$name.'": '.$this->reader->GetByte($i));
+                                break;
+                            case MgPropertyType::DateTime:
+                                $dt = $this->reader->GetDateTime($i);
+                                array_push($propVals, '"'.$name.'": "'.$dt->ToString().'"');
+                                break;
+                            case MgPropertyType::Decimal:
+                            case MgPropertyType::Double:
+                                array_push($propVals, '"'.$name.'": '.$this->reader->GetDouble($i));
+                                break;
+                            case MgPropertyType::Geometry:
+                                {
+                                    try {
+                                        $agf = $this->reader->GetGeometry($i);
+                                        $geom = ($this->transform != null) ? $agfRw->Read($agf, $this->transform) : $agfRw->Read($agf);
+                                        $geomJson = MgGeoJsonWriter::ToGeoJson($geom);
+                                    } catch (MgException $ex) {
+                                        $geomJson = '"geometry": null';
+                                    }
                                 }
-                            }
-                            break;
-                        case MgPropertyType::Int16:
-                            array_push($propVals, '"'.$name.'": '.$this->reader->GetInt16($i));
-                            break;
-                        case MgPropertyType::Int32:
-                            array_push($propVals, '"'.$name.'": '.$this->reader->GetInt32($i));
-                            break;
-                        case MgPropertyType::Int64:
-                            array_push($propVals, '"'.$name.'": '.$this->reader->GetInt64($i));
-                            break;
-                        case MgPropertyType::Single:
-                            array_push($propVals, '"'.$name.'": '.$this->reader->GetSingle($i));
-                            break;
-                        case MgPropertyType::String:
-                            array_push($propVals, '"'.$name.'": "'.MgUtils::EscapeJsonString($this->reader->GetString($i)).'"');
-                            break;
+                                break;
+                            case MgPropertyType::Int16:
+                                array_push($propVals, '"'.$name.'": '.$this->reader->GetInt16($i));
+                                break;
+                            case MgPropertyType::Int32:
+                                array_push($propVals, '"'.$name.'": '.$this->reader->GetInt32($i));
+                                break;
+                            case MgPropertyType::Int64:
+                                array_push($propVals, '"'.$name.'": '.$this->reader->GetInt64($i));
+                                break;
+                            case MgPropertyType::Single:
+                                array_push($propVals, '"'.$name.'": '.$this->reader->GetSingle($i));
+                                break;
+                            case MgPropertyType::String:
+                                array_push($propVals, '"'.$name.'": "'.MgUtils::EscapeJsonString($this->reader->GetString($i)).'"');
+                                break;
+                        }
                     }
                 } else {
                     array_push($propVals, '"'.$name.'": null');
                 }
             }
+            $output .= '{ "type": "Feature", ';
+            $idJson = "";
+            if ($idVal != NULL) {
+                $idJson = '"id": '.$idVal.', ';
+                $output .= $idJson;
+            }
             if ($geomJson !== "") {
-                $output .= '{ "type": "Feature", '.$geomJson.', "properties": {'.implode(",", $propVals)."} }\n";
+                $output .= $geomJson.', "properties": {'.implode(",", $propVals)."} }\n";
             } else {
-                $output .= '{ "type": "Feature", "properties": {'.implode(",", $propVals)."} }\n";;
+                $output .= '"properties": {'.implode(",", $propVals)."} }\n";;
             }
 
             $this->app->response->write($output);
@@ -156,7 +195,7 @@ class MgReaderChunkedResult
             for ($i = 0; $i < $propCount; $i++) {
                 $name = $this->reader->GetPropertyName($i);
                 $propType = $this->reader->GetPropertyType($i);
-                
+
                 $output .= "<Property><Name>$name</Name>";
                 if (!$this->reader->IsNull($i)) {
                     $output .= "<Value>";
@@ -205,7 +244,7 @@ class MgReaderChunkedResult
                     $output .= "</Value>";
                 }
                 $output .= "</Property>";
-                
+
             }
 
             $output .= "</Feature>";
@@ -226,7 +265,7 @@ class MgReaderChunkedResult
         $classes = $schema->GetClasses();
         $clsDef = $this->reader->GetClassDefinition();
         $classes->Add($clsDef);
-        
+
         if ($format === "geojson") {
             $this->OutputGeoJson($schemas);
         } else {

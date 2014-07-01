@@ -1,0 +1,446 @@
+<html>
+    <head>
+        <title>Sheboygan map as dynamic vector layers</title>
+        <link rel="stylesheet" href="../../assets/common/css/ol.css" />
+        <style type="text/css">
+            body { font-family: Verdana; font-size: 0.9em; }
+            #error { color: red; }
+            #wrap { width: 900; }
+            #map { width: 400; height: 300; float: left; border: 1px solid black; }
+        </style>
+        <script type="text/javascript" src="../../assets/common/js/ol-whitespace.js"></script>
+        <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript">
+
+        //This sample is assumed to be hosted at http://servername/mapguide/rest/sampleapps/tiled/index.html
+        var restUrl = "../../../rest";
+
+        function getFeatureText(feature) {
+            var layer = feature.get("_layer");
+            if (layer == "Parcels") {
+                return "Parcel<br/>Name: " + feature.get("RNAME") + "<br/>Address: " + feature.get("RBILAD");
+            } else {
+                return "";
+            }
+        }
+
+        var layerStyleCache = {};
+
+        function styleFunc(feature, resolution) {
+            //These styles have been painfully hand written from what's specified in the Layer Definitions
+            //
+            //Wouldn't it be nice if there was a way to translate these styles automatically? ;-)
+            var layer = feature.get("_layer");
+            var sort_key = feature.get("_displayIndex");
+            var styleName = "default";
+            if (layer == "Parcels") {
+                styleName = "parcel_" + feature.get("RTYPE");
+            } else if (layer == "CityLimits") {
+                styleName = "citylimits_" + (resolution <= 4.5) ? "low" : "high";
+            }
+            var styleKey = layer + "/" + styleName + "/" + sort_key;
+            var styleArray = layerStyleCache[styleKey];
+            if (!styleArray) {
+              if (layer == "Districts") {
+                styleArray = [
+                  new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                      color: '#A68B53',
+                      width: 1
+                    }),
+                    zIndex: sort_key
+                  })
+                ];
+              } else if (layer == "Buildings") {
+                styleArray = [
+                  new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                      color: '#DDDDDD',
+                      width: 1
+                    }),
+                    fill: new ol.style.Fill({
+                      color: '#808080'
+                    }),
+                    zIndex: sort_key
+                  })
+                ];
+              } else if (layer == "Parcels") {
+                var type = feature.get("RTYPE");
+                if (type == "AGR") {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#808080',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#C19E6A'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else if (type == "EXM") {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#808080',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#B9A670'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else if (type == "MER") {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#808080',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#B2AE77'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else if (type == "MFG") {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#808080',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#ABB67E'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else if (type == "RES") {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#808080',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#A4BE85'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else if (type == "S&W") {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#808080',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#9DC68C'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else if (type == "WTC") {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#ABC7E9',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#96CE93'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else { //Other
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#000',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#D4D4D4'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                }
+
+              } else if (layer == "CityLimits") {
+                if (resolution <= 4.5) {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#C0C0C0',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#C0C0C0'
+                        }),
+                        zIndex: sort_key
+                      })
+                    ];
+                } else {
+                    styleArray = [
+                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                          color: '#D5C8AC',
+                          width: 1
+                        }),
+                        fill: new ol.style.Fill({
+                          color: '#D5C8AC'
+                        }),/*
+                        text: new ol.style.Text({
+                          text: 'District',
+                          stroke: new ol.style.Stroke({
+                            color: '#C0C0C0',
+                            width: 1
+                          }),
+                          fill: new ol.style.Fill({
+                            color: '#C0C0C0'
+                          })
+                        }),*/
+                        zIndex: sort_key
+                      })
+                    ];
+                }
+              } else if (layer == "Hydrography") {
+                styleArray = [
+                  new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                      color: '#ABC7E9',
+                      width: 1
+                    }),
+                    fill: new ol.style.Fill({
+                      color: '#ABC7E9'
+                    }),
+                    zIndex: sort_key
+                  })
+                ];
+              } else if (layer == "Islands") {
+                styleArray = [
+                  new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                      color: '#D5C8AC',
+                      width: 1
+                    }),
+                    fill: new ol.style.Fill({
+                      color: '#D5C8AC'
+                    }),
+                    zIndex: sort_key
+                  })
+                ];
+              } else if (layer == "Roads") {
+                styleArray = [
+                  new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                      color: '#646464',
+                      width: 1.5
+                    }),
+                    zIndex: sort_key
+                  })
+                ];
+              } else if (layer == "Tracks") {
+                styleArray = [
+                  new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                      color: '#808080',
+                      width: 1.5
+                    }),
+                    zIndex: sort_key
+                  })
+                ];
+              } else {
+                styleArray = [new ol.style.Style({
+                  stroke: new ol.style.Stroke({
+                    color: '#000',
+                    width: 1
+                  }),
+                  zIndex: sort_key
+                })];
+              }
+
+              if (styleArray) {
+                layerStyleCache[styleKey] = styleArray;
+              }
+            }
+            return styleArray;
+        }
+
+        $(document).ready(function() {
+            var defaultStyle;
+
+            var parcelsSource = new ol.source.ServerVector({
+                format: new ol.format.GeoJSON({ defaultProjection: 'EPSG:3857' }),
+                loader: function(extent, resolution, projection) {
+                    var transform = ol.proj.getTransform(projection, 'EPSG:4326');
+                    var epsg4326Extent = transform(extent, []);
+                    var url = restUrl + '/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels?transformto=WGS84.PseudoMercator&bbox=' + epsg4326Extent.join(',');
+                    $.ajax(url).then(function(response) {
+                        var features = districtsSource.readFeatures(response);
+                        for (var i = 0; i < features.length; i++) {
+                            features[i].set("_layer", "Parcels");
+                            features[i].set("_selectable", true);
+                        }
+                        parcelsSource.addFeatures(features);
+                    });
+                },
+                projection: 'EPSG:3857'
+            });
+
+            var districtsSource = new ol.source.ServerVector({
+                format: new ol.format.GeoJSON({ defaultProjection: 'EPSG:3857' }),
+                loader: function(extent, resolution, projection) {
+                    var transform = ol.proj.getTransform(projection, 'EPSG:4326');
+                    var epsg4326Extent = transform(extent, []);
+                    var url = restUrl + '/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts?transformto=WGS84.PseudoMercator&bbox=' + epsg4326Extent.join(',');
+                    $.ajax(url).then(function(response) {
+                        var features = districtsSource.readFeatures(response);
+                        for (var i = 0; i < features.length; i++) {
+                            features[i].set("_layer", "Districts");
+                        }
+                        districtsSource.addFeatures(features);
+                    });
+                },
+                projection: 'EPSG:3857'
+            });
+
+            var roadsSource = new ol.source.ServerVector({
+                format: new ol.format.GeoJSON({ defaultProjection: 'EPSG:3857' }),
+                loader: function(extent, resolution, projection) {
+                    var transform = ol.proj.getTransform(projection, 'EPSG:4326');
+                    var epsg4326Extent = transform(extent, []);
+                    var url = restUrl + '/library/Samples/Sheboygan/Data/RoadCenterLines.FeatureSource/features.geojson/Default/RoadCenterLines?transformto=WGS84.PseudoMercator&bbox=' + epsg4326Extent.join(',');
+                    $.ajax(url).then(function(response) {
+                        var features = roadsSource.readFeatures(response);
+                        for (var i = 0; i < features.length; i++) {
+                            features[i].set("_layer", "Roads");
+                        }
+                        roadsSource.addFeatures(features);
+                    });
+                },
+                projection: 'EPSG:3857'
+            });
+
+            var map = new ol.Map({
+              layers: [
+                new ol.layer.Tile({
+                  source: new ol.source.OSM({
+                    attributions: [
+                      new ol.Attribution({
+                        html: 'Tiles &copy; <a href="http://www.openstreetmap.org/">' +
+                            'OpenStreetMap</a>'
+                      }),
+                      ol.source.OSM.DATA_ATTRIBUTION
+                    ],
+                    url: 'http://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                  })
+                }),
+                new ol.layer.Vector({
+                    source: parcelsSource,
+                    style: styleFunc,
+                    maxResolution: 6 //TODO: How to convert scale to resolution?
+                }),
+                new ol.layer.Vector({
+                    source: roadsSource,
+                    style: styleFunc,
+                    maxResolution: 15 //TODO: How to convert scale to resolution?
+                }),
+                new ol.layer.Vector({
+                    source: districtsSource,
+                    style: styleFunc
+                })
+              ],
+              renderer: 'canvas',
+              target: document.getElementById('map'),
+              view: new ol.View({
+                center: ol.proj.transform([-87.7302542509315, 43.744459064634], 'EPSG:4326', 'EPSG:3857'),
+                minZoom: 10,
+                maxZoom: 19,
+                zoom: 12
+              })
+            });
+
+            var highlightStyleCache = {};
+            var featureOverlay = new ol.FeatureOverlay({
+              map: map,
+              style: function(feature, resolution) {
+                var text = resolution < 5000 ? feature.get('_name') : '';
+                if (!highlightStyleCache[text]) {
+                  highlightStyleCache[text] = [new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                      color: '#f00',
+                      width: 1
+                    }),
+                    fill: new ol.style.Fill({
+                      color: 'rgba(255,0,0,0.1)'
+                    }),
+                    text: new ol.style.Text({
+                      font: '12px Calibri,sans-serif',
+                      text: text,
+                      fill: new ol.style.Fill({
+                        color: '#000'
+                      }),
+                      stroke: new ol.style.Stroke({
+                        color: '#f00',
+                        width: 3
+                      })
+                    })
+                  })];
+                }
+                return highlightStyleCache[text];
+              }
+            });
+
+            var highlight;
+            $(map.getViewport()).on('mousemove', function(evt) {
+              var pixel = map.getEventPixel(evt.originalEvent);
+              var feature = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+                if (feature.get("_selectable")) {
+                  return feature;
+                } else {
+                  return null;
+                }
+              });
+
+              if (feature) {
+                var text = getFeatureText(feature);
+                $("#featInfo").html(text);
+              } else {
+                $("#featInfo").html("");
+              }
+
+              if (feature !== highlight) {
+                if (highlight) {
+                  featureOverlay.removeFeature(highlight);
+                }
+                if (feature) {
+                  featureOverlay.addFeature(feature);
+                }
+                highlight = feature;
+              }
+            });
+        });
+
+        </script>
+    </head>
+    <body>
+        <p>This example demonstrates a Map Definition being consumed as a <strong>dynamic GeoJSON vector layers</strong> via the MapGuide REST API with <a href="http://ol3js.org/">OpenLayers 3</a>.</p>
+        <p>An OpenStreetMap layer is included as a backdrop for context</p>
+        <p>Sample not loading? <a href="../data/load.php">Check that the required resources have been loaded</a></p>
+        <div id="error">
+        </div>
+        <div id="wrap">
+            <div id="map">
+            </div>
+        </div>
+        <div id="featInfo">
+        </div>
+    </body>
+</html>
