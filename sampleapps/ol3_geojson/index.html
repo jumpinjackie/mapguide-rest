@@ -6,7 +6,7 @@
             body { font-family: Verdana; font-size: 0.9em; }
             #error { color: red; }
             #wrap { width: 900; }
-            #map { width: 400; height: 300; float: left; border: 1px solid black; }
+            #map { width: 800; height: 600; float: left; border: 1px solid black; }
         </style>
         <script type="text/javascript" src="../../assets/common/js/ol-whitespace.js"></script>
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
@@ -276,6 +276,23 @@
         $(document).ready(function() {
             var defaultStyle;
 
+            var buildingsSource = new ol.source.ServerVector({
+                format: new ol.format.GeoJSON({ defaultProjection: 'EPSG:3857' }),
+                loader: function(extent, resolution, projection) {
+                    var transform = ol.proj.getTransform(projection, 'EPSG:4326');
+                    var epsg4326Extent = transform(extent, []);
+                    var url = restUrl + '/library/Samples/Sheboygan/Data/BuildingOutlines.FeatureSource/features.geojson/SHP_Schema/BuildingOutlines?transformto=WGS84.PseudoMercator&bbox=' + epsg4326Extent.join(',');
+                    $.ajax(url).then(function(response) {
+                        var features = districtsSource.readFeatures(response);
+                        for (var i = 0; i < features.length; i++) {
+                            features[i].set("_layer", "Buildings");
+                        }
+                        buildingsSource.addFeatures(features);
+                    });
+                },
+                projection: 'EPSG:3857'
+            });
+
             var parcelsSource = new ol.source.ServerVector({
                 format: new ol.format.GeoJSON({ defaultProjection: 'EPSG:3857' }),
                 loader: function(extent, resolution, projection) {
@@ -345,7 +362,12 @@
                 new ol.layer.Vector({
                     source: parcelsSource,
                     style: styleFunc,
-                    maxResolution: 6 //TODO: How to convert scale to resolution?
+                    maxResolution: 3 //TODO: How to convert scale to resolution?
+                }),
+                new ol.layer.Vector({
+                    source: buildingsSource,
+                    style: styleFunc,
+                    maxResolution: 1 //TODO: How to convert scale to resolution?
                 }),
                 new ol.layer.Vector({
                     source: roadsSource,
