@@ -331,7 +331,7 @@ class MgTileServiceController extends MgBaseController {
     const XYZ_TILE_WIDTH = 256;
     const XYZ_TILE_HEIGHT = 256;
 
-    const MAX_RETRY_ATTEMPTS = 10;
+    const MAX_RETRY_ATTEMPTS = 5;
 
     public function GetTileXYZ($resId, $groupName, $x, $y, $z, $type) {
         $fmt = $this->ValidateRepresentation($type, array("json", "png", "png8", "jpg", "gif"));
@@ -349,7 +349,7 @@ class MgTileServiceController extends MgBaseController {
                 $attempts++;
                 //Bail after MAX_RETRY_ATTEMPTS
                 if ($attempts >= self::MAX_RETRY_ATTEMPTS)
-                    $this->halt(500, "Failed to create directory after $attempts attempts");
+                    $this->app->halt(500, "Failed to create directory after $attempts attempts");
             }
         }
 
@@ -369,7 +369,7 @@ class MgTileServiceController extends MgBaseController {
         while (!file_exists($path)) {
             //Bail after MAX_RETRY_ATTEMPTS
             if ($attempts >= self::MAX_RETRY_ATTEMPTS)
-                $this->halt(500, "Failed to generate tile after $attempts attempts");
+                $this->app->halt(500, "Failed to generate tile after $attempts attempts");
             $attempts++;
 
             //error_log("($requestId) $path does not exist. Locking for writing");
@@ -479,6 +479,9 @@ class MgTileServiceController extends MgBaseController {
                     }
                     if ($ex instanceof MgResourceNotFoundException) {
                         $this->app->halt(404, $ex->GetExceptionMessage());
+                    }
+                    else if ($ex instanceof MgConnectionFailedException) {
+                        $this->app->halt(503, $ex->GetExceptionMessage());
                     }
                 } catch (Exception $ex) {
                     if ($bLocked) {
