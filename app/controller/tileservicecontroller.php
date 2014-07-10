@@ -192,7 +192,6 @@ class MgTileServiceController extends MgBaseController {
         $scale = self::GetScaleFromBounds($map, self::XYZ_TILE_WIDTH, self::XYZ_TILE_HEIGHT, $metersPerUnit, $boundsMinx, $boundsMinY, $boundsMaxX, $boundsMaxY);
         $fp = fopen($path, "w");
 
-        //$this->app->response->write('{ "Type": "FeatureCollection", "features": [');
         fwrite($fp, '{ "type": "FeatureCollection", "features": [');
         for ($i = 0; $i < $layerCount; $i++) {
             $layer = $layers->GetItem($i);
@@ -205,6 +204,14 @@ class MgTileServiceController extends MgBaseController {
 
                 $geom = $wktRw->Read($wktPoly);
                 $clsDef = $layer->GetClassDefinition();
+                $clsProps = $clsDef->GetProperties();
+                $idProps = $clsDef->GetIdentityProperties();
+                $idName = NULL;
+                if ($idProps->GetCount() == 1) {
+                    $idp = $idProps->GetItem(0);
+                    $idName = $idp->GetName();
+                }
+
                 $fsId = new MgResourceIdentifier($layer->GetFeatureSourceId());
 
                 //Set up forward and inverse transforms. Inverse for transforming map bounding box
@@ -222,73 +229,25 @@ class MgTileServiceController extends MgBaseController {
                     $query->SetSpatialFilter($geomName, $geom, MgFeatureSpatialOperations::EnvelopeIntersects);
                 }
 
+                for ($p = 0; $p < $clsProps->GetCount(); $p++) {
+                    $propDef = $clsProps->GetItem($p);
+                    $query->AddFeatureProperty($propDef->GetName());
+                }
+                $query->AddComputedProperty("_displayIndex", ($layerCount - $i));
+                $query->AddComputedProperty("_layer", "'".$layer->GetName()."'");
+                $query->AddComputedProperty("_selectable", ($layer->GetSelectable() ? "true" : "false"));
+
                 $reader = $layer->SelectFeatures($query);
                 $read = 0;
                 while ($reader->ReadNext()) {
                     $read++;
                     if (!$reader->IsNull($geomName)) {
                         if (!$firstFeature) {
-                            //$this->app->response->write(",");
                             fwrite($fp, ",");
                         }
                         try {
-                            $agf = $reader->GetGeometry($geomName);
-                            $fgeom = $agfRw->Read($agf, $xform);
-                            $geomJson = MgGeoJsonWriter::ToGeoJson($fgeom);
-                            //$this->app->response->write('{ "Type": "Feature", "_layer": "'.$layer->GetName().'", '.$geomJson.'}');
-                            $propsJson = '"properties": {';
-                            $propsJson .= '"_layer": "'.$layer->GetName().'",';
-                            $propsJson .= '"_selectable": '.($layer->GetSelectable()?"true":"false").',';
-                            $propsJson .= '"_displayIndex": '.($layerCount - $i);
-                            for ($j = 0; $j < $reader->GetPropertyCount(); $j++) {
-                                $pname = $reader->GetPropertyName($j);
-                                $ptype = $reader->GetPropertyType($j);
-                                switch($ptype) {
-                                    case MgPropertyType::Boolean:
-                                        $val = $reader->IsNull($j) ? "null" : ($reader->GetBoolean($j) ? "true" : "false");
-                                        $propsJson .= ',"'.$pname.'": '.$val;
-                                        break;
-                                    case MgPropertyType::Byte:
-                                        $val = $reader->IsNull($j) ? "null" : $reader->GetByte($j);
-                                        $propsJson .= ',"'.$pname.'": '.$val;
-                                        break;
-                                    case MgPropertyType::DateTime:
-                                        $val = "null";
-                                        if (!$reader->IsNull($j)) {
-                                            $dt = $reader->GetDateTime($j);
-                                            $val = sprintf("%d-%02d-%02d %02d:%02d:%02d", $dt->GetYear(), $dt->GetMonth(), $dt->GetDay(), $dt->GetHour(), $dt->GetMinute(), $dt->GetSecond());
-                                        }
-                                        $propsJson .= ',"'.$pname.'": "'.$val.'"';
-                                        break;
-                                    case MgPropertyType::Decimal:
-                                    case MgPropertyType::Double:
-                                        $val = $reader->IsNull($j) ? "null" : $reader->GetDouble($j);
-                                        $propsJson .= ',"'.$pname.'": '.$val;
-                                        break;
-                                    case MgPropertyType::Int16:
-                                        $val = $reader->IsNull($j) ? "null" : $reader->GetInt16($j);
-                                        $propsJson .= ',"'.$pname.'": '.$val;
-                                        break;
-                                    case MgPropertyType::Int32:
-                                        $val = $reader->IsNull($j) ? "null" : $reader->GetInt32($j);
-                                        $propsJson .= ',"'.$pname.'": '.$val;
-                                        break;
-                                    case MgPropertyType::Int64:
-                                        $val = $reader->IsNull($j) ? "null" : $reader->GetInt64($j);
-                                        $propsJson .= ',"'.$pname.'": '.$val;
-                                        break;
-                                    case MgPropertyType::Single:
-                                        $val = $reader->IsNull($j) ? "null" : $reader->GetSingle($j);
-                                        $propsJson .= ',"'.$pname.'": '.$val;
-                                        break;
-                                    case MgPropertyType::String:
-                                        $val = $reader->IsNull($j) ? "null" : $reader->GetString($j);
-                                        $propsJson .= ',"'.$pname.'": "'.MgUtils::EscapeJsonString($val).'"';
-                                        break;
-                                }
-                            }
-                            $propsJson .= '}';
-                            fwrite($fp, '{ "type": "Feature", '.$propsJson.', '.$geomJson.'}');
+                            $output = MgGeoJsonWriter::FeatureToGeoJson($reader, $agfRw, $xform, $idName);
+                            fwrite($fp, $output);
                             $firstFeature = false;
                         } catch (MgException $ex) {
 
@@ -298,7 +257,6 @@ class MgTileServiceController extends MgBaseController {
                 $reader->Close();
             }
         }
-        //$this->app->response->write(']}');
         fwrite($fp, ']}');
         fclose($fp);
 

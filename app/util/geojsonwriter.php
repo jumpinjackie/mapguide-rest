@@ -19,6 +19,107 @@
 
 class MgGeoJsonWriter
 {
+    public static function FeatureToGeoJson($reader, $agfRw, $transform, $idName = NULL) {
+        $idVal = NULL;
+        $propVals = array();
+        $geomJson = "";
+        $idIndex = -1;
+        if ($idName != NULL)
+            $idIndex = $reader->GetPropertyIndex($idName);
+
+        $propCount = $reader->GetPropertyCount();
+        for ($i = 0; $i < $propCount; $i++) {
+            $name = $reader->GetPropertyName($i);
+            $propType = $reader->GetPropertyType($i);
+            if (!$reader->IsNull($i)) {
+                if ($idIndex == $i) {
+                    switch($propType) {
+                        case MgPropertyType::DateTime:
+                            $dt = $reader->GetDateTime($i);
+                            $idVal = '"'.$dt->ToString().'"';
+                            break;
+                        case MgPropertyType::Double:
+                            $idVal = $reader->GetDouble($i);
+                            break;
+                        case MgPropertyType::Int16:
+                            $idVal = $reader->GetInt16($i);
+                            break;
+                        case MgPropertyType::Int32:
+                            $idVal = $reader->GetInt32($i);
+                            break;
+                        case MgPropertyType::Int64:
+                            $idVal = $reader->GetInt64($i);
+                            break;
+                        case MgPropertyType::Single:
+                            $idVal = $reader->GetSingle($i);
+                            break;
+                        case MgPropertyType::String:
+                            $idVal = '"'.MgUtils::EscapeJsonString($reader->GetString($i)).'"';
+                            break;
+                    }
+                } else {
+                    switch($propType) {
+                        case MgPropertyType::Boolean:
+                            //NOTE: It appears PHP booleans are not string-able
+                            array_push($propVals, '"'.$name.'": '.($reader->GetBoolean($i)?"true":"false"));
+                            break;
+                        case MgPropertyType::Byte:
+                            array_push($propVals, '"'.$name.'": '.$reader->GetByte($i));
+                            break;
+                        case MgPropertyType::DateTime:
+                            $dt = $reader->GetDateTime($i);
+                            array_push($propVals, '"'.$name.'": "'.$dt->ToString().'"');
+                            break;
+                        case MgPropertyType::Decimal:
+                        case MgPropertyType::Double:
+                            array_push($propVals, '"'.$name.'": '.$reader->GetDouble($i));
+                            break;
+                        case MgPropertyType::Geometry:
+                            {
+                                try {
+                                    $agf = $reader->GetGeometry($i);
+                                    $geom = ($transform != null) ? $agfRw->Read($agf, $transform) : $agfRw->Read($agf);
+                                    $geomJson = self::ToGeoJson($geom);
+                                } catch (MgException $ex) {
+                                    $geomJson = '"geometry": null';
+                                }
+                            }
+                            break;
+                        case MgPropertyType::Int16:
+                            array_push($propVals, '"'.$name.'": '.$reader->GetInt16($i));
+                            break;
+                        case MgPropertyType::Int32:
+                            array_push($propVals, '"'.$name.'": '.$reader->GetInt32($i));
+                            break;
+                        case MgPropertyType::Int64:
+                            array_push($propVals, '"'.$name.'": '.$reader->GetInt64($i));
+                            break;
+                        case MgPropertyType::Single:
+                            array_push($propVals, '"'.$name.'": '.$reader->GetSingle($i));
+                            break;
+                        case MgPropertyType::String:
+                            array_push($propVals, '"'.$name.'": "'.MgUtils::EscapeJsonString($reader->GetString($i)).'"');
+                            break;
+                    }
+                }
+            } else {
+                array_push($propVals, '"'.$name.'": null');
+            }
+        }
+        $output = '{ "type": "Feature", ';
+        $idJson = "";
+        if ($idVal != NULL) {
+            $idJson = '"id": '.$idVal.', ';
+            $output .= $idJson;
+        }
+        if ($geomJson !== "") {
+            $output .= $geomJson.', "properties": {'.implode(",", $propVals)."} }\n";
+        } else {
+            $output .= '"properties": {'.implode(",", $propVals)."} }\n";;
+        }
+        return $output;
+    }
+
     public static function ToGeoJson($geom) {
         $geomType = $geom->GetGeometryType();
         //TODO: Convert all the geometry types. Right now, we're converting the same subset as GeoREST
