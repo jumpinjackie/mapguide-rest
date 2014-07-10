@@ -403,7 +403,11 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:qualifiedClas
  *     )
  *   )
  */
-$app->post("/library/:resourcePath+/features/:schemaName/:className", function($resourcePath, $schemaName, $className) use ($app) {
+$app->post("/library/:resourcePath+.FeatureSource/features/:schemaName/:className", function($resourcePath, $schemaName, $className) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->InsertFeatures($resId, $schemaName, $className);
@@ -429,7 +433,11 @@ $app->post("/library/:resourcePath+/features/:schemaName/:className", function($
  *     )
  *   )
  */
-$app->put("/library/:resourcePath+/features/:schemaName/:className", function($resourcePath, $schemaName, $className) use ($app) {
+$app->put("/library/:resourcePath+.FeatureSource/features/:schemaName/:className", function($resourcePath, $schemaName, $className) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->UpdateFeatures($resId, $schemaName, $className);
@@ -455,7 +463,11 @@ $app->put("/library/:resourcePath+/features/:schemaName/:className", function($r
  *     )
  *   )
  */
-$app->delete("/library/:resourcePath+/features/:schemaName/:className", function($resourcePath, $schemaName, $className) use ($app) {
+$app->delete("/library/:resourcePath+.FeatureSource/features/:schemaName/:className", function($resourcePath, $schemaName, $className) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->DeleteFeatures($resId, $schemaName, $className);
@@ -484,7 +496,11 @@ $app->delete("/library/:resourcePath+/features/:schemaName/:className", function
  *     )
  *   )
  */
-$app->get("/library/:resourcePath+/features/:schemaName/:className", function($resourcePath, $schemaName, $className) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/features/:schemaName/:className", function($resourcePath, $schemaName, $className) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->SelectFeatures($resId, $schemaName, $className, "xml");
@@ -514,7 +530,11 @@ $app->get("/library/:resourcePath+/features/:schemaName/:className", function($r
  *     )
  *   )
  */
-$app->get("/library/:resourcePath+/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->SelectFeatures($resId, $schemaName, $className, $format);
@@ -540,7 +560,11 @@ $app->get("/library/:resourcePath+/features.:format/:schemaName/:className", fun
  *     )
  *   )
  */
-$app->get("/library/:resourcePath+/aggregates/:type/:schemaName/:className", function($resourcePath, $type, $schemaName, $className) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/aggregates/:type/:schemaName/:className", function($resourcePath, $type, $schemaName, $className) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->SelectAggregates($resId, $schemaName, $className, $type, "xml");
@@ -567,7 +591,11 @@ $app->get("/library/:resourcePath+/aggregates/:type/:schemaName/:className", fun
  *     )
  *   )
  */
-$app->get("/library/:resourcePath+/aggregates.:format/:type/:schemaName/:className", function($resourcePath, $format, $type, $schemaName, $className) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/aggregates.:format/:type/:schemaName/:className", function($resourcePath, $format, $type, $schemaName, $className) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->SelectAggregates($resId, $schemaName, $className, $type, $format);
@@ -968,7 +996,7 @@ $app->get("/library/:resourcePath+/references.:format", function($resourcePath, 
 $app->delete("/library/:resourcePath+", function($resourcePath) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->DeleteResource($resId); 
+    $ctrl->DeleteResource($resId);
 });
 //============================== Tile Service APIs ============================================
 
