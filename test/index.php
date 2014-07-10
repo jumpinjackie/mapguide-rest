@@ -4355,9 +4355,9 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     var gj = JSON.parse(result);
                     ok(gj.features.length == 2, "Expected 2 inserted features");
                     for (var i = 0; i < gj.features.length; i++) {
-                        if (gj.features[i].properties.ID == 1) {
+                        if (gj.features[i].id == 1) {
                             ok(gj.features[i].properties.Text == "anon credential insert", "expected correct feature text for ID 1");
-                        } else if (gj.features[i].properties.ID == 2) {
+                        } else if (gj.features[i].id == 2) {
                             ok(gj.features[i].properties.Text == "admin credential insert", "expected correct feature text for ID 2");
                         }
                     }
@@ -4400,9 +4400,9 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     var gj = JSON.parse(result);
                     ok(gj.features.length == 2, "Expected 2 inserted features");
                     for (var i = 0; i < gj.features.length; i++) {
-                        if (gj.features[i].properties.ID == 1) {
+                        if (gj.features[i].id == 1) {
                             ok(gj.features[i].properties.Text == "anon credential update", "expected correct updated feature text for ID 1");
-                        } else if (gj.features[i].properties.ID == 2) {
+                        } else if (gj.features[i].id == 2) {
                             ok(gj.features[i].properties.Text == "admin credential update", "expected correct updated feature text for ID 2");
                         }
                     }
@@ -6492,9 +6492,9 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     var gj = JSON.parse(result);
                     ok(gj.features.length == 2, "Expected 2 inserted features");
                     for (var i = 0; i < gj.features.length; i++) {
-                        if (gj.features[i].properties.ID == 1) {
+                        if (gj.features[i].id == 1) {
                             ok(gj.features[i].properties.Text == "anon credential insert", "expected correct feature text for ID 1");
-                        } else if (gj.features[i].properties.ID == 2) {
+                        } else if (gj.features[i].id == 2) {
                             ok(gj.features[i].properties.Text == "admin credential insert", "expected correct feature text for ID 2");
                         }
                     }
@@ -6512,9 +6512,9 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     var gj = JSON.parse(result);
                     ok(gj.features.length == 2, "Expected 2 inserted features");
                     for (var i = 0; i < gj.features.length; i++) {
-                        if (gj.features[i].properties.ID == 1) {
+                        if (gj.features[i].id == 1) {
                             ok(gj.features[i].properties.Text == "anon credential update", "expected correct updated feature text for ID 1");
-                        } else if (gj.features[i].properties.ID == 2) {
+                        } else if (gj.features[i].id == 2) {
                             ok(gj.features[i].properties.Text == "admin credential update", "expected correct updated feature text for ID 2");
                         }
                     }
