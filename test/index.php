@@ -932,7 +932,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/.xml", "POST", createInsertXml("user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                
+
                 api_test(rest_root_url + "/data/test_administrator/.xml", "POST", createInsertXml("anonymous session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.anonymousSessionId), function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
@@ -1008,7 +1008,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 api_test_with_credentials(rest_root_url + "/data/test_administrator/" + testID2 + ".xml", "PUT", createUpdateXml("", "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                
+
                 api_test(rest_root_url + "/data/test_administrator/" + testID2 + ".xml", "PUT", createUpdateXml("", "anonymous session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.anonymousSessionId), function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
@@ -1237,7 +1237,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 api_test_with_credentials(rest_root_url + "/data/test_author/.xml", "POST", createInsertXml("user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                
+
                 api_test(rest_root_url + "/data/test_author/.xml", "POST", createInsertXml("anonymous session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.anonymousSessionId), function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
@@ -1313,7 +1313,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 api_test_with_credentials(rest_root_url + "/data/test_author/" + testID2 + ".xml", "PUT", createUpdateXml("", "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                
+
                 api_test(rest_root_url + "/data/test_author/" + testID2 + ".xml", "PUT", createUpdateXml("", "anonymous session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.anonymousSessionId), function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
@@ -1542,7 +1542,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/.xml", "POST", createInsertXml("user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                
+
                 api_test(rest_root_url + "/data/test_wfsuser/.xml", "POST", createInsertXml("anonymous session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.anonymousSessionId), function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
@@ -1618,7 +1618,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 api_test_with_credentials(rest_root_url + "/data/test_wfsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                
+
                 api_test(rest_root_url + "/data/test_wfsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "anonymous session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.anonymousSessionId), function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
@@ -1847,7 +1847,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/.xml", "POST", createInsertXml("user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                
+
                 api_test(rest_root_url + "/data/test_wmsuser/.xml", "POST", createInsertXml("anonymous session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.anonymousSessionId), function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
@@ -1923,7 +1923,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 api_test_with_credentials(rest_root_url + "/data/test_wmsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
-                
+
                 api_test(rest_root_url + "/data/test_wmsuser/" + testID2 + ".xml", "PUT", createUpdateXml("", "anonymous session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.anonymousSessionId), function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
@@ -2158,7 +2158,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                
+
                 api_test(rest_root_url + "/data/test_group/.xml", "POST", createInsertXml("anonymous session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.anonymousSessionId), function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
@@ -2237,7 +2237,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
                     ok(status == 200, "(" + status + ") Expected success");
                 });
-                
+
                 api_test(rest_root_url + "/data/test_group/" + testID2 + ".xml", "PUT", createUpdateXml("", "anonymous session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.anonymousSessionId), function(status, result) {
                     ok(status == 403, "(" + status + ") Expected forbidden");
                 });
@@ -4304,7 +4304,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     if (bUseTransaction === true) {
                         xml += "<Property><Name>_MgRestUseTransaction</Name><Value>1</Value></Property>";
                     } else {
-                        xml += "<Property><Name>_MgRestUseTransaction</Name><Value>0</Value></Property>";   
+                        xml += "<Property><Name>_MgRestUseTransaction</Name><Value>0</Value></Property>";
                     }
                     xml += '</Simple></Metadata></ResourceDocumentHeader>';
                     return xml;
@@ -4440,7 +4440,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                     var gj = JSON.parse(result);
                     ok(gj.features.length == 1, "Expected 1 inserted features. Got " + gj.features.length);
-                    ok(gj.features[0].properties.ID == 1, "expected feature ID 2 to be deleted");
+                    ok(gj.features[0].id == 1, "expected feature ID 2 to be deleted");
                 });
                 api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result) {
                     ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
@@ -6527,7 +6527,7 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                     var gj = JSON.parse(result);
                     ok(gj.features.length == 1, "Expected 1 inserted features. Got " + gj.features.length);
-                    ok(gj.features[0].properties.ID == 1, "expected feature ID 2 to be deleted");
+                    ok(gj.features[0].id == 1, "expected feature ID 2 to be deleted");
                 });
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result) {
                     ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
