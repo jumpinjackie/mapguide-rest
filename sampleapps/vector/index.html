@@ -6,7 +6,7 @@
             body { font-family: Verdana; font-size: 0.9em; }
             #error { color: red; }
             #wrap { width: 900; }
-            #map { width: 400; height: 300; float: left; border: 1px solid black; }
+            #map { width: 800; height: 600; float: left; border: 1px solid black; }
         </style>
         <script type="text/javascript" src="../../assets/common/js/ol-whitespace.js"></script>
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
@@ -38,6 +38,8 @@
                 styleName = "parcel_" + feature.get("RTYPE");
             } else if (layer == "CityLimits") {
                 styleName = "citylimits_" + (resolution <= 4.5) ? "low" : "high";
+            } else if (layer == "Districts") {
+                styleName = "districts_" + feature.getId();
             }
             var styleKey = layer + "/" + styleName + "/" + sort_key;
             var styleArray = layerStyleCache[styleKey];
@@ -48,6 +50,12 @@
                     stroke: new ol.style.Stroke({
                       color: '#A68B53',
                       width: 1
+                    }),
+                    text: new ol.style.Text({
+                      font: 'normal 11pt Verdana',
+                      text: 'District: ' + feature.getId(),
+                      fillColor: new ol.style.Fill({ color: '#625231' }),
+                      stroke: new ol.style.Stroke({ color: '#625231', width: 0.5 })
                     }),
                     zIndex: sort_key
                   })
@@ -196,17 +204,7 @@
                         }),
                         fill: new ol.style.Fill({
                           color: '#D5C8AC'
-                        }),/*
-                        text: new ol.style.Text({
-                          text: 'District',
-                          stroke: new ol.style.Stroke({
-                            color: '#C0C0C0',
-                            width: 1
-                          }),
-                          fill: new ol.style.Fill({
-                            color: '#C0C0C0'
-                          })
-                        }),*/
+                        }),
                         zIndex: sort_key
                       })
                     ];
@@ -297,6 +295,7 @@
 
             var map = new ol.Map({
               layers: [
+                  /*
                 new ol.layer.Tile({
                   source: new ol.source.OSM({
                     attributions: [
@@ -308,7 +307,7 @@
                     ],
                     url: 'http://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
                   })
-                }),
+                }),*/
                 tileLayer
               ],
               renderer: 'canvas',
