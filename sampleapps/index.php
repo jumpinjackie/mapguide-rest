@@ -93,6 +93,10 @@ $hasOL2Samples = true;
             <ul>
                 <li><a href="leaflet_xyz/index.html">Sheboygan map as an XYZ tile layer</a></li>
             </ul>
+            <p class="sample-header">MapGuide REST API with <a href="http://cesiumjs.org/">Cesium</a></p>
+            <ul>
+                <li><a href="cesium/index.html">Sheboygan Districts</a></li>
+            </ul>
         </div>
     </body>
 </html>

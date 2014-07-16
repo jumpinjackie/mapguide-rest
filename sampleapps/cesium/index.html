@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Cesium </title>
+    <script src="../../assets/cesium/Cesium.js"></script>
+    <style>
+      @import url(../../assets/cesium/Widgets/widgets.css);
+      #cesiumContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        overflow: hidden;
+        padding: 0;
+        font-family: sans-serif;
+      }
+
+      body {
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    viewer.scene.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(-87.727283, 43.749034, 15000.0)
+    });
+    var districtsSource = new Cesium.GeoJsonDataSource();
+    viewer.dataSources.add(districtsSource);
+    districtsSource.loadUrl("../../library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts?transformto=LL84");
+  </script>
+</body>
+</html>
