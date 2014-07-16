@@ -30,7 +30,7 @@ class MgFeatureServiceController extends MgBaseController {
     public function __construct($app) {
         parent::__construct($app);
     }
-    
+
     public function GetConnectPropertyValues($providerName, $propName, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
@@ -632,7 +632,7 @@ class MgFeatureServiceController extends MgBaseController {
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
                 $sessionId = $resId->GetRepositoryName();
             }
-            $this->EnsureAuthenticationForSite($sessionId);
+            $this->EnsureAuthenticationForSite($sessionId, true);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
