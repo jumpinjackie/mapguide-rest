@@ -2,7 +2,6 @@
 
 <project name="mapguide-rest" default="dist">
     <property name="app.version" value="master" />
-    <property name="apidoc.basepath" value="http://localhost/mapguide/rest" />
 
     <!-- ============================================  -->
     <!-- Target: prepare                               -->
@@ -16,24 +15,16 @@
     <!-- Target: clean                                 -->
     <!-- ============================================  -->
     <target name="clean">
-        <echo msg="Cleaning build directory..." />
+        <echo message="Cleaning build directory..." />
         <delete dir="./build" includeemptydirs="true" />
         <delete dir="./dist" includeemptydirs="true" />
     </target>
 
     <!-- ============================================  -->
-    <!-- Target: docgen                                -->
-    <!-- ============================================  -->
-    <target name="docgen">
-        <!-- NOTE: Window-ism. Can't use '/' here. Ugh! -->
-        <exec command="vendor\bin\swagger .\app\routes -o .\doc\data --default-base-path ${apidoc.basepath}" dir="." checkReturn="true" level="debug" />
-    </target>
-
-    <!-- ============================================  -->
     <!-- Target: build                                 -->
     <!-- ============================================  -->
-    <target name="build" depends="prepare, docgen">
-        <echo msg="Copying files to build directory..." />
+    <target name="build" depends="prepare">
+        <echo message="Copying files to build directory..." />
 
         <copy todir="./build/app" overwrite="true">
             <fileset dir="./app">
@@ -90,7 +81,7 @@
     <!-- (DEFAULT)  Target: dist                       -->
     <!-- ============================================  -->
     <target name="dist" depends="build">
-        <echo msg="Creating dist archive..." />
+        <echo message="Creating dist archive..." />
 
         <zip destfile="./dist/mapguide-rest-${app.version}.zip">
             <fileset dir="./build">

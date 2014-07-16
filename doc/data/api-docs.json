@@ -1,0 +1,30 @@
+{
+    "apiVersion": "0.5",
+    "swaggerVersion": "1.2",
+    "apis": [
+        {
+            "path": "/coordsys.json",
+            "description": "Coordinate System Catalog"
+        },
+        {
+            "path": "/library.json",
+            "description": "Site Repository"
+        },
+        {
+            "path": "/providers.json",
+            "description": "FDO Provider Registry"
+        },
+        {
+            "path": "/services.json",
+            "description": "Additional Services"
+        },
+        {
+            "path": "/session.json",
+            "description": "Session Repository"
+        },
+        {
+            "path": "/site.json",
+            "description": "Site Service"
+        }
+    ]
+}
