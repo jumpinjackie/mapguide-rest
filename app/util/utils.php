@@ -697,6 +697,26 @@ class MgUtils
         return $totalEntries;
     }
 
+    public static function DateTimeToString($dt) {
+        $val = "";
+        if ($dt->IsDate()) {
+            $val .= sprintf("%s-%s-%s",
+                ($dt->GetYear().""),
+                str_pad($dt->GetMonth()."", 2, '0', STR_PAD_LEFT),
+                str_pad($dt->GetDay()."", 2, '0', STR_PAD_LEFT));
+        }
+        if ($dt->IsTime()) {
+            if (strlen($val) > 0)
+                $val .= " ";
+            $val .= sprintf("%s:%s:%s",
+                str_pad($dt->GetHour()."", 2, '0', STR_PAD_LEFT),
+                str_pad($dt->GetMinute()."", 2, '0', STR_PAD_LEFT),
+                str_pad($dt->GetSecond()."", 2, '0', STR_PAD_LEFT)
+            );
+        }
+        return $val;
+    }
+
     public static function GetBasicValueFromReader($reader, $propName) {
         $val = "";
         if ($reader->IsNull($propName))
@@ -704,10 +724,14 @@ class MgUtils
         $propType = $reader->GetPropertyType($propName);
         switch($propType) {
             case MgPropertyType::Boolean:
-                $val = $reader->GetBoolean($propName)."";
+                $val = $reader->GetBoolean($propName) ? "true" : "false";
                 break;
             case MgPropertyType::Byte:
                 $val = $reader->GetByte($propName)."";
+                break;
+            case MgPropertyType::DateTime:
+                $dt = $reader->GetDateTime($propName);
+                $val = self::DateTimeToString($dt);
                 break;
             case MgPropertyType::Decimal:
             case MgPropertyType::Double:
@@ -741,6 +765,7 @@ class MgUtils
         while ($rdr->ReadNext()) {
             array_push($values, self::GetBasicValueFromReader($rdr, "RESULT"));
         }
+        $rdr->Close();
 
         return $values;
     }
