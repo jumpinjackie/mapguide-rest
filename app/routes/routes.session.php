@@ -1046,6 +1046,61 @@ $app->get("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaNa
 });
 /**
  * @SWG\Api(
+ *     path="/session/{session}/{resName}.LayerDefinition/features",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="SelectFeatures",
+ *        summary="Queries features from the specified layer definition. Any hyperlink and tooltip expressions will be computed and returned in the response",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
+ *          @SWG\parameter(name="filter", paramType="query", required=false, type="string", description="The FDO filter to apply"),
+ *          @SWG\parameter(name="properties", paramType="query", required=false, type="string", description="A comma-separated list of proprety names"),
+ *          @SWG\parameter(name="maxfeatures", paramType="query", required=false, type="string", description="The maximum number of features to restrict this response to"),
+ *          @SWG\parameter(name="transformto", paramType="query", required=false, type="string", description="The CS-Map coordinate system code to transform the resulting features into"),
+ *          @SWG\parameter(name="bbox", paramType="query", required=false, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:resName.LayerDefinition/features", function($sessionId, $resName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->SelectLayerFeatures($resId, "xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{resName}.LayerDefinition/features.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="SelectFeatures",
+ *        summary="Queries features from the specified layer definition. Any hyperlink and tooltip expressions will be computed and returned in the response",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
+ *          @SWG\parameter(name="filter", paramType="query", required=false, type="string", description="The FDO filter to apply"),
+ *          @SWG\parameter(name="properties", paramType="query", required=false, type="string", description="A comma-separated list of proprety names"),
+ *          @SWG\parameter(name="maxfeatures", paramType="query", required=false, type="string", description="The maximum number of features to restrict this response to"),
+ *          @SWG\parameter(name="transformto", paramType="query", required=false, type="string", description="The CS-Map coordinate system code to transform the resulting features into"),
+ *          @SWG\parameter(name="bbox", paramType="query", required=false, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','geojson']")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:resName.LayerDefinition/features.:format", function($sessionId, $resName, $format) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->SelectLayerFeatures($resId, $format);
+});
+/**
+ * @SWG\Api(
  *     path="/session/{session}/{resName}.FeatureSource/aggregates/{aggregateType}/{schemaName}/{className}",
  *     @SWG\Operation(
  *        method="GET",

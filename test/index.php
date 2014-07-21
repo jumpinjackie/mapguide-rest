@@ -4123,6 +4123,52 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
+            test("Select 100 Parcels by Layer", function() {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100 }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Select 100 Parcels by Layer - GeoJSON", function() {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { maxfeatures: 100 }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
             test("Parcels owned by SCHMITT", function() {
                 api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") - Request should've required authentication");
@@ -4166,6 +4212,52 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Parcels owned by SCHMITT by Layer", function() {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Parcels owned by SCHMITT by Layer - GeoJSON", function() {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
@@ -4215,6 +4307,52 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
+            test("Select 100 Parcels by layer with projected property list", function() {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Select 100 Parcels by layer with projected property list - GeoJSON", function() {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
             test("Select 100 Parcels (xformed to WGS84.PseudoMercator)", function() {
                 api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, "Foo", "Bar", function(status, result) {
                     ok(status == 401, "(" + status + ") - Request should've required authentication");
@@ -4258,6 +4396,52 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Select 100 Parcels by layer (xformed to WGS84.PseudoMercator)", function() {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Select 100 Parcels by layer (xformed to WGS84.PseudoMercator) - GeoJSON", function() {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, "Foo", "Bar", function(status, result) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
@@ -5385,6 +5569,14 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     });
                     api_test(rest_root_url + "/services/copyresource", "POST", {
                         session: this.anonymousSessionId,
+                        source: "Library://Samples/Sheboygan/Layers/Parcels.LayerDefinition",
+                        destination: "Session:" + this.anonymousSessionId + "//Parcels.LayerDefinition",
+                        overwrite: 1
+                    }, function(status, result) {
+                        ok(status == 200, "(" + status + ") copy operation should've succeeded");
+                    });
+                    api_test(rest_root_url + "/services/copyresource", "POST", {
+                        session: this.anonymousSessionId,
                         source: "Library://RestUnitTests/RedlineLayer.FeatureSource",
                         destination: "Session:" + this.anonymousSessionId + "//RedlineLayer.FeatureSource",
                         overwrite: 1
@@ -6343,6 +6535,44 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
+            test("Select 100 Parcels by layer", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Select 100 Parcels by layer - GeoJSON", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
             test("Parcels owned by SCHMITT", function() {
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
@@ -6378,6 +6608,44 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Parcels owned by SCHMITT by layer", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Parcels owned by SCHMITT by layer - GeoJSON", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
@@ -6419,6 +6687,44 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
+            test("Select 100 Parcels with projected property list by layer", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Select 100 Parcels with projected property list by layer - GeoJSON", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
             test("Select 100 Parcels (xformed to WGS84.PseudoMercator)", function() {
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
@@ -6454,6 +6760,44 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Select 100 Parcels by layer (xformed to WGS84.PseudoMercator)", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML respose");
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+            });
+            test("Select 100 Parcels by layer (xformed to WGS84.PseudoMercator) - GeoJSON", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.geojson", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });

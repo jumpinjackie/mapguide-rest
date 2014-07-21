@@ -2803,6 +2803,167 @@
             ]
         },
         {
+            "path": "/session/{session}/{resName}.LayerDefinition/features",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Queries features from the specified layer definition. Any hyperlink and tooltip expressions will be computed and returned in the response",
+                    "nickname": "SelectFeatures",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The feature source name"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "filter",
+                            "type": "string",
+                            "required": false,
+                            "description": "The FDO filter to apply"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "properties",
+                            "type": "string",
+                            "required": false,
+                            "description": "A comma-separated list of proprety names"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "maxfeatures",
+                            "type": "string",
+                            "required": false,
+                            "description": "The maximum number of features to restrict this response to"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "transformto",
+                            "type": "string",
+                            "required": false,
+                            "description": "The CS-Map coordinate system code to transform the resulting features into"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "bbox",
+                            "type": "string",
+                            "required": false,
+                            "description": "A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/session/{session}/{resName}.LayerDefinition/features.{type}",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Queries features from the specified layer definition. Any hyperlink and tooltip expressions will be computed and returned in the response",
+                    "nickname": "SelectFeatures",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The feature source name"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "filter",
+                            "type": "string",
+                            "required": false,
+                            "description": "The FDO filter to apply"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "properties",
+                            "type": "string",
+                            "required": false,
+                            "description": "A comma-separated list of proprety names"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "maxfeatures",
+                            "type": "string",
+                            "required": false,
+                            "description": "The maximum number of features to restrict this response to"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "transformto",
+                            "type": "string",
+                            "required": false,
+                            "description": "The CS-Map coordinate system code to transform the resulting features into"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "bbox",
+                            "type": "string",
+                            "required": false,
+                            "description": "A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "geojson"
+                            ]
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "path": "/session/{session}/{resName}.LayerDefinition/legend/{scale}/{geomType}/{themecat}/icon.{type}",
             "operations": [
                 {

@@ -623,6 +623,125 @@ class MgFeatureServiceController extends MgBaseController {
         }
     }
 
+    public function SelectLayerFeatures($ldfId, $format) {
+        try {
+            //Check for unsupported representations
+            $fmt = $this->ValidateRepresentation($format, array("xml", "geojson"));
+
+            $sessionId = "";
+            if ($ldfId->GetRepositoryType() == MgRepositoryType::Session) {
+                $sessionId = $ldfId->GetRepositoryName();
+            }
+            $this->EnsureAuthenticationForSite($sessionId, true);
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+
+            $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
+            $query = new MgFeatureQueryOptions();
+
+            $propList = $this->GetRequestParameter("properties", "");
+            $filter = $this->GetRequestParameter("filter", "");
+            //$orderby = $this->GetRequestParameter("orderby", "");
+            //$orderOptiosn = $this->GetRequestParameter("orderoption", "");
+            $maxFeatures = $this->GetRequestParameter("maxfeatures", "");
+            $transformto = $this->GetRequestParameter("transformto", "");
+            $bbox = $this->GetRequestParameter("bbox", "");
+
+            $limit = -1;
+            if ($maxFeatures !== "") {
+                $limit = intval($maxFeatures);
+            }
+
+            //Load the Layer Definition document and extract the relevant bits of information
+            //we're interested in
+            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+            $ldfContent = $resSvc->GetResourceContent($ldfId);
+            $doc = new DOMDocument();
+            $doc->loadXML($ldfContent->ToString());
+            $vl = $doc->getElementsByTagName("VectorLayerDefinition");
+            if ($vl->length == 1) {
+                $vlNode = $vl->item(0);
+                $fsId = $vlNode->getElementsByTagName("ResourceId");
+                $fc = $vlNode->getElementsByTagName("FeatureName");
+                $hlink = $vlNode->getElementsByTagName("Hyperlink");
+                $tt = $vlNode->getElementsByTagName("ToolTip");
+                $flt = $vlNode->getElementsByTagName("Filter");
+                if ($fsId->length == 1) {
+                    $fsId = new MgResourceIdentifier($fsId->item(0)->nodeValue);
+                    if ($fc->length == 1) {
+                        //Add hyperlink and tooltip as special computed properties
+                        if ($hlink->length == 1 && strlen($hlink->item(0)->nodeValue) > 0) {
+                            $query->AddComputedProperty("MG_HYPERLINK", $hlink->item(0)->nodeValue);
+                        }
+                        if ($tt->length == 1 && strlen($tt->item(0)->nodeValue) > 0) {
+                            $query->AddComputedProperty("MG_TOOLTIP", $tt->item(0)->nodeValue);
+                        }
+                        //Set filter from layer if defined
+                        if ($flt->length == 1 && strlen($flt->item(0)->nodeValue) > 0) {
+                            if ($filter !== "") {
+                                //logical AND with the layer's filter to combine them
+                                $query->SetFilter("(".$flt->item(0)->nodeValue.") AND (".$filter.")");
+                            } else {
+                                $query->SetFilter($flt->item(0)->nodeValue);
+                            }
+                        } else {
+                            if ($filter !== "") {
+                                $query->SetFilter($filter);
+                            }
+                        }
+                        $tokens = explode(":", $fc->item(0)->nodeValue);
+                        $schemaName = $tokens[0];
+                        $className = $tokens[1];
+                        $clsDef = NULL;
+                        //Unless an explicit property list has been specified, we're explicitly adding all properties
+                        //from the class definition
+                        if ($propList !== "") {
+                            $propNames = explode(",", $propList); //If you have a comma in your property names, it's your own fault :)
+                            foreach ($propNames as $propName) {
+                                $query->AddFeatureProperty($propName);
+                            }
+                        } else {
+                            if ($clsDef == NULL)
+                                $clsDef = $featSvc->GetClassDefinition($fsId, $schemaName, $className);
+                            $clsProps = $clsDef->GetProperties();
+                            for ($i = 0; $i < $clsProps->GetCount(); $i++) {
+                                $propDef = $clsProps->GetItem($i);
+                                $query->AddFeatureProperty($propDef->GetName());
+                            }
+                        }
+                        if ($bbox !== "") {
+                            $parts = explode(",", $bbox);
+                            if (count($parts) == 4) {
+                                $wktRw = new MgWktReaderWriter();
+                                if ($clsDef == NULL)
+                                    $clsDef = $featSvc->GetClassDefinition($fsId, $schemaName, $className);
+                                $geom = $wktRw->Read(MgUtils::MakeWktPolygon($parts[0], $parts[1], $parts[2], $parts[3]));
+                                $query->SetSpatialFilter($clsDef->GetDefaultGeometryPropertyName(), $geom, MgFeatureSpatialOperations::EnvelopeIntersects);
+                            }
+                        }
+
+                        $transform = null;
+                        if ($transformto !== "") {
+                            $transform = MgUtils::GetTransform($featSvc, $fsId, $schemaName, $className, $transformto);
+                        }
+
+                        $reader = $featSvc->SelectFeatures($fsId, "$schemaName:$className", $query);
+                        $result = new MgReaderChunkedResult($this->app, $featSvc, $reader, $limit);
+                        if ($transform != null)
+                            $result->SetTransform($transform);
+                        $result->Output($format);
+                    } else {
+                        throw new Exception("Layer ".$ldfId->ToString()." has an invalid feature class");
+                    }
+                } else {
+                    throw new Exception("Layer ".$ldfId->ToString()." has an invalid feature source");
+                }
+            }
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
+    }
+
     public function SelectFeatures($resId, $schemaName, $className, $format) {
         try {
             //Check for unsupported representations
