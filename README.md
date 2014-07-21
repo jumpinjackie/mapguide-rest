@@ -25,7 +25,7 @@ mapguide-rest has been tested on MapGuide Open Source 2.5 (latest stable release
 Setup
 =====
 
-NOTE: For convenience, you should use one of the pre-packaged [release distributions](https://github.com/jumpinjackie/mapguide-rest/releases)
+**NOTE: For convenience, you should use one of the pre-packaged [release distributions](https://github.com/jumpinjackie/mapguide-rest/releases)**
 
  1. Clone this repository into the www directory of your MapGuide Open Source installation. Rename the clone directory to "rest" (eg. C:\Program Files\OSGeo\MapGuide\Web\www\rest on windows or /usr/local/mapguideopensource-2.5.2/webserverextensions/www/rest on linux)
 
@@ -33,7 +33,9 @@ NOTE: For convenience, you should use one of the pre-packaged [release distribut
 
  3. Run the following composer command from the root of your clone to pull down required vendor libraries
  > composer install
+ 
  or
+ 
  > php composer.phar install
 
  4. [OPTIONAL] Install and enable the [Application Request Routing module for IIS](http://www.iis.net/downloads/microsoft/application-request-routing). This allows for "cleaner" URLs. If you have installed the ARR module, you can rename the web.config.iis file to web.config to activate ARR for the REST extension. For Apache, you can use the provided .htaccess file for clean URLs and skip this step.
