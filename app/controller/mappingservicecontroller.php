@@ -608,6 +608,15 @@ class MgMappingServiceController extends MgBaseController {
             $br = $mappingSvc->GeneratePlot($map, $center, floatval($scale), $plotSpec, $layout, $dwfVersion);
             $this->OutputByteReader($br);
         } else { //pdf
+            //FIXME: Initial visibility state is inconsistent (probably because this map hasn't been rendered
+            //yet). As a result, adding layered PDF support won't really work here.
+            /*
+            $bLayered = $this->app->request->params("layeredpdf");
+            if ($bLayered == null)
+                $bLayered = false;
+            else
+                $bLayered = ($bLayered == "1" || $bLayered == "true");
+            */
             $renderingService = $siteConn->CreateService(MgServiceType::RenderingService);
             $plotter = new MgPdfPlotter($this->app, $renderingService, $map);
             $plotter->SetTitle($title);
@@ -617,6 +626,7 @@ class MgMappingServiceController extends MgBaseController {
             $plotter->ShowNorthArrow(true);
             $plotter->ShowScaleBar(true);
             $plotter->ShowDisclaimer(true);
+            //$plotter->SetLayered($bLayered);
             $plotter->SetMargins($marginTop, $marginBottom, $marginLeft, $marginRight);
             $plotter->Plot($center, floatval($scale));
         }
@@ -661,6 +671,12 @@ class MgMappingServiceController extends MgBaseController {
             $br = $mappingSvc->GeneratePlot($map, $plotSpec, $layout, $dwfVersion);
             $this->OutputByteReader($br);
         } else { //pdf
+            $bLayered = $this->app->request->params("layeredpdf");
+            if ($bLayered == null)
+                $bLayered = false;
+            else
+                $bLayered = ($bLayered == "1" || $bLayered == "true");
+
             $renderingService = $siteConn->CreateService(MgServiceType::RenderingService);
             $plotter = new MgPdfPlotter($this->app, $renderingService, $map);
             $plotter->SetTitle($title);
@@ -670,6 +686,7 @@ class MgMappingServiceController extends MgBaseController {
             $plotter->ShowNorthArrow(true);
             $plotter->ShowScaleBar(true);
             $plotter->ShowDisclaimer(true);
+            $plotter->SetLayered($bLayered);
             $plotter->SetMargins($marginTop, $marginBottom, $marginLeft, $marginRight);
 
             $mapCenter = $map->GetViewCenter();

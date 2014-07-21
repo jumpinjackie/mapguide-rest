@@ -66,7 +66,7 @@ class MgPdfPlotter
     const VALIGN_CENTER = 'M'; //Docs say 'C', usage says 'M' ???
     const VALIGN_BOTTOM = 'B';
 
-    public function __construct($app, $renderingService, $map, $dpi = 96, $rotation = 0, $margin = NULL, $orientation = self::ORIENTATION_PORTRAIT, $paperType = 'A4', $showLegend = false, $showCoordinates = false, $showDisclaimer = false, $showScaleBar = false, $drawNorthArrow = false, $title = "", $subTitle = "") {
+    public function __construct($app, $renderingService, $map, $dpi = 96, $margin = NULL, $orientation = self::ORIENTATION_PORTRAIT, $paperType = 'A4', $showLegend = false, $showCoordinates = false, $showDisclaimer = false, $showScaleBar = false, $drawNorthArrow = false, $title = "", $subTitle = "") {
         $this->app = $app;
         $this->renderingService = $renderingService;
         $this->map = $map;
@@ -92,7 +92,8 @@ class MgPdfPlotter
         $this->box = $ll->GetX().",".$ll->GetY().",".$ur->GetX().",".$ll->GetY().",".$ur->GetX().",".$ur->GetY().",".$ll->GetX().",".$ur->GetY().",".$ll->GetX().",".$ll->GetY();
         $this->normalizedBox = $this->box;
 
-        $this->rotation = $rotation;
+        //Not used in main plotting, but still used for north arrow rendering
+        $this->rotation = 0;
 
         if ($margin != NULL)
             $this->margin = $margin;
@@ -454,7 +455,7 @@ class MgPdfPlotter
         return $tempImage;
     }
 
-    private function RenderMap($width, $height, $ovCenter = NULL, $ovScale = NULL) {
+    private function RenderMap($width, $height, $ovCenter = NULL, $ovScale = NULL, $ovColor = NULL) {
         $size = new MgPlotSize($this->printSize->width / 25.4 * $this->dpi, $this->printSize->height / 25.4 * $this->dpi);
         $selection = new MgSelection($this->map);
 
@@ -480,11 +481,14 @@ class MgPdfPlotter
             $scale = $this->scaleDenominator;
   
         $this->map->SetDisplayDpi($this->dpi);
-        $colorString = $this->map->GetBackgroundColor();
-        // The returned color string is in AARRGGBB format. But the constructor of MgColor needs a string in RRGGBBAA format
-        $colorString = substr($colorString, 2, 6) . substr($colorString, 0, 2);
-        $color = new MgColor($colorString);
-
+        if ($ovColor != NULL) {
+            $color = $ovColor;
+        } else {
+            $colorString = $this->map->GetBackgroundColor();
+            // The returned color string is in AARRGGBB format. But the constructor of MgColor needs a string in RRGGBBAA format
+            $colorString = substr($colorString, 2, 6) . substr($colorString, 0, 2);
+            $color = new MgColor($colorString);
+        }
 
         $mgReader = $this->renderingService->RenderMap($this->map, 
                                                        $selection, 
@@ -494,39 +498,14 @@ class MgPdfPlotter
                                                        $toSize->height,
                                                        $color,
                                                        MgImageFormats::Png,
-                                                       false);
+                                                       true);
         $tempImage = self::GetTempPath();
 
         $mgReader->ToFile($tempImage);
-        
-        $image = imagecreatefrompng($tempImage);
-        unlink($tempImage);
 
-        // Rotate the picture back to be normalized
-        $normalizedImg = imagerotate($image, -$this->rotation, 0);
-        // Free the original image
-        imagedestroy($image);
-        // Crop the normalized image
-        $croppedImg = imagecreatetruecolor($size->width, $size->height);
-        imagecopy($croppedImg, $normalizedImg, 0, 0, (imagesx($normalizedImg) - $size->width) / 2, (imagesy($normalizedImg) - $size->height) / 2, $size->width, $size->height);
-        // Free the normalized image
-        imagedestroy($normalizedImg);
-        if ($this->drawNorthArrow) {
-            // Draw the north arrow on the map
-            $this->DrawNorthArrow($croppedImg);
-        }
-        imagepng($croppedImg, $tempImage);
+        //TODO: Rotation support (not included from Fusion QuickPlot code). If included, we need to solve
+        //the transparency issue when outputting a layered PDF
         
-        if ($this->bDebug) {
-            ob_start();
-            imagepng($croppedImg);
-            $im = base64_encode(ob_get_contents());
-            ob_end_clean();
-            $this->app->header("Content-type: text/html", true);
-            $this->app->response->write("<img src='data:image/png;base64,".$im."' alt='legend image'></img>");
-        }
-        
-        imagedestroy($croppedImg);
         return $tempImage;
     }
 
@@ -602,11 +581,6 @@ class MgPdfPlotter
             $this->printSize->width = $idealWidth;
         
 
-        $filelocation = $this->RenderMap(MgUtils::InToPx($this->printSize->width, $this->dpi),
-                                         MgUtils::InToPx($this->printSize->height, $this->dpi),
-                                         $center,
-                                         $scale);
-        
         $link = "";
         $align = "";
         $resize = false;
@@ -617,26 +591,6 @@ class MgPdfPlotter
         $fitbox = false;
         $hidden = false;
         $fitonpage = false;
-
-        // Draw Map
-        $this->pdf->Image($filelocation, 
-                          ($this->showLegend ? ($this->margin[2] + $legendWidthIn) : $this->margin[2]), 
-                          $this->margin[0], 
-                          $this->printSize->width, 
-                          $this->printSize->height,
-                          MgImageFormats::Png,
-                          $link,
-                          $align,
-                          $resize,
-                          $this->dpi,
-                          $palign,
-                          $ismask,
-                          $imgmask,
-                          $border,
-                          $fitbox,
-                          $hidden,
-                          $fitonpage);
-        @unlink($filelocation);
 
         // Draw legend if specified
         if ($this->showLegend) {
@@ -660,7 +614,117 @@ class MgPdfPlotter
                               $fitonpage);
             @unlink($legendfilelocation);
         }
-        
+
+        if ($this->bLayered) {
+            $layerNames = array();
+            $mapLayers = $this->map->GetLayers();
+            //Collect all visible layers
+            for ($i = $mapLayers->GetCount() - 1; $i >= 0; $i--) {
+                $layer = $mapLayers->GetItem($i);
+                if ($layer->IsVisible()) {
+                    array_push($layerNames, $layer->GetName());
+                }
+            }
+
+            $bgColor = new MgColor("FFFFFF00");
+            //Turn off all layers first
+            for ($i = 0; $i < $mapLayers->GetCount(); $i++) {
+                $layer = $mapLayers->GetItem($i);
+                $layer->SetVisible(false);
+            }
+
+            //Plot this map background
+            $filelocation = $this->RenderMap(MgUtils::InToPx($this->printSize->width, $this->dpi),
+                                                 MgUtils::InToPx($this->printSize->height, $this->dpi),
+                                                 $center,
+                                                 $scale);
+            
+            // Draw Map background
+            $this->pdf->Image($filelocation, 
+                              ($this->showLegend ? ($this->margin[2] + $legendWidthIn) : $this->margin[2]), 
+                              $this->margin[0], 
+                              $this->printSize->width, 
+                              $this->printSize->height,
+                              MgImageFormats::Png,
+                              $link,
+                              $align,
+                              $resize,
+                              $this->dpi,
+                              $palign,
+                              $ismask,
+                              $imgmask,
+                              $border,
+                              $fitbox,
+                              $hidden,
+                              $fitonpage);
+            @unlink($filelocation);
+
+            $prevLayerName = NULL;
+            //Now plot each layer individually
+            foreach ($layerNames as $layerName) {
+                if ($prevLayerName != NULL) {
+                    $mapLayers->GetItem($prevLayerName)->SetVisible(false);
+                }
+                $mapLayers->GetItem($layerName)->SetVisible(true);
+                
+                $this->pdf->startLayer($layerName);
+
+                $filelocation = $this->RenderMap(MgUtils::InToPx($this->printSize->width, $this->dpi),
+                                                 MgUtils::InToPx($this->printSize->height, $this->dpi),
+                                                 $center,
+                                                 $scale,
+                                                 $bgColor);
+            
+                // Draw Map
+                $this->pdf->Image($filelocation, 
+                                  ($this->showLegend ? ($this->margin[2] + $legendWidthIn) : $this->margin[2]), 
+                                  $this->margin[0], 
+                                  $this->printSize->width, 
+                                  $this->printSize->height,
+                                  MgImageFormats::Png,
+                                  $link,
+                                  $align,
+                                  $resize,
+                                  $this->dpi,
+                                  $palign,
+                                  $ismask,
+                                  $imgmask,
+                                  $border,
+                                  $fitbox,
+                                  $hidden,
+                                  $fitonpage);
+                @unlink($filelocation);
+
+                $prevLayerName = $layerName;
+                $this->pdf->endLayer();
+            }
+        } else {
+            $filelocation = $this->RenderMap(MgUtils::InToPx($this->printSize->width, $this->dpi),
+                                             MgUtils::InToPx($this->printSize->height, $this->dpi),
+                                             $center,
+                                             $scale);
+            
+            // Draw Map
+            $this->pdf->Image($filelocation, 
+                              ($this->showLegend ? ($this->margin[2] + $legendWidthIn) : $this->margin[2]), 
+                              $this->margin[0], 
+                              $this->printSize->width, 
+                              $this->printSize->height,
+                              MgImageFormats::Png,
+                              $link,
+                              $align,
+                              $resize,
+                              $this->dpi,
+                              $palign,
+                              $ismask,
+                              $imgmask,
+                              $border,
+                              $fitbox,
+                              $hidden,
+                              $fitonpage);
+            @unlink($filelocation);
+        }
+
         // Draw coordiates if specified
         $mExt = NULL;
         if ($this->showCoordinates) {

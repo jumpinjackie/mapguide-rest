@@ -1041,6 +1041,13 @@
                             "description": "The title to put in the plot"
                         },
                         {
+                            "paramType": "query",
+                            "name": "layeredpdf",
+                            "type": "boolean",
+                            "required": false,
+                            "description": "Indicates whether to produce a layered PDF. Only applies if plotting PDFs. This is slower than regular PDF plot, but produces a PDF with the same layer structure as the map"
+                        },
+                        {
                             "paramType": "path",
                             "name": "type",
                             "type": "string",

@@ -340,6 +340,7 @@ $app->get("/session/:sessionId/:mapName.Map/plot", function($sessionId, $mapName
  *          @SWG\parameter(name="marginbottom", paramType="query", required=false, type="double", description="bottom margin in inches"),
  *          @SWG\parameter(name="printlayout", paramType="query", required=false, type="string", description="The PrintLayout resource to use for plotting. Only applies if plotting to DWF"),
  *          @SWG\parameter(name="title", paramType="query", required=false, type="string", description="The title to put in the plot"),
+ *          @SWG\parameter(name="layeredpdf", paramType="query", required=false, type="boolean", description="Indicates whether to produce a layered PDF. Only applies if plotting PDFs. This is slower than regular PDF plot, but produces a PDF with the same layer structure as the map"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="The plot type", enum="['dwf','pdf']")
  *        ),
  *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
