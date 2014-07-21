@@ -4,6 +4,7 @@
 /cache/templates_c
 /build
 /dist
+/vendor
 !/cache/readme.txt
 /conf/data/test_wfsuser
 /conf/data/test_wmsuser
