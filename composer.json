@@ -3,6 +3,7 @@
         "slim/slim": "2.x",
         "smarty/smarty": "3.*",
         "zircote/swagger-php": "*",
-        "phing/phing": "*"
+        "phing/phing": "*",
+        "tecnick.com/tcpdf": "6.0.089"
     }
 }
