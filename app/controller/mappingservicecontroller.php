@@ -18,6 +18,7 @@
 //
 
 require_once "controller.php";
+require_once dirname(__FILE__)."/../util/pdfplotter.php";
 
 class MgMappingServiceController extends MgBaseController {
     public function __construct($app) {
@@ -556,7 +557,7 @@ class MgMappingServiceController extends MgBaseController {
     }
 
     public function GeneratePlotFromMapDefinition($resId, $format) {
-        $fmt = $this->ValidateRepresentation($format, array("dwf"));
+        $fmt = $this->ValidateRepresentation($format, array("dwf", "pdf"));
         $x = $this->GetRequestParameter("x", "");
         $y = $this->GetRequestParameter("y", "");
         $scale = $this->GetRequestParameter("scale", "");
@@ -572,39 +573,57 @@ class MgMappingServiceController extends MgBaseController {
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
 
-        $mappingSvc = $siteConn->CreateService(MgServiceType::MappingService);
+        $map = new MgMap($siteConn);
+        $map->Create($resId, "Plot");
 
-        $width = floatval($this->GetRequestParameter("pagewidth", 8.5));
-        $height = floatval($this->GetRequestParameter("pageheight", 11.0));
+        $title = $this->GetRequestParameter("title", "");
+        $paperSize = $this->GetRequestParameter("papersize", 'A4');
+        $orientation = $this->GetRequestParameter("orientation", 'P');
         $marginLeft = floatval($this->GetRequestParameter("marginleft", 0.5));
         $marginRight = floatval($this->GetRequestParameter("marginright", 0.5));
-        $marginTop = floatval($this->GetRequestParameter("margintop", 0.5));
+        $marginTop = floatval($this->GetRequestParameter("margintop", ($title == "") ? 0.5: 1.0));
         $marginBottom = floatval($this->GetRequestParameter("marginbottom", 0.5));
-        $printLayoutStr = $this->GetRequestParameter("printlayout", null);
-        $title = $this->GetRequestParameter("title", "");
 
         $geomFact = new MgGeometryFactory();
         $center = $geomFact->CreateCoordinateXY(floatval($x), floatval($y));
 
-        $map = new MgMap($siteConn);
-        $map->Create($resId, "Plot");
+        if ($fmt == "dwf") {
+            $size = MgUtils::GetPaperSize($this->app, $paperSize);
+            //If landscape, flip the width/height
+            $width = ($orientation == 'L') ? MgUtils::MMToIn($size[1]) : MgUtils::MMToIn($size[0]);
+            $height = ($orientation == 'L') ? MgUtils::MMToIn($size[0]) : MgUtils::MMToIn($size[1]);
+            $printLayoutStr = $this->GetRequestParameter("printlayout", null);
+            $mappingSvc = $siteConn->CreateService(MgServiceType::MappingService);
 
-        $dwfVersion = new MgDwfVersion("6.01", "1.2");
-        $plotSpec = new MgPlotSpecification($width, $height, MgPageUnitsType::Inches);
-        $plotSpec->SetMargins($marginLeft, $marginTop, $marginRight, $marginBottom);
+            $dwfVersion = new MgDwfVersion("6.01", "1.2");
+            $plotSpec = new MgPlotSpecification($width, $height, MgPageUnitsType::Inches);
+            $plotSpec->SetMargins($marginLeft, $marginTop, $marginRight, $marginBottom);
 
-        $layout = null;
-        if ($printLayoutStr != null) {
-            $layoutRes = new MgResourceIdentifier($printLayoutStr);
-            $layout = new MgLayout($layoutRes, $title, MgPageUnitsType::Inches);
+            $layout = null;
+            if ($printLayoutStr != null) {
+                $layoutRes = new MgResourceIdentifier($printLayoutStr);
+                $layout = new MgLayout($layoutRes, $title, MgPageUnitsType::Inches);
+            }
+
+            $br = $mappingSvc->GeneratePlot($map, $center, floatval($scale), $plotSpec, $layout, $dwfVersion);
+            $this->OutputByteReader($br);
+        } else { //pdf
+            $renderingService = $siteConn->CreateService(MgServiceType::RenderingService);
+            $plotter = new MgPdfPlotter($this->app, $renderingService, $map);
+            $plotter->SetTitle($title);
+            $plotter->SetPaperType($paperSize);
+            $plotter->SetOrientation($orientation);
+            $plotter->ShowCoordinates(true);
+            $plotter->ShowNorthArrow(true);
+            $plotter->ShowScaleBar(true);
+            $plotter->ShowDisclaimer(true);
+            $plotter->SetMargins($marginTop, $marginBottom, $marginLeft, $marginRight);
+            $plotter->Plot($center, floatval($scale));
         }
-
-        $br = $mappingSvc->GeneratePlot($map, $center, floatval($scale), $plotSpec, $layout, $dwfVersion);
-        $this->OutputByteReader($br);
     }
 
     public function GeneratePlot($sessionId, $mapName, $format) {
-        $fmt = $this->ValidateRepresentation($format, array("dwf"));
+        $fmt = $this->ValidateRepresentation($format, array("dwf", "pdf"));
         $this->EnsureAuthenticationForSite($sessionId);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
@@ -614,27 +633,48 @@ class MgMappingServiceController extends MgBaseController {
 
         $mappingSvc = $siteConn->CreateService(MgServiceType::MappingService);
 
-        $width = floatval($this->GetRequestParameter("pagewidth", 8.5));
-        $height = floatval($this->GetRequestParameter("pageheight", 11.0));
+        $title = $this->GetRequestParameter("title", "");
+        $paperSize = $this->GetRequestParameter("papersize", 'A4');
+        $orientation = $this->GetRequestParameter("orientation", 'P');
         $marginLeft = floatval($this->GetRequestParameter("marginleft", 0.5));
         $marginRight = floatval($this->GetRequestParameter("marginright", 0.5));
-        $marginTop = floatval($this->GetRequestParameter("margintop", 0.5));
+        $marginTop = floatval($this->GetRequestParameter("margintop", ($title == "") ? 0.5: 1.0));
         $marginBottom = floatval($this->GetRequestParameter("marginbottom", 0.5));
-        $printLayoutStr = $this->GetRequestParameter("printlayout", null);
-        $title = $this->GetRequestParameter("title", "");
 
-        $dwfVersion = new MgDwfVersion("6.01", "1.2");
-        $plotSpec = new MgPlotSpecification($width, $height, MgPageUnitsType::Inches);
-        $plotSpec->SetMargins($marginLeft, $marginTop, $marginRight, $marginBottom);
+        if ($fmt == "dwf") {
+            $size = MgUtils::GetPaperSize($this->app, $paperSize);
+            //If landscape, flip the width/height
+            $width = ($orientation == 'L') ? MgUtils::MMToIn($size[1]) : MgUtils::MMToIn($size[0]);
+            $height = ($orientation == 'L') ? MgUtils::MMToIn($size[0]) : MgUtils::MMToIn($size[1]);
+            $printLayoutStr = $this->GetRequestParameter("printlayout", null);
+            
+            $dwfVersion = new MgDwfVersion("6.01", "1.2");
+            $plotSpec = new MgPlotSpecification($width, $height, MgPageUnitsType::Inches);
+            $plotSpec->SetMargins($marginLeft, $marginTop, $marginRight, $marginBottom);
 
-        $layout = null;
-        if ($printLayoutStr != null) {
-            $layoutRes = new MgResourceIdentifier($printLayoutStr);
-            $layout = new MgLayout($layoutRes, $title, MgPageUnitsType::Inches);
+            $layout = null;
+            if ($printLayoutStr != null) {
+                $layoutRes = new MgResourceIdentifier($printLayoutStr);
+                $layout = new MgLayout($layoutRes, $title, MgPageUnitsType::Inches);
+            }
+
+            $br = $mappingSvc->GeneratePlot($map, $plotSpec, $layout, $dwfVersion);
+            $this->OutputByteReader($br);
+        } else { //pdf
+            $renderingService = $siteConn->CreateService(MgServiceType::RenderingService);
+            $plotter = new MgPdfPlotter($this->app, $renderingService, $map);
+            $plotter->SetTitle($title);
+            $plotter->SetPaperType($paperSize);
+            $plotter->SetOrientation($orientation);
+            $plotter->ShowCoordinates(true);
+            $plotter->ShowNorthArrow(true);
+            $plotter->ShowScaleBar(true);
+            $plotter->ShowDisclaimer(true);
+            $plotter->SetMargins($marginTop, $marginBottom, $marginLeft, $marginRight);
+
+            $mapCenter = $map->GetViewCenter();
+            $plotter->Plot($mapCenter->GetCoordinate(), $map->GetViewScale());
         }
-
-        $br = $mappingSvc->GeneratePlot($map, $plotSpec, $layout, $dwfVersion);
-        $this->OutputByteReader($br);
     }
 }
 

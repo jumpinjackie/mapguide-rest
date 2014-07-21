@@ -63,6 +63,71 @@ class MgUtils
         return new MgResourceIdentifier($resIdStr);
     }
 
+    public static function GetPaperSize($app, $paperType) {
+        $sizes = $app->config("PDF.PaperSizes");
+        if (!array_key_exists($paperType, $sizes))
+            throw new Exception("Unknown paper size: ".$paperType); //TODO: Localize
+        return $sizes[$paperType];
+    }
+
+    public static function ParseLocaleDouble($stringValue) {
+        $lc = localeconv();
+        $result = str_replace(".", $lc["decimal_point"], $stringValue);
+        return doubleval($result);
+    }
+
+    public static function InToMM($in) {
+        return $in * 25.4;
+    }
+
+    public static function MMToIn($mm) {
+        return $mm / 25.4;
+    }
+
+    public static function InToPx($in, $dpi) {
+        return ($in * $dpi) / 25.4;
+    }
+    
+    public static function PxToIn($px, $dpi) {
+        return ($px * 25.4) / $dpi;
+    }
+
+    //This function try to get a more elegant number for the scale bar display.
+    //For example, convert 5.3 to 5, 5.5 to 6, 13 to 10, 230 to 200 and 1234 to 1200.
+    //Basically no number will execced 9999 in scale bar display, however we support that situation
+    //the minimum number for the return value is 0
+    public static function GetRoundNumber($number) {
+        $number = abs($number);
+        $temp = $number = round($number);
+        $len = 0;
+        
+        while($temp > 0)
+        {
+            $len++;
+            $temp /= 10;
+            $temp = floor($temp);
+        }      
+        
+        //10,20,30,40,50,60,70,80,90
+        if( 2 === $len )
+        {
+            $number = $number / 10;
+            $number = round($number);
+            $number = $number * 10;
+        }
+        
+        //100,200,300,400,500,600,700,800,900
+        if( $len >= 3 )
+        {
+            $number = $number / 100;
+            $number = round($number);
+            $number = $number * 100;
+        }
+        
+        //else, just 1,2,3,4,5,6,7,8,9
+        return $number; 
+    }
+
     public static function MakeWktPolygon($x1, $y1, $x2, $y2) {
         return "POLYGON(($x1 $y1, $x2 $y1, $x2 $y2, $x1 $y2, $x1 $y1))";
     }

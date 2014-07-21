@@ -868,38 +868,28 @@
                         },
                         {
                             "paramType": "query",
-                            "name": "x",
-                            "type": "integer",
+                            "name": "papersize",
+                            "type": "string",
                             "required": true,
-                            "description": "The X coordinate of the map center to plot"
+                            "description": "The paper size",
+                            "enum": [
+                                "A3",
+                                "A4",
+                                "A5",
+                                "Letter",
+                                "Legal"
+                            ]
                         },
                         {
                             "paramType": "query",
-                            "name": "y",
-                            "type": "integer",
+                            "name": "orientation",
+                            "type": "string",
                             "required": true,
-                            "description": "The Y coordinate of the map center to plot"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "scale",
-                            "type": "double",
-                            "required": true,
-                            "description": "The map scale to plot"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "pagewidth",
-                            "type": "double",
-                            "required": false,
-                            "description": "page width in inches"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "pageheight",
-                            "type": "double",
-                            "required": false,
-                            "description": "page height in inches"
+                            "description": "The plot orientation L=Landscape, P=Portrait",
+                            "enum": [
+                                "L",
+                                "P"
+                            ]
                         },
                         {
                             "paramType": "query",
@@ -934,7 +924,7 @@
                             "name": "printlayout",
                             "type": "string",
                             "required": false,
-                            "description": "The PrintLayout resource to use for plotting"
+                            "description": "The PrintLayout resource to use for plotting. Only applies if plotting to DWF"
                         },
                         {
                             "paramType": "query",
@@ -985,38 +975,28 @@
                         },
                         {
                             "paramType": "query",
-                            "name": "x",
-                            "type": "integer",
+                            "name": "papersize",
+                            "type": "string",
                             "required": true,
-                            "description": "The X coordinate of the map center to plot"
+                            "description": "The paper size",
+                            "enum": [
+                                "A3",
+                                "A4",
+                                "A5",
+                                "Letter",
+                                "Legal"
+                            ]
                         },
                         {
                             "paramType": "query",
-                            "name": "y",
-                            "type": "integer",
+                            "name": "orientation",
+                            "type": "string",
                             "required": true,
-                            "description": "The Y coordinate of the map center to plot"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "scale",
-                            "type": "double",
-                            "required": true,
-                            "description": "The map scale to plot"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "pagewidth",
-                            "type": "double",
-                            "required": false,
-                            "description": "page width in inches"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "pageheight",
-                            "type": "double",
-                            "required": false,
-                            "description": "page height in inches"
+                            "description": "The plot orientation L=Landscape, P=Portrait",
+                            "enum": [
+                                "L",
+                                "P"
+                            ]
                         },
                         {
                             "paramType": "query",
@@ -1067,7 +1047,8 @@
                             "required": true,
                             "description": "The plot type",
                             "enum": [
-                                "dwf"
+                                "dwf",
+                                "pdf"
                             ]
                         }
                     ],

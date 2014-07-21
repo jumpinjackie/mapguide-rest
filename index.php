@@ -32,6 +32,19 @@ if (strpos($_SERVER['SERVER_SOFTWARE'], "IIS") !== FALSE)
 require 'vendor/autoload.php';
 include dirname(__FILE__)."/../mapadmin/constants.php";
 
+//Shim some constants we know haven't been properly exposed in previous versions of MapGuide
+if (!class_exists("MgImageFormats")) {
+    class MgImageFormats
+    {
+        const Gif = "GIF";
+        const Jpeg = "JPG";
+        const Png = "PNG";
+        const Png8 = "PNG8";
+        const Raw = "RAW";
+        const Tiff = "TIF";
+    }
+}
+
 $webConfigPath = dirname(__FILE__)."/../webconfig.ini";
 MgInitializeWebTier($webConfigPath);
 

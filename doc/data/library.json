@@ -1751,17 +1751,28 @@
                         },
                         {
                             "paramType": "query",
-                            "name": "pagewidth",
-                            "type": "double",
-                            "required": false,
-                            "description": "page width in inches"
+                            "name": "papersize",
+                            "type": "string",
+                            "required": true,
+                            "description": "The paper size",
+                            "enum": [
+                                "A3",
+                                "A4",
+                                "A5",
+                                "Letter",
+                                "Legal"
+                            ]
                         },
                         {
                             "paramType": "query",
-                            "name": "pageheight",
-                            "type": "double",
-                            "required": false,
-                            "description": "page height in inches"
+                            "name": "orientation",
+                            "type": "string",
+                            "required": true,
+                            "description": "The plot orientation L=Landscape, P=Portrait",
+                            "enum": [
+                                "L",
+                                "P"
+                            ]
                         },
                         {
                             "paramType": "query",
@@ -1868,17 +1879,28 @@
                         },
                         {
                             "paramType": "query",
-                            "name": "pagewidth",
-                            "type": "double",
-                            "required": false,
-                            "description": "page width in inches"
+                            "name": "papersize",
+                            "type": "string",
+                            "required": true,
+                            "description": "The paper size",
+                            "enum": [
+                                "A3",
+                                "A4",
+                                "A5",
+                                "Letter",
+                                "Legal"
+                            ]
                         },
                         {
                             "paramType": "query",
-                            "name": "pageheight",
-                            "type": "double",
-                            "required": false,
-                            "description": "page height in inches"
+                            "name": "orientation",
+                            "type": "string",
+                            "required": true,
+                            "description": "The plot orientation L=Landscape, P=Portrait",
+                            "enum": [
+                                "L",
+                                "P"
+                            ]
                         },
                         {
                             "paramType": "query",
@@ -1929,7 +1951,8 @@
                             "required": true,
                             "description": "The plot type",
                             "enum": [
-                                "dwf"
+                                "dwf",
+                                "pdf"
                             ]
                         }
                     ],
