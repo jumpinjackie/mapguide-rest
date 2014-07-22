@@ -1,3 +1,35 @@
+ - PDF output support
+    - Uses same routes as DWF plotting, except a pdf extension is used instead of dwf
+        - The pagewidth and pageheight parameters have been replaced with papersize parameter, which can be any value of: A3,A4,A5,Letter,Legal
+    - Additional support for producing layered PDF output from a session-based map
+ - #59: Feature query routes (selecting features) no longer require authentication challenge
+ - Ant build system support
+ - "features" representation support for routes to Layer Definitions
+    - GET /library/{resourcePath}.LayerDefinition/features.{type}
+ - External libraries no longer included in source. Checkout footprint is significantly reduced. Developers are expected to use PHP Composer to pull in these libraries after checkout. Does not affect release archives.
+ - Improved GeoJSON output
+    - Features with single identity properties will have that property written out as the "id" attribute
+ - Improved tile cache resiliency
+    - Failed tile rendering requests can be retried up to a certain limit before bailing out with an error.
+ - New/updated samples
+    - Cesium example consuming GeoJSON served by mapguide-rest
+    - New ol3 sample with dynamic GeoJSON vector layers
+
+0.8
+===
+
+ - New Experimental XYZ tile support
+ - New Experimental XYZ GeoJSON vector tile support
+ - New sample applications included
+    - XYZ tile support via OpenLayers 2, OpenLayers 3 and Leaflet
+    - XYZ vector tile example using OpenLayers 3
+ - Fix: schemas.html and classes.html only showing one item for a multi-schema or multi-class feature source
+ - New REST API routes
+    - GET /library/{resourcePath}.MapDefinition/xyz/{group}/{z}/{x}/{y}/tile.{format} (fetch a image or vector XYZ tile for the given group of the given Map Definition for the given X, Y and Z values)
+    - GET /session/{session}/{mapName}.Map/description.{type} (fetch a runtime map description as XML or JSON)
+    - GET /session/{session}/{mapName}.Map/legendimage.{type} (renders a legend image of the given map)
+ - Creating or describing a Runtime Map will now use native APIs if MapGuide Server is 2.6 or newer.
+
 0.7
 ===
 
