@@ -20,20 +20,76 @@
 require_once "geojsonwriter.php";
 require_once "utils.php";
 
+abstract class MgChunkWriter
+{
+    public abstract function SetHeader($name, $value);
+
+    public abstract function WriteChunk($chunk);
+
+    public abstract function StartChunking();
+
+    public abstract function EndChunking();
+}
+
+class MgSlimChunkWriter extends MgChunkWriter
+{
+    private $app;
+
+    public function __construct($app) {
+        $this->app = $app;
+    }
+
+    public function SetHeader($name, $value) {
+        $this->app->response->header($name, $value);
+    }
+
+    public function WriteChunk($chunk) {
+        $this->app->response->write($chunk);
+    }
+
+    public function StartChunking() { }
+
+    public function EndChunking() { }
+}
+
+class MgHttpChunkWriter extends MgChunkWriter
+{
+    public function SetHeader($name, $value) {
+        header("$name: $value");
+    }
+
+    public function WriteChunk($chunk) {
+        echo $chunk;
+        ob_flush();
+        flush();
+    }
+
+    public function StartChunking() {
+        ob_start();
+    }
+
+    public function EndChunking() {
+        ob_end_flush();
+    }
+}
+
 class MgReaderChunkedResult
 {
     private $featSvc;
-    private $app;
     private $reader;
     private $limit;
     private $transform;
+    private $writer;
 
-    public function __construct($app, $featSvc, $reader, $limit) {
-        $this->app = $app;
+    public function __construct($featSvc, $reader, $limit, $writer = NULL) {
         $this->featSvc = $featSvc;
         $this->reader = $reader;
         $this->limit = $limit;
         $this->transform = null;
+        if ($writer != null)
+            $this->writer = $writer;
+        else
+            $this->writer = new MgHttpChunkWriter();
     }
 
     public function SetTransform($tx) {
@@ -44,7 +100,8 @@ class MgReaderChunkedResult
         $read = 0;
         $agfRw = new MgAgfReaderWriter();
 
-        $this->app->response->header("Content-Type", MgMimeType::Json);
+        $this->writer->SetHeader("Content-Type", MgMimeType::Json);
+        $this->writer->StartChunking();
 
         $output = '{ "type": "FeatureCollection", "features": ['."\n";
 
@@ -65,14 +122,15 @@ class MgReaderChunkedResult
                 $output .= ",";
             }
             $output .= MgGeoJsonWriter::FeatureToGeoJson($this->reader, $agfRw, $this->transform, ($idProp != NULL ? $idProp->GetName() : NULL));
-            $this->app->response->write($output);
+            $this->writer->WriteChunk($output);
             $output = "";
 
             $firstFeature = false;
         }
 
         $output .= "]}";
-        $this->app->response->write($output);
+        $this->writer->WriteChunk($output);
+        $this->writer->EndChunking();
         $this->reader->Close();
     }
 
@@ -81,7 +139,8 @@ class MgReaderChunkedResult
         $agfRw = new MgAgfReaderWriter();
         $wktRw = new MgWktReaderWriter();
 
-        $this->app->response->header("Content-Type", MgMimeType::Xml);
+        $this->writer->SetHeader("Content-Type", MgMimeType::Xml);
+        $this->writer->StartChunking();
 
         $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?><FeatureSet>";
         $classXml = $this->featSvc->SchemaToXml($schemas);
@@ -90,7 +149,7 @@ class MgReaderChunkedResult
         $output .= $classXml;
         $output .= "<Features>";
 
-        $this->app->response->write($output);
+        $this->writer->WriteChunk($output);
         $output = "";
 
         $propCount = $this->reader->GetPropertyCount();
@@ -159,12 +218,13 @@ class MgReaderChunkedResult
 
             $output .= "</Feature>";
 
-            $this->app->response->write($output);
+            $this->writer->WriteChunk($output);
             $output = "";
         }
 
         $output .= "</Features></FeatureSet>";
-        $this->app->response->write($output);
+        $this->writer->WriteChunk($output);
+        $this->writer->EndChunking();
         $this->reader->Close();
     }
 

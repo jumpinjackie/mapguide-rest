@@ -726,7 +726,7 @@ class MgFeatureServiceController extends MgBaseController {
                         }
 
                         $reader = $featSvc->SelectFeatures($fsId, "$schemaName:$className", $query);
-                        $result = new MgReaderChunkedResult($this->app, $featSvc, $reader, $limit);
+                        $result = new MgReaderChunkedResult($featSvc, $reader, $limit, new MgHttpChunkWriter($this->app));
                         if ($transform != null)
                             $result->SetTransform($transform);
                         $result->Output($format);
@@ -795,7 +795,7 @@ class MgFeatureServiceController extends MgBaseController {
             }
 
             $reader = $featSvc->SelectFeatures($resId, "$schemaName:$className", $query);
-            $result = new MgReaderChunkedResult($this->app, $featSvc, $reader, $limit);
+            $result = new MgReaderChunkedResult($featSvc, $reader, $limit, new MgHttpChunkWriter($this->app));
             if ($transform != null)
                 $result->SetTransform($transform);
             $result->Output($format);
