@@ -54,22 +54,40 @@ class MgSlimChunkWriter extends MgChunkWriter
 
 class MgHttpChunkWriter extends MgChunkWriter
 {
+    private $headers;
+
+    public function __construct() {
+        $this->headers = array();
+    }
+
     public function SetHeader($name, $value) {
-        header("$name: $value");
+        $this->headers["$name"] = $value;
     }
 
     public function WriteChunk($chunk) {
+        echo sprintf("%x\r\n", strlen($chunk));
         echo $chunk;
-        ob_flush();
+        echo "\r\n";
         flush();
+        ob_flush();
     }
 
     public function StartChunking() {
-        ob_start();
+        while (ob_get_level()) {
+            ob_end_flush();
+        }
+        if (ob_get_length() === false) {
+            ob_start();
+        }
+        $this->headers["Transfer-Encoding"] = "chunked";
+        foreach ($this->headers as $name => $value) {
+            header("$name: $value");
+        }
+        flush();
     }
 
     public function EndChunking() {
-        ob_end_flush();
+        
     }
 }
 
@@ -89,7 +107,7 @@ class MgReaderChunkedResult
         if ($writer != null)
             $this->writer = $writer;
         else
-            $this->writer = new MgHttpChunkWriter();
+            $this->writer = new MgSlimChunkWriter($this->app);
     }
 
     public function SetTransform($tx) {

@@ -73,6 +73,63 @@ $app->get("/", function() {
     echo "Hello World";
 });
 */
+/*
+$app->get("/chunktest", function() use ($app) {
+    function dump_chunk($chunk)
+    {
+        echo sprintf("%x\r\n", strlen($chunk));
+        echo $chunk;
+        echo "\r\n";
+        flush();
+        ob_flush();
+    }
+
+    while (ob_get_level()) {
+        ob_end_flush();
+    }
+    if (ob_get_length() === false) {
+        ob_start();
+    }
+    //@ini_set("output_buffering", "off");
+    header("Transfer-Encoding: chunked");
+    header("Content-Type: text/xml");
+    //$app->response->header("Content-Type", "text/xml; charset=utf-8");
+    flush();
+    $userInfo = new MgUserInformation("Anonymous", "");
+    $siteConn = new MgSiteConnection();
+    $siteConn->Open($userInfo);
+    $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
+    $fsId = new MgResourceIdentifier("Library://Samples/Sheboygan/Data/Parcels.FeatureSource");
+    $reader = $featSvc->SelectFeatures($fsId, "SHP_Schema:Parcels", null);
+    dump_chunk("<?xml version=\"1.0\" encoding=\"utf-8\"?><queryresult>");
+
+    //ob_flush();
+    //flush();
+    $count = 0;
+    while($reader->ReadNext()) {
+        if ($count >= 8000) {
+            break;
+        }
+        $xml = "<feature>";
+        for ($i = 0; $i < $reader->GetPropertyCount(); $i++) {
+            if (!$reader->IsNull($i)) {
+                $xml .= "<property>";
+                $xml .= $reader->GetPropertyName($i);
+                $xml .= "</property>";
+            } else {
+                $xml .= "<nullproperty>";
+                $xml .= $reader->GetPropertyName($i);
+                $xml .= "</nullproperty>";
+            }
+        }
+        $xml .= "</feature>";
+        dump_chunk($xml);
+        $count++;
+    }
+    $reader->Close();
+    dump_chunk("</queryresult>");
+});
+*/
 $app->run();
 
 ?>
