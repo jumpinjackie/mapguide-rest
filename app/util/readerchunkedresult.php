@@ -73,6 +73,16 @@ class MgHttpChunkWriter extends MgChunkWriter
     }
 
     public function StartChunking() {
+        //Fix for Apache. Have to turn off compression
+        if(function_exists('apache_setenv')) {
+            apache_setenv('no-gzip', '1');
+        }
+
+        //Remove PHP time limit
+        if(!ini_get('safe_mode')) {
+            @set_time_limit(0);
+        }
+
         while (ob_get_level()) {
             ob_end_flush();
         }
@@ -87,7 +97,7 @@ class MgHttpChunkWriter extends MgChunkWriter
     }
 
     public function EndChunking() {
-        
+        $this->WriteChunk("");
     }
 }
 
@@ -107,7 +117,7 @@ class MgReaderChunkedResult
         if ($writer != null)
             $this->writer = $writer;
         else
-            $this->writer = new MgSlimChunkWriter($this->app);
+            $this->writer = new MgHttpChunkWriter();
     }
 
     public function SetTransform($tx) {
