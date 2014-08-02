@@ -3,8 +3,9 @@
         - The pagewidth and pageheight parameters have been replaced with papersize parameter, which can be any value of: A3,A4,A5,Letter,Legal
     - Additional support for producing layered PDF output from a session-based map
  - #59: Feature query routes (selecting features) no longer require authentication challenge
- - Ant build system support
- - "features" representation support for routes to Layer Definitions
+ - #26: Output feature query response content as we iterate through the reader
+ - Ant build system support. Phing still required for API doc generation.
+ - "features" representation support for routes to Layer Definitions. Includes pre-eval'd tooltip and hyperlink values for each feature if specified.
     - GET /library/{resourcePath}.LayerDefinition/features.{type}
  - External libraries no longer included in source. Checkout footprint is significantly reduced. Developers are expected to use PHP Composer to pull in these libraries after checkout. Does not affect release archives.
  - Improved GeoJSON output
