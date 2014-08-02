@@ -40,8 +40,7 @@
         </copy>
         <copy todir="./build/cache" overwrite="true">
             <fileset dir="./cache">
-                <include name="**/*.*" />
-                <include name="*" />
+                <include name="readme.txt" />
             </fileset>
         </copy>
         <copy todir="./build/conf" overwrite="true">
