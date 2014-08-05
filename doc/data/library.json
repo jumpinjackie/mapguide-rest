@@ -2329,6 +2329,95 @@
             ]
         },
         {
+            "path": "/library/{resourcePath}.MapDefinition/xyz/{groupName}/{layerName}/{z}/{x}/{y}/tile.{format}",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Gets the specified tile for the given map definition",
+                    "nickname": "GetTileXYZForLayer",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resourcePath",
+                            "type": "string",
+                            "required": true,
+                            "description": "The path of the Map Definition"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "groupName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The tiled group of the Map Definition"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "layerName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The name of the layer within this group"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "z",
+                            "type": "integer",
+                            "required": true,
+                            "description": "The finite scale index"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "x",
+                            "type": "integer",
+                            "required": true,
+                            "description": "The column of the tile to fetch"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "y",
+                            "type": "integer",
+                            "required": true,
+                            "description": "The row of the tile to fetch"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "format",
+                            "type": "string",
+                            "required": true,
+                            "description": "The tile type",
+                            "enum": [
+                                "json"
+                            ]
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 304,
+                            "message": "This tile has not been modified. Your previously fetched tile is still the current one"
+                        },
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "path": "/library/{resourcePath}.MapDefinition/xyz/{groupName}/{z}/{x}/{y}/tile.{format}",
             "operations": [
                 {

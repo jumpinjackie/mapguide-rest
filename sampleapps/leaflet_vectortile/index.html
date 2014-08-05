@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sheboygan map as XYZ layer</title>
+        <link rel="stylesheet" href="../../assets/common/css/leaflet.css" />
+        <style type="text/css">
+            body { font-family: Verdana; font-size: 0.9em; }
+            #error { color: red; }
+            #map { width: 600px; height: 400px; }
+            .olControlMousePosition { background: #ffff66; font-size: 0.6em !important; padding: 2px; }
+        </style>
+        <script type="text/javascript">
+        L_PREFER_CANVAS = true;
+        </script>
+        <script src="../../assets/common/js/leaflet-src.js"></script>
+        <script src="../../assets/common/js/leaflet-tilelayer-vector.js"></script>
+        <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript">
+
+            // style of feature when hovered
+            var highlightStyle = {
+                "color": "#00F",
+                "weight": 1.5,
+                "fillOpacity": 0.4
+            };
+
+            // filters out invalid (empty) geometries in Polymaps county dataset
+            // to avoid exceptions in L.GeoJSON
+            function filterInvalidGeometry(feature) {
+                var geometry = feature.type === 'Feature' ? feature.geometry : feature;
+                return geometry.type !== undefined;
+            }
+
+            var map = null;
+
+            var styleFuncs = {
+                "CityLimits": function(feature) {
+                    return {
+                        weight: 1.0,
+                        fillOpacity: 1.0,
+                        color: "#C0C0C0",
+                        fillColor: "#D5CBAC",
+                        clickable: false
+                    }
+                },
+                "Buildings": function(feature) {
+                    return {
+                        weight: 1.0,
+                        fillOpacity: 1.0,
+                        color: "#DDDDDD",
+                        fillColor: "#808080",
+                        clickable: false
+                    }
+                },
+                "Hydrography": function(feature) {
+                    return {
+                        weight: 1.0,
+                        fillOpacity: 1.0,
+                        color: "#ABC7E9",
+                        fillColor: "#ABC7E9",
+                        clickable: false
+                    };
+                },
+                "Islands": function(feature) {
+                    return {
+                        weight: 1.0,
+                        fillOpacity: 1.0,
+                        color: "#D5C8AC",
+                        fillColor: "#D5C8AC",
+                        clickable: false
+                    };
+                },
+                "Parcels": function(feature) {
+                    var style = {
+                        weight: 1.0,
+                        fillOpacity: 1.0
+                    };
+                    var rtype = feature.properties.RTYPE;
+                    if (rtype == "AGR") {
+                        style.color = "#808080";
+                        style.fillColor = "#C19E6A";
+                    } else if (rtype == "EXM") {
+                        style.color = "#808080";
+                        style.fillColor = "#B9A670";
+                    } else if (rtype == "MER") {
+                        style.color = "#808080";
+                        style.fillColor = "#B2AE77";
+                    } else if (rtype == "MFG") {
+                        style.color = "#808080";
+                        style.fillColor = "#ABB67E";
+                    } else if (rtype == "RES") {
+                        style.color = "#808080";
+                        style.fillColor = "#A4BE85";
+                    } else if (rtype == "S&W") {
+                        style.color = "#808080";
+                        style.fillColor = "#9DC68C";
+                    } else if (rtype == "WTC") {
+                        style.color = "#ABC7E9";
+                        style.fillColor = "#96CE93";
+                    } else { //Other
+                        style.color = "#000";
+                        style.fillColor = "#D4D4D4";
+                    }
+                    return style;
+                },
+                "Roads": function(feature) {
+                    return {
+                        weight: 1.0,
+                        fillOpacity: 1.0,
+                        color: "#646464",
+                        clickable: false
+                    };
+                },
+                "Tracks": function(feature) {
+                    return {
+                        weight: 1.0,
+                        fillOpacity: 1.0,
+                        color: "#808080",
+                        clickable: false
+                    };
+                },
+                "Districts": function(feature) {
+                    return {
+                        weight: 1.0,
+                        fill: false,
+                        color: "#A68B53",
+                        clickable: false
+                    };
+                }
+            }
+
+            $(document).ready(function() {
+                map = L.map('map', {
+                    maxZoom: 19
+                }).setView([43.744459064634, -87.7302542509315], 12);
+                // default style of feature
+                
+                // style of feature when hovered
+                var highlightStyle = {
+                    "color": "#000",
+                    "weight": 1.5,
+                    "fillOpacity": 0.4
+                };
+                var layers = {};
+                for (var layerName in styleFuncs) {
+                    var vectorOptions = {
+                        style: styleFuncs[layerName],
+                        filter: filterInvalidGeometry
+                    };
+                    if (layerName == "Parcels") {
+                        vectorOptions.onEachFeature = function(feature, layer) {
+                            layer.on({
+                                mouseover: function(e) {
+                                    var layer = e.target;
+                                    layer.setStyle(highlightStyle);
+
+                                    if (!L.Browser.ie && !L.Browser.opera) {
+                                        layer.bringToFront();
+                                    }
+                                },
+                                mouseout: function(e) {
+                                    layer.setStyle(styleFuncs[layerName](e.target.feature));
+                                }
+                            });
+                            if (feature.properties) {
+                                // TODO disabled due to error with Leaflet master (0.8-dev)
+                                //layer.bindLabel(feature.properties.name);
+                                layer.bindPopup('Parcel<br>ID: ' + feature.id + '<br>Address: ' + feature.properties.RPROPAD);
+                            }
+                        };
+                    }
+                    var url = '../../library/Samples/Sheboygan/MapsTiled/SheboyganNoWatermark.MapDefinition/xyz/Base Layer Group/' + layerName + '/{z}/{x}/{y}/tile.json';
+                    var options = {
+                        // remove tiles outside viewport
+                        unloadInvisibleTiles: true,
+                        // no tile loading while panning (slow with large vector tiles)
+                        updateWhenIdle: true,
+                        //serverZooms: [3,4,5,6,7],
+                        //serverZooms: [3,5,7],
+                        //maxNativeZoom: 7,
+                        minZoom: 2
+                    };
+                    var vector = new L.TileLayer.Vector(url, options, vectorOptions);
+                    map.addLayer(vector);
+                    layers[layerName] = vector;
+                }
+                L.control.layers({}, layers).addTo(map);
+            });
+
+        </script>
+    </head>
+    <body>
+        <p>This example demonstrates a Map Definition being consumed as an XYZ layer from leaflet via the MapGuide REST API.</p>
+        <p>This example uses the <a href="https://github.com/nrenner/leaflet-tilelayer-vector">leaflet-tilelayer-vector plugin</a> to provide vector tile support</p>
+        <p>Unlike this OpenLayers 3 example, this example requests vector tiles for indiviudal layers</p>
+        <p>Sample not loading? <a href="../data/load.php">Check that the required resources have been loaded</a></p>
+        <div id="map">
+        </div>
+    </body>
+</html>

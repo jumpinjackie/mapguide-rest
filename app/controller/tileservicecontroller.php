@@ -157,11 +157,16 @@ class MgTileServiceController extends MgBaseController {
         return false;
     }
 
-    private static function GetTilePath($app, $resId, $groupName, $z, $x, $y, $type) {
+    private static function GetTilePath($app, $resId, $groupName, $z, $x, $y, $type, $layerNames) {
         $ext = $type;
         if (strtolower($type) == "png8")
             $ext = substr($type, 0, 3); //png8 -> png
-        $relPath = "/".$resId->GetPath()."/".$resId->GetName()."/$groupName/$z/$x/$y.$ext";
+        if ($layerNames != NULL && count($layerNames) == 1) {
+            $layerName = $layerNames[0];
+            $relPath = "/".$resId->GetPath()."/".$resId->GetName()."/$groupName/$layerName/$z/$x/$y.$ext";
+        } else {
+            $relPath = "/".$resId->GetPath()."/".$resId->GetName()."/$groupName/$z/$x/$y.$ext";
+        }
         $path = $app->config("AppRootDir")."/".$app->config("Cache.RootDir")."/tile.$type".$relPath;
         return $path;
     }
@@ -176,7 +181,7 @@ class MgTileServiceController extends MgBaseController {
             return $mcsH * $metersPerUnit / ($devH * $metersPerPixel); // height-limited
     }
 
-    private function PutVectorTileXYZ($map, $groupName, $siteConn, $metersPerUnit, $csFactory, $path, $boundsMinx, $boundsMinY, $boundsMaxX, $boundsMaxY) {
+    private function PutVectorTileXYZ($map, $groupName, $siteConn, $metersPerUnit, $csFactory, $path, $boundsMinx, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames) {
         $wktRw = new MgWktReaderWriter();
         $agfRw = new MgAgfReaderWriter();
 
@@ -199,6 +204,20 @@ class MgTileServiceController extends MgBaseController {
             if ($parentGroup != null && $parentGroup->GetObjectId() == $baseGroup->GetObjectId()) {
                 if (!self::IsLayerVisibleAtScale($layer, $resSvc, $scale))
                     continue;
+
+                //If list of layer names specified, skip if this layer is not in that list
+                if ($layerNames != null) {
+                    $bFound = false;
+                    foreach ($layerNames as $layerName) {
+                        if ($layer->GetName() == $layerName) {
+                            $bFound = true;
+                            break;
+                        }
+                    }
+                    if (!$bFound) {
+                        continue;
+                    }
+                }
 
                 $wktPoly = MgUtils::MakeWktPolygon($boundsMinx, $boundsMinY, $boundsMaxX, $boundsMaxY);
 
@@ -233,9 +252,13 @@ class MgTileServiceController extends MgBaseController {
                     $propDef = $clsProps->GetItem($p);
                     $query->AddFeatureProperty($propDef->GetName());
                 }
-                $query->AddComputedProperty("_displayIndex", ($layerCount - $i));
-                $query->AddComputedProperty("_layer", "'".$layer->GetName()."'");
-                $query->AddComputedProperty("_selectable", ($layer->GetSelectable() ? "true" : "false"));
+
+                //If we're rendering a vector tile for a single layer, we don't need these special attributes
+                if ($layerNames == NULL || count($layerNames) > 1) {
+                    $query->AddComputedProperty("_displayIndex", ($layerCount - $i));
+                    $query->AddComputedProperty("_layer", "'".$layer->GetName()."'");
+                    $query->AddComputedProperty("_selectable", ($layer->GetSelectable() ? "true" : "false"));
+                }
 
                 $reader = $layer->SelectFeatures($query);
                 $read = 0;
@@ -263,7 +286,7 @@ class MgTileServiceController extends MgBaseController {
         return $path;
     }
 
-    private function PutTileImageXYZ($map, $groupName, $siteConn, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY) {
+    private function PutTileImageXYZ($map, $groupName, $siteConn, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames) {
         //We don't use RenderTile (as it uses key parameters that are locked to serverconfig.ini), we use RenderMap instead
         $renderSvc = $siteConn->CreateService(MgServiceType::RenderingService);
         $env = new MgEnvelope($boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY);
@@ -273,6 +296,17 @@ class MgTileServiceController extends MgBaseController {
             $strColor = substr($strColor, 2)."00";
         } else if (strlen($strColor) == 6) {
             $strColor = $strColor."00";
+        }
+        if ($layerNames != NULL) {
+            $layers = $map->GetLayers();
+            for ($i = 0; $i < $layers->GetCount(); $i++) {
+                $layer = $layers->GetItem($i);
+                $layer->SetVisible(false);
+            }
+            foreach ($layerNames as $layerName) {
+                $layer = $layers->GetItem($layerName);
+                $layer->SetVisible(true);
+            }
         }
         $bgColor = new MgColor($strColor);
         $tileImg = $renderSvc->RenderMap($map, null, $env, self::XYZ_TILE_WIDTH, self::XYZ_TILE_HEIGHT, $bgColor, $format, false);
@@ -291,10 +325,15 @@ class MgTileServiceController extends MgBaseController {
 
     const MAX_RETRY_ATTEMPTS = 5;
 
-    public function GetTileXYZ($resId, $groupName, $x, $y, $z, $type) {
+    public function GetTileXYZForLayer($resId, $groupName, $layerName, $x, $y, $z, $type) {
+        $fmt = $this->ValidateRepresentation($type, array("json"));
+        $this->GetTileXYZ($resId, $groupName, $x, $y, $z, $type, array($layerName));
+    }
+
+    public function GetTileXYZ($resId, $groupName, $x, $y, $z, $type, $layerNames = NULL) {
         $fmt = $this->ValidateRepresentation($type, array("json", "png", "png8", "jpg", "gif"));
 
-        $path = self::GetTilePath($this->app, $resId, $groupName, $z, $x, $y, $type);
+        $path = self::GetTilePath($this->app, $resId, $groupName, $z, $x, $y, $type, $layerNames);
         clearstatcache();
 
         $dir = dirname($path);
@@ -422,11 +461,11 @@ class MgTileServiceController extends MgBaseController {
 
                     if ($type == "json") {
                         //error_log("($requestId) Render vector tile");
-                        $this->PutVectorTileXYZ($map, $groupName, $siteConn, $metersPerUnit, $factory, $path, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY);
+                        $this->PutVectorTileXYZ($map, $groupName, $siteConn, $metersPerUnit, $factory, $path, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames);
                     } else {
                         $format = strtoupper($type);
                         //error_log("($requestId) Render image tile");
-                        $this->PutTileImageXYZ($map, $groupName, $siteConn, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY);
+                        $this->PutTileImageXYZ($map, $groupName, $siteConn, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames);
                     }
                 } catch (MgException $ex) {
                     if ($bLocked) {

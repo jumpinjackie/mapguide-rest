@@ -3,27 +3,27 @@
     "swaggerVersion": "1.2",
     "apis": [
         {
-            "path": "/coordsys.json",
+            "path": "/coordsys.{format}",
             "description": "Coordinate System Catalog"
         },
         {
-            "path": "/library.json",
+            "path": "/library.{format}",
             "description": "Site Repository"
         },
         {
-            "path": "/providers.json",
+            "path": "/providers.{format}",
             "description": "FDO Provider Registry"
         },
         {
-            "path": "/services.json",
+            "path": "/services.{format}",
             "description": "Additional Services"
         },
         {
-            "path": "/session.json",
+            "path": "/session.{format}",
             "description": "Session Repository"
         },
         {
-            "path": "/site.json",
+            "path": "/site.{format}",
             "description": "Site Service"
         }
     ]

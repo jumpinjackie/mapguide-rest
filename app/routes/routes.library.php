@@ -1100,6 +1100,42 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:z/:x/:y/tile.:f
 
 /**
  * @SWG\Api(
+ *     path="/library/{resourcePath}.MapDefinition/xyz/{groupName}/{layerName}/{z}/{x}/{y}/tile.{format}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetTileXYZForLayer",
+ *        summary="Gets the specified tile for the given map definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the Map Definition"),
+ *          @SWG\parameter(name="groupName", paramType="path", required=true, type="string", description="The tiled group of the Map Definition"),
+ *          @SWG\parameter(name="layerName", paramType="path", required=true, type="string", description="The name of the layer within this group"),
+ *          @SWG\parameter(name="z", paramType="path", required=true, type="integer", description="The finite scale index"),
+ *          @SWG\parameter(name="x", paramType="path", required=true, type="integer", description="The column of the tile to fetch"),
+ *          @SWG\parameter(name="y", paramType="path", required=true, type="integer", description="The row of the tile to fetch"),
+ *          @SWG\parameter(name="format", paramType="path", required=true, type="string", description="The tile type", enum="['json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=304, message="This tile has not been modified. Your previously fetched tile is still the current one"),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:layerName/:z/:x/:y/tile.:format", function($resourcePath, $groupName, $layerName, $z, $x, $y, $format) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    //echo "ResId: ".$resId->ToString()."<br/>Group: $groupName<br/>X: $x<br/>Y: $y<br/>Z: $z<br/>Format: $format";
+    //die;
+    $ctrl = new MgTileServiceController($app);
+    $ctrl->GetTileXYZForLayer($resId, $groupName, $layerName, $x, $y, $z, $format);
+});
+
+/**
+ * @SWG\Api(
  *     path="/library/{resourcePath}.MapDefinition/tile/{groupName}/{scaleIndex}/{col}/{row}",
  *     @SWG\Operation(
  *        method="GET",

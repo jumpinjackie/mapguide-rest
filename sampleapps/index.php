@@ -92,6 +92,7 @@ $hasOL2Samples = true;
             <p class="sample-header">MapGuide REST API with <a href="http://leafletjs.com/">Leaflet</a></p>
             <ul>
                 <li><a href="leaflet_xyz/index.html">Sheboygan map as an XYZ tile layer</a></li>
+                <li><a href="leaflet_vectortile/index.html">Sheboygan map as an XYZ vector tiles</a></li>
             </ul>
             <p class="sample-header">MapGuide REST API with <a href="http://cesiumjs.org/">Cesium</a></p>
             <ul>
