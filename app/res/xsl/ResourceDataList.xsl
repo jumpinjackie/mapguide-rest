@@ -32,7 +32,7 @@
             <xsl:value-of select="Name" />
             &#160;
             <xsl:if test="Type = 'File'">
-                <a href="{$root}data/{$resDataName}"><i class="fa fa-download" />&#160;Download</a>
+                <a href="{$root}/data/{$resDataName}"><i class="fa fa-download" />&#160;Download</a>
             </xsl:if>
         </li>
     </xsl:template>
