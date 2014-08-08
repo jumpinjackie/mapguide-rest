@@ -119,6 +119,14 @@ class MgBaseController extends MgResponseHandler
         $param->AddParameter("LOCALE", $this->app->config("Locale"));
         $param->AddParameter("CLIENTAGENT", "MapGuide REST Extension");
         $param->AddParameter("CLIENTIP", $this->GetClientIp());
+
+        //Apply file download parameters if specified
+        if ($this->app->request->params("download") === "1" || $this->app->request->params("download") === "true") {
+            $param->AddParameter("X-DOWNLOAD-ATTACHMENT", "true");
+            if ($this->app->request->params("downloadname")) {
+                $param->AddParameter("X-DOWNLOAD-ATTACHMENT-NAME", $this->app->request->params("downloadname"));
+            }
+        }
         $callback($req, $param);
     }
 

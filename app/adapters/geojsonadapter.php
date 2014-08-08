@@ -41,6 +41,8 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
 
     }
 
+    protected function GetFileExtension() { return "json"; }
+
     /**
      * Writes the GET response header based on content of the given MgReader
      */

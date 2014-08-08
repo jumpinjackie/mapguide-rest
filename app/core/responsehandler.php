@@ -48,11 +48,25 @@ abstract class MgResponseHandler
         $response = $req->Execute();
         $result = $response->GetResult();
 
+        $bDownload = false;
+        if ($param->GetParameterValue("X-DOWNLOAD-ATTACHMENT") === "true") {
+            $bDownload = true;
+        }
+
         $status = $result->GetStatusCode();
         if ($status == 200) {
             $resultObj = $result->GetResultObject();
             if ($resultObj != null) {
-                $this->app->response->headers->set("Content-Type", $result->GetResultContentType());
+                $mimeType = $result->GetResultContentType();
+                $this->app->response->headers->set("Content-Type", $mimeType);
+                //Set download response headers if specified
+                if ($bDownload === true) {
+                    $filebasename = "download";
+                    if ($param->ContainsParameter("X-DOWNLOAD-ATTACHMENT-NAME")) {
+                        $filebasename = $param->GetParameterValue("X-DOWNLOAD-ATTACHMENT-NAME");
+                    }
+                    $this->app->response->headers->set("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($filebasename, $mimeType));
+                }
                 if ($resultObj instanceof MgByteReader) {
                     if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
                         $this->OutputXmlByteReaderAsJson($resultObj);

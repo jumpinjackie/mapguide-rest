@@ -509,7 +509,7 @@ class MgPdfPlotter
         return $tempImage;
     }
 
-    public function Plot($center = NULL, $scale = NULL) {
+    public function Plot($center = NULL, $scale = NULL, $downloadFileName = NULL) {
         $legendWidthPx = 250;
         $legendWidthIn = 0;
         if ($this->showLegend) {
@@ -733,11 +733,18 @@ class MgPdfPlotter
         }
         
         $this->app->response->header("Content-Type", "application/pdf");
+        $mode = 'I';
+        $name = 'Map.pdf';
+        if (strlen($this->title) > 0)
+            $name = $this->title.'.pdf';
+
+        if ($downloadFileName != NULL) {
+            $mode = 'D';
+            $name = $downloadFileName;
+        }
+
         // Close and output PDF document
-        if (strlen($this->title) == 0)
-            $this->pdf->Output('Map.pdf', 'I');
-        else
-            $this->pdf->Output($this->title.'.pdf', 'I');
+        $this->pdf->Output($name, $mode);
     }
 }
 

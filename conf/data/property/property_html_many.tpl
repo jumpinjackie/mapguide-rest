@@ -13,6 +13,11 @@
                 window.location.href = url;
             }
 
+            function downloadAs(format) {
+                var url = window.location.href.replace(".html", "." + format);
+                window.location.href = updateQueryStringParameter(url, "download", "1");
+            }
+
             function updateQueryStringParameter(uri, key, value) {
                 var re = new RegExp("([?|&])" + key + "=.*?(&|$)", "i");
                 separator = uri.indexOf('?') !== -1 ? "&" : "?";
@@ -49,6 +54,17 @@
                 <a href="javascript:viewResultsAs('png8')">PNG8</a>
                 <a href="javascript:viewResultsAs('jpg')">JPG</a>
                 <a href="javascript:viewResultsAs('gif')">GIF</a>
+            </div>
+            <div>
+                <span>Download:</span>
+                <a href="javascript:downloadAs('xml')">XML</a>
+                <a href="javascript:downloadAs('csv')">CSV</a>
+                <a href="javascript:downloadAs('kml')">KML</a>
+                <a href="javascript:downloadAs('geojson')">GeoJSON</a>
+                <a href="javascript:downloadAs('png')">PNG</a>
+                <a href="javascript:downloadAs('png8')">PNG8</a>
+                <a href="javascript:downloadAs('jpg')">JPG</a>
+                <a href="javascript:downloadAs('gif')">GIF</a>
             </div>
             {if $maxPages > 1}
                 {if $currentPage > 1}

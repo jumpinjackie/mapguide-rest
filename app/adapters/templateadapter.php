@@ -485,6 +485,17 @@ class MgTemplateRestAdapter extends MgRestAdapter
                 $output = $smarty->fetch($this->manyViewPath);
             }
             $this->app->response->header("Content-Type", $this->mimeType);
+
+            //Apply download headers
+            $downloadFlag = $this->app->request->params("download");
+            if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
+                $name = $this->app->request->params("downloadname");
+                if (!$name) {
+                    $name = "download";
+                }
+                $this->app->response->header("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($name, $this->mimeType));
+            }
+
             $this->app->response->write($output);
         } catch (MgException $ex) {
             $err = new stdClass();

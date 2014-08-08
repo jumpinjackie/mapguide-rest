@@ -24,6 +24,39 @@
 //
 class MgUtils
 {
+    public static function GetFileNameFromMimeType($fileNameWithoutExtension, $mimeType = NULL) {
+        if ($mimeType == NULL) {
+            return $fileNameWithoutExtension;
+        } else {
+            switch ($mimeType) {
+                case MgMimeType::Dwf:
+                    return $fileNameWithoutExtension.".dwf";
+                case MgMimeType::Gif:
+                    return $fileNameWithoutExtension.".gif";
+                case MgMimeType::Html:
+                    return $fileNameWithoutExtension.".html";
+                case MgMimeType::Jpeg:
+                    return $fileNameWithoutExtension.".jpg";
+                case MgMimeType::Json:
+                    return $fileNameWithoutExtension.".json";
+                case MgMimeType::Kml:
+                    return $fileNameWithoutExtension.".kml";
+                case MgMimeType::Kmz:
+                    return $fileNameWithoutExtension.".kmz";
+                case MgMimeType::Png:
+                    return $fileNameWithoutExtension.".png";
+                case MgMimeType::Text:
+                    return $fileNameWithoutExtension.".text";
+                case MgMimeType::Tiff:
+                    return $fileNameWithoutExtension.".tif";
+                case MgMimeType::Xml:
+                    return $fileNameWithoutExtension.".xml";
+                default:
+                    return $fileNameWithoutExtension;
+            }
+        }
+    }
+
     public static function ParseLibraryResourceID($parts, $stopAt = null) {
         $appendSlash = false;
         $count = count($parts);

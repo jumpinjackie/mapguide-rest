@@ -120,6 +120,19 @@ class MgReaderChunkedResult
             $this->writer = new MgHttpChunkWriter();
     }
 
+    public function CheckAndSetDownloadHeaders($app, $format) {
+        $downloadFlag = $app->request->params("download");
+        if ($downloadFlag === "1" || $downloadFlag === "true") {
+            $fn = "download";
+            if ($app->request->params("downloadname"))
+                $fn = $app->request->params("downloadname");
+            $ext = $format;
+            if ($format == "geojson")
+                $ext = "json";
+            $this->writer->SetHeader("Content-Disposition", "attachment; filename=".$fn.".".$ext);
+        }
+    }
+
     public function SetTransform($tx) {
         $this->transform = $tx;
     }

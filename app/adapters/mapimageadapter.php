@@ -244,6 +244,14 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             $param->AddParameter("SETVIEWSCALE", $this->viewScale);
             $param->AddParameter("BEHAVIOR", 3); //Layers + Selection
 
+            //Apply file download parameters if specified
+            if ($this->app->request->params("download") === "1" || $this->app->request->params("download") === "true") {
+                $param->AddParameter("X-DOWNLOAD-ATTACHMENT", "true");
+                if ($this->app->request->params("downloadname")) {
+                    $param->AddParameter("X-DOWNLOAD-ATTACHMENT-NAME", $this->app->request->params("downloadname"));
+                }
+            }
+
             $this->ExecuteHttpRequest($req);
             
             if ($bCreatedSession === true) {

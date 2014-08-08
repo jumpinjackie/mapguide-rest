@@ -102,6 +102,8 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     protected function InitAdapterConfig($config) {
         
     }
+
+    protected function GetFileExtension() { return "xml"; }
     
     /**
      * Writes the GET response header based on content of the given MgReader

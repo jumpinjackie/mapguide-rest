@@ -606,6 +606,16 @@ class MgMappingServiceController extends MgBaseController {
             }
 
             $br = $mappingSvc->GeneratePlot($map, $center, floatval($scale), $plotSpec, $layout, $dwfVersion);
+            //Apply download headers
+            $downloadFlag = $this->app->request->params("download");
+            if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
+                $name = $this->app->request->params("downloadname");
+                if (!$name) {
+                    $name = "download";
+                }
+                $name .= ".dwf";
+                $this->app->response->header("Content-Disposition", "attachment; filename=".$name);
+            }
             $this->OutputByteReader($br);
         } else { //pdf
             //FIXME: Initial visibility state is inconsistent (probably because this map hasn't been rendered
@@ -628,7 +638,18 @@ class MgMappingServiceController extends MgBaseController {
             $plotter->ShowDisclaimer(true);
             //$plotter->SetLayered($bLayered);
             $plotter->SetMargins($marginTop, $marginBottom, $marginLeft, $marginRight);
-            $plotter->Plot($center, floatval($scale));
+            //Apply download headers
+            $downloadFlag = $this->app->request->params("download");
+            if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
+                $name = $this->app->request->params("downloadname");
+                if (!$name) {
+                    $name = "download";
+                }
+                $name .= ".pdf";
+                $plotter->Plot($center, floatval($scale), $name);
+            } else {
+                $plotter->Plot($center, floatval($scale));
+            }
         }
     }
 
@@ -669,6 +690,16 @@ class MgMappingServiceController extends MgBaseController {
             }
 
             $br = $mappingSvc->GeneratePlot($map, $plotSpec, $layout, $dwfVersion);
+            //Apply download headers
+            $downloadFlag = $this->app->request->params("download");
+            if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
+                $name = $this->app->request->params("downloadname");
+                if (!$name) {
+                    $name = "download";
+                }
+                $name .= ".dwf";
+                $this->app->response->header("Content-Disposition", "attachment; filename=".$name);
+            }
             $this->OutputByteReader($br);
         } else { //pdf
             $bLayered = $this->app->request->params("layeredpdf");
@@ -690,7 +721,18 @@ class MgMappingServiceController extends MgBaseController {
             $plotter->SetMargins($marginTop, $marginBottom, $marginLeft, $marginRight);
 
             $mapCenter = $map->GetViewCenter();
-            $plotter->Plot($mapCenter->GetCoordinate(), $map->GetViewScale());
+            //Apply download headers
+            $downloadFlag = $this->app->request->params("download");
+            if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
+                $name = $this->app->request->params("downloadname");
+                if (!$name) {
+                    $name = "download";
+                }
+                $name .= ".pdf";
+                $plotter->Plot($mapCenter->GetCoordinate(), $map->GetViewScale(), $name);
+            } else {
+                $plotter->Plot($mapCenter->GetCoordinate(), $map->GetViewScale());
+            }
         }
     }
 }

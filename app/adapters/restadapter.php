@@ -262,11 +262,24 @@ abstract class MgFeatureRestAdapter extends MgRestAdapter {
      */
     protected abstract function GetResponseEnd($reader);
 
+    protected abstract function GetFileExtension();
+
     /**
      * Handles GET requests for this adapter. Overridden.
      */
     public function HandleGet($single) {
         $reader = $this->CreateReader($single);
+        //Apply download headers
+        $downloadFlag = $this->app->request->params("download");
+        if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
+            $name = $this->app->request->params("downloadname");
+            if (!$name) {
+                $name = "download";
+            }
+            $name .= ".";
+            $name .= $this->GetFileExtension();
+            $this->app->response->header("Content-Disposition", "attachment; filename=".$name);
+        }
         $this->GetResponseBegin($reader);
 
         $start = -1;

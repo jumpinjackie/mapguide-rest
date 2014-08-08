@@ -566,6 +566,7 @@ class MgMapController extends MgBaseController {
             }
             $reader = $selection->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), $bMapped);
             $result = new MgReaderChunkedResult($featSvc, $reader, -1, new MgHttpChunkWriter());
+            $result->CheckAndSetDownloadHeaders($this->app, $format);
             if ($transform != null)
                 $result->SetTransform($transform);
             $result->Output($format);
