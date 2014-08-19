@@ -2,7 +2,7 @@
     "Source": {
         "Type": "MapGuide",
         "FeatureSource": "Library://Samples/Sheboygan/Data/ParcelComments.FeatureSource",
-        "FeatureClass": "Default:ParcelComments"
+        "FeatureClass": "ParcelComments"
     },
     "Representations": {
         "xml": {

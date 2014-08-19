@@ -2,7 +2,7 @@
     "Source": {
         "Type": "MapGuide",
         "FeatureSource": "Library://RedlineLayer.FeatureSource",
-        "FeatureClass": "MarkupSchema:Markup"
+        "FeatureClass": "Markup"
     },
     "Representations": {
         "xml": {

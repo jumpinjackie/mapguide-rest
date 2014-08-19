@@ -73,8 +73,30 @@ abstract class MgRestAdapter extends MgResponseHandler
         }
         if (array_key_exists("TransformTo", $config)) {
             $tokens = explode(":", $this->className);
-            $schemaName = $tokens[0];
-            $className = $tokens[1];
+            $schemaName = null;
+            $className = null;
+            if (count($tokens) == 2) { //Fully-qualified
+                $schemaName = $tokens[0];
+                $className = $tokens[1];
+            } else { //Not qualified
+                $schemas = $this->featSvc->DescribeSchema($this->featureSourceId, "");
+                $schema = $schemas->GetItem(0);
+                $classes = $schema->GetClasses();
+                $clsDef = null;
+                for ($i = 0; $i < $classes->GetCount(); $i++) {
+                    $cls = $classes->GetItem($i);
+                    if ($cls->GetName() == $this->className) {
+                        $clsDef = $cls;
+                        break;
+                    }
+                }
+                if ($clsDef == null) {
+                    throw new Exception("Class not found: ".$this->className); //TODO: Localize
+                } else {
+                    $schemaName = $schema->GetName();
+                    $className = $this->className;
+                }
+            }
             $this->transform = MgUtils::GetTransform($this->featSvc, $this->featureSourceId, $schemaName, $className, $config["TransformTo"]);
         }
         if (array_key_exists("UseTransaction", $config)) {
@@ -106,7 +128,24 @@ abstract class MgRestAdapter extends MgResponseHandler
     protected function CreateQueryOptions($single) {
         $query = new MgFeatureQueryOptions();
         $tokens = explode(":", $this->className);
-        $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $tokens[0], $tokens[1]);
+        $clsDef = null;
+        if (count($tokens) == 2) { //Fully-qualified
+            $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $tokens[0], $tokens[1]);
+        } else { //Not qualified
+            $schemas = $this->featSvc->DescribeSchema($this->featureSourceId, "");
+            $schema = $schemas->GetItem(0);
+            $classes = $schema->GetClasses();
+            for ($i = 0; $i < $classes->GetCount(); $i++) {
+                $cls = $classes->GetItem($i);
+                if ($cls->GetName() == $this->className) {
+                    $clsDef = $cls;
+                    break;
+                }
+            }
+            if ($clsDef == null) {
+                throw new Exception("Class not found: ".$this->className); //TODO: Localize
+            }
+        }
         if ($single === true) {
             if ($this->featureId == null) {
                 throw new Exception("No feature ID set"); //TODO: Localize
