@@ -79,23 +79,9 @@ abstract class MgRestAdapter extends MgResponseHandler
                 $schemaName = $tokens[0];
                 $className = $tokens[1];
             } else { //Not qualified
-                $schemas = $this->featSvc->DescribeSchema($this->featureSourceId, "");
-                $schema = $schemas->GetItem(0);
-                $classes = $schema->GetClasses();
-                $clsDef = null;
-                for ($i = 0; $i < $classes->GetCount(); $i++) {
-                    $cls = $classes->GetItem($i);
-                    if ($cls->GetName() == $this->className) {
-                        $clsDef = $cls;
-                        break;
-                    }
-                }
-                if ($clsDef == null) {
-                    throw new Exception("Class not found: ".$this->className); //TODO: Localize
-                } else {
-                    $schemaName = $schema->GetName();
-                    $className = $this->className;
-                }
+                $schemaNames = $this->featSvc->GetSchemas($this->featureSourceId);
+                $schemaName = $schemaNames->GetItem(0);
+                $className = $this->className;
             }
             $this->transform = MgUtils::GetTransform($this->featSvc, $this->featureSourceId, $schemaName, $className, $config["TransformTo"]);
         }
@@ -132,19 +118,9 @@ abstract class MgRestAdapter extends MgResponseHandler
         if (count($tokens) == 2) { //Fully-qualified
             $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $tokens[0], $tokens[1]);
         } else { //Not qualified
-            $schemas = $this->featSvc->DescribeSchema($this->featureSourceId, "");
-            $schema = $schemas->GetItem(0);
-            $classes = $schema->GetClasses();
-            for ($i = 0; $i < $classes->GetCount(); $i++) {
-                $cls = $classes->GetItem($i);
-                if ($cls->GetName() == $this->className) {
-                    $clsDef = $cls;
-                    break;
-                }
-            }
-            if ($clsDef == null) {
-                throw new Exception("Class not found: ".$this->className); //TODO: Localize
-            }
+            $schemaNames = $this->featSvc->GetSchemas($this->featureSourceId);
+            $schemaName = $schemaNames->GetItem(0);
+            $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $this->className);
         }
         if ($single === true) {
             if ($this->featureId == null) {
