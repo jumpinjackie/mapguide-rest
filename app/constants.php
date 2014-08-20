@@ -17,20 +17,14 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-require_once "geometryoutputformatter.php";
-
-class MgWktGeometryOutputFormatter extends MgGeometryOutputFormatter
+class MgRestConstants
 {
-    private $wktRw;
-
-    public function __construct() {
-        parent::__construct();
-        $this->wktRw = new MgWktReaderWriter();
-    }
-
-    protected function OutputGeom($geom, $reader) {
-        return $this->wktRw->Write($geom);
-    }
+    const PROP_HYPERLINK = "MG_HYPERLINK";
+    const PROP_TOOLTIP = "MG_TOOLTIP";
+    const PROP_Z_OFFSET = "MG_Z_OFFSET";
+    const PROP_Z_OFFSET_TYPE = "MG_Z_OFFSET_TYPE";
+    const PROP_Z_EXTRUSION = "MG_Z_EXTRUSION";
+    const PROP_Z_UNITS = "MG_Z_UNITS";
 }
 
 ?>

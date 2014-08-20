@@ -18,6 +18,7 @@
 //
 
 require_once "geometryoutputformatter.php";
+require_once dirname(__FILE__)."/../constants.php";
 
 class MgKmlGeometryOutputFormatter extends MgGeometryOutputFormatter
 {
@@ -25,7 +26,39 @@ class MgKmlGeometryOutputFormatter extends MgGeometryOutputFormatter
         parent::__construct();
     }
 
-    protected function OutputGeom($geom, $extrude = 0, $zval = null) {
+    protected function OutputGeom($geom, $reader) {
+        $extrude = 0;
+        $zval = null;
+        //Check if special extrusion properties exist
+        try {
+            if ($reader->GetPropertyIndex(MgRestConstants::PROP_Z_EXTRUSION) >= 0) {
+                switch ($reader->GetPropertyType(MgRestConstants::PROP_Z_EXTRUSION)) {
+                    case MgPropertyType::Int16:
+                        $extrude = 1;
+                        $zval = $reader->GetInt16(MgRestConstants::PROP_Z_EXTRUSION);
+                        break;
+                    case MgPropertyType::Int32:
+                        $extrude = 1;
+                        $zval = $reader->GetInt32(MgRestConstants::PROP_Z_EXTRUSION);
+                        break;
+                    case MgPropertyType::Int64:
+                        $extrude = 1;
+                        $zval = $reader->GetInt64(MgRestConstants::PROP_Z_EXTRUSION);
+                        break;
+                    case MgPropertyType::Double:
+                        $extrude = 1;
+                        $zval = $reader->GetDouble(MgRestConstants::PROP_Z_EXTRUSION);
+                        break;
+                    case MgPropertyType::Single:
+                        $extrude = 1;
+                        $zval = $reader->GetSingle(MgRestConstants::PROP_Z_EXTRUSION);
+                        break;
+                }
+            }
+        } catch (MgException $ex) {
+            $extrude = 0;
+            $zval = null;
+        }
         $geomType = $geom->GetGeometryType();
         switch($geomType) {
             case MgGeometryType::Point:

@@ -16,8 +16,8 @@
       <atom:link href="http://localhost/mapguide/rest/data/building/{$model->FeatId}.html" />
     </Placemark>
     <atom:author>
-      <atom:name>mapguide-rest Sample Data</atom:name>    
-      <atom:uri>https://github.com/jumpinjackie/mapguide-rest</atom:uri>    
+      <atom:name>Melbourne Building Footprints</atom:name>    
+      <atom:uri>https://data.melbourne.vic.gov.au/Property-and-Planning/Building-Foot-Prints/qe9w-cym8</atom:uri>    
     </atom:author>    
   </Document> 
 </kml>

@@ -25,7 +25,8 @@ class MgGmlGeometryOutputFormatter extends MgGeometryOutputFormatter
         parent::__construct();
     }
 
-    protected function OutputGeom($geom, $zval = null) {
+    protected function OutputGeom($geom, $reader) {
+        $zval = null;
         $geomType = $geom->GetGeometryType();
         switch($geomType) {
             case MgGeometryType::Point:

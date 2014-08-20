@@ -167,14 +167,32 @@ abstract class MgRestAdapter extends MgResponseHandler
                 }
             }
         }
-        if (count($this->propertyList) > 0) {
-            foreach($this->propertyList as $propName) {
-                $query->AddFeatureProperty($propName);
+        if (isset($this->app->ComputedProperties)) {
+            $compProps = $this->app->ComputedProperties;
+            foreach ($compProps as $alias => $expression) {
+                $this->computedPropertyList[$alias] = $expression;
             }
         }
+        $bAppliedComputedProperties = false;
         if (count($this->computedPropertyList) > 0) {
             foreach ($this->computedPropertyList as $alias => $expression) {
                 $query->AddComputedProperty($alias, $expression);
+                $bAppliedComputedProperties = true;
+            }
+        }
+        //If computed properties were applied, add all properties from the class definition if no
+        //explicit property list supplied
+        if ($bAppliedComputedProperties && count($this->propertyList) == 0) {
+            $clsProps = $clsDef->GetProperties();
+            for ($i = 0; $i < $clsProps->GetCount(); $i++) {
+                $propDef = $clsProps->GetItem($i);
+                $query->AddFeatureProperty($propDef->GetName());
+            }
+        } else {
+            if (count($this->propertyList) > 0) {
+                foreach($this->propertyList as $propName) {
+                    $query->AddFeatureProperty($propName);
+                }
             }
         }
         return $query;

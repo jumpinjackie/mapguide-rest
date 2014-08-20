@@ -25,7 +25,7 @@ abstract class MgGeometryOutputFormatter
         $this->agfRw = new MgAgfReaderWriter();
     }
 
-    protected abstract function OutputGeom($geom);
+    protected abstract function OutputGeom($geom, $reader);
     
     public function Output($reader, $geomName, $transform) {
         $output = "";
@@ -38,7 +38,7 @@ abstract class MgGeometryOutputFormatter
                     $geom = $this->agfRw->Read($agf);
 
                 if ($geom != null)
-                    $output = $this->OutputGeom($geom);
+                    $output = $this->OutputGeom($geom, $reader);
             }
         } catch (MgException $ex) {
         }

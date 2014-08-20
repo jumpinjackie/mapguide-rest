@@ -25,7 +25,7 @@ class MgCentroidCommaSeparatedGeometryOutputFormatter extends MgGeometryOutputFo
         parent::__construct();
     }
 
-    protected function OutputGeom($geom) {
+    protected function OutputGeom($geom, $reader) {
         $pt = $geom->GetCentroid();
         $coord = $pt->GetCoordinate();
         return $coord->GetX().",".$coord->GetY();

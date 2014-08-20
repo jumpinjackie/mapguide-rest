@@ -18,6 +18,7 @@
 //
 
 require_once "controller.php";
+require_once dirname(__FILE__)."/../constants.php";
 require_once dirname(__FILE__)."/../util/readerchunkedresult.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
@@ -672,10 +673,10 @@ class MgFeatureServiceController extends MgBaseController {
                     if ($fc->length == 1) {
                         //Add hyperlink, tooltip and elevation as special computed properties
                         if ($hlink->length == 1 && strlen($hlink->item(0)->nodeValue) > 0) {
-                            $query->AddComputedProperty("MG_HYPERLINK", $hlink->item(0)->nodeValue);
+                            $query->AddComputedProperty(MgRestConstants::PROP_HYPERLINK, $hlink->item(0)->nodeValue);
                         }
                         if ($tt->length == 1 && strlen($tt->item(0)->nodeValue) > 0) {
-                            $query->AddComputedProperty("MG_TOOLTIP", $tt->item(0)->nodeValue);
+                            $query->AddComputedProperty(MgRestConstants::PROP_TOOLTIP, $tt->item(0)->nodeValue);
                         }
                         if ($elev->length == 1) {
                             $elevNode = $elev->item(0);
@@ -684,24 +685,24 @@ class MgFeatureServiceController extends MgBaseController {
                             $zext = $elevNode->getElementsByTagName("ZExtrusion");
                             $unit = $elevNode->getElementsByTagName("Unit");
                             if ($zoff->length == 1 && strlen($zoff->item(0)->nodeValue) > 0) {
-                                $query->AddComputedProperty("MG_Z_OFFSET", $zoff->item(0)->nodeValue);
+                                $query->AddComputedProperty(MgRestConstants::PROP_Z_OFFSET, $zoff->item(0)->nodeValue);
                             } else {
-                                $query->AddComputedProperty("MG_Z_OFFSET", "0");
+                                $query->AddComputedProperty(MgRestConstants::PROP_Z_OFFSET, "0");
                             }
                             if ($zofftype->length == 1 && strlen($zofftype->item(0)->nodeValue) > 0) {
-                                $query->AddComputedProperty("MG_Z_OFFSET_TYPE", "'".$zofftype->item(0)->nodeValue."'");
+                                $query->AddComputedProperty(MgRestConstants::PROP_Z_OFFSET_TYPE, "'".$zofftype->item(0)->nodeValue."'");
                             } else {
-                                $query->AddComputedProperty("MG_Z_OFFSET", "'RelativeToGround'");
+                                $query->AddComputedProperty(MgRestConstants::PROP_Z_OFFSET_TYPE, "'RelativeToGround'");
                             }
                             if ($zext->length == 1 && strlen($zext->item(0)->nodeValue) > 0) {
-                                $query->AddComputedProperty("MG_Z_EXTRUSION", $zext->item(0)->nodeValue);
+                                $query->AddComputedProperty(MgRestConstants::PROP_Z_EXTRUSION, $zext->item(0)->nodeValue);
                             } else {
-                                $query->AddComputedProperty("MG_Z_EXTRUSION", "0");
+                                $query->AddComputedProperty(MgRestConstants::PROP_Z_EXTRUSION, "0");
                             }
                             if ($unit->length == 1 && strlen($unit->item(0)->nodeValue) > 0) {
-                                $query->AddComputedProperty("MG_Z_UNITS", "'".$unit->item(0)->nodeValue."'");
+                                $query->AddComputedProperty(MgRestConstants::PROP_Z_UNITS, "'".$unit->item(0)->nodeValue."'");
                             } else {
-                                $query->AddComputedProperty("MG_Z_UNITS", "'Meters'");
+                                $query->AddComputedProperty(MgRestConstants::PROP_Z_UNITS, "'Meters'");
                             }
                         }
                         //Set filter from layer if defined
