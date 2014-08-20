@@ -138,7 +138,7 @@ Legend.prototype.update = function() {
         var el = $(e);
         var min = el.attr("data-layer-min-scale");
         var max = el.attr("data-layer-max-scale");
-        if (scale >= min && scale < max) {
+        if ((scale >= min && scale < max) || (scale >= min && max==="infinity")) {
             if (el.is(":hidden"))
                 el.show();
         } else {
