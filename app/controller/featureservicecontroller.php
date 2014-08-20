@@ -666,15 +666,43 @@ class MgFeatureServiceController extends MgBaseController {
                 $hlink = $vlNode->getElementsByTagName("Hyperlink");
                 $tt = $vlNode->getElementsByTagName("ToolTip");
                 $flt = $vlNode->getElementsByTagName("Filter");
+                $elev = $vlNode->getElementsByTagName("ElevationSettings");
                 if ($fsId->length == 1) {
                     $fsId = new MgResourceIdentifier($fsId->item(0)->nodeValue);
                     if ($fc->length == 1) {
-                        //Add hyperlink and tooltip as special computed properties
+                        //Add hyperlink, tooltip and elevation as special computed properties
                         if ($hlink->length == 1 && strlen($hlink->item(0)->nodeValue) > 0) {
                             $query->AddComputedProperty("MG_HYPERLINK", $hlink->item(0)->nodeValue);
                         }
                         if ($tt->length == 1 && strlen($tt->item(0)->nodeValue) > 0) {
                             $query->AddComputedProperty("MG_TOOLTIP", $tt->item(0)->nodeValue);
+                        }
+                        if ($elev->length == 1) {
+                            $elevNode = $elev->item(0);
+                            $zoff = $elevNode->getElementsByTagName("ZOffset");
+                            $zofftype = $elevNode->getElementsByTagName("ZOffsetType");
+                            $zext = $elevNode->getElementsByTagName("ZExtrusion");
+                            $unit = $elevNode->getElementsByTagName("Unit");
+                            if ($zoff->length == 1 && strlen($zoff->item(0)->nodeValue) > 0) {
+                                $query->AddComputedProperty("MG_Z_OFFSET", $zoff->item(0)->nodeValue);
+                            } else {
+                                $query->AddComputedProperty("MG_Z_OFFSET", "0");
+                            }
+                            if ($zofftype->length == 1 && strlen($zofftype->item(0)->nodeValue) > 0) {
+                                $query->AddComputedProperty("MG_Z_OFFSET_TYPE", "'".$zofftype->item(0)->nodeValue."'");
+                            } else {
+                                $query->AddComputedProperty("MG_Z_OFFSET", "'RelativeToGround'");
+                            }
+                            if ($zext->length == 1 && strlen($zext->item(0)->nodeValue) > 0) {
+                                $query->AddComputedProperty("MG_Z_EXTRUSION", $zext->item(0)->nodeValue);
+                            } else {
+                                $query->AddComputedProperty("MG_Z_EXTRUSION", "0");
+                            }
+                            if ($unit->length == 1 && strlen($unit->item(0)->nodeValue) > 0) {
+                                $query->AddComputedProperty("MG_Z_UNITS", "'".$unit->item(0)->nodeValue."'");
+                            } else {
+                                $query->AddComputedProperty("MG_Z_UNITS", "'Meters'");
+                            }
                         }
                         //Set filter from layer if defined
                         if ($flt->length == 1 && strlen($flt->item(0)->nodeValue) > 0) {
@@ -732,10 +760,10 @@ class MgFeatureServiceController extends MgBaseController {
                             $result->SetTransform($transform);
                         $result->Output($format);
                     } else {
-                        throw new Exception("Layer ".$ldfId->ToString()." has an invalid feature class");
+                        throw new Exception("Layer ".$ldfId->ToString()." has an invalid feature class"); //TODO: Localize
                     }
                 } else {
-                    throw new Exception("Layer ".$ldfId->ToString()." has an invalid feature source");
+                    throw new Exception("Layer ".$ldfId->ToString()." has an invalid feature source"); //TODO: Localize
                 }
             }
         } catch (MgException $ex) {
