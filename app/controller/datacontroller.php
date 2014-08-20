@@ -141,17 +141,23 @@ class MgDataController extends MgBaseController {
             throw new Exception("Missing property 'Type' in configuration section 'Source'"); //TODO: Localize
         if ($cfgSource["Type"] !== "MapGuide") 
             throw new Exception("Unsupported source type: ".$cfgSource["Type"]); //TODO: Localize
-        if (!array_key_exists("FeatureSource", $cfgSource))
-            throw new Exception("Missing property 'FeatureSource' in configuration section 'Source'"); //TODO: Localize
-        if (!array_key_exists("FeatureClass", $cfgSource))
-            throw new Exception("Missing property 'FeatureClass' in configuration section 'Source'"); //TODO: Localize
+        if (!array_key_exists("LayerDefinition", $cfgSource)) {
+            if (!array_key_exists("FeatureSource", $cfgSource))
+                throw new Exception("Missing property 'FeatureSource' in configuration section 'Source'"); //TODO: Localize
+            if (!array_key_exists("FeatureClass", $cfgSource))
+                throw new Exception("Missing property 'FeatureClass' in configuration section 'Source'"); //TODO: Localize
+        }
         if (array_key_exists("IdentityProperty", $cfgSource))
             $result->IdentityProperty = $cfgSource["IdentityProperty"];
         else
             $result->IdentityProperty = null;
 
-        $result->resId = new MgResourceIdentifier($cfgSource["FeatureSource"]);
-        $result->className = $cfgSource["FeatureClass"];
+        if (!array_key_exists("LayerDefinition", $cfgSource)) {
+            $result->resId = new MgResourceIdentifier($cfgSource["FeatureSource"]);
+            $result->className = $cfgSource["FeatureClass"];
+        } else {
+            $result->LayerDefinition = $cfgSource["LayerDefinition"];
+        }
 
         if (!array_key_exists("Representations", $config))
             throw new Exception("No representations defined in configuration document"); //TODO: Localize
@@ -241,6 +247,69 @@ class MgDataController extends MgBaseController {
         return false;
     }
 
+    static function ApplyFeatureSource($resSvc, $app, $layerDefId) {
+        $ldfId = new MgResourceIdentifier($layerDefId);
+        $ldfContent = $resSvc->GetResourceContent($ldfId);
+        $doc = new DOMDocument();
+        $doc->loadXML($ldfContent->ToString());
+        $vl = $doc->getElementsByTagName("VectorLayerDefinition");
+        if ($vl->length == 1) {
+            $vlNode = $vl->item(0);
+            $fsId = $vlNode->getElementsByTagName("ResourceId");
+            $fc = $vlNode->getElementsByTagName("FeatureName");
+            $hlink = $vlNode->getElementsByTagName("Hyperlink");
+            $tt = $vlNode->getElementsByTagName("ToolTip");
+            $flt = $vlNode->getElementsByTagName("Filter");
+            $elev = $vlNode->getElementsByTagName("ElevationSettings");
+            if ($fsId->length == 1) {
+                $app->FeatureSource = new MgResourceIdentifier($fsId->item(0)->nodeValue);
+                if ($fc->length == 1) {
+                    $app->FeatureClass = $fc->item(0)->nodeValue;
+                    $props = array();
+                    //Add hyperlink, tooltip and elevation as special computed properties
+                    if ($hlink->length == 1 && strlen($hlink->item(0)->nodeValue) > 0) {
+                        $props["MG_HYPERLINK"] = $hlink->item(0)->nodeValue;
+                    }
+                    if ($tt->length == 1 && strlen($tt->item(0)->nodeValue) > 0) {
+                        $props["MG_TOOLTIP"] = $tt->item(0)->nodeValue;
+                    }
+                    if ($elev->length == 1) {
+                        $elevNode = $elev->item(0);
+                        $zoff = $elevNode->getElementsByTagName("ZOffset");
+                        $zofftype = $elevNode->getElementsByTagName("ZOffsetType");
+                        $zext = $elevNode->getElementsByTagName("ZExtrusion");
+                        $unit = $elevNode->getElementsByTagName("Unit");
+                        if ($zoff->length == 1 && strlen($zoff->item(0)->nodeValue) > 0) {
+                            $props["MG_Z_OFFSET"] = $zoff->item(0)->nodeValue;
+                        } else {
+                            $props["MG_Z_OFFSET"] = "0";
+                        }
+                        if ($zofftype->length == 1 && strlen($zofftype->item(0)->nodeValue) > 0) {
+                            $props["MG_Z_OFFSET_TYPE"] = "'".$zofftype->item(0)->nodeValue."'";
+                        } else {
+                            $props["MG_Z_OFFSET"] = "'RelativeToGround'";
+                        }
+                        if ($zext->length == 1 && strlen($zext->item(0)->nodeValue) > 0) {
+                            $props["MG_Z_EXTRUSION"] = $zext->item(0)->nodeValue;
+                        } else {
+                            $props["MG_Z_EXTRUSION"] = "0";
+                        }
+                        if ($unit->length == 1 && strlen($unit->item(0)->nodeValue) > 0) {
+                            $props["MG_Z_UNITS"] = "'".$unit->item(0)->nodeValue."'";
+                        } else {
+                            $props["MG_Z_UNITS"] = "'Meters'";
+                        }
+                    }
+                    $app->ComputedProperties = $props;
+                    //Set filter from layer if defined
+                    if ($flt->length == 1 && strlen($flt->item(0)->nodeValue) > 0) {
+                        $app->Filter = $flt->item(0)->nodeValue;
+                    }
+                }
+            }
+        }
+    }
+
     private function HandleMethod($uriParts, $extension, $method) {
         $uriPath = implode("/", $uriParts);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
@@ -270,9 +339,14 @@ class MgDataController extends MgBaseController {
                 $siteConn->Open($this->userInfo);
                 if ($this->ValidateAcl($siteConn, $result->config)) {
                     $this->app->MgSiteConnection = $siteConn;
-                    $this->app->FeatureSource = $result->resId;
+                    if (property_exists($result, "LayerDefinition")) {
+                        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+                        self::ApplyFeatureSource($resSvc, $this->app, $result->LayerDefinition);
+                    } else {
+                        $this->app->FeatureSource = $result->resId;
+                        $this->app->FeatureClass = $result->className;
+                    }
                     $this->app->AdapterConfig = $result->config;
-                    $this->app->FeatureClass = $result->className;
                     $this->app->ConfigPath = dirname($path);
                     $this->app->IdentityProperty = $result->IdentityProperty;
                     $adapter = $this->app->container[$result->adapterName];
@@ -315,9 +389,14 @@ class MgDataController extends MgBaseController {
                 $siteConn->Open($this->userInfo);
                 if ($this->ValidateAcl($siteConn, $result->config)) {
                     $this->app->MgSiteConnection = $siteConn;
-                    $this->app->FeatureSource = $result->resId;
+                    if (property_exists($result, "LayerDefinition")) {
+                        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+                        self::ApplyFeatureSource($resSvc, $this->app, $result->LayerDefinition);
+                    } else {
+                        $this->app->FeatureSource = $result->resId;
+                        $this->app->FeatureClass = $result->className;
+                    }
                     $this->app->AdapterConfig = $result->config;
-                    $this->app->FeatureClass = $result->className;
                     $this->app->ConfigPath = dirname($path);
                     $this->app->IdentityProperty = $result->IdentityProperty;
                     $adapter = $this->app->container[$result->adapterName];

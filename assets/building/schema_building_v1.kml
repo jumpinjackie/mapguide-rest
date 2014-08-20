@@ -1,0 +1,12 @@
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <Schema name="building" id="georest-building-schema">     
+      <SimpleField name="FeatId" type="string">
+        <displayName>Feature ID</displayName>     
+      </SimpleField>
+      <SimpleField name="FMTADDRESS" type="string">
+        <displayName>Building Address</displayName>
+      </SimpleField>
+    </Schema>
+  </Document> 
+</kml>

@@ -144,9 +144,9 @@ abstract class MgRestAdapter extends MgResponseHandler
                 if ($iidx >= 0) {
                     $propDef = $props->GetItem($iidx);
                     if ($propDef->GetPropertyType() != MgFeaturePropertyType::DataProperty)
-                        throw new Exception("Specified identity property ".$this->featureIdProp." is not a data property");
+                        throw new Exception("Specified identity property ".$this->featureIdProp." is not a data property"); //TODO: Localize
                 } else {
-                    throw new Exception("Specified identity property ".$this->featureIdProp." not found in class definition");
+                    throw new Exception("Specified identity property ".$this->featureIdProp." not found in class definition"); //TODO: Localize
                 }
             }
             if ($idType == MgPropertyType::String)
