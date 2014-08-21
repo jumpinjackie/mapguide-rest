@@ -27,7 +27,10 @@
 //
 // Only do this for IIS though, as this will screw up Apache httpd
 if (strpos($_SERVER['SERVER_SOFTWARE'], "IIS") !== FALSE)
-    $_SERVER['REQUEST_URI'] = $_SERVER['UNENCODED_URL'];
+{
+    if (array_key_exists('UNENCODED_URL', $_SERVER))
+        $_SERVER['REQUEST_URI'] = $_SERVER['UNENCODED_URL'];
+}
 
 require 'vendor/autoload.php';
 include dirname(__FILE__)."/../mapadmin/constants.php";
