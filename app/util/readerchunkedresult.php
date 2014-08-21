@@ -77,6 +77,12 @@ class MgHttpChunkWriter extends MgChunkWriter
         if(function_exists('apache_setenv')) {
             apache_setenv('no-gzip', '1');
         }
+        
+        $this->headers["Transfer-Encoding"] = "chunked";
+        foreach ($this->headers as $name => $value) {
+            header("$name: $value");
+        }
+        flush();
 
         //Remove PHP time limit
         if(!ini_get('safe_mode')) {
@@ -89,11 +95,6 @@ class MgHttpChunkWriter extends MgChunkWriter
         if (ob_get_length() === false) {
             ob_start();
         }
-        $this->headers["Transfer-Encoding"] = "chunked";
-        foreach ($this->headers as $name => $value) {
-            header("$name: $value");
-        }
-        flush();
     }
 
     public function EndChunking() {
