@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CZML Example </title>
+    <script src="../../assets/cesium/Cesium.js"></script>
+    <style>
+      @import url(../../assets/cesium/Widgets/widgets.css);
+      #cesiumContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        overflow: hidden;
+        padding: 0;
+        font-family: sans-serif;
+      }
+
+      body {
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+    <script type="text/javascript">
+      window.onload = function() {
+        var viewer = new Cesium.Viewer('cesiumContainer');
+        var districtsSource = new Cesium.CzmlDataSource();
+        var treesSource = new Cesium.CzmlDataSource();
+        var roadsSource = new Cesium.CzmlDataSource();
+        var districts = districtsSource.loadUrl("../../library/Samples/Sheboygan/Layers/Districts.LayerDefinition/features.czml");
+        districts.then(function() {
+          viewer.dataSources.add(districtsSource);
+          viewer.scene.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(-87.727283, 43.749034, 15000.0)
+          });
+          //roadsSource.loadUrl("../../library/Samples/Sheboygan/Layers/Roads.LayerDefinition/features.czml").then(function() {
+          //  viewer.dataSources.add(roadsSource);
+          //});
+          treesSource.loadUrl("../../library/Samples/Sheboygan/Layers/Trees.LayerDefinition/features.czml").then(function() {
+            viewer.dataSources.add(treesSource);
+          });
+        });
+      };
+    </script>
+  </head>
+<body>
+  <div id="cesiumContainer"></div>
+</body>
+</html>

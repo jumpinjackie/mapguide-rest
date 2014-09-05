@@ -627,7 +627,7 @@ class MgFeatureServiceController extends MgBaseController {
     public function SelectLayerFeatures($ldfId, $format) {
         try {
             //Check for unsupported representations
-            $fmt = $this->ValidateRepresentation($format, array("xml", "geojson"));
+            $fmt = $this->ValidateRepresentation($format, array("xml", "geojson", "czml"));
 
             $sessionId = "";
             if ($ldfId->GetRepositoryType() == MgRepositoryType::Session) {
@@ -747,6 +747,11 @@ class MgFeatureServiceController extends MgBaseController {
                                 $geom = $wktRw->Read(MgUtils::MakeWktPolygon($parts[0], $parts[1], $parts[2], $parts[3]));
                                 $query->SetSpatialFilter($clsDef->GetDefaultGeometryPropertyName(), $geom, MgFeatureSpatialOperations::EnvelopeIntersects);
                             }
+                        }
+
+                        //We must require features as LL84 for CZML output
+                        if ($fmt == "czml") {
+                            $transformto = "LL84";
                         }
 
                         $transform = null;
