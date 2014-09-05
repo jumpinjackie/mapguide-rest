@@ -545,7 +545,7 @@ $app->get("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:c
  *     @SWG\Operation(
  *        method="GET",
  *        nickname="SelectLayerFeatures",
- *        summary="Queries features from the specified layer definition. Any hyperlink and tooltip expressions will be computed and returned in the response",
+ *        summary="Queries features from the specified layer definition. Any hyperlink, tooltip and elevation expressions in the Layer Definition will be computed and returned in the response",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
@@ -576,7 +576,7 @@ $app->get("/library/:resourcePath+.LayerDefinition/features", function($resource
  *     @SWG\Operation(
  *        method="GET",
  *        nickname="SelectLayerFeatures",
- *        summary="Queries features from the specified layer definition. Any hyperlink and tooltip expressions will be computed and returned in the response",
+ *        summary="Queries features from the specified layer definition. Any hyperlink, tooltip and elevation expressions in the Layer Definition will be computed and returned in the response",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
@@ -585,7 +585,7 @@ $app->get("/library/:resourcePath+.LayerDefinition/features", function($resource
  *          @SWG\parameter(name="maxfeatures", paramType="query", required=false, type="string", description="The maximum number of features to restrict this response to"),
  *          @SWG\parameter(name="transformto", paramType="query", required=false, type="string", description="The CS-Map coordinate system code to transform the resulting features into"),
  *          @SWG\parameter(name="bbox", paramType="query", required=false, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','geojson']")
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml, geojson or czml", enum="['xml','geojson','czml']")
  *        ),
  *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),

@@ -1474,7 +1474,7 @@
             "operations": [
                 {
                     "method": "GET",
-                    "summary": "Queries features from the specified layer definition. Any hyperlink and tooltip expressions will be computed and returned in the response",
+                    "summary": "Queries features from the specified layer definition. Any hyperlink, tooltip and elevation expressions in the Layer Definition will be computed and returned in the response",
                     "nickname": "SelectLayerFeatures",
                     "parameters": [
                         {
@@ -1549,7 +1549,7 @@
             "operations": [
                 {
                     "method": "GET",
-                    "summary": "Queries features from the specified layer definition. Any hyperlink and tooltip expressions will be computed and returned in the response",
+                    "summary": "Queries features from the specified layer definition. Any hyperlink, tooltip and elevation expressions in the Layer Definition will be computed and returned in the response",
                     "nickname": "SelectLayerFeatures",
                     "parameters": [
                         {
@@ -1606,10 +1606,11 @@
                             "name": "type",
                             "type": "string",
                             "required": true,
-                            "description": "xml or json",
+                            "description": "xml, geojson or czml",
                             "enum": [
                                 "xml",
-                                "geojson"
+                                "geojson",
+                                "czml"
                             ]
                         }
                     ],
