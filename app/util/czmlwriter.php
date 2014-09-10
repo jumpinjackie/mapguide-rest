@@ -37,7 +37,7 @@ class MgCzmlWriter
         } catch (MgException $ex) { }
 
         if ($ttIndex >= 0) {
-            $output .= ', "description": "'.MgUtils::EscapeJsonString($reader->GetString($ttIndex)).'"';
+            $output .= ', "description": "'.str_replace('\\\n', "<br/>", MgUtils::EscapeJsonString($reader->GetString($ttIndex))).'"';
         }
 
         $output .= ",";

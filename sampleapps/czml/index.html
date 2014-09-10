@@ -26,7 +26,8 @@
     <script type="text/javascript">
       window.onload = function() {
         var viewer = new Cesium.Viewer('cesiumContainer');
-        
+        viewer.extend(Cesium.viewerEntityMixin);
+
         var parcelsSource = new Cesium.CzmlDataSource();
         var treesSource = new Cesium.CzmlDataSource();
         var roadsSource = new Cesium.CzmlDataSource();
