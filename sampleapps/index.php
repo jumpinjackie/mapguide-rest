@@ -97,6 +97,7 @@ $hasOL2Samples = true;
             <p class="sample-header">MapGuide REST API with <a href="http://cesiumjs.org/">Cesium</a></p>
             <ul>
                 <li><a href="cesium/index.html">Sheboygan Districts</a></li>
+                <li><a href="czml/index.html">Cesium viewer with CZML sources</a></li>
             </ul>
         </div>
     </body>
