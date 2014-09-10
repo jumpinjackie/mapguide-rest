@@ -290,10 +290,13 @@ class MgReaderChunkedResult
             if ($this->limit > 0 && $read > $this->limit) {
                 break;
             }
-            $output .= ",";
-            $output .= MgCzmlWriter::FeatureToCzml($this->reader, $agfRw, $this->transform, $clsDef->GetDefaultGeometryPropertyName(), ($idProp != NULL ? $idProp->GetName() : NULL));
-            $this->writer->WriteChunk($output);
-            $output = "";
+            $featCzml = MgCzmlWriter::FeatureToCzml($this->reader, $agfRw, $this->transform, $clsDef->GetDefaultGeometryPropertyName(), ($idProp != NULL ? $idProp->GetName() : NULL));
+            if (strlen($featCzml) > 0) {
+                $output .= ",";
+                $output .= $featCzml;
+                $this->writer->WriteChunk($output);
+                $output = "";
+            }
         }
         $output .= "]";
         $this->writer->WriteChunk($output);
