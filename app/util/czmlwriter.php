@@ -25,15 +25,11 @@ class MgCzmlWriter
 
         $ttIndex = -1;
         $hlIndex = -1;
-        $elevIndex = -1;
         try {
             $ttIndex = $reader->GetPropertyIndex(MgRestConstants::PROP_TOOLTIP);
         } catch (MgException $ex) { }
         try {
             $hlIndex = $reader->GetPropertyIndex(MgRestConstants::PROP_HYPERLINK);
-        } catch (MgException $ex) { }
-        try {
-            $elevIndex = $reader->GetPropertyIndex(MgRestConstants::PROP_Z_EXTRUSION);
         } catch (MgException $ex) { }
 
         if ($ttIndex >= 0) {
@@ -98,12 +94,38 @@ class MgCzmlWriter
                 $idVal = uniqid();
             }
 
+            $elevIndex = -1;
+            $extrude = 0.0;
+            try {
+                $elevIndex = $reader->GetPropertyIndex(MgRestConstants::PROP_Z_EXTRUSION);
+                if ($elevIndex >= 0) {
+                    switch ($reader->GetPropertyType($elevIndex)) {
+                        case MgPropertyType::Int16:
+                            $extrude = $reader->GetInt16($elevIndex);
+                            break;
+                        case MgPropertyType::Int32:
+                            $extrude = $reader->GetInt32($elevIndex);
+                            break;
+                        case MgPropertyType::Int64:
+                            $extrude = $reader->GetInt64($elevIndex);
+                            break;
+                        case MgPropertyType::Double:
+                            $extrude = $reader->GetDouble($elevIndex);
+                            break;
+                        case MgPropertyType::Single:
+                            $extrude = $reader->GetSingle($elevIndex);
+                            break;
+                    }
+                }
+                //TODO: If units not in meters, convert it to meters
+            } catch (MgException $ex) { }
+
             switch ($geom->GetGeometryType()) {
                 case MgGeometryType::Point:
                 case MgGeometryType::LineString:
                 case MgGeometryType::Polygon:
                     {
-                        $geomCzml = self::GeometryToCzml($geom);
+                        $geomCzml = self::GeometryToCzml($geom, $extrude);
                         if ($geomCzml == null)
                             return "";
 
@@ -118,7 +140,7 @@ class MgCzmlWriter
                         for ($i = 0; $i < $geom->GetCount(); $i++) {
                             $idValComp = $idVal."_segment_".$i."_".$featId;
                             $lineStr = $geom->GetLineString($i);
-                            $geomCzml = self::GeometryToCzml($lineStr);
+                            $geomCzml = self::GeometryToCzml($lineStr, $extrude);
                             if ($geomCzml == null)
                                 continue;
 
@@ -134,7 +156,7 @@ class MgCzmlWriter
         }
     }
 
-    private static function GeometryToCzml($geom) {
+    private static function GeometryToCzml($geom, $zval = 0.0) {
         $geomType = $geom->GetGeometryType();
         //TODO: Convert all the geometry types.
         //TODO: Translate Layer Definition styles to CZML styles
@@ -157,6 +179,9 @@ class MgCzmlWriter
             case MgGeometryType::Polygon:
                 {
                     $fragment = '"polygon": { ';
+                    if ($zval > 0.0) {
+                        $fragment .= '"extrudedHeight": { "number": '.$zval.' }, ';
+                    }
                     $fragment .= '"outline": { "boolean": true }, "outlineColor": { "rgba": [ 0, 0, 0, 255 ] }, ';
                     $fragment .= '"material": { "solidColor": { "color": { "rgba": [ 255, 127, 127, 153 ] } } },"positions": '.self::PolygonToCzml($geom).'}';
                     return $fragment;
@@ -166,17 +191,17 @@ class MgCzmlWriter
         }
     }
 
-    private static function CoordToCzml($coord, $enclose = true) {
+    private static function CoordToCzml($coord, $zval = 0.0, $enclose = true) {
         $str = "";
         if ($enclose)
             $str .= "[";
-        $str .= $coord->GetX().",".$coord->GetY().",0.0";
+        $str .= $coord->GetX().",".$coord->GetY().",".$zval;
         if ($enclose)
             $str .= "]";
         return $str;
     }
 
-    private static function LineStringToCzml($coords) {
+    private static function LineStringToCzml($coords, $zval = 0.0) {
         //HACK: Cesium does not like polylines that are all the same coordinates.
         //To workaround this, we bail on any line strings that have identical coordinates
         //this assoc array will use to check for this
@@ -187,7 +212,7 @@ class MgCzmlWriter
             if (!$first)
                 $str .= ",";
             $coord = $coords->GetCurrent();
-            $coordCzml = self::CoordToCzml($coord, false);
+            $coordCzml = self::CoordToCzml($coord, $zval, false);
             if (!array_key_exists($coordCzml, $fragments))
                 $fragments[$coordCzml] = true;
             $str .= $coordCzml;
@@ -204,7 +229,7 @@ class MgCzmlWriter
             return $str;
     }
 
-    private static function PolygonToCzml($geom) {
+    private static function PolygonToCzml($geom, $zval = 0.0) {
         $str = '{ "cartographicDegrees": [';
         $first = true;
         //TODO: Only handles exterior ring. Can CZML support polygons with holes?
@@ -214,7 +239,7 @@ class MgCzmlWriter
             if (!$first)
                 $str .= ",";
             $coord = $coords->GetCurrent();
-            $str .= self::CoordToCzml($coord, false);
+            $str .= self::CoordToCzml($coord, $zval, false);
             $first = false;
         }
         $str .= ']}';
