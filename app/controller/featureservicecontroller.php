@@ -705,17 +705,21 @@ class MgFeatureServiceController extends MgBaseController {
                                 $query->AddComputedProperty(MgRestConstants::PROP_Z_UNITS, "'Meters'");
                             }
                         }
+                        $baseFilter = "";
                         //Set filter from layer if defined
                         if ($flt->length == 1 && strlen($flt->item(0)->nodeValue) > 0) {
                             if ($filter !== "") {
                                 //logical AND with the layer's filter to combine them
-                                $query->SetFilter("(".$flt->item(0)->nodeValue.") AND (".$filter.")");
+                                $baseFilter = "(".$flt->item(0)->nodeValue.") AND (".$filter.")";
+                                $query->SetFilter($baseFilter);
                             } else {
-                                $query->SetFilter($flt->item(0)->nodeValue);
+                                $baseFilter = $flt->item(0)->nodeValue;
+                                $query->SetFilter($baseFilter);
                             }
                         } else {
                             if ($filter !== "") {
-                                $query->SetFilter($filter);
+                                $baseFilter = $filter;
+                                $query->SetFilter($baseFilter);
                             }
                         }
                         $tokens = explode(":", $fc->item(0)->nodeValue);

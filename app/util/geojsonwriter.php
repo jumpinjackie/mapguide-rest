@@ -108,7 +108,7 @@ class MgGeoJsonWriter
         }
         $output = '{ "type": "Feature", ';
         $idJson = "";
-        if ($idVal != NULL) {
+        if ($idVal !== NULL) {
             $idJson = '"id": '.$idVal.', ';
             $output .= $idJson;
         }
