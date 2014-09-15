@@ -20,6 +20,7 @@
 require_once "controller.php";
 require_once dirname(__FILE__)."/../constants.php";
 require_once dirname(__FILE__)."/../util/readerchunkedresult.php";
+require_once dirname(__FILE__)."/../util/czmlresult.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgFeatureServiceController extends MgBaseController {
@@ -722,6 +723,7 @@ class MgFeatureServiceController extends MgBaseController {
                                 $query->SetFilter($baseFilter);
                             }
                         }
+
                         $tokens = explode(":", $fc->item(0)->nodeValue);
                         $schemaName = $tokens[0];
                         $className = $tokens[1];
@@ -763,12 +765,21 @@ class MgFeatureServiceController extends MgBaseController {
                             $transform = MgUtils::GetTransform($featSvc, $fsId, $schemaName, $className, $transformto);
                         }
 
-                        $reader = $featSvc->SelectFeatures($fsId, "$schemaName:$className", $query);
-                        $result = new MgReaderChunkedResult($featSvc, $reader, $limit, new MgHttpChunkWriter());
-                        $result->CheckAndSetDownloadHeaders($this->app, $format);
-                        if ($transform != null)
-                            $result->SetTransform($transform);
-                        $result->Output($format);
+                        if ($fmt == "czml") {
+                            $reader = $featSvc->SelectFeatures($fsId, "$schemaName:$className", $query);
+                            $result = new MgCzmlResult($featSvc, $reader, $limit, new MgHttpChunkWriter());
+                            $result->CheckAndSetDownloadHeaders($this->app, $format);
+                            if ($transform != null)
+                                $result->SetTransform($transform);
+                            $result->Output($format);
+                        } else {
+                            $reader = $featSvc->SelectFeatures($fsId, "$schemaName:$className", $query);
+                            $result = new MgReaderChunkedResult($featSvc, $reader, $limit, new MgHttpChunkWriter());
+                            $result->CheckAndSetDownloadHeaders($this->app, $format);
+                            if ($transform != null)
+                                $result->SetTransform($transform);
+                            $result->Output($format);
+                        }
                     } else {
                         throw new Exception("Layer ".$ldfId->ToString()." has an invalid feature class"); //TODO: Localize
                     }

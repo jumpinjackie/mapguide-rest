@@ -17,7 +17,6 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-require_once "czmlwriter.php";
 require_once "geojsonwriter.php";
 require_once "utils.php";
 
@@ -271,40 +270,6 @@ class MgReaderChunkedResult
         $this->reader->Close();
     }
 
-    private function OutputCzml($schemas) {
-        $read = 0;
-        $agfRw = new MgAgfReaderWriter();
-        $this->writer->SetHeader("Content-Type", MgMimeType::Json);
-        $this->writer->StartChunking();
-        $output = '['."\n";
-        $output .= '{ "id": "document", "version": "1.0" }';
-        $clsDef = $this->reader->GetClassDefinition();
-        $clsIdProps = $clsDef->GetIdentityProperties();
-        $idProp = NULL;
-        if ($clsIdProps->GetCount() == 1) {
-            $idProp = $clsIdProps->GetItem(0);
-        }
-        $propCount = $this->reader->GetPropertyCount();
-        while ($this->reader->ReadNext()) {
-            $read++;
-            if ($this->limit > 0 && $read > $this->limit) {
-                break;
-            }
-            $featCzml = MgCzmlWriter::FeatureToCzml($this->reader, $agfRw, $this->transform, $clsDef->GetDefaultGeometryPropertyName(), ($idProp != NULL ? $idProp->GetName() : NULL));
-            if (strlen($featCzml) > 0) {
-                $output .= ",";
-                $output .= $featCzml;
-                $this->writer->WriteChunk($output);
-                $output = "";
-            }
-        }
-        $output .= "]";
-        $this->writer->WriteChunk($output);
-        $this->writer->EndChunking();
-        $this->reader->Close();
-    }
-
-
     public function Output($format = "xml") {
         $schemas = new MgFeatureSchemaCollection();
         $schema = new MgFeatureSchema("TempSchema", "");
@@ -315,8 +280,6 @@ class MgReaderChunkedResult
 
         if ($format === "geojson") {
             $this->OutputGeoJson($schemas);
-        } else if ($format === "czml") {
-            $this->OutputCzml($schemas);
         } else {
             $this->OutputXml($schemas);
         }
