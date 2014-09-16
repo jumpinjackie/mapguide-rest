@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Property Results</title>
+        <title>Buidling Results</title>
         <link rel="stylesheet" href="{$helper->GetAssetPath('common/css/bootstrap.min.css')}" />
         <script type="text/javascript">
 
@@ -43,7 +43,7 @@
         End of Reader: {$endOfReader}
         -->
         <div class="container">
-            <h3>Property Results</h3>
+            <h3>Building Results</h3>
             <div>
                 <span>View result as:</span>
                 <a href="javascript:viewResultsAs('xml')">XML</a>

@@ -38,18 +38,18 @@
         <td colspan="2">&nbsp;</td>
       </tr>
           <tr>
-            <td><b>$[property/FeatId/displayName]</b>:</td>
-            <td>$[property/FeatId]</td>
+            <td><b>$[building/FeatId/displayName]</b>:</td>
+            <td>$[building/FeatId]</td>
           </tr>
           <tr>
-            <td><b>$[property/FMTADDRESS/displayName]</b>:</td>
-            <td>$[property/FMTADDRESS]</td>
+            <td><b>$[building/FMTADDRESS/displayName]</b>:</td>
+            <td>$[building/FMTADDRESS]</td>
           </tr>
       <tr>
         <td colspan="2">&nbsp;</td>
       </tr>
       <tr>
-        <td colspan="2"><a href="http://localhost/mapguide/rest/data/property/$[property/FeatId].html">Building report for: $[name]</a></td>
+        <td colspan="2"><a href="http://localhost/mapguide/rest/data/building/$[building/FeatId].html">Building report for: $[name]</a></td>
       </tr>
       <tr>
         <td colspan="2">&nbsp;</td>
@@ -85,19 +85,11 @@
       <tr>
         <td colspan="2">&nbsp;</td>
       </tr>
-          <tr>
-            <td><b>$[property/FeatId/displayName]</b>:</td>
-            <td>$[property/FeatId]</td>
-          </tr>
-          <tr>
-            <td><b>$[property/FMTADDRESS/displayName]</b>:</td>
-            <td>$[property/FMTADDRESS]</td>
-          </tr>
       <tr>
         <td colspan="2">&nbsp;</td>
       </tr>
       <tr>
-        <td colspan="2"><a href="http://localhost/mapguide/rest/data/property/$[property/FeatId].html">Building report for: $[name]</a></td>
+        <td colspan="2"><a href="http://localhost/mapguide/rest/data/building/$[building/FeatId].html">Building report for: $[name]</a></td>
       </tr>
       <tr>
         <td colspan="2">&nbsp;</td>

@@ -47,6 +47,7 @@ $hasOL2Samples = true;
         <div class="content-body">
             <p>Here you will find an assorted list of samples using the MapGuide REST API and its data publishing framework</p>
             <p><strong>NOTE: You should download the <a href="http://download.osgeo.org/mapguide/releases/2.0.0/samples/Sheboygan.mgp">Sheboygan Dataset</a> and load this in via the <a href="mapadmin/login.php">MapGuide Site Administrator</a> before running any of these samples</strong></p>
+            <p><strong>NOTE: Some samples require the <a href="https://github.com/jumpinjackie/mapguide-sample-melbourne/releases">Melbourne dataset</a></strong></p>
             <p><strong>NOTE: Some of these samples require some sample resources and data to be loaded. <a href="data/load.php">Click here</a> to load these resources</strong></p>
             <p>Click on a link below to go to that particular sample</p>
             <p class="sample-header">Published Data examples</p>
@@ -73,6 +74,14 @@ $hasOL2Samples = true;
             <ul>
                 <li><a href="../../mapviewerajax/?WEBLAYOUT=Library://Samples/Sheboygan/Layouts/SheboyganREST.WebLayout">Sample Web Layout - Editable Properties</a> <strong>NOTE: You must login as Author (default pwd: author) for property insert/update/delete operations to work</strong></li>
             </ul>
+            <p class="sample-header">Published Data examples (Melbourne Buildings)</p>
+            <strong>Note: All examples below are configured to return 500 results maximum, at 100 results per page</strong>
+            <ul>
+                <li><a href="../data/building/.html">HTML building Example</a> <a href="../data/building/.html?page=2">Page 2</a> <a href="../data/building/.html?page=2">Page 3</a></li>
+                <li><a href="../data/building/.kml">KML building Example</a> <a href="../data/building/.kml?page=2">Page 2</a> <a href="../data/building/.kml?page=2">Page 3</a></li>
+                <li><a href="../data/building/.png">Map Image building Example</a> <a href="../data/building/.png?page=2">Page 2</a> <a href="../data/building/.png?page=2">Page 3</a></li>
+                <li><a href="../data/building/.csv">CSV building Example</a> <a href="../data/building/.csv?page=2">Page 2</a> <a href="../data/building/.csv?page=2">Page 3</a></li>
+            </ul>
             <? if ($hasOL2Samples) { ?>
             <p class="sample-header">MapGuide REST API with <a href="http://www.openlayers.org">OpenLayers</a></p>
             <ul>
@@ -98,6 +107,7 @@ $hasOL2Samples = true;
             <ul>
                 <li><a href="cesium/index.html">Sheboygan Districts</a></li>
                 <li><a href="czml/index.html">Cesium viewer with CZML sources</a></li>
+                <li><a href="czml/building.html">Melbourne building footprints</a></li>
             </ul>
         </div>
     </body>

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Property not found</title>
+        <title>Building not found</title>
         <link rel="stylesheet" href="{$helper->GetAssetPath('common/css/bootstrap.min.css')}" />
     </head>
     <body>
         <div class="container">
-            <h3>Property not found</h3>
+            <h3>Building not found</h3>
             <div class="alert alert-danger">
-                No property with ID ({$ID}) found
+                No building with ID ({$ID}) found
             </div>
         </div>
     </body>
