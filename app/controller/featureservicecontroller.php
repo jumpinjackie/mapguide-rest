@@ -665,7 +665,7 @@ class MgFeatureServiceController extends MgBaseController {
                 $vlNode = $vl->item(0);
                 $fsId = $vlNode->getElementsByTagName("ResourceId");
                 $fc = $vlNode->getElementsByTagName("FeatureName");
-                $hlink = $vlNode->getElementsByTagName("Hyperlink");
+                $hlink = $vlNode->getElementsByTagName("Url");
                 $tt = $vlNode->getElementsByTagName("ToolTip");
                 $flt = $vlNode->getElementsByTagName("Filter");
                 $elev = $vlNode->getElementsByTagName("ElevationSettings");
@@ -766,8 +766,7 @@ class MgFeatureServiceController extends MgBaseController {
                         }
 
                         if ($fmt == "czml") {
-                            $reader = $featSvc->SelectFeatures($fsId, "$schemaName:$className", $query);
-                            $result = new MgCzmlResult($featSvc, $reader, $limit, new MgHttpChunkWriter());
+                            $result = new MgCzmlResult($featSvc, $fsId, "$schemaName:$className", $query, $limit, $baseFilter, $vlNode, new MgHttpChunkWriter());
                             $result->CheckAndSetDownloadHeaders($this->app, $format);
                             if ($transform != null)
                                 $result->SetTransform($transform);
