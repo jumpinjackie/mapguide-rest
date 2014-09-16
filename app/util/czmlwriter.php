@@ -135,7 +135,7 @@ class MgCzmlWriter
                 case MgGeometryType::LineString:
                 case MgGeometryType::Polygon:
                     {
-                        $geomCzml = self::GeometryToCzml($geom, $style, $extrude);
+                        $geomCzml = self::GeometryToCzml($geom, $reader, $style, $extrude);
                         if ($geomCzml == null)
                             return "";
 
@@ -150,7 +150,7 @@ class MgCzmlWriter
                         for ($i = 0; $i < $geom->GetCount(); $i++) {
                             $idValComp = $idVal."_segment_".$i."_".$featId;
                             $lineStr = $geom->GetLineString($i);
-                            $geomCzml = self::GeometryToCzml($lineStr, $style, $extrude);
+                            $geomCzml = self::GeometryToCzml($lineStr, $reader, $style, $extrude);
                             if ($geomCzml == null)
                                 continue;
 
@@ -166,7 +166,7 @@ class MgCzmlWriter
         }
     }
 
-    private static function GeometryToCzml($geom, $style, $zval = 0.0) {
+    private static function GeometryToCzml($geom, $reader, $style, $zval = 0.0) {
         $geomType = $geom->GetGeometryType();
         //TODO: Convert all the geometry types.
         //TODO: Translate Layer Definition styles to CZML styles
@@ -175,7 +175,9 @@ class MgCzmlWriter
                 {
                     if (isset($style->point)) {
                         $coord = $geom->GetCoordinate();
-                        $fragment  = '"point": { "color": { "rgba": ['.implode(",", $style->point->color).'] }, "pixelSize": { "number": '.$style->point->size.' } }, "position": { "cartographicDegrees": '.self::CoordToCzml($coord)." }";
+                        $pointColor = call_user_func_array($style->point->color, array($reader));
+                        $pointSize = call_user_func_array($style->point->size, array($reader));
+                        $fragment  = '"point": { "color": { "rgba": ['.implode(",", $pointColor).'] }, "pixelSize": { "number": '.$pointSize.' } }, "position": { "cartographicDegrees": '.self::CoordToCzml($coord)." }";
                         return $fragment;
                     } else {
                         return null; //No style, draw nothing
@@ -186,10 +188,12 @@ class MgCzmlWriter
                     if (isset($style->line)) {
                         $coords = $geom->GetCoordinates();
                         $posCzml = self::LineStringToCzml($coords);
-                        if ($posCzml != null)
-                            return '"polyline": { "material": { "solidColor": { "color": { "rgba": ['.implode(",", $style->line->color).'] } } },"positions": '.$posCzml.'}';
-                        else
+                        if ($posCzml != null) {
+                            $lineColor = call_user_func_array($style->line->color, array($reader));
+                            return '"polyline": { "material": { "solidColor": { "color": { "rgba": ['.implode(",", $lineColor).'] } } },"positions": '.$posCzml.'}';
+                        } else {
                             return null;
+                        }
                     } else {
                         return null; //No style, draw nothing
                     }
@@ -201,10 +205,12 @@ class MgCzmlWriter
                         if ($zval > 0.0) {
                             $fragment .= '"extrudedHeight": { "number": '.$zval.' }, ';
                         }
-                        if (isset($style->area->outline) && $style->area->outline === true) {
-                            $fragment .= '"outline": { "boolean": true }, "outlineColor": { "rgba": ['.implode(",", $style->area->outlineColor).'] }, ';
+                        if (isset($style->area->outline) && $style->area->outline === true && is_callable($style->area->outlineColor)) {
+                            $areaOutlineColor = call_user_func_array($style->area->outlineColor, array($reader));
+                            $fragment .= '"outline": { "boolean": true }, "outlineColor": { "rgba": ['.implode(",", $areaOutlineColor).'] }, ';
                         }
-                        $fragment .= '"material": { "solidColor": { "color": { "rgba": ['.implode(",", $style->area->fillColor).'] } } },"positions": '.self::PolygonToCzml($geom).'}';
+                        $areaFillColor = call_user_func_array($style->area->fillColor, array($reader));
+                        $fragment .= '"material": { "solidColor": { "color": { "rgba": ['.implode(",", $areaFillColor).'] } } },"positions": '.self::PolygonToCzml($geom).'}';
                         return $fragment;
                     } else {
                         return null; //No style, draw nothing

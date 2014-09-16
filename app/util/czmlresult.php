@@ -38,6 +38,10 @@ class MgCzmlResult
     private $vlNode;
     private $baseFilter;
 
+    private $pointStyleNo;
+    private $lineStyleNo;
+    private $areaStyleNo;
+
     public function __construct($featSvc, $fsId, $className, $query, $limit, $baseFilter, $vlNode, $writer = NULL) {
         $this->featSvc = $featSvc;
         $this->limit = $limit;
@@ -47,6 +51,9 @@ class MgCzmlResult
         $this->vlNode = $vlNode;
         $this->baseFilter = $baseFilter;
         $this->transform = null;
+        $this->pointStyleNo = 1;
+        $this->lineStyleNo = 1;
+        $this->areaStyleNo = 1;
         if ($writer != null)
             $this->writer = $writer;
         else
@@ -72,46 +79,71 @@ class MgCzmlResult
 
     private static function CreateDefaultPointStyle() {
         $style = new stdClass();
-        $style->color = array(0, 255, 0, 255);
-        $style->size = 3.0;
+        $style->color = function($reader) { return array(0, 255, 0, 255); };
+        $style->size = function($reader) { return 3.0; };
         return $style;
     }
 
     private static function CreateDefaultLineStyle() {
         $style = new stdClass();
-        $style->color = array(0, 255, 255, 255);
+        $style->color = function($reader) { return array(0, 255, 255, 255); };
         return $style;
     }
 
     private static function CreateDefaultAreaStyle() {
         $style = new stdClass();
         $style->outline = true;
-        $style->outlineColor = array(0, 0, 0, 255);
-        $style->fillColor = array(255, 127, 127, 153);
+        $style->outlineColor = function($reader) { return array(0, 0, 0, 255); };
+        $style->fillColor = function($reader) { array(255, 127, 127, 153); };
         return $style;
     }
 
-    private static function CreatePointStyle($ruleNode) {
+    private function CreatePointStyle($query, $ruleNode) {
         $style = new stdClass();
         $sym2DNodes = $ruleNode->getElementsByTagName("PointSymbolization2D");
         $sym2DNode = $sym2DNodes->item(0);
-        $sizeXNodes = $ruleNode->getElementsByTagName("SizeX");
+        $sizeXNodes = $sym2DNode->getElementsByTagName("SizeX");
         $sizeYNodes = $sym2DNode->getElementsByTagName("SizeY");
         $colorNodes = $sym2DNode->getElementsByTagName("ForegroundColor");
         if ($sizeXNodes->length == 1 && $sizeYNodes->length == 1) {
-            $style->size = (floatval($sizeXNodes->item(0)->nodeValue) + floatval($sizeYNodes->item(0)->nodeValue)) / 2.0;
+            $xExpr = $sizeXNodes->item(0)->nodeValue;
+            $yExpr = $sizeYNodes->item(0)->nodeValue;
+            if (is_numeric($xExpr) && is_numeric($yExpr)) {
+                $style->size = function($reader) use ($xExpr, $yExpr) {
+                    return ($xExpr + $yExpr) / 2.0;
+                };
+            } else {
+                $xAlias = "EXPR_POINT_X_SIZE_".($this->pointStyleNo++);
+                $yAlias = "EXPR_POINT_Y_SIZE_".($this->pointStyleNo++);
+                $style->size = function($reader) use ($xAlias, $yAlias) {
+                    $xVal = floatval(MgUtils::GetBasicValueFromReader($reader, $xAlias));
+                    $yVal = floatval(MgUtils::GetBasicValueFromReader($reader, $yAlias));
+                    return ($xVal + $yVal) / 2.0;
+                };
+            }
         } else {
-            $style->size = 3.0;
+            $style->size = function($reader) { return 3.0; };
         }
         if ($colorNodes->length == 1) {
-            $style->color = MgUtils::HtmlToRgba($colorNodes->item(0)->nodeValue);
+            $colorExpr = $colorNodes->item(0)->nodeValue;
+            $color = MgUtils::HtmlToRgba($colorExpr);
+            if ($color === FALSE) { //Does not parse into a color. Assume FDO expression
+                $colorAlias = "EXPR_POINT_COLOR_".($this->pointStyleNo++);
+                $query->AddComputedProperty($colorAlias, $colorExpr);
+                $style->color = function($reader) use ($colorAlias) {
+                    $colorStr = MgUtils::GetBasicValueFromReader($reader, $colorAlias);
+                    return MgUtils::HtmlToRgba($colorStr);
+                };
+            } else {
+                $style->color = function($reader) use ($color) { return $color; };
+            }
         } else {
-            $style->color = array(0, 255, 255, 255);
+            $style->color = function($reader) { return array(0, 255, 255, 255); };
         }
         return $style;
     }
 
-    private static function CreateLineStyle($ruleNode) {
+    private function CreateLineStyle($query, $ruleNode) {
         $style = new stdClass();
         $sym2DNodes = $ruleNode->getElementsByTagName("LineSymbolization2D");
         $sym2DNode = $sym2DNodes->item(0);
@@ -121,14 +153,25 @@ class MgCzmlResult
 
         }
         if ($colorNodes->length == 1) {
-            $style->color = MgUtils::HtmlToRgba($colorNodes->item(0)->nodeValue);
+            $colorExpr = $colorNodes->item(0)->nodeValue;
+            $color = MgUtils::HtmlToRgba($colorExpr);
+            if ($color === FALSE) { //Does not parse into a color. Assume FDO expression
+                $colorAlias = "EXPR_LINE_COLOR_".($this->lineStyleNo++);
+                $query->AddComputedProperty($colorAlias, $colorExpr);
+                $style->color = function($reader) use ($colorAlias) {
+                    $colorStr = MgUtils::GetBasicValueFromReader($reader, $colorAlias);
+                    return MgUtils::HtmlToRgba($colorStr);
+                };
+            } else {
+                $style->color = function($reader) use ($color) { return $color; };
+            }
         } else {
-            $style->color = array(0, 255, 255, 255);
+            $style->color = function($reader) { return array(0, 255, 255, 255); };
         }
         return $style;
     }
 
-    private static function CreateAreaStyle($ruleNode) {
+    private function CreateAreaStyle($query, $ruleNode) {
         $style = new stdClass();
         $sym2DNodes = $ruleNode->getElementsByTagName("AreaSymbolization2D");
         $sym2DNode = $sym2DNodes->item(0);
@@ -139,11 +182,33 @@ class MgCzmlResult
 
         }
         if ($fillNodes->length == 1) {
-            $style->fillColor = MgUtils::HtmlToRgba($fillNodes->item(0)->getElementsByTagName("ForegroundColor")->item(0)->nodeValue);
+            $colorExpr = $fillNodes->item(0)->getElementsByTagName("ForegroundColor")->item(0)->nodeValue;
+            $color = MgUtils::HtmlToRgba($colorExpr);
+            if ($color === FALSE) { //Does not parse into a color. Assume FDO expression
+                $colorAlias = "EXPR_AREA_FILL_COLOR_".($this->areaStyleNo++);
+                $query->AddComputedProperty($colorAlias, $colorExpr);
+                $style->fillColor = function($reader) use ($colorAlias) {
+                    $colorStr = MgUtils::GetBasicValueFromReader($reader, $colorAlias);
+                    return MgUtils::HtmlToRgba($colorStr);
+                };
+            } else {
+                $style->fillColor = function($reader) use ($color) { return $color; };
+            }
         }
         if ($strokeNodes->length == 1) {
             $style->outline = true;
-            $style->outlineColor = MgUtils::HtmlToRgba($strokeNodes->item(0)->getElementsByTagName("Color")->item(0)->nodeValue);
+            $colorExpr = $strokeNodes->item(0)->getElementsByTagName("Color")->item(0)->nodeValue;
+            $color = MgUtils::HtmlToRgba($colorExpr);
+            if ($color === FALSE) { //Does not parse into a color. Assume FDO expression
+                $colorAlias = "EXPR_AREA_OUTLINE_COLOR_".($this->areaStyleNo++);
+                $query->AddComputedProperty($colorAlias, $colorExpr);
+                $style->outlineColor = function($reader) use ($colorAlias) {
+                    $colorStr = MgUtils::GetBasicValueFromReader($reader, $colorAlias);
+                    return MgUtils::HtmlToRgba($colorStr);
+                };
+            } else {
+                $style->outlineColor = function($reader) use ($color) { return $color; };
+            }
         }
         return $style;
     }
@@ -169,7 +234,7 @@ class MgCzmlResult
             $ruleNodes = $atsNode->getElementsByTagName("AreaRule");
             if ($ruleNodes->length == 1) {
                 $ruleNode = $ruleNodes->item(0);
-                $areaStyle = self::CreateAreaStyle($ruleNode);
+                $areaStyle = $this->CreateAreaStyle($this->query, $ruleNode);
                 $filterNodes = $ruleNode->getElementsByTagName("Filter");
                 if ($filterNodes->length == 1) {
                     $flt = $filterNodes->item(0)->nodeValue;
@@ -190,7 +255,7 @@ class MgCzmlResult
             } else { //This is a themed style
                 for ($i = 0; $i < $ruleNodes->length; $i++) {
                     $ruleNode = $ruleNodes->item($i);
-                    $areaStyle = self::CreateAreaStyle($ruleNode);
+                    $areaStyle = $this->CreateAreaStyle($this->query, $ruleNode);
                     $filterNodes = $ruleNode->getElementsByTagName("Filter");
                     if ($filterNodes->length == 1) {
                         $flt = $filterNodes->item(0)->nodeValue;
@@ -217,7 +282,7 @@ class MgCzmlResult
             $ruleNodes = $ltsNode->getElementsByTagName("LineRule");
             if ($ruleNodes->length == 1) {
                 $ruleNode = $ruleNodes->item(0);
-                $lineStyle = self::CreateLineStyle($ruleNode);
+                $lineStyle = $this->CreateLineStyle($this->query, $ruleNode);
                 $filterNodes = $ruleNode->getElementsByTagName("Filter");
                 if ($filterNodes->length == 1) {
                     $flt = $filterNodes->item(0)->nodeValue;
@@ -238,7 +303,7 @@ class MgCzmlResult
             } else { //This is a themed style
                 for ($i = 0; $i < $ruleNodes->length; $i++) {
                     $ruleNode = $ruleNodes->item($i);
-                    $lineStyle = self::CreateLineStyle($ruleNode);
+                    $lineStyle = $this->CreateLineStyle($this->query, $ruleNode);
                     $filterNodes = $ruleNode->getElementsByTagName("Filter");
                     if ($filterNodes->length == 1) {
                         $flt = $filterNodes->item(0)->nodeValue;
@@ -265,7 +330,7 @@ class MgCzmlResult
             $ruleNodes = $ptsNode->getElementsByTagName("PointRule");
             if ($ruleNodes->length == 1) {
                 $ruleNode = $ruleNodes->item(0);
-                $pointStyle = self::CreatePointStyle($ruleNode);
+                $pointStyle = $this->CreatePointStyle($this->query, $ruleNode);
                 $filterNodes = $ruleNode->getElementsByTagName("Filter");
                 if ($filterNodes->length == 1) {
                     $flt = $filterNodes->item(0)->nodeValue;
@@ -286,7 +351,7 @@ class MgCzmlResult
             } else { //This is a themed style
                 for ($i = 0; $i < $ruleNodes->length; $i++) {
                     $ruleNode = $ruleNodes->item($i);
-                    $pointStyle = self::CreatePointStyle($ruleNode);
+                    $pointStyle = $this->CreatePointStyle($this->query, $ruleNode);
                     $filterNodes = $ruleNode->getElementsByTagName("Filter");
                     if ($filterNodes->length == 1) {
                         $flt = $filterNodes->item(0)->nodeValue;
