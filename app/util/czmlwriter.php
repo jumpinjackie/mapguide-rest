@@ -32,9 +32,19 @@ class MgCzmlWriter
             $hlIndex = $reader->GetPropertyIndex(MgRestConstants::PROP_HYPERLINK);
         } catch (MgException $ex) { }
 
+        $html = "";
         if ($ttIndex >= 0) {
-            $output .= ', "description": "'.str_replace('\\\n', "<br/>", MgUtils::EscapeJsonString($reader->GetString($ttIndex))).'"';
+            $html .= str_replace('\\\n', "<br/>", MgUtils::EscapeJsonString($reader->GetString($ttIndex)));
         }
+        /*
+        if ($hlIndex >= 0) {
+            $html .= '<br/><a href=\"'.MgUtils::EscapeJsonString($reader->GetString($hlIndex)).'\">Click to open link</a>';
+        }
+        */
+        //TODO: Include feature properties as specified in the Layer Definition
+
+        if (strlen($html) > 0)
+            $output .= ', "description": "'.$html.'"';
 
         $output .= ",";
         
@@ -44,7 +54,7 @@ class MgCzmlWriter
         return $output;
     }
 
-    public static function FeatureToCzml($reader, $agfRw, $transform, $geometryName, $idName = NULL) {
+    public static function FeatureToCzml($reader, $agfRw, $transform, $geometryName, $style, $idName = NULL) {
         if (!$reader->IsNull($geometryName)) {
 
             $agf = null;
@@ -125,7 +135,7 @@ class MgCzmlWriter
                 case MgGeometryType::LineString:
                 case MgGeometryType::Polygon:
                     {
-                        $geomCzml = self::GeometryToCzml($geom, $extrude);
+                        $geomCzml = self::GeometryToCzml($geom, $style, $extrude);
                         if ($geomCzml == null)
                             return "";
 
@@ -140,7 +150,7 @@ class MgCzmlWriter
                         for ($i = 0; $i < $geom->GetCount(); $i++) {
                             $idValComp = $idVal."_segment_".$i."_".$featId;
                             $lineStr = $geom->GetLineString($i);
-                            $geomCzml = self::GeometryToCzml($lineStr, $extrude);
+                            $geomCzml = self::GeometryToCzml($lineStr, $style, $extrude);
                             if ($geomCzml == null)
                                 continue;
 
@@ -156,35 +166,49 @@ class MgCzmlWriter
         }
     }
 
-    private static function GeometryToCzml($geom, $zval = 0.0) {
+    private static function GeometryToCzml($geom, $style, $zval = 0.0) {
         $geomType = $geom->GetGeometryType();
         //TODO: Convert all the geometry types.
         //TODO: Translate Layer Definition styles to CZML styles
         switch ($geomType) {
             case MgGeometryType::Point:
                 {
-                    $coord = $geom->GetCoordinate();
-                    $fragment  = '"point": { "color": { "rgba": [0, 255, 0, 255] }, "pixelSize": { "number": 3.0 } }, "position": { "cartographicDegrees": '.self::CoordToCzml($coord)." }";
-                    return $fragment;
+                    if (isset($style->point)) {
+                        $coord = $geom->GetCoordinate();
+                        $fragment  = '"point": { "color": { "rgba": ['.implode(",", $style->point->color).'] }, "pixelSize": { "number": '.$style->point->size.' } }, "position": { "cartographicDegrees": '.self::CoordToCzml($coord)." }";
+                        return $fragment;
+                    } else {
+                        return null; //No style, draw nothing
+                    }
                 }
             case MgGeometryType::LineString:
                 {
-                    $coords = $geom->GetCoordinates();
-                    $posCzml = self::LineStringToCzml($coords);
-                    if ($posCzml != null)
-                        return '"polyline": { "material": { "solidColor": { "color": { "rgba": [ 0, 255, 255, 255 ] } } },"positions": '.$posCzml.'}';
-                    else
-                        return null;
+                    if (isset($style->line)) {
+                        $coords = $geom->GetCoordinates();
+                        $posCzml = self::LineStringToCzml($coords);
+                        if ($posCzml != null)
+                            return '"polyline": { "material": { "solidColor": { "color": { "rgba": ['.implode(",", $style->line->color).'] } } },"positions": '.$posCzml.'}';
+                        else
+                            return null;
+                    } else {
+                        return null; //No style, draw nothing
+                    }
                 }
             case MgGeometryType::Polygon:
                 {
-                    $fragment = '"polygon": { ';
-                    if ($zval > 0.0) {
-                        $fragment .= '"extrudedHeight": { "number": '.$zval.' }, ';
+                    if (isset($style->area)) {
+                        $fragment = '"polygon": { ';
+                        if ($zval > 0.0) {
+                            $fragment .= '"extrudedHeight": { "number": '.$zval.' }, ';
+                        }
+                        if (isset($style->area->outline) && $style->area->outline === true) {
+                            $fragment .= '"outline": { "boolean": true }, "outlineColor": { "rgba": ['.implode(",", $style->area->outlineColor).'] }, ';
+                        }
+                        $fragment .= '"material": { "solidColor": { "color": { "rgba": ['.implode(",", $style->area->fillColor).'] } } },"positions": '.self::PolygonToCzml($geom).'}';
+                        return $fragment;
+                    } else {
+                        return null; //No style, draw nothing
                     }
-                    $fragment .= '"outline": { "boolean": true }, "outlineColor": { "rgba": [ 0, 0, 0, 255 ] }, ';
-                    $fragment .= '"material": { "solidColor": { "color": { "rgba": [ 255, 127, 127, 153 ] } } },"positions": '.self::PolygonToCzml($geom).'}';
-                    return $fragment;
                 }
             default:
                 return null;

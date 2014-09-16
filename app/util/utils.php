@@ -125,6 +125,32 @@ class MgUtils
         return ($px * 25.4) / $dpi;
     }
 
+    public static function HtmlToRgba($argbColor) {
+        if ($argbColor[0] == '#')
+            $argbColor = substr($argbColor, 1);
+
+        $a = 0;
+        if (strlen($argbColor) == 6) {
+            list($r, $g, $b) = array($argbColor[0].$argbColor[1],
+                                     $argbColor[2].$argbColor[3],
+                                     $argbColor[4].$argbColor[5]);
+        } else if (strlen($argbColor) == 8) {
+            list($a, $r, $g, $b) = array($argbColor[0].$argbColor[1],
+                                         $argbColor[2].$argbColor[3],
+                                         $argbColor[4].$argbColor[5],
+                                         $argbColor[6].$argbColor[7]);
+            $a = hexdec($a);
+        } else {
+            return false;
+        }
+
+        $r = hexdec($r);
+        $g = hexdec($g);
+        $b = hexdec($b);
+
+        return array($r, $g, $b, $a);
+    }
+
     //This function try to get a more elegant number for the scale bar display.
     //For example, convert 5.3 to 5, 5.5 to 6, 13 to 10, 230 to 200 and 1234 to 1200.
     //Basically no number will execced 9999 in scale bar display, however we support that situation
