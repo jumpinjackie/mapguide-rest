@@ -63,6 +63,8 @@ class MgRestServiceController extends MgBaseController {
         try {
             $siteConn = new MgSiteConnection();
             $userInfo = new MgUserInformation($sessionId);
+            $userInfo->SetClientAgent("MapGuide REST Extension");
+            $userInfo->SetClientIp($this->GetClientIp());
             $siteConn->Open($userInfo);
             $site = $siteConn->GetSite();
             $site->DestroySession($sessionId);

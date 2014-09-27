@@ -134,6 +134,7 @@ class MgBaseController extends MgResponseHandler
         if ($this->userInfo == null) {
             $this->userInfo = new MgUserInformation();
             $this->userInfo->SetClientAgent("MapGuide REST Extension");
+            $this->userInfo->SetClientIp($this->GetClientIp());
             //Try session id first
             $session = $this->app->request->params("session");
             if ($session != null) {
