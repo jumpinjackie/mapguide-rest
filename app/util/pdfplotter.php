@@ -617,20 +617,34 @@ class MgPdfPlotter
 
         if ($this->bLayered) {
             $layerNames = array();
+            $tiledGroupNames = array();
             $mapLayers = $this->map->GetLayers();
+            $mapGroups = $this->map->GetLayerGroups();
             //Collect all visible layers
             for ($i = $mapLayers->GetCount() - 1; $i >= 0; $i--) {
                 $layer = $mapLayers->GetItem($i);
-                if ($layer->IsVisible()) {
+                if ($layer->IsVisible() && $layer->GetLayerType() == MgLayerType::Dynamic) {
                     array_push($layerNames, $layer->GetName());
+                }
+            }
+            for ($i = $mapGroups->GetCount() - 1; $i >= 0; $i--) {
+                $group = $mapGroups->GetItem($i);
+                if ($group->IsVisible() && $group->GetLayerGroupType() != MgLayerGroupType::Normal) {
+                    array_push($tiledGroupNames, $group->GetName());
                 }
             }
 
             $bgColor = new MgColor("FFFFFF00");
-            //Turn off all layers first
+            //Turn off all layers and tiled groups first
+            for ($i = 0; $i < $mapGroups->GetCount(); $i++) {
+                $group = $mapGroups->GetItem($i);
+                if ($group->GetLayerGroupType() != MgLayerGroupType::Normal)
+                    $group->SetVisible(false);
+            }
             for ($i = 0; $i < $mapLayers->GetCount(); $i++) {
                 $layer = $mapLayers->GetItem($i);
-                $layer->SetVisible(false);
+                if ($layer->GetLayerType() == MgLayerType::Dynamic)
+                    $layer->SetVisible(false);
             }
 
             //Plot this map background
@@ -660,6 +674,44 @@ class MgPdfPlotter
             @unlink($filelocation);
 
             $prevLayerName = NULL;
+            $prevGroupName = NULL;
+            //Plot each tiled group individually
+            foreach ($tiledGroupNames as $groupName) {
+                if ($prevGroupName != NULL) {
+                    $mapGroups->GetItem($prevGroupName)->SetVisible(false);
+                }
+                $mapGroups->GetItem($groupName)->SetVisible(true);
+                $this->pdf->startLayer($groupName);
+
+                $filelocation = $this->RenderMap(MgUtils::InToPx($this->printSize->width, $this->dpi),
+                                                 MgUtils::InToPx($this->printSize->height, $this->dpi),
+                                                 $center,
+                                                 $scale,
+                                                 $bgColor);
+            
+                // Draw Map
+                $this->pdf->Image($filelocation, 
+                                  ($this->showLegend ? ($this->margin[2] + $legendWidthIn) : $this->margin[2]), 
+                                  $this->margin[0], 
+                                  $this->printSize->width, 
+                                  $this->printSize->height,
+                                  MgImageFormats::Png,
+                                  $link,
+                                  $align,
+                                  $resize,
+                                  $this->dpi,
+                                  $palign,
+                                  $ismask,
+                                  $imgmask,
+                                  $border,
+                                  $fitbox,
+                                  $hidden,
+                                  $fitonpage);
+                @unlink($filelocation);
+
+                $prevGroupName = $groupName;
+                $this->pdf->endLayer();
+            }
             //Now plot each layer individually
             foreach ($layerNames as $layerName) {
                 if ($prevLayerName != NULL) {
