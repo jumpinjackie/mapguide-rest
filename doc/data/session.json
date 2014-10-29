@@ -556,6 +556,54 @@
                             "type": "string",
                             "required": true,
                             "description": "The name of the runtime map"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "requestedfeatures",
+                            "type": "integer",
+                            "required": false,
+                            "description": "A bitmask of the additional information that you would like returned. 2=icons, 4=Feature Source Information"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "iconformat",
+                            "type": "string",
+                            "required": false,
+                            "description": "The desired icon image format if icons are requested",
+                            "enum": [
+                                "PNG",
+                                "JPG",
+                                "PNG8",
+                                "GIF"
+                            ]
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "iconwidth",
+                            "type": "integer",
+                            "required": false,
+                            "description": "The desired width of generated icons if icons are requested"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "iconheight",
+                            "type": "integer",
+                            "required": false,
+                            "description": "The desired height of generated icons if icons are requested"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "iconsperscalerange",
+                            "type": "integer",
+                            "required": false,
+                            "description": "The number of icons to generate per scale range if icons are requested"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "group",
+                            "type": "string",
+                            "required": false,
+                            "description": "Only return layers belonging to the specified group"
                         }
                     ],
                     "responseMessages": [
@@ -607,6 +655,54 @@
                                 "xml",
                                 "json"
                             ]
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "requestedfeatures",
+                            "type": "integer",
+                            "required": false,
+                            "description": "A bitmask of the additional information that you would like returned. 2=icons, 4=Feature Source Information"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "iconformat",
+                            "type": "string",
+                            "required": false,
+                            "description": "The desired icon image format if icons are requested",
+                            "enum": [
+                                "PNG",
+                                "JPG",
+                                "PNG8",
+                                "GIF"
+                            ]
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "iconwidth",
+                            "type": "integer",
+                            "required": false,
+                            "description": "The desired width of generated icons if icons are requested"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "iconheight",
+                            "type": "integer",
+                            "required": false,
+                            "description": "The desired height of generated icons if icons are requested"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "iconsperscalerange",
+                            "type": "integer",
+                            "required": false,
+                            "description": "The number of icons to generate per scale range if icons are requested"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "group",
+                            "type": "string",
+                            "required": false,
+                            "description": "Only return layers belonging to the specified group"
                         }
                     ],
                     "responseMessages": [
