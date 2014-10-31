@@ -17,6 +17,7 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+require_once dirname(__FILE__)."/../controller/kmlservicecontroller.php";
 require_once dirname(__FILE__)."/../controller/resourceservicecontroller.php";
 require_once dirname(__FILE__)."/../controller/featureservicecontroller.php";
 require_once dirname(__FILE__)."/../controller/tileservicecontroller.php";
