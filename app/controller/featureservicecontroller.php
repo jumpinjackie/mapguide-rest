@@ -657,7 +657,7 @@ class MgFeatureServiceController extends MgBaseController {
                 $this->app->halt(400, "Missing required 'pagesize' parameter"); //TODO: Localize
             } else {
                 //The way that CZML output is done means we cannot support pagination
-                if ($fmt === "czml") {
+                if ($pageNo >= 0 && $pageSize > 0 && $fmt === "czml") {
                     $this->app->halt(400, "Pagination of czml output not supported"); //TODO: Localize
                 }
             }
