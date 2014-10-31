@@ -19,6 +19,7 @@
 
 require_once "controller.php";
 require_once dirname(__FILE__)."/../constants.php";
+require_once dirname(__FILE__)."/../util/paginatedfeaturereader.php";
 require_once dirname(__FILE__)."/../util/readerchunkedresult.php";
 require_once dirname(__FILE__)."/../util/czmlresult.php";
 require_once dirname(__FILE__)."/../util/utils.php";
@@ -649,6 +650,18 @@ class MgFeatureServiceController extends MgBaseController {
             $transformto = $this->GetRequestParameter("transformto", "");
             $bbox = $this->GetRequestParameter("bbox", "");
 
+            $pageSize = $this->GetRequestParameter("pagesize", -1);
+            $pageNo = $this->GetRequestParameter("page", -1);
+
+            if ($pageNo >= 0 && $pageSize === -1) {
+                $this->app->halt(400, "Missing required 'pagesize' parameter"); //TODO: Localize
+            } else {
+                //The way that CZML output is done means we cannot support pagination
+                if ($fmt === "czml") {
+                    $this->app->halt(400, "Pagination of czml output not supported"); //TODO: Localize
+                }
+            }
+
             $limit = -1;
             if ($maxFeatures !== "") {
                 $limit = intval($maxFeatures);
@@ -765,6 +778,13 @@ class MgFeatureServiceController extends MgBaseController {
                             $transform = MgUtils::GetTransform($featSvc, $fsId, $schemaName, $className, $transformto);
                         }
 
+                        //Ensure valid page number if specified
+                        if ($pageSize > 0) {
+                            if ($pageNo < 1) {
+                                $pageNo = 1;
+                            }
+                        }
+
                         if ($fmt == "czml") {
                             $result = new MgCzmlResult($featSvc, $fsId, "$schemaName:$className", $query, $limit, $baseFilter, $vlNode, new MgHttpChunkWriter());
                             $result->CheckAndSetDownloadHeaders($this->app, $format);
@@ -773,7 +793,12 @@ class MgFeatureServiceController extends MgBaseController {
                             $result->Output($format);
                         } else {
                             $reader = $featSvc->SelectFeatures($fsId, "$schemaName:$className", $query);
-                            $result = new MgReaderChunkedResult($featSvc, $reader, $limit, new MgHttpChunkWriter());
+                            if ($pageSize > 0) {
+                                $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo);
+                                $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, new MgHttpChunkWriter());
+                            } else {
+                                $result = new MgReaderChunkedResult($featSvc, $reader, $limit, new MgHttpChunkWriter());
+                            }
                             $result->CheckAndSetDownloadHeaders($this->app, $format);
                             if ($transform != null)
                                 $result->SetTransform($transform);
@@ -815,6 +840,13 @@ class MgFeatureServiceController extends MgBaseController {
             $transformto = $this->GetRequestParameter("transformto", "");
             $bbox = $this->GetRequestParameter("bbox", "");
 
+            $pageSize = $this->GetRequestParameter("pagesize", -1);
+            $pageNo = $this->GetRequestParameter("page", -1);
+
+            if ($pageNo >= 0 && $pageSize === -1) {
+                $this->app->halt(400, "Missing required 'pagesize' parameter"); //TODO: Localize
+            }
+
             if ($filter !== "") {
                 $query->SetFilter($filter);
             }
@@ -844,7 +876,16 @@ class MgFeatureServiceController extends MgBaseController {
             }
 
             $reader = $featSvc->SelectFeatures($resId, "$schemaName:$className", $query);
-            $result = new MgReaderChunkedResult($featSvc, $reader, $limit, new MgHttpChunkWriter());
+
+            if ($pageSize > 0) {
+                if ($pageNo < 1) {
+                    $pageNo = 1;
+                }
+                $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo);
+                $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, new MgHttpChunkWriter());
+            } else {
+                $result = new MgReaderChunkedResult($featSvc, $reader, $limit, new MgHttpChunkWriter());
+            }
             $result->CheckAndSetDownloadHeaders($this->app, $format);
             if ($transform != null)
                 $result->SetTransform($transform);

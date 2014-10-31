@@ -854,6 +854,20 @@
                                 "xml",
                                 "geojson"
                             ]
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "pagesize",
+                            "type": "string",
+                            "required": false,
+                            "description": "Applies pagination on the query result. This specifies the number of results for the page."
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "page",
+                            "type": "string",
+                            "required": false,
+                            "description": "Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply."
                         }
                     ],
                     "responseMessages": [
@@ -1123,6 +1137,20 @@
                             "type": "string",
                             "required": false,
                             "description": "A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "pagesize",
+                            "type": "string",
+                            "required": false,
+                            "description": "Applies pagination on the query result. This specifies the number of results for the page."
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "page",
+                            "type": "string",
+                            "required": false,
+                            "description": "Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply."
                         }
                     ],
                     "responseMessages": [
@@ -1525,6 +1553,20 @@
                             "type": "string",
                             "required": false,
                             "description": "A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "pagesize",
+                            "type": "string",
+                            "required": false,
+                            "description": "Applies pagination on the query result. This specifies the number of results for the page. You cannot specify this parameter for CZML output"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "page",
+                            "type": "string",
+                            "required": false,
+                            "description": "Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply. You cannot specify this parameter for CZML output"
                         }
                     ],
                     "responseMessages": [
@@ -1612,6 +1654,20 @@
                                 "geojson",
                                 "czml"
                             ]
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "pagesize",
+                            "type": "string",
+                            "required": false,
+                            "description": "Applies pagination on the query result. This specifies the number of results for the page. You cannot specify this parameter for CZML output"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "page",
+                            "type": "string",
+                            "required": false,
+                            "description": "Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply. You cannot specify this parameter for CZML output"
                         }
                     ],
                     "responseMessages": [
