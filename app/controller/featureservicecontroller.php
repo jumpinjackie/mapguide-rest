@@ -193,6 +193,7 @@ class MgFeatureServiceController extends MgBaseController {
                 $param->AddParameter("XSLSTYLESHEET", "FeatureSchemaNameList.xsl");
                 $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
                 $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
+                $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
@@ -235,8 +236,9 @@ class MgFeatureServiceController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
         }
         $resIdStr = $resId->ToString();
+        $selfUrl = $this->app->config("SelfUrl");
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $resIdStr) {
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $resIdStr, $selfUrl) {
             $param->AddParameter("OPERATION", "GETCLASSES");
             $param->AddParameter("VERSION", "1.0.0");
             if ($fmt === "json") {
@@ -246,6 +248,7 @@ class MgFeatureServiceController extends MgBaseController {
             } else if ($fmt === "html") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
                 $param->AddParameter("XSLSTYLESHEET", "ClassNameList.xsl");
+                $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $param->AddParameter("SCHEMA", $schemaName);

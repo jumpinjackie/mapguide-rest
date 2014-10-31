@@ -210,6 +210,8 @@ class MgViewerController extends MgBaseController {
         if ($sessionId == null) {
             $site = $siteConn->GetSite();
             $sessionId = $site->CreateSession();
+            $userInfo = new MgUserInformation($sessionId);
+            $siteConn->Open($userInfo);
         }
         $selfUrl = $this->app->config("SelfUrl");
         switch ($resId->GetResourceType()) {

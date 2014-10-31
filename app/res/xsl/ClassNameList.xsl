@@ -5,14 +5,16 @@
                 xmlns:str="http://exslt.org/strings"
                 extension-element-prefixes="str">
     <xsl:output method='html'/>
+    <xsl:param name="ASSETPATH" />
     <xsl:template match="/">
         <html>
             <head>
+                <link rel="stylesheet" href="{$ASSETPATH}/common/css/bootstrap.min.css" />
+                <link rel="stylesheet" href="{$ASSETPATH}/fa/css/font-awesome.min.css" />
             </head>
             <body>
-                <h1>Class Names</h1>
-                <a href="javascript:history.go(-1)">Back</a>
-                <ul>
+                <h3>Class Names</h3>
+                <ul class="list-group">
                 <xsl:apply-templates select="//StringCollection" />
                 </ul>
             </body>
@@ -21,7 +23,7 @@
 
     <xsl:template match="StringCollection">
         <xsl:for-each select="Item">
-        <li>
+        <li class="list-group-item">
             <xsl:variable name="className" select="text()" />
             <xsl:variable name="classNamePath" select="translate(text(), ':', '/')" />
             <xsl:value-of select="$className" />

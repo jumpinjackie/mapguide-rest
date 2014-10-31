@@ -982,6 +982,28 @@ $app->get("/library/:resourcePath+/content", function($resourcePath) use ($app) 
 });
 /**
  * @SWG\Api(
+ *     path="/library/{resourcePath}/html",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="ResourceInfoHtml",
+ *        summary="Generates a HTML information page for the given resource ID",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID (including extension)")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/library/:resourcePath+/html", function($resourcePath) use ($app) {
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgResourceServiceController($app);
+    $ctrl->GetResourceInfo($resId, "html");
+});
+/**
+ * @SWG\Api(
  *     path="/library/{resourcePath}/content.{type}",
  *     @SWG\Operation(
  *        method="GET",

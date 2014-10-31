@@ -99,6 +99,7 @@ class MgResourceServiceController extends MgBaseController {
                 $param->AddParameter("XSLSTYLESHEET", "ResourceDataList.xsl");
                 $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
                 $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
+                $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
@@ -111,8 +112,9 @@ class MgResourceServiceController extends MgBaseController {
 
         $resIdStr = $resId->ToString();
         $resName = $resId->GetName().".".$resId->GetResourceType();
+        $selfUrl = $this->app->config("SelfUrl");
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr, $resName) {
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr, $resName, $selfUrl) {
             $param->AddParameter("OPERATION", "ENUMERATERESOURCEREFERENCES");
             $param->AddParameter("VERSION", "1.0.0");
             if ($fmt === "json") {
@@ -123,6 +125,7 @@ class MgResourceServiceController extends MgBaseController {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
                 $param->AddParameter("XSLSTYLESHEET", "ResourceReferenceList.xsl");
                 $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
+                $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
@@ -214,6 +217,34 @@ class MgResourceServiceController extends MgBaseController {
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
         }, false, "", $sessionId);
+    }
+
+    public function GetResourceInfo($resId, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("html"));
+        $sessionId = null;
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
+        $this->EnsureAuthenticationForSite($sessionId, true);
+
+        $pathInfo = $this->app->request->getPathInfo();
+        $selfUrl = $this->app->config("SelfUrl");
+
+        $thisUrl = $selfUrl.$pathInfo;
+        //Chop off the html part of the url
+        $rootPath = substr($thisUrl, 0, strlen($thisUrl) - strlen("/html"));
+
+        $resIdStr = $resId->ToString();
+        $smarty = new Smarty();
+        $smarty->setCompileDir($this->app->config("Cache.RootDir")."/templates_c");
+        $smarty->assign("resId", $resIdStr);
+        $smarty->assign("assetPath", $selfUrl."/assets");
+        $smarty->assign("urlRoot", $rootPath);
+        $smarty->assign("resourceType", $resId->GetResourceType());
+
+        $this->app->response->header("Content-Type", MgMimeType::Html);
+        $this->app->response->setBody($smarty->fetch(dirname(__FILE__)."/../res/resourceinfo.tpl"));
     }
 
     public function EnumerateResources($resId, $format) {

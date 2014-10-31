@@ -6,16 +6,28 @@
                 extension-element-prefixes="str">
     <xsl:output method='html'/>
     <xsl:param name="RESOURCENAME" />
+    <xsl:param name="ASSETPATH" />
     <xsl:template match="/">
         <html>
             <head>
                 <title>Resource References: <xsl:value-of select="$RESOURCENAME"/></title>
+                <link rel="stylesheet" href="{$ASSETPATH}/common/css/bootstrap.min.css" />
+                <link rel="stylesheet" href="{$ASSETPATH}/fa/css/font-awesome.min.css" />
             </head>
             <body>
                 <h3>Resource References: <xsl:value-of select="$RESOURCENAME"/></h3>
-                <ul class="list-group">
-                <xsl:apply-templates select="//ResourceReferenceList" />
-                </ul>
+                <xsl:choose>
+                    <xsl:when test="count(//ResourceReferenceList/*[text()]) &gt; 0">
+                        <ul class="list-group">
+                        <xsl:apply-templates select="//ResourceReferenceList" />
+                        </ul>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <div class="well">
+                            No resources reference this resource
+                        </div>
+                    </xsl:otherwise>
+                </xsl:choose>
             </body>
         </html>
     </xsl:template>

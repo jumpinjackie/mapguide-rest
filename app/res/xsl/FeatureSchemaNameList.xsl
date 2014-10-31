@@ -7,10 +7,13 @@
     <xsl:output method='html'/>
     <xsl:param name="ROOTPATH" />
     <xsl:param name="RESOURCENAME" />
+    <xsl:param name="ASSETPATH" />
     <xsl:template match="/">
         <html>
             <head>
                 <title>Schema Names: <xsl:value-of select="$RESOURCENAME"/></title>
+                <link rel="stylesheet" href="{$ASSETPATH}/common/css/bootstrap.min.css" />
+                <link rel="stylesheet" href="{$ASSETPATH}/fa/css/font-awesome.min.css" />
             </head>
             <body>
                 <h3>Schema Names: <xsl:value-of select="$RESOURCENAME"/></h3>

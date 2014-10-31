@@ -14,11 +14,21 @@
             </head>
             <body>
                 <h3>Resource Data: <xsl:value-of select="$RESOURCENAME"/></h3>
-                <ul class="list-group">
-                <xsl:apply-templates select="//ResourceDataList/ResourceData">
-                    <xsl:with-param name="root" select="$ROOTPATH" />
-                </xsl:apply-templates>
-                </ul>
+
+                <xsl:choose>
+                    <xsl:when test="count(//ResourceDataList/ResourceData/*[text()]) &gt; 0">
+                        <ul class="list-group">
+                        <xsl:apply-templates select="//ResourceDataList/ResourceData">
+                            <xsl:with-param name="root" select="$ROOTPATH" />
+                        </xsl:apply-templates>
+                        </ul>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <div class="well">
+                            No resource data for this resource
+                        </div>
+                    </xsl:otherwise>
+                </xsl:choose>
             </body>
         </html>
     </xsl:template>
