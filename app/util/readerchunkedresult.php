@@ -110,11 +110,18 @@ class MgReaderChunkedResult
     private $transform;
     private $writer;
 
+    //For HTML output
+    private $baseUrl;
+    private $thisUrl;
+    private $thisReqParams;
+
     public function __construct($featSvc, $reader, $limit, $writer = NULL) {
         $this->featSvc = $featSvc;
         $this->reader = $reader;
         $this->limit = $limit;
+        $this->baseUrl = null;
         $this->transform = null;
+        $this->thisReqParams = array();
         if ($writer != null)
             $this->writer = $writer;
         else
@@ -136,6 +143,15 @@ class MgReaderChunkedResult
 
     public function SetTransform($tx) {
         $this->transform = $tx;
+    }
+
+    public function SetBaseUrl($baseUrl) {
+        $this->baseUrl = $baseUrl;
+    }
+
+    public function SetThisUrl($thisUrl, $reqParams) {
+        $this->thisUrl = $thisUrl;
+        $this->thisReqParams = $reqParams;
     }
 
     private function OutputGeoJson($schemas) {
@@ -171,6 +187,170 @@ class MgReaderChunkedResult
         }
 
         $output .= "]}";
+        $this->writer->WriteChunk($output);
+        $this->writer->EndChunking();
+        $this->reader->Close();
+    }
+
+    private function OutputHtml($schemas) {
+        $read = 0;
+        $agfRw = new MgAgfReaderWriter();
+        $wktRw = new MgWktReaderWriter();
+
+        $paginated = (is_callable(array($this->reader, "GetPageSize")) && is_callable(array($this->reader, "GetPageNo")));
+
+        $this->writer->SetHeader("Content-Type", MgMimeType::Html);
+        $this->writer->StartChunking();
+
+        $output = "<!DOCTYPE html>";
+        $output .= "<html><head>";
+        if ($this->baseUrl != null) {
+            $bsUrl = $this->baseUrl . "/assets/common/css/bootstrap.min.css";
+            $output .= "<link rel='stylesheet' href='".$bsUrl."' />";
+        }
+        $output .= "</head><body>";
+
+        $this->writer->WriteChunk($output);
+        $output = "";
+
+        $propCount = $this->reader->GetPropertyCount();
+
+        $pageHtml = "";
+        //Write pagination HTML if this reader is paginated
+        if ($paginated === TRUE) {
+            $pageSize = $this->reader->GetPageSize();
+            $pageNo = $this->reader->GetPageNo();
+
+            $params = $this->thisReqParams;
+
+            $nextUrl = $this->thisUrl;
+            $firstPart = true;
+            foreach ($params as $key => $value) {
+                if ($firstPart === true) {
+                    $nextUrl .= "?";
+                    $firstPart = false;
+                } else {
+                    $nextUrl .= "&";
+                }
+
+                if (strtoupper($key) == "PAGE") {
+                    $nextUrl .= "$key=".($pageNo + 1);
+                } else {
+                    $nextUrl .= "$key=$value";
+                }
+            }
+            $prevUrl = $this->thisUrl;
+            $firstPart = true;
+            foreach ($params as $key => $value) {
+                if ($firstPart === true) {
+                    $prevUrl .= "?";
+                    $firstPart = false;
+                } else {
+                    $prevUrl .= "&";
+                }
+
+                if (strtoupper($key) == "PAGE") {
+                    $prevUrl .= "$key=".($pageNo - 1);
+                } else {
+                    $prevUrl .= "$key=$value";
+                }
+            }
+
+            if ($pageNo > 1) {
+                //Write prev/next page links.
+                $pageHtml .= "<a href='".$prevUrl."'>&lt;&lt;&nbsp;Prev</a>&nbsp;|&nbsp;"; //TODO: Localize
+                $pageHtml .= "<a href='".$nextUrl."'>Next&nbsp;&gt;&gt;</a>"; //TODO: Localize
+            } else {
+                //Write next page link. Note that we cannot determine the size of this reader, so we cannot determine the actual
+                //end of reader without iterating through it, so the next page link is always written regardless.
+                $pageHtml .= "<a href='".$nextUrl."'>Next</a>"; //TODO: Localize
+            }
+        }
+
+        $clsDef = $this->reader->GetClassDefinition();
+        $output .= "<div class='pull-left'><div><strong>Class: ".$clsDef->GetName()."</strong></div><div>$pageHtml</div></div>";
+        $output .= "<table class='table table-bordered'>";
+        $output .= "<!-- Table header -->";
+        $output .= "<tr>";
+        for ($i = 0; $i < $propCount; $i++) {
+            $name = $this->reader->GetPropertyName($i);
+            $output .= "<th>$name</th>";
+        }
+        $output .= "</tr>";
+        $this->writer->WriteChunk($output);
+
+        while ($this->reader->ReadNext()) {
+            $read++;
+            if ($this->limit > 0 && $read > $this->limit) {
+                break;
+            }
+
+            $output = "<tr>";
+            for ($i = 0; $i < $propCount; $i++) {
+                $name = $this->reader->GetPropertyName($i);
+                $propType = $this->reader->GetPropertyType($i);
+
+                $output .= "<td>";
+                if (!$this->reader->IsNull($i)) {
+                    switch($propType) {
+                        case MgPropertyType::Boolean:
+                            //NOTE: It appears PHP booleans are not string-able
+                            $output .= ($this->reader->GetBoolean($i) ? "true" : "false");
+                            break;
+                        case MgPropertyType::Byte:
+                            $output .= $this->reader->GetByte($i);
+                            break;
+                        case MgPropertyType::DateTime:
+                            $dt = $this->reader->GetDateTime($i);
+                            $output .= $dt->ToString();
+                            break;
+                        case MgPropertyType::Decimal:
+                        case MgPropertyType::Double:
+                            $output .= $this->reader->GetDouble($i);
+                            break;
+                        case MgPropertyType::Geometry:
+                            {
+                                try {
+                                    $agf = $this->reader->GetGeometry($i);
+                                    $geom = ($this->transform != null) ? $agfRw->Read($agf, $this->transform) : $agfRw->Read($agf);
+                                    $output .= $wktRw->Write($geom);
+                                } catch (MgException $ex) {
+
+                                }
+                            }
+                            break;
+                        case MgPropertyType::Int16:
+                            $output .= $this->reader->GetInt16($i);
+                            break;
+                        case MgPropertyType::Int32:
+                            $output .= $this->reader->GetInt32($i);
+                            break;
+                        case MgPropertyType::Int64:
+                            $output .= $this->reader->GetInt64($i);
+                            break;
+                        case MgPropertyType::Single:
+                            $output .= $this->reader->GetSingle($i);
+                            break;
+                        case MgPropertyType::String:
+                            $output .= MgUtils::EscapeXmlChars($this->reader->GetString($i));
+                            break;
+                    }
+                } else {
+                    $output .= "(null)";
+                }
+                $output .= "</td>";
+
+            }
+
+            $output .= "</tr>";
+
+            $this->writer->WriteChunk($output);
+            $output = "";
+        }
+
+        $output .= "</table>";
+        $output .= "<div class='pull-left'>$pageHtml</div>";
+        $output .= "</body></html>";
         $this->writer->WriteChunk($output);
         $this->writer->EndChunking();
         $this->reader->Close();
@@ -280,6 +460,8 @@ class MgReaderChunkedResult
 
         if ($format === "geojson") {
             $this->OutputGeoJson($schemas);
+        } else if ($format === "html") {
+            $this->OutputHtml($schemas);
         } else {
             $this->OutputXml($schemas);
         }

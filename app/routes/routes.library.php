@@ -592,7 +592,7 @@ $app->get("/library/:resourcePath+.LayerDefinition/features", function($resource
  *          @SWG\parameter(name="maxfeatures", paramType="query", required=false, type="string", description="The maximum number of features to restrict this response to"),
  *          @SWG\parameter(name="transformto", paramType="query", required=false, type="string", description="The CS-Map coordinate system code to transform the resulting features into"),
  *          @SWG\parameter(name="bbox", paramType="query", required=false, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml, geojson or czml", enum="['xml','geojson','czml']"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml, geojson, html or czml", enum="['xml','geojson','html', czml']"),
  *          @SWG\parameter(name="pagesize", paramType="query", required=false, type="string", description="Applies pagination on the query result. This specifies the number of results for the page. You cannot specify this parameter for CZML output"),
  *          @SWG\parameter(name="page", paramType="query", required=false, type="string", description="Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply. You cannot specify this parameter for CZML output")
  *        ),

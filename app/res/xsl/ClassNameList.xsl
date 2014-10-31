@@ -23,6 +23,7 @@
         <xsl:for-each select="Item">
         <li>
             <xsl:variable name="className" select="text()" />
+            <xsl:variable name="classNamePath" select="translate(text(), ':', '/')" />
             <xsl:value-of select="$className" />
             &#160;
             <a href="../classdef.xml/{$className}">
@@ -31,6 +32,10 @@
             &#160;
             <a href="../classdef.json/{$className}">
                 [json]
+            </a>
+            &#160;
+            <a href="../features.html/{$classNamePath}?pagesize=100&amp;page=1">
+                [HTML preview]
             </a>
         </li>
         </xsl:for-each>

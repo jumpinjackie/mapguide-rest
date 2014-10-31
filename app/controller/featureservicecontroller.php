@@ -629,7 +629,7 @@ class MgFeatureServiceController extends MgBaseController {
     public function SelectLayerFeatures($ldfId, $format) {
         try {
             //Check for unsupported representations
-            $fmt = $this->ValidateRepresentation($format, array("xml", "geojson", "czml"));
+            $fmt = $this->ValidateRepresentation($format, array("xml", "geojson", "html", "czml"));
 
             $sessionId = "";
             if ($ldfId->GetRepositoryType() == MgRepositoryType::Session) {
@@ -802,6 +802,10 @@ class MgFeatureServiceController extends MgBaseController {
                             $result->CheckAndSetDownloadHeaders($this->app, $format);
                             if ($transform != null)
                                 $result->SetTransform($transform);
+                            if ($fmt === "html") {
+                                $result->SetBaseUrl($this->app->config("SelfUrl"));
+                                $result->SetThisUrl($this->app->config("SelfUrl").$this->app->request->getPathInfo(), $this->app->request->params());
+                            }
                             $result->Output($format);
                         }
                     } else {
@@ -819,7 +823,7 @@ class MgFeatureServiceController extends MgBaseController {
     public function SelectFeatures($resId, $schemaName, $className, $format) {
         try {
             //Check for unsupported representations
-            $fmt = $this->ValidateRepresentation($format, array("xml", "geojson"));
+            $fmt = $this->ValidateRepresentation($format, array("xml", "html", "geojson"));
 
             $sessionId = "";
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
@@ -889,6 +893,10 @@ class MgFeatureServiceController extends MgBaseController {
             $result->CheckAndSetDownloadHeaders($this->app, $format);
             if ($transform != null)
                 $result->SetTransform($transform);
+            if ($fmt === "html") {
+                $result->SetBaseUrl($this->app->config("SelfUrl"));
+                $result->SetThisUrl($this->app->config("SelfUrl").$this->app->request->getPathInfo(), $this->app->request->params());
+            }
             $result->Output($format);
         } catch (MgException $ex) {
             $this->OnException($ex);

@@ -40,6 +40,14 @@ class MgPaginatedFeatureReader
         $this->upperBound = $this->pageSize * $this->pageNo;
     }
 
+    public function GetPageSize() {
+        return $this->pageSize;
+    }
+
+    public function GetPageNo() {
+        return $this->pageNo;
+    }
+
     public function ReadNext() {
         $bResult = $this->innerReader->ReadNext();
         //End of reader
