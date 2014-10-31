@@ -24,6 +24,28 @@
 //
 class MgUtils
 {
+    public static function TranscodeResourceUrl($baseUrl, $resId) {
+        $fullUrl = $baseUrl;
+        if ($resId->GetRepositoryType() == MgRepositoryType::Library) {
+            $fullUrl .= "/library/";
+        } else { //Session
+            $fullUrl .= "/session/" . $resId->GetRepositoryName() . "/";
+        }
+        $fullUrl .= $resId->GetPath() . "/" . $resId->GetName() . "." . $resId->GetResourceType();
+        return $fullUrl;
+    }
+
+    public static function GetScale($extents, $csObj, $width, $height, $dpi)
+    {
+        $mapWidth = $csObj->ConvertCoordinateSystemUnitsToMeters($extents->GetWidth());
+        $mapHeight = $csObj->ConvertCoordinateSystemUnitsToMeters($extents->GetHeight());
+        $screenWidth = $width / $dpi * 0.0254; //METERS_PER_INCH
+        $screenHeight = $height / $dpi * 0.0254; //METERS_PER_INCH
+        $xScale = $mapWidth / $screenWidth;
+        $yScale = $mapHeight / $screenHeight;
+        return min($xScale, $yScale);
+    }
+
     public static function GetFileNameFromMimeType($fileNameWithoutExtension, $mimeType = NULL) {
         if ($mimeType == NULL) {
             return $fileNameWithoutExtension;

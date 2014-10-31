@@ -1568,4 +1568,100 @@ $app->get("/library/:resourcePath+.WatermarkDefinition/preview", function($resou
     $ctrl->LaunchResourcePreview($resId);
 });
 
+// =========================================== KML Service APIs ====================================================
+
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.MapDefinition/kml",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetMapKml",
+ *        summary="Gets the KML for the specified map definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the Map Definition"),
+ *          @SWG\parameter(name="native", paramType="query", required=false, type="boolean", description="If true, this operation will simply pass through to the mapagent. This is much faster, but note that all network link URLs will be referring to the mapagent instead of downstream RESTful layer KML URLs.")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/library/:resourcePath+.MapDefinition/kml", function($resourcePath) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgKmlServiceController($app);
+    $ctrl->GetMapKml($resId, "kml");
+});
+
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.LayerDefinition/kml",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetMapKml",
+ *        summary="Gets the KML for the specified layer definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the Layer Definition"),
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="bbox", paramType="query", required=true, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry. Coordinates must be LL84 coordinates"),
+ *          @SWG\parameter(name="dpi", paramType="query", required=true, type="integer", description="Display DPI. Default is 96"),
+ *          @SWG\parameter(name="width", paramType="query", required=true, type="integer", description="The display width of the KML viewport"),
+ *          @SWG\parameter(name="height", paramType="query", required=true, type="integer", description="The display height of the KML viewport"),
+ *          @SWG\parameter(name="draworder", paramType="query", required=true, type="integer", description="The draw order of this layer")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/library/:resourcePath+.LayerDefinition/kml", function($resourcePath) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgKmlServiceController($app);
+    $ctrl->GetLayerKml($resId, "kml");
+});
+
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.LayerDefinition/kmlfeatures",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetFeaturesKml",
+ *        summary="Gets the features KML for the specified layer definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the Layer Definition"),
+ *          @SWG\parameter(name="bbox", paramType="query", required=true, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry. Coordinates must be LL84 coordinates"),
+ *          @SWG\parameter(name="dpi", paramType="query", required=true, type="integer", description="Display DPI. Default is 96"),
+ *          @SWG\parameter(name="width", paramType="query", required=true, type="integer", description="The display width of the KML viewport"),
+ *          @SWG\parameter(name="height", paramType="query", required=true, type="integer", description="The display height of the KML viewport"),
+ *          @SWG\parameter(name="draworder", paramType="query", required=true, type="integer", description="The draw order of this layer")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/library/:resourcePath+.LayerDefinition/kmlfeatures", function($resourcePath) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgKmlServiceController($app);
+    $ctrl->GetFeaturesKml($resId, "kml");
+});
+
+
 ?>

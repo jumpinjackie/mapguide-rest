@@ -18,6 +18,7 @@
 //
 
 require_once dirname(__FILE__)."/../util/utils.php";
+require_once dirname(__FILE__)."/../util/readerchunkedresult.php";
 
 abstract class MgResponseHandler
 {
@@ -43,7 +44,7 @@ abstract class MgResponseHandler
         return $values;
     }
 
-    public function ExecuteHttpRequest($req, $chunkResult = false) {
+    public function ExecuteHttpRequest($req) {
         $param = $req->GetRequestParam();
         $response = $req->Execute();
         $result = $response->GetResult();
@@ -75,7 +76,7 @@ abstract class MgResponseHandler
                             $this->app->response->header("Content-Type", MgMimeType::Html);
                             $this->app->response->setBody(MgUtils::XslTransformByteReader($resultObj, $param->GetParameterValue("XSLSTYLESHEET"), $this->CollectXslParameters($param)));
                         } else {
-                            $this->OutputByteReader($resultObj, $chunkResult, ($param->GetParameterValue("X-PREPEND-XML-PROLOG") === "true"));
+                            $this->OutputByteReader($resultObj, ($param->GetParameterValue("X-CHUNK-RESPONSE") === "true"), ($param->GetParameterValue("X-PREPEND-XML-PROLOG") === "true"));
                         }
                     }
                 } else if ($resultObj instanceof MgStringCollection) {
@@ -84,7 +85,7 @@ abstract class MgResponseHandler
                     $this->app->response->setBody($resultObj->ToString());
                 } else if (method_exists($resultObj, "ToXml")) {
                     $byteReader = $resultObj->ToXml();
-                    $this->OutputByteReader($byteReader, $chunkResult);
+                    $this->OutputByteReader($byteReader, ($param->GetParameterValue("X-CHUNK-RESPONSE") === "true"));
                 } else {
                     throw new Exception("Could not determine how to output: ".$resultObj->ToString()); //TODO: Localize
                 }
@@ -286,12 +287,23 @@ abstract class MgResponseHandler
         $this->app->response->write($content);
     }
 
-    protected function OutputByteReader($byteReader, $chunkResult = false, $bPrependXmlProlog = false) {
+    protected function OutputByteReader($byteReader, $bChunkResult = false, $bPrependXmlProlog = false) {
         $mimeType = $byteReader->GetMimeType();
-        $this->app->response->header("Content-Type", $mimeType);
-        $rdrLen = $byteReader->GetLength();
+
+        $writer = null;
+        if ($bChunkResult)
+            $writer = new MgHttpChunkWriter();
+        else
+            $writer = new MgSlimChunkWriter($this->app);
+
+        $writer->SetHeader("Content-Type", $mimeType);
+        if (!$bChunkResult) {
+            $rdrLen = $byteReader->GetLength();
+            $writer->SetHeader("Content-Length", $rdrLen);
+        }
+        $writer->StartChunking();
         if ($mimeType == MgMimeType::Xml && $bPrependXmlProlog) {
-            $this->app->response->write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+            $writer->WriteChunk("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
         }
         do
         {
@@ -300,9 +312,10 @@ abstract class MgResponseHandler
             if ($len > 0)
             {
                 $str = substr($data, 0, $len);
-                $this->app->response->write($str);
+                $writer->WriteChunk($str);
             }
         } while ($len > 0);
+        $writer->EndChunking();
     }
 
     protected function ValidateValueInDomain($value, $allowedValues = null) {

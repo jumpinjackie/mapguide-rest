@@ -77,6 +77,12 @@
             <a class="iframeload" href="{$urlRoot}/preview">
                 <i class="fa fa-search" ></i>&nbsp;Preview
             </a>
+            <a class="iframeload" href="{$urlRoot}/kml?native=0">
+                <i class="fa fa-globe" ></i>&nbsp;KML
+            </a>
+            <a class="iframeload" href="{$urlRoot}/kml">
+                <i class="fa fa-globe" ></i>&nbsp;KML (Passthrough to mapagent)
+            </a>
         </div>
         {elseif $resourceType eq 'SymbolDefinition'}
         <div class="well">
