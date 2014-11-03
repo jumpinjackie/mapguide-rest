@@ -118,11 +118,11 @@ class MgCoordinateSystemController extends MgBaseController {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
         if ($source == null)
-            $this->app->halt(400, "Missing required parameter: from"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "from"));
         if ($target == null)
-            $this->app->halt(400, "Missing required parameter: to"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "to"));
         if ($coordList == null)
-            $this->app->halt(400, "Missing required parameter: coords"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "coords"));
 
         try {
             $factory = new MgCoordinateSystemFactory();
@@ -142,7 +142,7 @@ class MgCoordinateSystemController extends MgBaseController {
                 } else {
                     //TODO: We should accept a partial response, but there's currently no way an empty <Coordinate/> tag survives the
                     //XML to JSON conversion, so we have to throw lest we return an inconsisten partial result
-                    throw new Exception("Encountered invalid coordinate pair: '$coordPair'. Found $tokenCount tokens. Expected 2"); //TODO: Localize
+                    throw new Exception($this->app->localizer->getText("E_INVALID_COORDINATE_PAIR", $coordPair, $tokenCount));
                 }
             }
             $output .= "</CoordinateCollection>";

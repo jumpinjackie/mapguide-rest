@@ -439,7 +439,7 @@ class MgTileServiceController extends MgBaseController {
                     $layerCount = $layers->GetCount();
 
                     if ($groups->IndexOf($groupName) < 0) {
-                        throw new Exception("Group not found: $groupName"); //TODO: Localize
+                        throw new Exception($this->app->localizer->getText("E_GROUP_NOT_FOUND", $groupName));
                     } else {
                         $grp = $groups->GetItem($groupName);
                         $grp->SetVisible(true);

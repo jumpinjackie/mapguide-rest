@@ -367,7 +367,7 @@ class MgFeatureServiceController extends MgBaseController {
 
             $commands = new MgFeatureCommandCollection();
             $classDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
-            $batchProps = MgUtils::ParseMultiFeatureXml($classDef, $this->app->request->getBody());
+            $batchProps = MgUtils::ParseMultiFeatureXml($this->app, $classDef, $this->app->request->getBody());
             $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
             $commands->Add($insertCmd);
 
@@ -423,7 +423,7 @@ class MgFeatureServiceController extends MgBaseController {
             if ($filterNode->length == 1)
                 $filter = $filterNode->item(0)->nodeValue;
             $classDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
-            $props = MgUtils::ParseSingleFeatureDocument($classDef, $doc, "UpdateProperties");
+            $props = MgUtils::ParseSingleFeatureDocument($this->app, $classDef, $doc, "UpdateProperties");
             $updateCmd = new MgUpdateFeatures("$schemaName:$className", $props, $filter);
             $commands->Add($updateCmd);
 
@@ -505,7 +505,7 @@ class MgFeatureServiceController extends MgBaseController {
             $aggType = $this->ValidateValueInDomain($type, array("count", "bbox", "distinctvalues"));
             $distinctPropName = $this->GetRequestParameter("property", "");
             if ($aggType === "distinctvalues" && $distinctPropName === "") {
-                $this->app->halt(400, "Missing required parameter: property"); //TODO: Localize
+                $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "property"));
             }
 
             $sessionId = "";
@@ -548,7 +548,7 @@ class MgFeatureServiceController extends MgBaseController {
                     {
                         $geomName = $this->app->request->get("property");
                         $txTo = $this->app->request->get("transformto");
-                        $bounds = MgUtils::GetFeatureClassMBR($featSvc, $resId, $schemaName, $className, $geomName, $txTo);
+                        $bounds = MgUtils::GetFeatureClassMBR($this->app, $featSvc, $resId, $schemaName, $className, $geomName, $txTo);
                         $iterator = $bounds->extentGeometry->GetCoordinates();
                         $csCode = $bounds->csCode;
                         $csWkt = $bounds->coordinateSystem;
@@ -657,11 +657,11 @@ class MgFeatureServiceController extends MgBaseController {
             $pageNo = $this->GetRequestParameter("page", -1);
 
             if ($pageNo >= 0 && $pageSize === -1) {
-                $this->app->halt(400, "Missing required 'pagesize' parameter"); //TODO: Localize
+                $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "pagesize"));
             } else {
                 //The way that CZML output is done means we cannot support pagination
                 if ($pageNo >= 0 && $pageSize > 0 && $fmt === "czml") {
-                    $this->app->halt(400, "Pagination of czml output not supported"); //TODO: Localize
+                    $this->app->halt(400, $this->app->localizer->getText("E_CZML_PAGINATION_NOT_SUPPORTED"));
                 }
             }
 
@@ -812,10 +812,10 @@ class MgFeatureServiceController extends MgBaseController {
                             $result->Output($format);
                         }
                     } else {
-                        throw new Exception("Layer ".$ldfId->ToString()." has an invalid feature class"); //TODO: Localize
+                        throw new Exception($this->app->localizer->getText("E_LAYER_HAS_INVALID_FEATURE_CLASS", $ldfId->ToString()));
                     }
                 } else {
-                    throw new Exception("Layer ".$ldfId->ToString()." has an invalid feature source"); //TODO: Localize
+                    throw new Exception($this->app->localizer->getText("E_LAYER_HAS_INVALID_FEATURE_SOURCE", $ldfId->ToString()));
                 }
             }
         } catch (MgException $ex) {
@@ -851,7 +851,7 @@ class MgFeatureServiceController extends MgBaseController {
             $pageNo = $this->GetRequestParameter("page", -1);
 
             if ($pageNo >= 0 && $pageSize === -1) {
-                $this->app->halt(400, "Missing required 'pagesize' parameter"); //TODO: Localize
+                $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "pagesize"));
             }
 
             if ($filter !== "") {

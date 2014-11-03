@@ -563,11 +563,11 @@ class MgMappingServiceController extends MgBaseController {
         $scale = $this->GetRequestParameter("scale", "");
 
         if ($x == "")
-            $this->app->halt(400, "Missing required parameter: x"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "x"));
         if ($y == "")
-            $this->app->halt(400, "Missing required parameter: y"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "y"));
         if ($scale == "")
-            $this->app->halt(400, "Missing required parameter: scale"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "scale"));
 
         $this->EnsureAuthenticationForSite();
         $siteConn = new MgSiteConnection();

@@ -29,7 +29,7 @@ class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
             $pPostBody->name = "body";
             $pPostBody->type = "string";
             $pPostBody->required = true;
-            $pPostBody->description = "The XML envelope describing the features to be inserted";
+            $pPostBody->description = "The XML envelope describing the features to be inserted"; //TODO: Localize
 
             array_push($params, $pPostBody);
         } else if ($method == "PUT") {
@@ -38,7 +38,7 @@ class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
             $pPutBody->name = "body";
             $pPutBody->type = "string";
             $pPutBody->required = true;
-            $pPutBody->description = "The XML envelope describing the features to be updated";
+            $pPutBody->description = "The XML envelope describing the features to be updated"; //TODO: Localize
 
             array_push($params, $pPutBody);
         } else if ($method == "DELETE") {
@@ -47,7 +47,7 @@ class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
             $pFilter->name = "filter";
             $pFilter->type = "string";
             $pFilter->required = false;
-            $pFilter->description = "The FDO Filter string that will determine what features are deleted";
+            $pFilter->description = "The FDO Filter string that will determine what features are deleted"; //TODO: Localize
 
             array_push($params, $pFilter);
         }
@@ -224,9 +224,9 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
             $commands = new MgFeatureCommandCollection();
             $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
             if ($this->app->REQUEST_BODY_DOCUMENT != null)
-                $batchProps = MgUtils::ParseMultiFeatureDocument($classDef, $this->app->REQUEST_BODY_DOCUMENT);
+                $batchProps = MgUtils::ParseMultiFeatureDocument($this->app, $classDef, $this->app->REQUEST_BODY_DOCUMENT);
             else    
-                $batchProps = MgUtils::ParseMultiFeatureXml($classDef, $this->app->request->getBody());
+                $batchProps = MgUtils::ParseMultiFeatureXml($this->app, $classDef, $this->app->request->getBody());
             $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
             $commands->Add($insertCmd);
 
@@ -275,7 +275,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
             if ($single === true) {
                 $idProps = $classDef->GetIdentityProperties();
                 if ($idProps->GetCount() != 1) {
-                    $app->halt(400, "Cannot apply update. The value (".$this->featureId.") is not enough to uniquely identify the feature to be updated. Class definition has ".$idProps->GetCount()." identity properties"); //TODO: Localize
+                    $app->halt(400, $this->app->localizer->getText("E_CANNOT_APPLY_UPDATE_CANNOT_UNIQUELY_IDENTIFY", $this->featureId, $idProps->GetCount()));
                 } else {
                     $idProp = $idProps->GetItem(0);
                     if ($idProp->GetDataType() == MgPropertyType::String) {
@@ -290,7 +290,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
                     $filter = $filterNode->item(0)->nodeValue;
             }
             $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
-            $props = MgUtils::ParseSingleFeatureDocument($classDef, $doc, "UpdateProperties");
+            $props = MgUtils::ParseSingleFeatureDocument($this->app, $classDef, $doc, "UpdateProperties");
             $updateCmd = new MgUpdateFeatures("$schemaName:$className", $props, $filter);
             $commands->Add($updateCmd);
 
@@ -328,7 +328,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
 
             if ($single === true) {
                 if ($this->featureId == null) {
-                    throw new Exception("No feature ID set"); //TODO: Localize
+                    throw new Exception($this->app->localizer->getText("E_NO_FEATURE_ID_SET"));
                 }
                 $idType = MgPropertyType::String;
                 $tokens = explode(":", $this->className);
@@ -336,9 +336,9 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
                 if ($this->featureIdProp == null) {
                     $idProps = $clsDef->GetIdentityProperties();
                     if ($idProps->GetCount() == 0) {
-                        throw new Exception(sprintf("Cannot delete (%s) in %s by ID. Class has no identity properties", $this->className, $this->featureSourceId->ToString())); //TODO: Localize
+                        throw new Exception($this->app->localizer->getText("E_CANNOT_DELETE_NO_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
                     } else if ($idProps->GetCount() > 1) {
-                        throw new Exception(sprintf("Cannot delete (%s) in %s by ID. Class has more than one identity property", $this->className, $this->featureSourceId->ToString())); //TODO: Localize
+                        throw new Exception($this->app->localizer->getText("E_CANNOT_DELETE_MULTIPLE_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
                     } else {
                         $idProp = $idProps->GetItem(0);
                         $this->featureIdProp = $idProp->GetName();
@@ -350,9 +350,9 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
                     if ($iidx >= 0) {
                         $propDef = $props->GetItem($iidx);
                         if ($propDef->GetPropertyType() != MgFeaturePropertyType::DataProperty)
-                            throw new Exception("Specified identity property ".$this->featureIdProp." is not a data property");
+                            throw new Exception($this->app->localizer->getText("E_ID_PROP_NOT_DATA", $this->featureIdProp));
                     } else {
-                        throw new Exception("Specified identity property ".$this->featureIdProp." not found in class definition");
+                        throw new Exception($this->app->localizer->getText("E_ID_PROP_NOT_FOUND", $this->featureIdProp));
                     }
                 }
                 if ($idType == MgPropertyType::String)

@@ -22,7 +22,7 @@ class MgFormatterSet
     public function GetFormatter($formatterName) {
         if (!array_key_exists($formatterName, $this->formatters)) {
             if (!$this->app->container->has($formatterName)) {
-                throw new Exception("No formatter named ".$formatterName." registered"); //TODO: Localize
+                throw new Exception($this->app->localizer->getText("E_UNKNOWN_FORMATTER", $formatterName));
             }
             $this->formatters[$formatterName] = $this->app->container->$formatterName;
         }
@@ -54,7 +54,7 @@ class MgFeatureModel
         if (!array_key_exists($formatterName, $this->data[$name])) {
             $fmt = $this->formatters->GetFormatter($formatterName);
             if ($fmt == null)
-                throw new Exception("No DateTime Formatter named ".$formatterName." registered"); //TODO: Localize
+                throw new Exception($this->app->localizer->getText("E_UNKNOWN_DATETIME_FORMATTER", $formatterName));
             $this->data[$name][$formatterName] = $fmt->Output($this->reader, $name);
         }
         return $this->data[$name][$formatterName];
@@ -67,7 +67,7 @@ class MgFeatureModel
         if (!array_key_exists($formatterName, $this->data[$name])) {
             $fmt = $this->formatters->GetFormatter($formatterName);
             if ($fmt == null)
-                throw new Exception("No Geometry Formatter named ".$formatterName." registered"); //TODO: Localize
+                throw new Exception($this->app->localizer->getText("E_UNKNOWN_GEOMETRY_FORMATTER", $formatterName));
             $this->data[$name][$formatterName] = $fmt->Output($this->reader, $name, $this->transform);
         }
         return $this->data[$name][$formatterName];
@@ -287,22 +287,22 @@ class MgTemplateRestAdapter extends MgRestAdapter
      */
     protected function InitAdapterConfig($config) {
         if (!array_key_exists("Templates", $config))
-            throw new Exception("Missing required property 'Templates' in adapter configuration"); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_MISSING_REQUIRED_ADAPTER_PROPERTY", "Templates"));
 
         if (!array_key_exists("MimeType", $config))
-            throw new Exception("Missing required property 'MimeType' in adapter configuration"); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_MISSING_REQUIRED_ADAPTER_PROPERTY", "MimeType"));
 
         $this->mimeType = $config["MimeType"];
 
         $tplConfig = $config["Templates"];
         if (!array_key_exists("Single", $tplConfig))
-            throw new Exception("Missing definition of 'Single' template"); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_TEMPLATE_MISSING_DEFINITION", "Single"));
         if (!array_key_exists("Many", $tplConfig))
-            throw new Exception("Missing definition of 'Many' template"); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_TEMPLATE_MISSING_DEFINITION", "Many"));
         if (!array_key_exists("None", $tplConfig))
-            throw new Exception("Missing definition of 'None' template"); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_TEMPLATE_MISSING_DEFINITION", "None"));
         if (!array_key_exists("Error", $tplConfig))
-            throw new Exception("Missing definition of 'Error' template"); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_TEMPLATE_MISSING_DEFINITION", "Error"));
 
         $this->singleViewPath   = "file:".$this->configPath."/".$tplConfig["Single"];
         $this->manyViewPath     = "file:".$this->configPath."/".$tplConfig["Many"];
@@ -314,20 +314,20 @@ class MgTemplateRestAdapter extends MgRestAdapter
             foreach ($cfgRelations as $relName => $relCfg) {
                 //Make our lives easier, don't put spaces in relation names
                 if (strpos($relName, ' ') !== FALSE)
-                    throw new Exception("Relation '$relName' cannot have spaces"); //TODO: Localize
+                    throw new Exception($this->app->localizer->getText("E_RELATION_CANNOT_HAVE_SPACES", $relName));
                 if (!array_key_exists("Source", $relCfg)) {
-                    throw new Exception("Configuration for relation $relName is missing 'Source' property"); //TODO: Localize
+                    throw new Exception($this->app->localizer->getText("E_RELATION_MISSING_PROPERTY", $relName, "Source"));
                 }
                 if (!array_key_exists("KeyMap", $relCfg)) {
-                    throw new Exception("Configuration for relation $relName is missing 'KeyMap' property"); //TODO: Localize   
+                    throw new Exception($this->app->localizer->getText("E_RELATION_MISSING_PROPERTY", $relName, "KeyMap"));
                 }
                 $cfgSource = $relCfg["Source"];
                 $cfgKeyMap = $relCfg["KeyMap"];
                 if (!array_key_exists("FeatureSource", $cfgSource)) {
-                    throw new Exception("Source configuration for relation $relName is missing 'FeatureSource' property"); //TODO: Localize
+                    throw new Exception($this->app->localizer->getText("E_RELATION_MISSING_SOURCE_PROPERTY", $relName, "FeatureSource"));
                 }
                 if (!array_key_exists("FeatureClass", $cfgSource)) {
-                    throw new Exception("Source configuration for relation $relName is missing 'FeatureSource' property"); //TODO: Localize
+                    throw new Exception($this->app->localizer->getText("E_RELATION_MISSING_SOURCE_PROPERTY", $relName, "FeatureSource"));
                 }
                 $rel = new stdClass();
                 $rel->FeatureSource = new MgResourceIdentifier($cfgSource["FeatureSource"]);
@@ -417,7 +417,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
                             $relReader = $this->featSvc->SelectFeatures($rel->FeatureSource, $rel->FeatureClass, $relQuery);
                             $related->Add($relName, new MgFeatureReaderModel(new MgFormatterSet($this->app), $relReader, -1, 0, null));
                         } catch (MgException $ex) {
-                            throw new Exception("Error setting up related query. Filter was: $relFilter, Details:".$ex->GetDetails()); //TODO: Localize
+                            throw new Exception($this->app->localizer->getText("E_QUERY_SETUP", $relFilter, $ex->GetDetails()));
                         }
                     }
                     $smarty->assign("model", new MgFeatureModel(new MgFormatterSet($this->app), $reader, $this->transform));

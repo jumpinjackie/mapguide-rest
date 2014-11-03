@@ -26,7 +26,7 @@ class MgResourceServiceController extends MgBaseController {
 
     public function ApplyResourcePackage() {
         if (!array_key_exists("package", $_FILES))
-            $this->app->halt(400, "Missing required file parameter: package"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "package"));
         
         $this->EnsureAuthenticationForSite();
         $siteConn = new MgSiteConnection();
@@ -40,7 +40,7 @@ class MgResourceServiceController extends MgBaseController {
             $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
             $resSvc->ApplyResourcePackage($reader);
         } else {
-            $this->app->response->setBody("File upload error (code: $err). See <a href='http://www.php.net/manual/en/features.file-upload.errors.php'>http://www.php.net/manual/en/features.file-upload.errors.php</a> for more information");
+            $this->app->response->setBody("File upload error (code: $err). See <a href='http://www.php.net/manual/en/features.file-upload.errors.php'>http://www.php.net/manual/en/features.file-upload.errors.php</a> for more information"); //TODO: Localize
         }
     }
 

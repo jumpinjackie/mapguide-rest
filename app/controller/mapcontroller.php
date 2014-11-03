@@ -310,11 +310,11 @@ class MgMapController extends MgBaseController {
     public function CreateMap($resId) {
         $mdfIdStr = $this->app->request->params("mapdefinition");
         if ($mdfIdStr == null) {
-            $this->app->halt(400, "Missing required parameter: mapdefinition"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "mapdefinition"));
         } else {
             $mdfId = new MgResourceIdentifier($mdfIdStr);
             if ($mdfId->GetResourceType() != MgResourceType::MapDefinition) {
-                $this->app->halt(400, "Parameter 'mapdefinition' is not a Map Definition resource id"); //TODO: Localize
+                $this->app->halt(400, $this->app->localizer->getText("E_INVALID_MAP_DEFINITION_PARAMETER", "mapdefinition"));
             } else {
                 //$this->EnsureAuthenticationForSite();
                 $userInfo = new MgUserInformation($resId->GetRepositoryName());
@@ -553,7 +553,7 @@ class MgMapController extends MgBaseController {
             }
         }
         if ($lidx < 0) {
-            $this->app->halt(404, "Layer ($layerName) not found in selection"); //TODO: Localize
+            $this->app->halt(404, $this->app->localizer->getText("E_LAYER_NOT_IN_SELECTION", $layerName));
         } else {
             $layer = $layers->GetItem($lidx);
             $bMapped = ($this->GetBooleanRequestParameter("mappedonly", "0") == "1");

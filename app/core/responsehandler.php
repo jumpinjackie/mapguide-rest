@@ -100,7 +100,6 @@ abstract class MgResponseHandler
             } else {
                 $this->OutputError($result);
             }
-            //throw new Exception("Error executing operation: ".$param->GetParameterValue("OPERATION").". The status code is: $status"); //TODO: Localize
         }
         return $status;
     }
@@ -329,7 +328,7 @@ abstract class MgResponseHandler
                     return $fmt;
             }
         }
-        $this->app->halt(400, "Unrecognised value: $value. Allowed values are (".implode(", ", $allowedValues).")"); //TODO: Localize
+        $this->app->halt(400, $this->app->localizer->getText("E_UNRECOGNIZED_VALUE_IN_DOMAIN", $value, implode(", ", $allowedValues)));
     }
 
     protected function ValidateRepresentation($format, $validRepresentations = null) {
@@ -343,9 +342,7 @@ abstract class MgResponseHandler
                     return $fmt;
             }
         }
-        $this->app->halt(400, "Unsupported representation: ".$format); //TODO: Localize
-        //$e = new Exception();
-        //$this->app->halt(400, "Unsupported representation: ".$format."<pre>".$e->getTraceAsString()."</pre>"); //TODO: Localize
+        $this->app->halt(400, $this->app->localizer->getText("E_UNSUPPORTED_REPRESENTATION", $format));
     }
 
     protected function OutputMgPropertyCollection($props, $mimeType = MgMimeType::Xml) {
@@ -496,9 +493,8 @@ abstract class MgResponseHandler
         $fromTestHarness = $this->app->request->headers->get("x-mapguide-test-harness");
         if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
             $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
-        //$this->app->halt(401, "You must enter a valid login ID and password to access this site"); //TODO: Localize
         $e = new Exception();
-        $this->app->halt(401, "You must enter a valid login ID and password to access this site<br/>".$e->getTraceAsString()); //TODO: Localize
+        $this->app->halt(401, $this->app->localizer->getText("E_UNAUTHORIZED", $e->getTraceAsString()));
     }
 }
 

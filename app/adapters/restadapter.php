@@ -124,15 +124,15 @@ abstract class MgRestAdapter extends MgResponseHandler
         }
         if ($single === true) {
             if ($this->featureId == null) {
-                throw new Exception("No feature ID set"); //TODO: Localize
+                throw new Exception($this->app->localizer->getText("E_NO_FEATURE_ID_SET"));
             }
             $idType = MgPropertyType::String;
             if ($this->featureIdProp == null) {
                 $idProps = $clsDef->GetIdentityProperties();
                 if ($idProps->GetCount() == 0) {
-                    throw new Exception(sprintf("Cannot query (%s) in %s by ID. Class has no identity properties", $this->className, $this->featureSourceId->ToString())); //TODO: Localize
+                    throw new Exception($this->app->localizer->getText("E_CANNOT_QUERY_NO_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
                 } else if ($idProps->GetCount() > 1) {
-                    throw new Exception(sprintf("Cannot query (%s) in %s by ID. Class has more than one identity property", $this->className, $this->featureSourceId->ToString())); //TODO: Localize
+                    throw new Exception($this->app->localizer->getText("E_CANNOT_QUERY_MULTIPLE_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
                 } else {
                     $idProp = $idProps->GetItem(0);
                     $this->featureIdProp = $idProp->GetName();
@@ -144,9 +144,9 @@ abstract class MgRestAdapter extends MgResponseHandler
                 if ($iidx >= 0) {
                     $propDef = $props->GetItem($iidx);
                     if ($propDef->GetPropertyType() != MgFeaturePropertyType::DataProperty)
-                        throw new Exception("Specified identity property ".$this->featureIdProp." is not a data property"); //TODO: Localize
+                        throw new Exception($this->app->localizer->getText("E_ID_PROP_NOT_DATA", $this->featureIdProp));
                 } else {
-                    throw new Exception("Specified identity property ".$this->featureIdProp." not found in class definition"); //TODO: Localize
+                    throw new Exception($this->app->localizer->getText("E_ID_PROP_NOT_FOUND", $this->featureIdProp));
                 }
             }
             if ($idType == MgPropertyType::String)
@@ -235,7 +235,7 @@ abstract class MgRestAdapter extends MgResponseHandler
 
     public function HandleMethod($method, $single = false) {
         if (!$this->SupportsMethod($method)) {
-            $this->app->halt(405, "Method not supported: ".$method); //TODO: Localize
+            $this->app->halt(405, $this->app->localizer->getText("E_METHOD_NOT_SUPPORTED", $method));
         } else {
             $mth = strtoupper($method);
             switch ($mth) {
@@ -252,7 +252,7 @@ abstract class MgRestAdapter extends MgResponseHandler
                     $this->HandleDelete($single);
                     break;
                 default:
-                    $this->app->halt(405, "Method not supported: ".$method); //TODO: Localize
+                    $this->app->halt(405, $this->app->localizer->getText("E_METHOD_NOT_SUPPORTED", $method));
                     break;
             }
         }
@@ -413,7 +413,7 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
                 $pFilter->name = "filter";
                 $pFilter->type = "string";
                 $pFilter->required = false;
-                $pFilter->description = "The url-encoded FDO filter string";
+                $pFilter->description = "The url-encoded FDO filter string"; //TODO: Localize
                 
                 //bbox
                 $pbbox = new stdClass();
@@ -421,7 +421,7 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
                 $pbbox->name = "bbox";
                 $pbbox->type = "string";
                 $pbbox->required = false;
-                $pbbox->description = "A quartet of x1,y1,x2,y2";
+                $pbbox->description = "A quartet of x1,y1,x2,y2"; //TODO: Localize
 
                 array_push($op->parameters, $pFilter);
                 array_push($op->parameters, $pbbox);
@@ -447,7 +447,7 @@ abstract class MgFeatureRestAdapterDocumentor extends MgRestAdapterDocumentor {
                 $pPage->name = "page";
                 $pPage->type = "integer";
                 $pPage->required = false;
-                $pPage->description = "The page number to switch to. Only applies if pagination is configured for the data source";
+                $pPage->description = "The page number to switch to. Only applies if pagination is configured for the data source"; //TODO: Localize
 
                 array_push($params, $pPage);
             }

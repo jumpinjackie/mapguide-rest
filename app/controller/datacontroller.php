@@ -31,7 +31,7 @@ class MgDataController extends MgBaseController {
         $this->EnsureAuthenticationForSite();
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
+            $this->app->halt(404, $this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
         } else {
             $this->app->response->setBody(file_get_contents($path));
         }
@@ -41,7 +41,7 @@ class MgDataController extends MgBaseController {
         $uriPath = implode("/", $uriParts);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
+            $this->app->halt(404, $this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
         } else {
             $docUrl = $this->app->config("SelfUrl")."/data/$uriPath/apidoc";
             $assetUrlRoot = $this->app->config("SelfUrl")."/doc";
@@ -63,7 +63,7 @@ class MgDataController extends MgBaseController {
         $uriPath = implode("/", $uriParts);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
+            $this->app->halt(404, $this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
         } else {
             $config = json_decode(file_get_contents($path), true);
             
@@ -100,7 +100,7 @@ class MgDataController extends MgBaseController {
                         $pId->name = "id";
                         $pId->type = "string";
                         $pId->required = true;
-                        $pId->description = "The ID of the feature to return";
+                        $pId->description = "The ID of the feature to return"; //TODO: Localize
 
                         array_push($singleConf->extraParams, $pId);
 
@@ -132,20 +132,20 @@ class MgDataController extends MgBaseController {
 
     private function ValidateConfiguration($config, $extension, $method) {
         if (!array_key_exists("Source", $config))
-            throw new Exception("Missing root property 'Source' in configuration"); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_MISSING_ROOT_PROPERTY", "Source"));
 
         $result = new stdClass();
 
         $cfgSource = $config["Source"];
         if (!array_key_exists("Type", $cfgSource))
-            throw new Exception("Missing property 'Type' in configuration section 'Source'"); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_MISSING_PROPERTY_IN_SECTION", "Type", "Source"));
         if ($cfgSource["Type"] !== "MapGuide") 
-            throw new Exception("Unsupported source type: ".$cfgSource["Type"]); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_UNSUPPORTED_SOURCE_TYPE", $cfgSource["Type"]));
         if (!array_key_exists("LayerDefinition", $cfgSource)) {
             if (!array_key_exists("FeatureSource", $cfgSource))
-                throw new Exception("Missing property 'FeatureSource' in configuration section 'Source'"); //TODO: Localize
+                throw new Exception($this->app->localizer->getText("E_MISSING_PROPERTY_IN_SECTION", "FeatureSource", "Source"));
             if (!array_key_exists("FeatureClass", $cfgSource))
-                throw new Exception("Missing property 'FeatureClass' in configuration section 'Source'"); //TODO: Localize
+                throw new Exception($this->app->localizer->getText("E_MISSING_PROPERTY_IN_SECTION", "FeatureClass", "Source"));
         }
         if (array_key_exists("IdentityProperty", $cfgSource))
             $result->IdentityProperty = $cfgSource["IdentityProperty"];
@@ -160,16 +160,16 @@ class MgDataController extends MgBaseController {
         }
 
         if (!array_key_exists("Representations", $config))
-            throw new Exception("No representations defined in configuration document"); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_NO_REPRESENTATIONS_DEFINED_IN_CONFIGURATION"));
         $cfgRep = $config["Representations"];
         if (!array_key_exists($extension, $cfgRep))
-            throw new Exception("This configuration does not support or handle the given representation: ".$extension); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_REPRESENTATION_NOT_HANDLED_OR_SUPPORTED", $extension));
         $cfgExtension = $cfgRep[$extension];
         if (!array_key_exists("Methods", $cfgExtension))
-            throw new Exception("Missing 'Methods' property in configuration of representation: ".$extension); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_REPRESENTATION_CONFIGURATION_MISSING_PROPERTY", "Methods", $extension));
         $cfgMethods = $cfgExtension["Methods"];
         if (!array_key_exists($method, $cfgMethods))
-            throw new Exception("The configured representation '$extension' is not configured to handle $method requests"); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_METHOD_NOT_SUPPORTED_ON_REPRESENTATION", $extension, $method));
 
         $result->config = $cfgMethods[$method];
         $result->adapterName = $cfgExtension["Adapter"];
@@ -314,12 +314,12 @@ class MgDataController extends MgBaseController {
         $uriPath = implode("/", $uriParts);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
+            $this->app->halt(404, $this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
         } else {
             $config = json_decode(file_get_contents($path), true);
             $result = $this->ValidateConfiguration($config, $extension, $method);
             if (!$this->app->container->has($result->adapterName)) {
-                throw new Exception("Adapter (".$result->adapterName.") not defined or registered"); //TODO: Localize
+                throw new Exception($this->app->localizer->getText("E_ADAPTER_NOT_REGISTERED", $result->adapterName));
             }
             $bAllowAnonymous = false;
             if (array_key_exists("AllowAnonymous", $result->config) && $result->config["AllowAnonymous"] == true)
@@ -352,7 +352,7 @@ class MgDataController extends MgBaseController {
                     $adapter = $this->app->container[$result->adapterName];
                     $adapter->HandleMethod($method, false);
                 } else {
-                    $this->app->halt(403, "You are not authorized to access this resource"); //TODO: Localize
+                    $this->app->halt(403, $this->app->localizer->getText("E_FORBIDDEN_ACCESS"));
                 }
             } catch (MgException $ex) {
                 $this->OnException($ex);
@@ -364,12 +364,12 @@ class MgDataController extends MgBaseController {
         $uriPath = implode("/", $uriParts);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->app->halt(404, "No data configuration found for URI part: ".$uriPath); //TODO: Localize
+            $this->app->halt(404, $this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
         } else {
             $config = json_decode(file_get_contents($path), true);
             $result = $this->ValidateConfiguration($config, $extension, $method);
             if (!$this->app->container->has($result->adapterName)) {
-                throw new Exception("Adapter (".$result->adapterName.") not defined or registered"); //TODO: Localize
+                throw new Exception($this->app->localizer->getText("E_ADAPTER_NOT_REGISTERED", $result->adapterName));
             }
             $bAllowAnonymous = false;
             if (array_key_exists("AllowAnonymous", $result->config) && $result->config["AllowAnonymous"] == true)
@@ -403,7 +403,7 @@ class MgDataController extends MgBaseController {
                     $adapter->SetFeatureId($id);
                     $adapter->HandleMethod($method, true);
                 } else {
-                    $this->app->halt(403, "You are not authorized to access this resource"); //TODO: Localize
+                    $this->app->halt(403, $this->app->localizer->getText("E_FORBIDDEN_ACCESS"));
                 }
             } catch (MgException $ex) {
                 $this->OnException($ex);

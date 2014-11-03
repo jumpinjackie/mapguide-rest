@@ -121,7 +121,7 @@ class MgUtils
     public static function GetPaperSize($app, $paperType) {
         $sizes = $app->config("PDF.PaperSizes");
         if (!array_key_exists($paperType, $sizes))
-            throw new Exception("Unknown paper size: ".$paperType); //TODO: Localize
+            throw new Exception($app->localizer->getText("E_UNKNOWN_PAPER_SIZE", $paperType));
         return $sizes[$paperType];
     }
 
@@ -406,7 +406,7 @@ class MgUtils
         return $xslt->transformToXml($doc);
     }
 
-    private static function ParseFeatureNode($propNodes, $agfRw, $wktRw, $classProps) {
+    private static function ParseFeatureNode($app, $propNodes, $agfRw, $wktRw, $classProps) {
         $props = new MgPropertyCollection();
         for ($j = 0; $j < $propNodes->length; $j++) {
             $propNode = $propNodes->item($j);
@@ -465,15 +465,15 @@ class MgUtils
                                     //We're expecting this: YYYY-MM-DD HH:mm:ss
                                     $dtMajorParts = explode(" ", $value);
                                     if (count($dtMajorParts) != 2) {
-                                        throw new Exception("Invalid date string: $value"); //TODO: Localize
+                                        throw new Exception($app->localizer->getText("E_INVALID_DATE_STRING", $value));
                                     }
                                     $dateComponents = explode("-", $dtMajorParts[0]);
                                     $timeComponents = explode(":", $dtMajorParts[1]);
                                     if (count($dateComponents) != 3) {
-                                        throw new Exception("Invalid date string: $value has invalid date component".$dtMajorParts[0]); //TODO: Localize
+                                        throw new Exception($app->localizer->getText("E_CANNOT_PARSE_DATE_STRING_INVALID_COMPONENT", $value, $dtMajorParts[0]));
                                     }
                                     if (count($timeComponents) != 3) {
-                                        throw new Exception("Invalid date string: $value has invalid date component".$dtMajorParts[1]); //TODO: Localize
+                                        throw new Exception($app->localizer->getText("E_CANNOT_PARSE_DATE_STRING_INVALID_COMPONENT", $value, $dtMajorParts[1]));
                                     }
                                     
                                     $dt = new MgDateTime();
@@ -570,14 +570,14 @@ class MgUtils
         return $props;
     }
 
-    public static function ParseMultiFeatureXml($classDef, $xml, $featureNodeName = "Feature", $propertyNodeName = "Property") {
+    public static function ParseMultiFeatureXml($app, $classDef, $xml, $featureNodeName = "Feature", $propertyNodeName = "Property") {
         $doc = new DOMDocument();
         $doc->loadXML($xml);
 
-        return MgUtils::ParseMultiFeatureDocument($classDef, $doc, $featureNodeName, $propertyNodeName);
+        return MgUtils::ParseMultiFeatureDocument($app, $classDef, $doc, $featureNodeName, $propertyNodeName);
     }
 
-    public static function ParseMultiFeatureDocument($classDef, $doc, $featureNodeName = "Feature", $propertyNodeName = "Property") {
+    public static function ParseMultiFeatureDocument($app, $classDef, $doc, $featureNodeName = "Feature", $propertyNodeName = "Property") {
         $batchProps = new MgBatchPropertyCollection();
         $featureNodes = $doc->getElementsByTagName($featureNodeName);
 
@@ -587,14 +587,14 @@ class MgUtils
 
         for ($i = 0; $i < $featureNodes->length; $i++) {
             $propNodes = $featureNodes->item($i)->getElementsByTagName($propertyNodeName);
-            $props = MgUtils::ParseFeatureNode($propNodes, $agfRw, $wktRw, $classProps);
+            $props = MgUtils::ParseFeatureNode($app, $propNodes, $agfRw, $wktRw, $classProps);
             $batchProps->Add($props);
         }
 
         return $batchProps;
     }
 
-    public static function ParseSingleFeatureDocument($classDef, $doc, $featureNodeName = "Feature", $propertyNodeName = "Property") {
+    public static function ParseSingleFeatureDocument($app, $classDef, $doc, $featureNodeName = "Feature", $propertyNodeName = "Property") {
         $wktRw = new MgWktReaderWriter();
         $agfRw = new MgAgfReaderWriter();
         $classProps = $classDef->GetProperties();
@@ -603,15 +603,15 @@ class MgUtils
         $featureNodes = $doc->GetElementsByTagName($featureNodeName);
         $propNodes = $featureNodes->item(0)->getElementsByTagName($propertyNodeName);
 
-        $props = MgUtils::ParseFeatureNode($propNodes, $agfRw, $wktRw, $classProps);
+        $props = MgUtils::ParseFeatureNode($app, $propNodes, $agfRw, $wktRw, $classProps);
         return $props;
     }
 
-    public static function ParseSingleFeatureXml($classDef, $xml, $featureNodeName = "Feature", $propertyNodeName = "Property") {
+    public static function ParseSingleFeatureXml($app, $classDef, $xml, $featureNodeName = "Feature", $propertyNodeName = "Property") {
         $doc = new DOMDocument($xml);
         $doc->loadXML($xml);
 
-        return MgUtils::ParseSingleFeatureDocument($classDef, $doc, $featureNodeName, $propertyNodeName);
+        return MgUtils::ParseSingleFeatureDocument($app, $classDef, $doc, $featureNodeName, $propertyNodeName);
     }
 
     public static function GetTransform($featSvc, $resId, $schemaName, $className, $transformto) {
@@ -656,7 +656,7 @@ class MgUtils
         return null;
     }
 
-    public static function GetFeatureClassMBR($featureSrvc, $featuresId, $schemaName, $className, $geomName = null, $transformToCsCode = null)
+    public static function GetFeatureClassMBR($app, $featureSrvc, $featuresId, $schemaName, $className, $geomName = null, $transformToCsCode = null)
     {
         $extentGeometryAgg = null;
         $extentGeometrySc = null;
@@ -672,7 +672,7 @@ class MgUtils
         }
         $geomProp = $props->GetItem($geomName);
         if ($geomProp->GetPropertyType() != MgFeaturePropertyType::GeometricProperty)
-            throw new Exception("Not a geometry property: ".$geomName); //TODO: Localize
+            throw new Exception($app->localizer->getText("E_NOT_GEOMETRY_PROPERTY", $geomName));
 
         $spatialContext = $geomProp->GetSpatialContextAssociation();
 

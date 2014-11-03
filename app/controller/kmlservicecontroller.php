@@ -333,13 +333,13 @@ class MgKmlServiceController extends MgBaseController {
         $extents = null;
 
         if ($width == null)
-            $this->app->halt(400, "Missing required parameter: width"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "width"));
         if ($height == null)
-            $this->app->halt(400, "Missing required parameter: height"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "height"));
         if ($drawOrder == null)
-            $this->app->halt(400, "Missing required parameter: draworder"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "draworder"));
         if ($bbox == null) {
-            $this->app->halt(400, "Missing required parameter: bbox"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "bbox"));
         } else {
             $parts = explode(",", $bbox);
             if (count($parts) == 4) {
@@ -440,13 +440,13 @@ class MgKmlServiceController extends MgBaseController {
         $drawOrder = $this->GetRequestParameter("draworder", null);
 
         if ($width == null)
-            $this->app->halt(400, "Missing required parameter: width"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "width"));
         if ($height == null)
-            $this->app->halt(400, "Missing required parameter: height"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "height"));
         if ($drawOrder == null)
-            $this->app->halt(400, "Missing required parameter: draworder"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "draworder"));
         if ($bbox == null)
-            $this->app->halt(400, "Missing required parameter: bbox"); //TODO: Localize
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "bbox"));
 
         //We still need the mapagent URL so that GETFEATURESKML can generate legend icons from
         //within the operation

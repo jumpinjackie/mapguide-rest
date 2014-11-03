@@ -51,10 +51,30 @@ if (!class_exists("MgImageFormats")) {
 $webConfigPath = dirname(__FILE__)."/../webconfig.ini";
 MgInitializeWebTier($webConfigPath);
 
+require_once dirname(__FILE__)."/app/util/localizer.php";
 $config = require_once dirname(__FILE__)."/app/config.php";
+//Pull in the appropriate string bundle
+$strings = require_once dirname(__FILE__)."/app/res/lang/".$config["Locale"].".php";
 $app = new \Slim\Slim($config);
+$app->localizer = new Localizer($strings);
 $app->config("SelfUrl", $app->request->getUrl() . $app->request->getRootUri());
-
+/*
+var_dump($app->localizer->getText("E_METHOD_NOT_SUPPORTED"));
+var_dump($app->localizer->getText("E_METHOD_NOT_SUPPORTED", "test"));
+var_dump($app->localizer->getText("E_METHOD_NOT_SUPPORTED", 123));
+var_dump($app->localizer->getText("I_DONT_EXIST"));
+var_dump($app->localizer->getText("I_DONT_EXIST", "test"));
+var_dump($app->localizer->getText("I_DONT_EXIST", 123));
+var_dump($app->localizer->getText("E_CANNOT_DELETE_MULTIPLE_ID_PROPS"));
+var_dump($app->localizer->getText("E_CANNOT_DELETE_MULTIPLE_ID_PROPS", "foo"));
+var_dump($app->localizer->getText("E_CANNOT_DELETE_MULTIPLE_ID_PROPS", 123));
+var_dump($app->localizer->getText("E_CANNOT_DELETE_MULTIPLE_ID_PROPS", "foo", "bar"));
+var_dump($app->localizer->getText("E_CANNOT_DELETE_MULTIPLE_ID_PROPS", 123, "bar"));
+var_dump($app->localizer->getText("E_INVALID_COORDINATE_PAIR", "bar", 2));
+var_dump($app->localizer->getText("E_INVALID_COORDINATE_PAIR", "bar", "sdf"));
+var_dump($app->localizer->getText("E_INVALID_COORDINATE_PAIR", "bar", "234"));
+die;
+*/
 //Register known REST adapters and geom formatters to our DI container
 include dirname(__FILE__)."/app/adapters/registration.php";
 include dirname(__FILE__)."/app/formatters/registration.php";

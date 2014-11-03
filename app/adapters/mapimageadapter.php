@@ -95,9 +95,9 @@ class MgMapImageRestAdapter extends MgRestAdapter {
         if ($this->limit === -1)
             $this->limit = 0;
         if (!array_key_exists("MapDefinition", $config))
-            throw new Exception("Missing required adapter property 'MapDefinition'"); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_MISSING_REQUIRED_ADAPTER_PROPERTY", "MapDefinition"));
         if (!array_key_exists("SelectionLayer", $config))
-            throw new Exception("Missing required adapter property 'SelectionLayer'"); //TODO: Localize
+            throw new Exception($this->app->localizer->getText("E_MISSING_REQUIRED_ADAPTER_PROPERTY", "SelectionLayer"));
         
         $this->mapDefId = new MgResourceIdentifier($config["MapDefinition"]);
         $this->selLayerName = $config["SelectionLayer"];
@@ -152,10 +152,10 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             $layers = $this->map->GetLayers();
             $idx = $layers->IndexOf($this->selLayerName);
             if ($idx < 0)
-                throw new Exception("No layer named ".$this->selLayerName." found in map"); //TODO: Localize
+                throw new Exception($this->app->localizer->getText("E_LAYER_NOT_FOUND_IN_MAP", $this->selLayerName));
             $layer = $layers->GetItem($idx);
             if ($layer->GetFeatureSourceId() !== $this->featureSourceId->ToString())
-                throw new Exception("Layer ".$this->selLayerName." does not point to the expected feature source of (".$this->featureSourceId->ToString()."). It instead points to: ".$layer->GetFeatureSourceId()); //TODO: Localize
+                throw new Exception($this->app->localizer->getText("E_LAYER_NOT_POINTING_TO_EXPECTED_FEATURE_SOURCE", $this->selLayerName, $this->featureSourceId->ToString(), $layer->GetFeatureSourceId()));
 
             $this->selLayer = $layer;
 
