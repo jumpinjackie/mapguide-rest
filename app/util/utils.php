@@ -387,8 +387,9 @@ class MgUtils
         echo '{"'.$root->tagName.'":'.MgUtils::DomElementToJson($root).'}'; 
     }
 
-    public static function XslTransformByteReader($byteReader, $xslStylesheet, $xslParams) {
-        $xslPath = dirname(__FILE__)."/../res/xsl/$xslStylesheet";
+    public static function XslTransformByteReader($app, $byteReader, $xslStylesheet, $xslParams) {
+        $locale = $app->config("Locale");
+        $xslPath = dirname(__FILE__)."/../res/xsl/$locale/$xslStylesheet";
         
         $xsl = new DOMDocument();
         $xsl->load($xslPath);
