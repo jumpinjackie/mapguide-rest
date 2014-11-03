@@ -1,3 +1,37 @@
+ - KML service support:
+    - Provides a RESTful wrapper around existing MapGuide KML services
+ - #71: Record client agent and IP address when creating a MgSiteConnection
+ - #73: Fix layered PDF plotting for maps with base layer groups
+ - #77: Add missing REST API documentation for EnumerateMapLayers route
+ - #75: Features routes now support pagination. CZML representation does not support pagination.
+ - #76: Add HTML representation for features routes. This displays features attributes in a HTML table.
+ - Improved HTML representation of site repository
+    - All resource links in a resource list now open a separate resource info view. All action links have been moved here.
+    - Add informative placeholders for resources with no data items or references
+    - Fix permission issue in preview route
+    - Add missing CSS for some XSL stylesheets
+ - #78: mapguide-rest is now localization-ready
+
+0.10
+====
+
+ - #55: Feature query routes for Layer Definitions now pre-evaluate elevation settings
+ - #56: Experimental Cesium CZML support
+ - #62: Support for layer-specific vector tiles
+ - #63: Add download file support for most GET urls.
+ - #64: Fixed bad download links on resource data list HTML representation
+ - #65: You can now use un-qualified class names for specifying the data source in restcfg.json
+ - #66: Only override REQUEST_URI with UNENCODED_URL if UNENCODED_URL actually exists
+ - #67: Fix chunked response headers failing to be sent
+ - #68: Handle maxscale = infinity properly for sample applications
+ - #69: Support Layer Definitions as data sources in restcfg.json
+ - Samples now use:
+    - OpenLayers 3 final
+    - Cesium 1.1
+
+0.9
+===
+
  - PDF output support
     - Uses same routes as DWF plotting, except a pdf extension is used instead of dwf
         - The pagewidth and pageheight parameters have been replaced with papersize parameter, which can be any value of: A3,A4,A5,Letter,Legal
