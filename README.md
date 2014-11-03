@@ -20,7 +20,7 @@ Requirements
 
 mapguide-rest requires an installation of MapGuide Open Source and its bundled copy of PHP. As PHP is required by Fusion and other installed MapGuide web applications, this requirement will almost always be satisifed.
 
-mapguide-rest has been tested on MapGuide Open Source 2.5 (latest stable release is 2.5.2). It should theoretically work on any installation of MapGuide Open Source or AIMS that includes PHP 5.3 or newer.
+mapguide-rest has been tested on MapGuide Open Source 2.6. It should theoretically work on any installation of MapGuide Open Source or AIMS that includes PHP 5.3 or newer.
 
 Setup
 =====
