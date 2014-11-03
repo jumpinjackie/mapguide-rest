@@ -17,6 +17,13 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+//
+// This is the english text bundle for mapguide-rest
+// 
+// Use this as the reference bundle when doing your own translations. Due to the use of sprintf
+// placeholder substitution, make sure your translated text can still use placeholders in the
+// specified order here
+
 return array(
     "E_CZML_PAGINATION_NOT_SUPPORTED" => "Pagination of czml output not supported",
     "E_FORBIDDEN_ACCESS" => "You are not authorized to access this resource",
