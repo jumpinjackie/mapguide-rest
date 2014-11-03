@@ -243,8 +243,10 @@ class MgResourceServiceController extends MgBaseController {
         $smarty->assign("urlRoot", $rootPath);
         $smarty->assign("resourceType", $resId->GetResourceType());
 
+        $locale = $this->app->config("Locale");
+
         $this->app->response->header("Content-Type", MgMimeType::Html);
-        $this->app->response->setBody($smarty->fetch(dirname(__FILE__)."/../res/resourceinfo.tpl"));
+        $this->app->response->setBody($smarty->fetch(dirname(__FILE__)."/../res/templates/$locale/resourceinfo.tpl"));
     }
 
     public function EnumerateResources($resId, $format) {

@@ -289,7 +289,7 @@ class MgKmlServiceController extends MgBaseController {
     public function GetMapKml($resId, $format = "kml") {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("kml", "kmz"));
-        $native = ($this->GetBooleanRequestParameter("native", "1") == "1");
+        $native = ($this->GetBooleanRequestParameter("native", "0") == "1");
         $sessionId = "";
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
@@ -465,7 +465,7 @@ class MgKmlServiceController extends MgBaseController {
             $param->AddParameter("FORMAT", strtoupper($fmt));
             $param->AddParameter("X-CHUNK-RESPONSE", "true");
             $that->ExecuteHttpRequest($req);
-        }, false, $agentUri);
+        }, true, $agentUri);
     }
 }
 

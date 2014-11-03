@@ -121,6 +121,20 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
         <script src="qunit-1.10.0.js" type="text/javascript"></script>
         <script type="text/javascript">
 
+            var MgMimeType = {
+                Html: '<?= MgMimeType::Html ?>',
+                Xml: '<?= MgMimeType::Xml ?>',
+                Json: '<?= MgMimeType::Json ?>',
+                Png: '<?= MgMimeType::Png ?>',
+                Jpeg: '<?= MgMimeType::Jpeg ?>',
+                Gif: '<?= MgMimeType::Gif ?>',
+                Kml: '<?= MgMimeType::Kml ?>',
+                Kmz: '<?= MgMimeType::Kmz ?>',
+                Dwf: '<?= MgMimeType::Dwf ?>',
+                Binary: '<?= MgMimeType::Binary ?>',
+                Pdf: 'application/pdf'
+            };
+
             /**
              * jQuery plugin to convert a given $.ajax response xml object to json.
              *
@@ -344,13 +358,13 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     },
                     complete: function(result) {
                         if(result.status == 0) {
-                            callback(result.status, null);
+                            callback(result.status, null, result.getResponseHeader("Content-Type"));
                         } else if(result.status == 404) {
-                            callback(result.status, null);
+                            callback(result.status, null, result.getResponseHeader("Content-Type"));
                         } else if(result.status == 401) {
-                            callback(result.status, null);
+                            callback(result.status, null, result.getResponseHeader("Content-Type"));
                         } else {
-                            callback(result.status, result.responseText);
+                            callback(result.status, result.responseText, result.getResponseHeader("Content-Type"));
                         }
                     }
                 });
@@ -388,13 +402,13 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     async: false,
                     complete: function(result) {
                         if(result.status == 0) {
-                            callback(result.status, null);
+                            callback(result.status, null, result.getResponseHeader("Content-Type"));
                         } else if(result.status == 404) {
-                            callback(result.status, null);
+                            callback(result.status, null, result.getResponseHeader("Content-Type"));
                         } else if(result.status == 401) {
-                            callback(result.status, null);
+                            callback(result.status, null, result.getResponseHeader("Content-Type"));
                         } else {
-                            callback(result.status, result.responseText);
+                            callback(result.status, result.responseText, result.getResponseHeader("Content-Type"));
                         }
                     }
                 });
@@ -6881,6 +6895,473 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                     ok(status == 200, "(" + status + ") - Response should've been ok");
                     var gj = JSON.parse(result);
                     ok(gj.features.length == 0, "Expected 0 inserted features. Got " + gj.features.length);
+                });
+            });
+
+            module("Rendering Service - Library", {
+                setup: function() {
+                    var self = this;
+                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result) {
+                        ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                        self.anonymousSessionId = result;
+                    });
+                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                        ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                        self.adminSessionId = result;
+                    });
+                },
+                teardown: function() {
+                    api_test(rest_root_url + "/session/" + this.anonymousSessionId, "DELETE", null, function(status, result) {
+                        ok(status == 200, "(" + status + ") - Expected anonymous session to be destroyed");
+                        delete this.anonymousSessionId;
+                    });
+
+                    api_test(rest_root_url + "/session/" + this.adminSessionId, "DELETE", null, function(status, result) {
+                        ok(status == 200, "(" + status + ") - Expected admin session to be destroyed");
+                        delete this.adminSessionId;
+                    });
+                }
+            });
+            test("RenderMap", function() {
+                //Various missing parameters
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png", "GET", { scale: 8000 }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png", "GET", { scale: 8000 }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png", "GET", { x: -87.73, scale: 8000 }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png", "GET", { x: -87.73, scale: 8000 }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png", "GET", { x: -87.73, y: 43.74, scale: 8000 }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected image response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png", "GET", { x: -87.73, y: 43.74, scale: 8000 }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected image response");
+                });
+
+                //PNG
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Png, "(" + mimeType + ") expected PNG mime type");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Png, "(" + mimeType + ") expected PNG mime type");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Png, "(" + mimeType + ") expected PNG mime type");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200, session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Png, "(" + mimeType + ") expected PNG mime type");
+                });
+
+                //PNG8
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png8", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Png, "(" + mimeType + ") expected PNG mime type");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png8", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Png, "(" + mimeType + ") expected PNG mime type");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png8", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Png, "(" + mimeType + ") expected PNG mime type");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png8", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200, session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Png, "(" + mimeType + ") expected PNG mime type");
+                });
+
+                //JPG
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.jpg", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Jpeg, "(" + mimeType + ") expected JPG mime type");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.jpg", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Jpeg, "(" + mimeType + ") expected JPG mime type");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.jpg", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Jpeg, "(" + mimeType + ") expected JPG mime type");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.jpg", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200, session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Jpeg, "(" + mimeType + ") expected JPG mime type");
+                });
+
+                //GIF
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.gif", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Gif, "(" + mimeType + ") expected GIF mime type");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.gif", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Gif, "(" + mimeType + ") expected GIF mime type");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.gif", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Gif, "(" + mimeType + ") expected GIF mime type");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.gif", "GET", { x: -87.73, y: 43.74, scale: 8000, width: 320, height: 200, session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected image response");
+                    ok(mimeType == MgMimeType.Gif, "(" + mimeType + ") expected GIF mime type");
+                });
+            });
+            test("RenderDynamicOverlay", function() {
+
+            });
+
+            module("KML Service - Library", {
+                setup: function() {
+                    var self = this;
+                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result) {
+                        ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                        self.anonymousSessionId = result;
+                    });
+                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                        ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                        self.adminSessionId = result;
+                    });
+                },
+                teardown: function() {
+                    api_test(rest_root_url + "/session/" + this.anonymousSessionId, "DELETE", null, function(status, result) {
+                        ok(status == 200, "(" + status + ") - Expected anonymous session to be destroyed");
+                        delete this.anonymousSessionId;
+                    });
+
+                    api_test(rest_root_url + "/session/" + this.adminSessionId, "DELETE", null, function(status, result) {
+                        ok(status == 200, "(" + status + ") - Expected admin session to be destroyed");
+                        delete this.adminSessionId;
+                    });
+                }
+            });
+            test("GetMapKml", function() {
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+
+                //Pass thru
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", { "native": 1 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", { "native": 1 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", { "native": 1 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", { "native": 1 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
+                });
+            });
+            test("GetLayerKml", function() {
+                //Various missing parameters
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                //The actual valid requests
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+            });
+            test("GetFeaturesKml", function() {
+                //Various missing parameters
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                //The actual valid requests
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+            });
+
+            module("Plotting - Library", {
+                setup: function() {
+                    var self = this;
+                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result) {
+                        ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                        self.anonymousSessionId = result;
+                    });
+                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result) {
+                        ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                        self.adminSessionId = result;
+                    });
+                },
+                teardown: function() {
+                    api_test(rest_root_url + "/session/" + this.anonymousSessionId, "DELETE", null, function(status, result) {
+                        ok(status == 200, "(" + status + ") - Expected anonymous session to be destroyed");
+                        delete this.anonymousSessionId;
+                    });
+
+                    api_test(rest_root_url + "/session/" + this.adminSessionId, "DELETE", null, function(status, result) {
+                        ok(status == 200, "(" + status + ") - Expected admin session to be destroyed");
+                        delete this.adminSessionId;
+                    });
+                }
+            });
+            test("PDF Plot", function() {
+                //Various missing parameters
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.pdf", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.pdf", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.pdf", "GET", { scale: 8000 }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.pdf", "GET", { scale: 8000 }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.pdf", "GET", { x: -87.73, scale: 8000 }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.pdf", "GET", { x: -87.73, scale: 8000 }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.pdf", "GET", { x: -87.73, y: 43.74, scale: 8000 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected pdf response");
+                    ok(mimeType.indexOf(MgMimeType.Pdf) >= 0, "(" + mimeType + ") expected PDF mime type");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.pdf", "GET", { x: -87.73, y: 43.74, scale: 8000 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected pdf response");
+                    ok(mimeType.indexOf(MgMimeType.Pdf) >= 0, "(" + mimeType + ") expected PDF mime type");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.pdf", "GET", { x: -87.73, y: 43.74, scale: 8000, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected pdf response");
+                    ok(mimeType.indexOf(MgMimeType.Pdf) >= 0, "(" + mimeType + ") expected PDF mime type");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.pdf", "GET", { x: -87.73, y: 43.74, scale: 8000, session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected pdf response");
+                    ok(mimeType.indexOf(MgMimeType.Pdf) >= 0, "(" + mimeType + ") expected PDF mime type");
+                });
+            });
+            test("Layered PDF Plot", function() {
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.pdf", "GET", { x: -87.73, y: 43.74, scale: 8000, layeredpdf: 1 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected pdf response");
+                    ok(mimeType.indexOf(MgMimeType.Pdf) >= 0, "(" + mimeType + ") expected PDF mime type");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.pdf", "GET", { x: -87.73, y: 43.74, scale: 8000, layeredpdf: 1 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected pdf response");
+                    ok(mimeType.indexOf(MgMimeType.Pdf) >= 0, "(" + mimeType + ") expected PDF mime type");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.pdf", "GET", { x: -87.73, y: 43.74, scale: 8000, layeredpdf: 1, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected pdf response");
+                    ok(mimeType.indexOf(MgMimeType.Pdf) >= 0, "(" + mimeType + ") expected PDF mime type");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.pdf", "GET", { x: -87.73, y: 43.74, scale: 8000, layeredpdf: 1, session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected pdf response");
+                    ok(mimeType.indexOf(MgMimeType.Pdf) >= 0, "(" + mimeType + ") expected PDF mime type");
+                });
+            });
+            test("DWF Plot", function() {
+                //Various missing parameters
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.dwf", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.dwf", "GET", null, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.dwf", "GET", { scale: 8000 }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.dwf", "GET", { scale: 8000 }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.dwf", "GET", { x: -87.73, scale: 8000 }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.dwf", "GET", { x: -87.73, scale: 8000 }, function(status, result) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.dwf", "GET", { x: -87.73, y: 43.74, scale: 8000 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected dwf response");
+                    ok(mimeType.indexOf(MgMimeType.Dwf) >= 0, "(" + mimeType + ") expected DWF mime type");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.dwf", "GET", { x: -87.73, y: 43.74, scale: 8000 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected dwf response");
+                    ok(mimeType.indexOf(MgMimeType.Dwf) >= 0, "(" + mimeType + ") expected DWF mime type");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.dwf", "GET", { x: -87.73, y: 43.74, scale: 8000, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected dwf response");
+                    ok(mimeType.indexOf(MgMimeType.Dwf) >= 0, "(" + mimeType + ") expected DWF mime type");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/plot.dwf", "GET", { x: -87.73, y: 43.74, scale: 8000, session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected dwf response");
+                    ok(mimeType.indexOf(MgMimeType.Dwf) >= 0, "(" + mimeType + ") expected DWF mime type");
                 });
             });
 

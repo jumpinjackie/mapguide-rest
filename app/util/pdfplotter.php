@@ -784,7 +784,6 @@ class MgPdfPlotter
             $mExt = $this->DrawExtentCS($legendWidthIn);
         }
         
-        $this->app->response->header("Content-Type", "application/pdf");
         $mode = 'I';
         $name = 'Map.pdf';
         if (strlen($this->title) > 0)

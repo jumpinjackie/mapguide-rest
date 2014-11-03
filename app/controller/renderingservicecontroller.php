@@ -89,8 +89,26 @@ class MgRenderingServiceController extends MgBaseController {
 
     public function RenderMapDefinition($mdfId, $format) {
         $resIdStr = $mdfId->ToString();
+
+        $x = $this->GetRequestParameter("x", null);
+        $y = $this->GetRequestParameter("y", null);
+        $scale = $this->GetRequestParameter("scale", null);
+        $width = $this->GetRequestParameter("width", null);
+        $height = $this->GetRequestParameter("height", null);
+
+        if ($x == null)
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "x"));
+        if ($y == null)
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "y"));
+        if ($scale == null)
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "scale"));
+        if ($width == null)
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "width"));
+        if ($height == null)
+            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "height"));
+
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr, $format) {
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr, $format, $x, $y, $scale, $width, $height) {
             $param->AddParameter("OPERATION", "GETMAPIMAGE");
             $param->AddParameter("VERSION", "2.0.0");
             $param->AddParameter("MAPDEFINITION", $resIdStr);
@@ -104,29 +122,16 @@ class MgRenderingServiceController extends MgBaseController {
             if ($clip != null)
                 $param->AddParameter("CLIP", $clip);
 
-            $x = $that->GetRequestParameter("x", null);
-            if ($x != null)
-                $param->AddParameter("SETVIEWCENTERX", $x);
-
-            $y = $that->GetRequestParameter("y", null);
-            if ($y != null)
-                $param->AddParameter("SETVIEWCENTERY", $y);
-
-            $scale = $that->GetRequestParameter("scale", null);
-            if ($scale != null)
-                $param->AddParameter("SETVIEWSCALE", $scale);
+            $param->AddParameter("SETVIEWCENTERX", $x);
+            $param->AddParameter("SETVIEWCENTERY", $y);
+            $param->AddParameter("SETVIEWSCALE", $scale);
 
             $dpi = $that->GetRequestParameter("dpi", null);
             if ($dpi != null)
                 $param->AddParameter("SETDISPLAYDPI", $dpi);
-
-            $width = $that->GetRequestParameter("width", null);
-            if ($width != null)
-                $param->AddParameter("SETDISPLAYWIDTH", $width);
-
-            $height = $that->GetRequestParameter("height", null);
-            if ($height != null)
-                $param->AddParameter("SETDISPLAYHEIGHT", $height);
+            
+            $param->AddParameter("SETDISPLAYWIDTH", $width);
+            $param->AddParameter("SETDISPLAYHEIGHT", $height);
 
             $showlayers = $that->GetRequestParameter("showlayers", null);
             if ($showlayers != null)
