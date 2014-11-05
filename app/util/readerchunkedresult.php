@@ -263,12 +263,13 @@ class MgReaderChunkedResult
             } else {
                 //Write next page link. Note that we cannot determine the size of this reader, so we cannot determine the actual
                 //end of reader without iterating through it, so the next page link is always written regardless.
-                $pageHtml .= "<a href='".$nextUrl."'>Next</a>"; //TODO: Localize
+                $pageHtml .= "<a href='".$nextUrl."'>Next&nbsp;&gt;&gt;</a>"; //TODO: Localize
             }
         }
 
         $clsDef = $this->reader->GetClassDefinition();
-        $output .= "<div class='pull-left'><div><strong>Class: ".$clsDef->GetName()."</strong></div><div>$pageHtml</div></div>";
+        $pageNoHtml = "<span>(Page $pageNo)</span>"; //TODO: Localize
+        $output .= "<div class='pull-left'><div><strong>Class: ".$clsDef->GetName()."</strong> $pageNoHtml</div><div>$pageHtml</div></div>"; //TODO: Localize
         $output .= "<table class='table table-bordered'>";
         $output .= "<!-- Table header -->";
         $output .= "<tr>";

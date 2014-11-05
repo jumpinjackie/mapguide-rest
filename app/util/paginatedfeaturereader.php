@@ -48,6 +48,10 @@ class MgPaginatedFeatureReader
         return $this->pageNo;
     }
 
+    public function CanContinue($limit) {
+        return $limit > $this->read;
+    }
+
     public function ReadNext() {
         $bResult = $this->innerReader->ReadNext();
         //End of reader

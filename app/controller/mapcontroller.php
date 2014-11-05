@@ -529,7 +529,11 @@ class MgMapController extends MgBaseController {
     }
 
     public function GetSelectedFeatures($sessionId, $mapName, $layerName, $format) {
-        $fmt = $this->ValidateRepresentation($format, array("xml", "geojson"));
+        $fmt = $this->ValidateRepresentation($format, array("xml", "geojson", "html"));
+
+        $pageSize = $this->GetRequestParameter("pagesize", -1);
+        $pageNo = $this->GetRequestParameter("page", -1);
+
         $this->EnsureAuthenticationForSite($sessionId);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
@@ -565,10 +569,19 @@ class MgMapController extends MgBaseController {
                 $transform = MgUtils::GetTransform($featSvc, $resId, $tokens[0], $tokens[1], $transformto);
             }
             $reader = $selection->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), $bMapped);
-            $result = new MgReaderChunkedResult($featSvc, $reader, -1, new MgHttpChunkWriter());
+            if ($pageSize > 0) {
+                $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo);
+                $result = new MgReaderChunkedResult($featSvc, $pageReader, -1, new MgHttpChunkWriter());
+            } else {
+                $result = new MgReaderChunkedResult($featSvc, $reader, -1, new MgHttpChunkWriter());
+            }
             $result->CheckAndSetDownloadHeaders($this->app, $format);
             if ($transform != null)
                 $result->SetTransform($transform);
+            if ($fmt === "html") {
+                $result->SetBaseUrl($this->app->config("SelfUrl"));
+                $result->SetThisUrl($this->app->config("SelfUrl").$this->app->request->getPathInfo(), $this->app->request->params());
+            }
             $result->Output($format);
         }
     }
