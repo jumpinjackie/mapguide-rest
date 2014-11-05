@@ -114,13 +114,15 @@ class MgReaderChunkedResult
     private $baseUrl;
     private $thisUrl;
     private $thisReqParams;
+    private $orientation;
 
     public function __construct($featSvc, $reader, $limit, $writer = NULL) {
         $this->featSvc = $featSvc;
         $this->reader = $reader;
         $this->limit = $limit;
         $this->baseUrl = null;
-        $this->transform = null;
+        $transform = null;
+        $this->orientation = "h";
         $this->thisReqParams = array();
         if ($writer != null)
             $this->writer = $writer;
@@ -141,8 +143,12 @@ class MgReaderChunkedResult
         }
     }
 
+    public function SetAttributeDisplayOrientation($orientation) {
+        $this->orientation = $orientation;
+    }
+
     public function SetTransform($tx) {
-        $this->transform = $tx;
+        $transform = $tx;
     }
 
     public function SetBaseUrl($baseUrl) {
@@ -179,7 +185,7 @@ class MgReaderChunkedResult
             if (!$firstFeature) {
                 $output .= ",";
             }
-            $output .= MgGeoJsonWriter::FeatureToGeoJson($this->reader, $agfRw, $this->transform, ($idProp != NULL ? $idProp->GetName() : NULL));
+            $output .= MgGeoJsonWriter::FeatureToGeoJson($this->reader, $agfRw, $transform, ($idProp != NULL ? $idProp->GetName() : NULL));
             $this->writer->WriteChunk($output);
             $output = "";
 
@@ -190,6 +196,59 @@ class MgReaderChunkedResult
         $this->writer->WriteChunk($output);
         $this->writer->EndChunking();
         $this->reader->Close();
+    }
+
+    private static function WriteFeatureAttributeCell($reader, $i, $agfRw, $wktRw, $transform = null) {
+        $output = "";
+        $propType = $reader->GetPropertyType($i);
+        if (!$reader->IsNull($i)) {
+            switch($propType) {
+                case MgPropertyType::Boolean:
+                    //NOTE: It appears PHP booleans are not string-able
+                    $output .= ($reader->GetBoolean($i) ? "true" : "false");
+                    break;
+                case MgPropertyType::Byte:
+                    $output .= $reader->GetByte($i);
+                    break;
+                case MgPropertyType::DateTime:
+                    $dt = $reader->GetDateTime($i);
+                    $output .= $dt->ToString();
+                    break;
+                case MgPropertyType::Decimal:
+                case MgPropertyType::Double:
+                    $output .= $reader->GetDouble($i);
+                    break;
+                case MgPropertyType::Geometry:
+                    {
+                        try {
+                            $agf = $reader->GetGeometry($i);
+                            $geom = ($transform != null) ? $agfRw->Read($agf, $transform) : $agfRw->Read($agf);
+                            $output .= $wktRw->Write($geom);
+                        } catch (MgException $ex) {
+
+                        }
+                    }
+                    break;
+                case MgPropertyType::Int16:
+                    $output .= $reader->GetInt16($i);
+                    break;
+                case MgPropertyType::Int32:
+                    $output .= $reader->GetInt32($i);
+                    break;
+                case MgPropertyType::Int64:
+                    $output .= $reader->GetInt64($i);
+                    break;
+                case MgPropertyType::Single:
+                    $output .= $reader->GetSingle($i);
+                    break;
+                case MgPropertyType::String:
+                    $output .= MgUtils::EscapeXmlChars($reader->GetString($i));
+                    break;
+            }
+        } else {
+            $output .= "(null)";
+        }
+        return $output;
     }
 
     private function OutputHtml($schemas) {
@@ -287,93 +346,76 @@ class MgReaderChunkedResult
         $idProps = $clsDef->GetIdentityProperties();
         
         $output .= "<div class='pull-left'><div><strong>".$clsDef->GetName()."</strong> $pageNoHtml</div><div>$totalHtml</div><div>$pageHtml</div></div>"; //TODO: Localize
-        $output .= "<table class='table table-bordered'>";
-        $output .= "<!-- Table header -->";
-        $output .= "<tr>";
-        for ($i = 0; $i < $propCount; $i++) {
-            $name = $this->reader->GetPropertyName($i);
-            if ($idProps->IndexOf($name) >= 0) {
-                $output .= "<th>$name*</th>"; //Denote identity property
-            } else {
-                $output .= "<th>$name</th>";
-            }
-        }
-        $output .= "</tr>";
-        $this->writer->WriteChunk($output);
-
-        while ($this->reader->ReadNext()) {
-            $read++;
-            if ($this->limit > 0 && $read > $this->limit) {
-                break;
-            }
-
-            $output = "<tr>";
+        if ($this->orientation === "h") {
+            $output .= "<table class='table table-bordered table-condensed table-hover'>";
+            $output .= "<!-- Table header -->";
+            $output .= "<tr>";
             for ($i = 0; $i < $propCount; $i++) {
                 $name = $this->reader->GetPropertyName($i);
-                $propType = $this->reader->GetPropertyType($i);
-
-                $output .= "<td>";
-                if (!$this->reader->IsNull($i)) {
-                    switch($propType) {
-                        case MgPropertyType::Boolean:
-                            //NOTE: It appears PHP booleans are not string-able
-                            $output .= ($this->reader->GetBoolean($i) ? "true" : "false");
-                            break;
-                        case MgPropertyType::Byte:
-                            $output .= $this->reader->GetByte($i);
-                            break;
-                        case MgPropertyType::DateTime:
-                            $dt = $this->reader->GetDateTime($i);
-                            $output .= $dt->ToString();
-                            break;
-                        case MgPropertyType::Decimal:
-                        case MgPropertyType::Double:
-                            $output .= $this->reader->GetDouble($i);
-                            break;
-                        case MgPropertyType::Geometry:
-                            {
-                                try {
-                                    $agf = $this->reader->GetGeometry($i);
-                                    $geom = ($this->transform != null) ? $agfRw->Read($agf, $this->transform) : $agfRw->Read($agf);
-                                    $output .= $wktRw->Write($geom);
-                                } catch (MgException $ex) {
-
-                                }
-                            }
-                            break;
-                        case MgPropertyType::Int16:
-                            $output .= $this->reader->GetInt16($i);
-                            break;
-                        case MgPropertyType::Int32:
-                            $output .= $this->reader->GetInt32($i);
-                            break;
-                        case MgPropertyType::Int64:
-                            $output .= $this->reader->GetInt64($i);
-                            break;
-                        case MgPropertyType::Single:
-                            $output .= $this->reader->GetSingle($i);
-                            break;
-                        case MgPropertyType::String:
-                            $output .= MgUtils::EscapeXmlChars($this->reader->GetString($i));
-                            break;
-                    }
+                if ($idProps->IndexOf($name) >= 0) {
+                    $output .= "<th>$name*</th>"; //Denote identity property
                 } else {
-                    $output .= "(null)";
+                    $output .= "<th>$name</th>";
                 }
-                $output .= "</td>";
+            }
+            $output .= "</tr>";
+            $this->writer->WriteChunk($output);
 
+            while ($this->reader->ReadNext()) {
+                $read++;
+                if ($this->limit > 0 && $read > $this->limit) {
+                    break;
+                }
+
+                $output = "<tr>";
+                for ($i = 0; $i < $propCount; $i++) {
+                    $name = $this->reader->GetPropertyName($i);
+
+                    $output .= "<td>";
+                    $output .= self::WriteFeatureAttributeCell($this->reader, $i, $agfRw, $wktRw, $this->transform);
+                    $output .= "</td>";
+
+                }
+
+                $output .= "</tr>";
+
+                $this->writer->WriteChunk($output);
+                $output = "";
             }
 
-            $output .= "</tr>";
-
+            $output .= "</table>";
+            $output .= "<div class='pull-left'>$pageHtml</div>";
+            $output .= "</body></html>";
             $this->writer->WriteChunk($output);
-            $output = "";
-        }
+        } else { //vertical
+            while ($this->reader->ReadNext()) {
+                $read++;
+                if ($this->limit > 0 && $read > $this->limit) {
+                    break;
+                }
 
-        $output .= "</table>";
-        $output .= "<div class='pull-left'>$pageHtml</div>";
-        $output .= "</body></html>";
-        $this->writer->WriteChunk($output);
+                $output .= "<table class='table table-bordered table-condensed table-hover'>";
+                $output .= "<!-- Table header -->";
+                for ($i = 0; $i < $propCount; $i++) {
+                    $output .= "<tr>";
+                    $name = $this->reader->GetPropertyName($i);
+                    $propType = $this->reader->GetPropertyType($i);
+                    $name = $this->reader->GetPropertyName($i);
+                    if ($idProps->IndexOf($name) >= 0) {
+                        $output .= "<td><strong>$name*</strong></td>"; //Denote identity property
+                    } else {
+                        $output .= "<td><strong>$name</strong></td>";
+                    }
+                    $output .= "<td>";
+                    $output .= self::WriteFeatureAttributeCell($this->reader, $i, $agfRw, $wktRw, $this->transform);
+                    $output .= "</td>";
+                    $output .= "</tr>";
+                }
+                $output .= "</table>";
+                $this->writer->WriteChunk($output);
+                $output = "";
+            }
+        }
         $this->writer->EndChunking();
         $this->reader->Close();
     }
@@ -431,7 +473,7 @@ class MgReaderChunkedResult
                             {
                                 try {
                                     $agf = $this->reader->GetGeometry($i);
-                                    $geom = ($this->transform != null) ? $agfRw->Read($agf, $this->transform) : $agfRw->Read($agf);
+                                    $geom = ($transform != null) ? $agfRw->Read($agf, $transform) : $agfRw->Read($agf);
                                     $output .= $wktRw->Write($geom);
                                 } catch (MgException $ex) {
 

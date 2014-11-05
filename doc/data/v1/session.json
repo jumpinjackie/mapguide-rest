@@ -1373,6 +1373,17 @@
                             "type": "integer",
                             "required": false,
                             "description": "Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply."
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "orientation",
+                            "type": "string",
+                            "required": false,
+                            "description": "The display orientation of feature attribuutes. Only applies if type is html. h=horizontal, v=vertical",
+                            "enum": [
+                                "h",
+                                "v"
+                            ]
                         }
                     ],
                     "responseMessages": [

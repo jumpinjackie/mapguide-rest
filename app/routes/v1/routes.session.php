@@ -521,7 +521,8 @@ $app->get("/session/:sessionId/:mapName.Selection/features/:layerName", function
  *          @SWG\parameter(name="mappedonly", paramType="path", required=false, type="boolean", description="Only return properties mapped in the Layer Definition"),
  *          @SWG\parameter(name="transformto", paramType="path", required=false, type="string", description="The CS-Map coordinate system code to transform these features to"),
  *          @SWG\parameter(name="pagesize", paramType="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the number of results for the page."),
- *          @SWG\parameter(name="page", paramType="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply.")
+ *          @SWG\parameter(name="page", paramType="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply."),
+ *          @SWG\parameter(name="orientation", paramType="query", required=false, type="string", description="The display orientation of feature attribuutes. Only applies if type is html. h=horizontal, v=vertical", enum="['h','v']")
  *        ),
  *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),

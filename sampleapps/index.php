@@ -88,6 +88,7 @@ $hasOL2Samples = true;
                 <li><a href="untiled/index.html">Basic Sheboygan un-tiled map example with basic legend</a></li>
                 <li><a href="tiled/index.html">Basic Sheboygan tiled map example</a></li>
                 <li><a href="selection/index.html">Basic Sheboygan un-tiled map example with selection</a></li>
+                <li><a href="selection2/index.html">Basic Sheboygan un-tiled map example with selection property palette</a></li>
                 <li><a href="mixed/index.html">Basic Sheboygan mixed map (tiled and untiled) example</a></li>
                 <li><a href="commercial/index.html">Sheboygan map with Google/OSM layers</a></li>
                 <li><a href="xyz/index.html">Sheboygan map as an XYZ tile layer (OpenLayers 2)</a></li>

@@ -533,6 +533,7 @@ class MgMapController extends MgBaseController {
 
         $pageSize = $this->GetRequestParameter("pagesize", -1);
         $pageNo = $this->GetRequestParameter("page", -1);
+        $orientation = $this->GetRequestParameter("orientation", "h");
 
         $this->EnsureAuthenticationForSite($sessionId);
         $siteConn = new MgSiteConnection();
@@ -581,6 +582,7 @@ class MgMapController extends MgBaseController {
             if ($transform != null)
                 $result->SetTransform($transform);
             if ($fmt === "html") {
+                $result->SetAttributeDisplayOrientation($orientation);
                 $result->SetBaseUrl($this->app->config("SelfUrl"));
                 $result->SetThisUrl($this->app->config("SelfUrl").$this->app->request->getPathInfo(), $this->app->request->params());
             }
