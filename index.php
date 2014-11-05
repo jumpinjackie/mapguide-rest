@@ -83,27 +83,27 @@ include dirname(__FILE__)."/app/formatters/registration.php";
 $app->config("AppRootDir", dirname(__FILE__));
 include "app/config.php";
 //Register these routes in the default namespace
-include "app/routes/routes.data.v1.php";
-include "app/routes/routes.library.v1.php";
-include "app/routes/routes.session.v1.php";
-include "app/routes/routes.coordsys.v1.php";
-include "app/routes/routes.providers.v1.php";
-include "app/routes/routes.site.v1.php";
-include "app/routes/routes.admin.v1.php";
-include "app/routes/routes.services.v1.php";
-include "app/routes/routes.doc.v1.php";
+include "app/routes/routes.data.php";
+include "app/routes/routes.library.php";
+include "app/routes/routes.session.php";
+include "app/routes/routes.coordsys.php";
+include "app/routes/routes.providers.php";
+include "app/routes/routes.site.php";
+include "app/routes/routes.admin.php";
+include "app/routes/routes.services.php";
+include "app/routes/routes.doc.php";
 //Now scope the same routes under the v1 namespace. While the above includes may change, the includes
 //here cannot. We have effectively set these routes "in stone". Once set, this cannot be changed
 $app->group("/v1", function() use ($app) {
-    include "app/routes/routes.data.v1.php";
-    include "app/routes/routes.library.v1.php";
-    include "app/routes/routes.session.v1.php";
-    include "app/routes/routes.coordsys.v1.php";
-    include "app/routes/routes.providers.v1.php";
-    include "app/routes/routes.site.v1.php";
-    include "app/routes/routes.admin.v1.php";
-    include "app/routes/routes.services.v1.php";
-    include "app/routes/routes.doc.v1.php";
+    include "app/routes/routes.data.php";
+    include "app/routes/routes.library.php";
+    include "app/routes/routes.session.php";
+    include "app/routes/routes.coordsys.php";
+    include "app/routes/routes.providers.php";
+    include "app/routes/routes.site.php";
+    include "app/routes/routes.admin.php";
+    include "app/routes/routes.services.php";
+    include "app/routes/routes.doc.php";
 });
 /*
 $app->get("/", function() {
