@@ -568,9 +568,11 @@ class MgMapController extends MgBaseController {
                 $tokens = explode(":", $layer->GetFeatureClassName());
                 $transform = MgUtils::GetTransform($featSvc, $resId, $tokens[0], $tokens[1], $transformto);
             }
+            //NOTE: This does not do a query to ascertain a total, this is already a pre-computed property of the selection set.
+            $total = $selection->GetSelectedFeaturesCount($layer, $layer->GetFeatureClassName());
             $reader = $selection->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), $bMapped);
             if ($pageSize > 0) {
-                $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo);
+                $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo, $total);
                 $result = new MgReaderChunkedResult($featSvc, $pageReader, -1, new MgHttpChunkWriter());
             } else {
                 $result = new MgReaderChunkedResult($featSvc, $reader, -1, new MgHttpChunkWriter());

@@ -199,6 +199,8 @@ class MgReaderChunkedResult
 
         $paginated = (is_callable(array($this->reader, "GetPageSize")) && is_callable(array($this->reader, "GetPageNo")));
 
+        //TODO: This should really be offloaded to a smarty template
+
         $this->writer->SetHeader("Content-Type", MgMimeType::Html);
         $this->writer->StartChunking();
 
@@ -216,6 +218,8 @@ class MgReaderChunkedResult
         $propCount = $this->reader->GetPropertyCount();
 
         $pageHtml = "";
+        $totalHtml = "";
+        $pageNoHtml = "";
         //Write pagination HTML if this reader is paginated
         if ($paginated === TRUE) {
             $pageSize = $this->reader->GetPageSize();
@@ -258,24 +262,41 @@ class MgReaderChunkedResult
 
             if ($pageNo > 1) {
                 //Write prev/next page links.
-                $pageHtml .= "<a href='".$prevUrl."'>&lt;&lt;&nbsp;Prev</a>&nbsp;|&nbsp;"; //TODO: Localize
-                $pageHtml .= "<a href='".$nextUrl."'>Next&nbsp;&gt;&gt;</a>"; //TODO: Localize
+                $pageHtml .= "<a href='".$prevUrl."'>&lt;&lt;&nbsp;Prev</a>&nbsp;"; //TODO: Localize
+                if ($this->reader->HasMorePages()) {
+                    $pageHtml .= "|&nbsp;<a href='".$nextUrl."'>Next&nbsp;&gt;&gt;</a>"; //TODO: Localize
+                }
             } else {
-                //Write next page link. Note that we cannot determine the size of this reader, so we cannot determine the actual
-                //end of reader without iterating through it, so the next page link is always written regardless.
-                $pageHtml .= "<a href='".$nextUrl."'>Next&nbsp;&gt;&gt;</a>"; //TODO: Localize
+                if ($this->reader->HasMorePages()) {
+                    $pageHtml .= "<a href='".$nextUrl."'>Next&nbsp;&gt;&gt;</a>"; //TODO: Localize
+                }
+            }
+            if ($this->reader->GetTotal() >= 0) {
+                $totalHtml = "<span>".$this->reader->GetTotal()." features</span>"; //TODO: Localize
+            }
+            $maxPages = $this->reader->GetMaxPages();
+            if ($maxPages >= 0) {
+                $pageNoHtml = "<strong>(Page $pageNo of $maxPages)</strong>"; //TODO: Localize
+            } else {
+                $pageNoHtml = "<strong>(Page $pageNo)</strong>"; //TODO: Localize
             }
         }
 
+
         $clsDef = $this->reader->GetClassDefinition();
-        $pageNoHtml = "<span>(Page $pageNo)</span>"; //TODO: Localize
-        $output .= "<div class='pull-left'><div><strong>Class: ".$clsDef->GetName()."</strong> $pageNoHtml</div><div>$pageHtml</div></div>"; //TODO: Localize
+        $idProps = $clsDef->GetIdentityProperties();
+        
+        $output .= "<div class='pull-left'><div><strong>".$clsDef->GetName()."</strong> $pageNoHtml</div><div>$totalHtml</div><div>$pageHtml</div></div>"; //TODO: Localize
         $output .= "<table class='table table-bordered'>";
         $output .= "<!-- Table header -->";
         $output .= "<tr>";
         for ($i = 0; $i < $propCount; $i++) {
             $name = $this->reader->GetPropertyName($i);
-            $output .= "<th>$name</th>";
+            if ($idProps->IndexOf($name) >= 0) {
+                $output .= "<th>$name*</th>"; //Denote identity property
+            } else {
+                $output .= "<th>$name</th>";
+            }
         }
         $output .= "</tr>";
         $this->writer->WriteChunk($output);
