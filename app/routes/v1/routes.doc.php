@@ -28,36 +28,25 @@ require_once dirname(__FILE__)."/../../version.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
 
 $app->get("/apidoc/", function() use ($app) {
-    $cacheFile = $app->config("Cache.RootDir")."/docfiles".$app->request->getPathInfo().".json";
-    $data = null;
-    if (!file_exists($cacheFile)) {
-        $path = $app->config("AppRootDir")."/doc/data/api-docs.json";
-
-        //HACK: swagger-php doesn't seem to support annotations for describing the API
-        //So we'll intercept the api-docs.json request via this route to inject that
-        //information
-        $doc = json_decode(file_get_contents($path));
-        $doc->apiVersion = MG_REST_API_VERSION;
-        $doc->swaggerVersion = SWAGGER_API_VERSION;
-        $doc->info = new stdClass();
-        //TODO: Localize
-        $doc->info->title = "mapguide-rest";
-        $doc->info->description = "mapguide-rest is a RESTful web extension for MapGuide Open Source and Autodesk Infrastructure Map Server.<br/><br/><strong>NOTE:</strong> Basic HTTP authentication credentials will generally be cached by the web browser for a short period should you choose to use this method instead of passing in session ids"; //TODO: Localize
-        $doc->info->license = "LGPL 2.1";
-        $doc->info->licenseUrl = "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html";
-        
-        //Scrub out the .json extensions
-        foreach ($doc->apis as $api) {
-            $api->path = str_replace(".json", "", $api->path);
-        }
-        $data = json_encode($doc);
-        $dir = dirname($cacheFile);
-        if (!is_dir($dir))
-            mkdir($dir, 0777, true);
-        file_put_contents($cacheFile, $data);
-    } else {
-        $data = file_get_contents($cacheFile);
+    $path = $app->config("AppRootDir")."/doc/data/api-docs.json";
+    //HACK: swagger-php doesn't seem to support annotations for describing the API
+    //So we'll intercept the api-docs.json request via this route to inject that
+    //information
+    $doc = json_decode(file_get_contents($path));
+    $doc->apiVersion = MG_REST_API_VERSION;
+    $doc->swaggerVersion = SWAGGER_API_VERSION;
+    $doc->info = new stdClass();
+    //TODO: Localize
+    $doc->info->title = "mapguide-rest";
+    $doc->info->description = "mapguide-rest is a RESTful web extension for MapGuide Open Source and Autodesk Infrastructure Map Server.<br/><br/><strong>NOTE:</strong> Basic HTTP authentication credentials will generally be cached by the web browser for a short period should you choose to use this method instead of passing in session ids"; //TODO: Localize
+    $doc->info->license = "LGPL 2.1";
+    $doc->info->licenseUrl = "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html";
+    
+    //Scrub out the .json extensions
+    foreach ($doc->apis as $api) {
+        $api->path = str_replace(".json", "", $api->path);
     }
+    $data = json_encode($doc);
     $app->response->header("Content-Type", "application/json");
     $app->response->setBody($data);
 });
