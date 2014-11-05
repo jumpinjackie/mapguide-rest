@@ -26,7 +26,7 @@
     <!-- ============================================  -->
     <target name="docgen">
         <!-- NOTE: Window-ism. Can't use '/' here. Ugh! -->
-        <exec command="vendor\bin\swagger .\app\routes -o .\doc\data --default-base-path ${apidoc.basepath}" dir="." checkReturn="true" level="debug" />
+        <exec command="vendor\bin\swagger .\app\routes -o .\doc\data --default-base-path ${apidoc.basepath}" dir="." logoutput="true" checkReturn="true" level="debug" />
     </target>
 
     <!-- ============================================  -->

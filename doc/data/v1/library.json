@@ -826,7 +826,7 @@
                         {
                             "paramType": "query",
                             "name": "maxfeatures",
-                            "type": "string",
+                            "type": "integer",
                             "required": false,
                             "description": "The maximum number of features to restrict this response to"
                         },
@@ -858,14 +858,14 @@
                         {
                             "paramType": "query",
                             "name": "pagesize",
-                            "type": "string",
+                            "type": "integer",
                             "required": false,
                             "description": "Applies pagination on the query result. This specifies the number of results for the page."
                         },
                         {
                             "paramType": "query",
                             "name": "page",
-                            "type": "string",
+                            "type": "integer",
                             "required": false,
                             "description": "Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply."
                         }
@@ -1120,7 +1120,7 @@
                         {
                             "paramType": "query",
                             "name": "maxfeatures",
-                            "type": "string",
+                            "type": "integer",
                             "required": false,
                             "description": "The maximum number of features to restrict this response to"
                         },
@@ -1141,14 +1141,14 @@
                         {
                             "paramType": "query",
                             "name": "pagesize",
-                            "type": "string",
+                            "type": "integer",
                             "required": false,
                             "description": "Applies pagination on the query result. This specifies the number of results for the page."
                         },
                         {
                             "paramType": "query",
                             "name": "page",
-                            "type": "string",
+                            "type": "integer",
                             "required": false,
                             "description": "Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply."
                         }
@@ -1536,7 +1536,7 @@
                         {
                             "paramType": "query",
                             "name": "maxfeatures",
-                            "type": "string",
+                            "type": "integer",
                             "required": false,
                             "description": "The maximum number of features to restrict this response to"
                         },
@@ -1557,14 +1557,116 @@
                         {
                             "paramType": "query",
                             "name": "pagesize",
-                            "type": "string",
+                            "type": "integer",
                             "required": false,
                             "description": "Applies pagination on the query result. This specifies the number of results for the page. You cannot specify this parameter for CZML output"
                         },
                         {
                             "paramType": "query",
                             "name": "page",
+                            "type": "integer",
+                            "required": false,
+                            "description": "Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply. You cannot specify this parameter for CZML output"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/library/{resourcePath}.LayerDefinition/features.{type}",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Queries features from the specified layer definition. Any hyperlink, tooltip and elevation expressions in the Layer Definition will be computed and returned in the response",
+                    "nickname": "SelectLayerFeatures",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "session",
                             "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resourcePath",
+                            "type": "string",
+                            "required": true,
+                            "description": "The path of the resource ID"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "properties",
+                            "type": "string",
+                            "required": false,
+                            "description": "A comma-separated list of proprety names"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "filter",
+                            "type": "string",
+                            "required": false,
+                            "description": "The FDO filter to apply. This will be combined with whatever filter is defined in the layer"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "maxfeatures",
+                            "type": "integer",
+                            "required": false,
+                            "description": "The maximum number of features to restrict this response to"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "transformto",
+                            "type": "string",
+                            "required": false,
+                            "description": "The CS-Map coordinate system code to transform the resulting features into"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "bbox",
+                            "type": "string",
+                            "required": false,
+                            "description": "A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml, geojson, html or czml",
+                            "enum": [
+                                "xml",
+                                "geojson",
+                                "html",
+                                "czml"
+                            ]
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "pagesize",
+                            "type": "integer",
+                            "required": false,
+                            "description": "Applies pagination on the query result. This specifies the number of results for the page. You cannot specify this parameter for CZML output"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "page",
+                            "type": "integer",
                             "required": false,
                             "description": "Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply. You cannot specify this parameter for CZML output"
                         }
@@ -1918,14 +2020,14 @@
                             "paramType": "query",
                             "name": "width",
                             "type": "integer",
-                            "required": false,
+                            "required": true,
                             "description": "The width of the image"
                         },
                         {
                             "paramType": "query",
                             "name": "height",
                             "type": "integer",
-                            "required": false,
+                            "required": true,
                             "description": "The height of the image"
                         },
                         {
