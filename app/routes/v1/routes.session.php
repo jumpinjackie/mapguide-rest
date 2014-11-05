@@ -18,14 +18,14 @@
 //
 
 
-require_once dirname(__FILE__)."/../controller/restservicecontroller.php";
-require_once dirname(__FILE__)."/../controller/mapcontroller.php";
-require_once dirname(__FILE__)."/../controller/resourceservicecontroller.php";
-require_once dirname(__FILE__)."/../controller/featureservicecontroller.php";
-require_once dirname(__FILE__)."/../controller/tileservicecontroller.php";
-require_once dirname(__FILE__)."/../controller/mappingservicecontroller.php";
-require_once dirname(__FILE__)."/../controller/renderingservicecontroller.php";
-require_once dirname(__FILE__)."/../util/utils.php";
+require_once dirname(__FILE__)."/../../controller/restservicecontroller.php";
+require_once dirname(__FILE__)."/../../controller/mapcontroller.php";
+require_once dirname(__FILE__)."/../../controller/resourceservicecontroller.php";
+require_once dirname(__FILE__)."/../../controller/featureservicecontroller.php";
+require_once dirname(__FILE__)."/../../controller/tileservicecontroller.php";
+require_once dirname(__FILE__)."/../../controller/mappingservicecontroller.php";
+require_once dirname(__FILE__)."/../../controller/renderingservicecontroller.php";
+require_once dirname(__FILE__)."/../../util/utils.php";
 
 /**
  * @SWG\Resource(

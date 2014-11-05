@@ -17,9 +17,9 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-require_once dirname(__FILE__)."/../controller/coordinatesystemcontroller.php";
-require_once dirname(__FILE__)."/../controller/resourceservicecontroller.php";
-require_once dirname(__FILE__)."/../controller/mappingservicecontroller.php";
+require_once dirname(__FILE__)."/../../controller/coordinatesystemcontroller.php";
+require_once dirname(__FILE__)."/../../controller/resourceservicecontroller.php";
+require_once dirname(__FILE__)."/../../controller/mappingservicecontroller.php";
 
 /**
  * @SWG\Resource(

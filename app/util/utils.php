@@ -24,6 +24,25 @@
 //
 class MgUtils
 {
+    public static function GetApiVersionNamespace($app, $prefix) {
+        $pi = $app->request->getPathInfo();
+        if (strpos($pi, $prefix) > 0) {
+            $tokens = explode("/", $pi);
+            //This runs with a major assumption that we have the version in the url (ie: /rest/v1/*, and this method will return "v1")
+            if (count($tokens) > 0) {
+                for ($i = 0; $i < count($tokens); $i++) {
+                    if (strlen($tokens[$i]) > 0) {
+                        return $tokens[$i];
+                    }
+                }
+            } else {
+                return "";
+            }
+        } else {
+            return "";
+        }
+    }
+
     public static function TranscodeResourceUrl($baseUrl, $resId) {
         $fullUrl = $baseUrl;
         if ($resId->GetRepositoryType() == MgRepositoryType::Library) {

@@ -24,35 +24,49 @@
 // TODO: Perhaps we should try to dynamically build this at runtime so that the base path can be inferred instead of specified up-front or we find a way to rewrite this at runtime
 // TODO: If dynamically building, it should save the build output to cache where permissions are assumed to be properly set up
 
-require_once dirname(__FILE__)."/../version.php";
-require_once dirname(__FILE__)."/../util/utils.php";
+require_once dirname(__FILE__)."/../../version.php";
+require_once dirname(__FILE__)."/../../util/utils.php";
 
 $app->get("/apidoc/", function() use ($app) {
-    $path = $app->config("AppRootDir")."/doc/data/api-docs.json";
+    $cacheFile = $app->config("Cache.RootDir")."/docfiles".$app->request->getPathInfo().".json";
+    $data = null;
+    if (!file_exists($cacheFile)) {
+        $path = $app->config("AppRootDir")."/doc/data/api-docs.json";
 
-    //HACK: swagger-php doesn't seem to support annotations for describing the API
-    //So we'll intercept the api-docs.json request via this route to inject that
-    //information
-    $doc = json_decode(file_get_contents($path));
-    $doc->apiVersion = MG_REST_API_VERSION;
-    $doc->swaggerVersion = SWAGGER_API_VERSION;
-    $doc->info = new stdClass();
-    //TODO: Localize
-    $doc->info->title = "mapguide-rest";
-    $doc->info->description = "mapguide-rest is a RESTful web extension for MapGuide Open Source and Autodesk Infrastructure Map Server.<br/><br/><strong>NOTE:</strong> Basic HTTP authentication credentials will generally be cached by the web browser for a short period should you choose to use this method instead of passing in session ids";
-    $doc->info->license = "LGPL 2.1";
-    $doc->info->licenseUrl = "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html";
-    
-    //Scrub out the .json extensions
-    foreach ($doc->apis as $api) {
-        $api->path = str_replace(".json", "", $api->path);
+        //HACK: swagger-php doesn't seem to support annotations for describing the API
+        //So we'll intercept the api-docs.json request via this route to inject that
+        //information
+        $doc = json_decode(file_get_contents($path));
+        $doc->apiVersion = MG_REST_API_VERSION;
+        $doc->swaggerVersion = SWAGGER_API_VERSION;
+        $doc->info = new stdClass();
+        //TODO: Localize
+        $doc->info->title = "mapguide-rest";
+        $doc->info->description = "mapguide-rest is a RESTful web extension for MapGuide Open Source and Autodesk Infrastructure Map Server.<br/><br/><strong>NOTE:</strong> Basic HTTP authentication credentials will generally be cached by the web browser for a short period should you choose to use this method instead of passing in session ids"; //TODO: Localize
+        $doc->info->license = "LGPL 2.1";
+        $doc->info->licenseUrl = "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html";
+        
+        //Scrub out the .json extensions
+        foreach ($doc->apis as $api) {
+            $api->path = str_replace(".json", "", $api->path);
+        }
+        $data = json_encode($doc);
+        $dir = dirname($cacheFile);
+        if (!is_dir($dir))
+            mkdir($dir, 0777, true);
+        file_put_contents($cacheFile, $data);
+    } else {
+        $data = file_get_contents($cacheFile);
     }
-
     $app->response->header("Content-Type", "application/json");
-    $app->response->setBody(json_encode($doc));
+    $app->response->setBody($data);
 });
 $app->get("/doc/index.html", function() use ($app) {
-    $docUrl = $app->config("SelfUrl")."/apidoc";
+    $prefix = MgUtils::GetApiVersionNamespace($app, "/doc/index.html");
+    if (strlen($prefix) > 0)
+        $docUrl = $app->config("SelfUrl")."/$prefix/apidoc";
+    else
+        $docUrl = $app->config("SelfUrl")."/apidoc";
     $assetUrlRoot = $app->config("SelfUrl")."/doc";
     $docTpl = $app->config("AppRootDir")."/assets/doc/viewer.tpl";
 
@@ -70,12 +84,19 @@ $app->get("/apidoc/:file", function($file) use ($app) {
     if (MgUtils::StringEndsWith($file, ".json"))
         $file = str_replace(".json", "", $file);
 
-    $path = $app->config("AppRootDir")."/doc/data/$file.json";
+    $prefix = MgUtils::GetApiVersionNamespace($app, "/apidoc");
+    if (strlen($prefix) > 0) {
+        $path = $app->config("AppRootDir")."/doc/data/$prefix/$file.json";
+    } else {
+        $path = $app->config("AppRootDir")."/doc/data/$file.json";
+    }
 
-    //HACK/TODO: Overwrite whatever basepath we get from the JSON with the self-URL to index.php
-    //There should be something in $app that lets us do this.
     $doc = json_decode(file_get_contents($path));
-    $doc->basePath = $app->config("SelfUrl");
+    if (strlen($prefix) > 0) {
+        $doc->basePath = $app->config("SelfUrl")."/$prefix";
+    } else {
+        $doc->basePath = $app->config("SelfUrl");
+    }
     $doc->swaggerVersion = SWAGGER_API_VERSION;
     $doc->apiVersion = MG_REST_API_VERSION;
 

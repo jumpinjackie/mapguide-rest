@@ -17,8 +17,8 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-require_once dirname(__FILE__)."/../controller/siteadmincontroller.php";
-require_once dirname(__FILE__)."/../util/utils.php";
+require_once dirname(__FILE__)."/../../controller/siteadmincontroller.php";
+require_once dirname(__FILE__)."/../../util/utils.php";
 
 /**
  * @SWG\Resource(
