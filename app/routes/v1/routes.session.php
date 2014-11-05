@@ -517,9 +517,11 @@ $app->get("/session/:sessionId/:mapName.Selection/features/:layerName", function
  *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map"),
  *          @SWG\parameter(name="layerName", paramType="path", required=true, type="string", description="The name of the layer in the selection set"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','geojson','html']"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml, geojson or html", enum="['xml','geojson','html']"),
  *          @SWG\parameter(name="mappedonly", paramType="path", required=false, type="boolean", description="Only return properties mapped in the Layer Definition"),
- *          @SWG\parameter(name="transformto", paramType="path", required=false, type="string", description="The CS-Map coordinate system code to transform these features to")
+ *          @SWG\parameter(name="transformto", paramType="path", required=false, type="string", description="The CS-Map coordinate system code to transform these features to"),
+ *          @SWG\parameter(name="pagesize", paramType="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the number of results for the page."),
+ *          @SWG\parameter(name="page", paramType="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply.")
  *        ),
  *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
