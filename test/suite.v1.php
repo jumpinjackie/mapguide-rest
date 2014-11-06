@@ -8282,6 +8282,14 @@
                     ok(status == 200, "(" + status + ") copy operation should've succeeded");
                 });
 
+                api_test(rest_root_url + "/services/createmap", "POST", {
+                    session: this.anonymousSessionId,
+                    mapdefinition: "Library://Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition",
+                    targetmapname: "Sheboygan"
+                }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") createmap should've succeeded");
+                });
+
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/kml", "GET", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Expected KML response");
                     assertMimeType(mimeType, MgMimeType.Kml);
@@ -8320,6 +8328,49 @@
                     ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
                 });
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/kml", "GET", { "native": 1 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    assertMimeType(mimeType, MgMimeType.Kml);
+                    ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
+                });
+
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.Map/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    assertMimeType(mimeType, MgMimeType.Kml);
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.Map/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    assertMimeType(mimeType, MgMimeType.Kml);
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.Map/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    assertMimeType(mimeType, MgMimeType.Kml);
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.Map/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    assertMimeType(mimeType, MgMimeType.Kml);
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+
+                //Pass thru
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.Map/kml", "GET", { "native": 1 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    assertMimeType(mimeType, MgMimeType.Kml);
+                    ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.Map/kml", "GET", { "native": 1 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    assertMimeType(mimeType, MgMimeType.Kml);
+                    ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.Map/kml", "GET", { "native": 1 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    assertMimeType(mimeType, MgMimeType.Kml);
+                    ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.Map/kml", "GET", { "native": 1 }, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Expected KML response");
                     assertMimeType(mimeType, MgMimeType.Kml);
                     ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");

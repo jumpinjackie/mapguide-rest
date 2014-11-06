@@ -100,20 +100,6 @@ class MgKmlServiceController extends MgBaseController {
         $url = MgUtils::TranscodeResourceUrl($baseUrl, $resId) . "/".strtolower($format)."features?draworder=" . $drawOrder . "&amp;session=" . $sessionId;
         $content .= $url;
 
-        /*
-        $content .= agentUri, false);
-        $content .= "?OPERATION=GetFeaturesKml&amp;VERSION=1.0.0&amp;LAYERDEFINITION=", false);
-        Ptr<MgResourceIdentifier> resource = layer->GetLayerDefinition();
-        $content .= MgUtil::WideCharToMultiByte(resource->ToString()), false);
-        sprintf(buffer,"&amp;DPI=%f", dpi);
-        $content .= buffer, false);
-        sprintf(buffer,"&amp;DRAWORDER=%d", drawOrder);
-        $content .= buffer, false);
-        $content .= "&amp;FORMAT=", false);
-        $content .= MgUtil::WideCharToMultiByte(format), false);
-        $content .= "&amp;SESSION=", false);
-        $content .= MgUtil::WideCharToMultiByte(sessionId));
-        */
         $content .= "</href>";
         $content .= "<viewRefreshMode>onStop</viewRefreshMode>";
         $content .= "<viewRefreshTime>1</viewRefreshTime>";
@@ -341,7 +327,7 @@ class MgKmlServiceController extends MgBaseController {
 
         if ($native) {
             $mdfId = $map->GetMapDefinition();
-            $mdfIdStr = $resId->ToString();
+            $mdfIdStr = $mdfId->ToString();
             $selfUrl = $this->app->config("SelfUrl");
             $this->app->redirect("$selfUrl/../mapagent/mapagent.fcgi?OPERATION=GETMAPKML&VERSION=1.0.0&SESSION=$sessionId&MAPDEFINITION=$mdfIdStr&CLIENTAGENT=MapGuide REST Extension");
         } else {

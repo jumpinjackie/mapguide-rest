@@ -1687,9 +1687,9 @@ $app->get("/session/:sessionId/:resName.WatermarkDefinition/preview", function($
  *     )
  *   )
  */
-$app->get("/session/:sessionId/:mapName.map/kml", function($sessionId, $mapName) use ($app) {
+$app->get("/session/:sessionId/:mapName.Map/kml", function($sessionId, $mapName) use ($app) {
     $ctrl = new MgKmlServiceController($app);
-    $ctrl->GetMapKml($resId, "kml");
+    $ctrl->GetSessionMapKml($sessionId, $mapName, "kml");
 });
 
 /**
