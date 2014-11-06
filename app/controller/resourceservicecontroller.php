@@ -40,7 +40,7 @@ class MgResourceServiceController extends MgBaseController {
             $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
             $resSvc->ApplyResourcePackage($reader);
         } else {
-            $this->app->response->setBody("File upload error (code: $err). See <a href='http://www.php.net/manual/en/features.file-upload.errors.php'>http://www.php.net/manual/en/features.file-upload.errors.php</a> for more information"); //TODO: Localize
+            $this->app->response->setBody($this->app->localizer->getText("E_PHP_FILE_UPLOAD_ERROR", $err));
         }
     }
 

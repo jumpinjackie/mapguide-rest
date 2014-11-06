@@ -49,7 +49,7 @@ class MgDataController extends MgBaseController {
 
             $smarty = new Smarty();
             $smarty->setCompileDir($this->app->config("Cache.RootDir")."/templates_c");
-            $smarty->assign("title", $uriParts[count($uriParts)-1]." API Reference"); //TODO: Localize
+            $smarty->assign("title", $this->app->localizer->getText("L_PRODUCT_API_REFERENCE", $uriParts[count($uriParts)-1]));
             $smarty->assign("docUrl", $docUrl);
             $smarty->assign("docAssetRoot", $assetUrlRoot);
 
@@ -100,7 +100,7 @@ class MgDataController extends MgBaseController {
                         $pId->name = "id";
                         $pId->type = "string";
                         $pId->required = true;
-                        $pId->description = "The ID of the feature to return"; //TODO: Localize
+                        $pId->description = $this->app->localizer->getText("L_REST_GET_ID_DESC");
 
                         array_push($singleConf->extraParams, $pId);
 
@@ -112,7 +112,7 @@ class MgDataController extends MgBaseController {
 
                             $methodsConf = $adapterConfig["Methods"];
                             foreach ($methodsConf as $method => $methodOptions) {
-                                $op = $documentor->DocumentOperation($method, $extension, $conf->single);
+                                $op = $documentor->DocumentOperation($this->app, $method, $extension, $conf->single);
                                 foreach ($conf->extraParams as $extraParam) {
                                     array_push($op->parameters, $extraParam);
                                 }

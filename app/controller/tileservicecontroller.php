@@ -346,7 +346,7 @@ class MgTileServiceController extends MgBaseController {
                 $attempts++;
                 //Bail after MAX_RETRY_ATTEMPTS
                 if ($attempts >= self::MAX_RETRY_ATTEMPTS)
-                    $this->ServerError("Failed to create directory after $attempts attempts", $this->GetMimeTypeForFormat($type)); //TODO: Localize
+                    $this->ServerError($this->app->localizer->getText("E_FAILED_TO_CREATE_DIR_AFTER_N_ATTEMPTS", $attempts), $this->GetMimeTypeForFormat($type));
             }
         }
 
@@ -366,7 +366,7 @@ class MgTileServiceController extends MgBaseController {
         while (!file_exists($path)) {
             //Bail after MAX_RETRY_ATTEMPTS
             if ($attempts >= self::MAX_RETRY_ATTEMPTS)
-                $this->ServerError("Failed to generate tile after $attempts attempts", $this->GetMimeTypeForFormat($type)); //TODO: Localize
+                $this->ServerError($this->app->localizer->getText("E_FAILED_TO_GENERATE_TILE_AFTER_N_ATTEMPTS", $attempts), $this->GetMimeTypeForFormat($type));
             $attempts++;
 
             //error_log("($requestId) $path does not exist. Locking for writing");

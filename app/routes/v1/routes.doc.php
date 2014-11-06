@@ -36,9 +36,9 @@ $app->get("/apidoc/", function() use ($app) {
     $doc->apiVersion = MG_REST_API_VERSION;
     $doc->swaggerVersion = SWAGGER_API_VERSION;
     $doc->info = new stdClass();
-    //TODO: Localize
+    
     $doc->info->title = "mapguide-rest";
-    $doc->info->description = "mapguide-rest is a RESTful web extension for MapGuide Open Source and Autodesk Infrastructure Map Server.<br/><br/><strong>NOTE:</strong> Basic HTTP authentication credentials will generally be cached by the web browser for a short period should you choose to use this method instead of passing in session ids"; //TODO: Localize
+    $doc->info->description = $app->localizer->getText("L_ABOUT_MAPGUIDE_REST");
     $doc->info->license = "LGPL 2.1";
     $doc->info->licenseUrl = "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html";
     
@@ -61,7 +61,7 @@ $app->get("/doc/index.html", function() use ($app) {
 
     $smarty = new Smarty();
     $smarty->setCompileDir($app->config("Cache.RootDir")."/templates_c");
-    $smarty->assign("title", "mapguide-rest API Reference"); //TODO: Localize
+    $smarty->assign("title", $app->localizer->getText("L_PRODUCT_API_REFERENCE", "mapguide-rest"));
     $smarty->assign("docUrl", $docUrl);
     $smarty->assign("docAssetRoot", $assetUrlRoot);
 

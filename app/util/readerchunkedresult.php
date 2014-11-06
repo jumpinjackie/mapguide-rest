@@ -321,23 +321,23 @@ class MgReaderChunkedResult
 
             if ($pageNo > 1) {
                 //Write prev/next page links.
-                $pageHtml .= "<a href='".$prevUrl."'>&lt;&lt;&nbsp;Prev</a>&nbsp;"; //TODO: Localize
+                $pageHtml .= "<a href='".$prevUrl."'>&lt;&lt;&nbsp;".$this->localizer->getText("L_PREV_PAGE")."</a>&nbsp;";
                 if ($this->reader->HasMorePages()) {
-                    $pageHtml .= "|&nbsp;<a href='".$nextUrl."'>Next&nbsp;&gt;&gt;</a>"; //TODO: Localize
+                    $pageHtml .= "|&nbsp;<a href='".$nextUrl."'>".$this->localizer->getText("L_NEXT_PAGE")."&nbsp;&gt;&gt;</a>";
                 }
             } else {
                 if ($this->reader->HasMorePages()) {
-                    $pageHtml .= "<a href='".$nextUrl."'>Next&nbsp;&gt;&gt;</a>"; //TODO: Localize
+                    $pageHtml .= "<a href='".$nextUrl."'>".$this->localizer->getText("L_NEXT_PAGE")."&nbsp;&gt;&gt;</a>";
                 }
             }
             if ($this->reader->GetTotal() >= 0) {
-                $totalHtml = "<span>".$this->reader->GetTotal()." features</span>"; //TODO: Localize
+                $totalHtml = "<span>".$this->localizer->getText("L_TOTAL_FEATURES", $this->reader->GetTotal())."</span>";
             }
             $maxPages = $this->reader->GetMaxPages();
             if ($maxPages >= 0) {
-                $pageNoHtml = "<strong>(Page $pageNo of $maxPages)</strong>"; //TODO: Localize
+                $pageNoHtml = "<strong>(".$this->localizer->getText("L_PAGE_X_OF_Y", $pageNo, $maxPage).")</strong>";
             } else {
-                $pageNoHtml = "<strong>(Page $pageNo)</strong>"; //TODO: Localize
+                $pageNoHtml = "<strong>(".$this->localizer->getText("L_PAGE_NO", $pageNo).")</strong>";
             }
         }
 
@@ -345,7 +345,7 @@ class MgReaderChunkedResult
         $clsDef = $this->reader->GetClassDefinition();
         $idProps = $clsDef->GetIdentityProperties();
         
-        $output .= "<div class='pull-left'><div><strong>".$clsDef->GetName()."</strong> $pageNoHtml</div><div>$totalHtml</div><div>$pageHtml</div></div>"; //TODO: Localize
+        $output .= "<div class='pull-left'><div><strong>".$clsDef->GetName()."</strong> $pageNoHtml</div><div>$totalHtml</div><div>$pageHtml</div></div>";
         if ($this->orientation === "h") {
             $output .= "<table class='table table-bordered table-condensed table-hover'>";
             $output .= "<!-- Table header -->";

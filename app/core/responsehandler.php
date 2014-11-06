@@ -87,7 +87,7 @@ abstract class MgResponseHandler
                     $byteReader = $resultObj->ToXml();
                     $this->OutputByteReader($byteReader, ($param->GetParameterValue("X-CHUNK-RESPONSE") === "true"));
                 } else {
-                    throw new Exception("Could not determine how to output: ".$resultObj->ToString()); //TODO: Localize
+                    $this->ServerError($this->app->localizer->getText("E_DONT_KNOW_HOW_TO_OUTPUT", $resultObj->ToString()));
                 }
             }
         } else {
@@ -488,8 +488,8 @@ abstract class MgResponseHandler
         $this->OutputException(get_class($ex), $ex->GetExceptionMessage(), $ex->GetDetails(), $e->getTraceAsString(), $status, $mimeType);
     }
 
-    protected function FormatException($statusMessage, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
-        return MgUtils::FormatException($statusMessage, $errorMessage, $details, $phpTrace, $status, $mimeType);
+    protected function FormatException($type, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
+        return MgUtils::FormatException($this->app, $type, $errorMessage, $details, $phpTrace, $status, $mimeType);
     }
 
     protected function OutputException($statusMessage, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
@@ -500,7 +500,7 @@ abstract class MgResponseHandler
 
     protected function BadRequest($msg, $mimeType = MgMimeType::Html) {
         $e = new Exception();
-        $errResponse = $this->FormatException($this->app->localizer->getText("E_BAD_REQUEST"), $msg, $msg, $e->getTraceAsString(), 400, $mimeType);
+        $errResponse = $this->FormatException("BadRequest", $this->app->localizer->getText("E_BAD_REQUEST"), $msg, $e->getTraceAsString(), 400, $mimeType);
         $this->app->response->header("Content-Type", $mimeType);
         $this->app->halt(400, $errResponse);
     }
@@ -508,35 +508,35 @@ abstract class MgResponseHandler
     protected function MethodNotSupported($method, $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $msg = $this->app->localizer->getText("E_METHOD_NOT_SUPPORTED_DESC", $method);
-        $errResponse = $this->FormatException($this->app->localizer->getText("E_METHOD_NOT_SUPPORTED"), $msg, $msg, $e->getTraceAsString(), 405, $mimeType);
+        $errResponse = $this->FormatException("MethodNotSupported", $this->app->localizer->getText("E_METHOD_NOT_SUPPORTED"), $msg, $e->getTraceAsString(), 405, $mimeType);
         $this->app->response->header("Content-Type", $mimeType);
         $this->app->halt(405, $errResponse);
     }
 
     protected function NotFound($msg, $mimeType = MgMimeType::Html) {
         $e = new Exception();
-        $errResponse = $this->FormatException($this->app->localizer->getText("E_NOT_FOUND"), $msg, $msg, $e->getTraceAsString(), 404, $mimeType);
+        $errResponse = $this->FormatException("NotFound", $this->app->localizer->getText("E_NOT_FOUND"), $msg, $e->getTraceAsString(), 404, $mimeType);
         $this->app->response->header("Content-Type", $mimeType);
         $this->app->halt(404, $errResponse);
     }
 
     protected function Forbidden($msg, $mimeType = MgMimeType::Html) {
         $e = new Exception();
-        $errResponse = $this->FormatException($this->app->localizer->getText("E_FORBIDDEN"), $msg, $msg, $e->getTraceAsString(), 403, $mimeType);
+        $errResponse = $this->FormatException("Forbidden", $this->app->localizer->getText("E_FORBIDDEN"), $msg, $e->getTraceAsString(), 403, $mimeType);
         $this->app->response->header("Content-Type", $mimeType);
         $this->app->halt(403, $errResponse);
     }
 
     protected function ServerError($msg, $mimeType = MgMimeType::Html) {
         $e = new Exception();
-        $errResponse = $this->FormatException($this->app->localizer->getText("E_SERVER_ERROR"), $msg, $msg, $e->getTraceAsString(), 500, $mimeType);
+        $errResponse = $this->FormatException("ServerError", $this->app->localizer->getText("E_SERVER_ERROR"), $msg, $e->getTraceAsString(), 500, $mimeType);
         $this->app->response->header("Content-Type", $mimeType);
         $this->app->halt(500, $errResponse);
     }
 
     protected function ServiceUnavailable($msg, $mimeType = MgMimeType::Html) {
         $e = new Exception();
-        $errResponse = $this->FormatException($this->app->localizer->getText("E_SERVICE_UNAVAILABLE"), $msg, $msg, $e->getTraceAsString(), 503, $mimeType);
+        $errResponse = $this->FormatException("ServiceUnavailable", $this->app->localizer->getText("E_SERVICE_UNAVAILABLE"), $msg, $e->getTraceAsString(), 503, $mimeType);
         $this->app->response->header("Content-Type", $mimeType);
         $this->app->halt(503, $errResponse);
     }
@@ -550,7 +550,7 @@ abstract class MgResponseHandler
         $e = new Exception();
         $title = $this->app->localizer->getText("E_UNAUTHORIZED");
         $message = $this->app->localizer->getText("E_UNAUTHORIZED_DESC");
-        $errResponse = $this->FormatException($title, $message, $message, $e->getTraceAsString(), 401, $mimeType);
+        $errResponse = $this->FormatException("Unauthorized", $title, $message, $e->getTraceAsString(), 401, $mimeType);
         
         $this->app->response->header("Content-Type", $mimeType);
         $this->app->halt(401, $errResponse);

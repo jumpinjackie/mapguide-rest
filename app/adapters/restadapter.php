@@ -365,7 +365,7 @@ abstract class MgFeatureRestAdapter extends MgRestAdapter {
 }
 
 interface IAdapterDocumentor {
-    public function DocumentOperation($method, $extension, $bSingle);
+    public function DocumentOperation($app, $method, $extension, $bSingle);
 }
 
 interface ISessionIDExtractor {
@@ -388,8 +388,8 @@ class MgSessionIDExtractor implements ISessionIDExtractor {
 
 abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
 
-    private function DescribeMethodSummary($method, $extension) {
-        return "Returns data as $extension";
+    private function DescribeMethodSummary($app, $method, $extension) {
+        return $app->localizer->getText("L_RETURNS_DATA_AS_TYPE", $extension);
     }
 
     private function GetMethodNickname($method, $extension) {
@@ -397,14 +397,14 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
         return implode("", explode(" ", $str));
     }
 
-    protected function GetAdditionalParameters($bSingle, $method) {
+    protected function GetAdditionalParameters($app, $bSingle, $method) {
         return array();
     }
 
-    public function DocumentOperation($method, $extension, $bSingle) {
+    public function DocumentOperation($app, $method, $extension, $bSingle) {
         $op = new stdClass();
         $op->method = $method;
-        $op->summary = $this->DescribeMethodSummary($method, $extension);
+        $op->summary = $this->DescribeMethodSummary($app, $method, $extension);
         $op->nickname = $this->GetMethodNickname($method, $extension);
         $op->parameters = array();
         if ($bSingle) {
@@ -417,7 +417,7 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
                 $pFilter->name = "filter";
                 $pFilter->type = "string";
                 $pFilter->required = false;
-                $pFilter->description = "The url-encoded FDO filter string"; //TODO: Localize
+                $pFilter->description = $app->localizer->getText("L_REST_GET_FILTER_DESC");
                 
                 //bbox
                 $pbbox = new stdClass();
@@ -425,13 +425,13 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
                 $pbbox->name = "bbox";
                 $pbbox->type = "string";
                 $pbbox->required = false;
-                $pbbox->description = "A quartet of x1,y1,x2,y2"; //TODO: Localize
+                $pbbox->description = $app->localizer->getText("L_REST_GET_BBOX_DESC");
 
                 array_push($op->parameters, $pFilter);
                 array_push($op->parameters, $pbbox);
             }
         }
-        $extraParams = $this->GetAdditionalParameters($bSingle, $method);
+        $extraParams = $this->GetAdditionalParameters($app, $bSingle, $method);
         foreach ($extraParams as $p) {
             array_push($op->parameters, $p);
         }
@@ -441,8 +441,8 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
 }
 
 abstract class MgFeatureRestAdapterDocumentor extends MgRestAdapterDocumentor {
-    protected function GetAdditionalParameters($bSingle, $method) {
-        $params = parent::GetAdditionalParameters($bSingle, $method);
+    protected function GetAdditionalParameters($app, $bSingle, $method) {
+        $params = parent::GetAdditionalParameters($app, $bSingle, $method);
         if (!$bSingle) {
             if ($method == "GET") {
                 //page
@@ -451,7 +451,7 @@ abstract class MgFeatureRestAdapterDocumentor extends MgRestAdapterDocumentor {
                 $pPage->name = "page";
                 $pPage->type = "integer";
                 $pPage->required = false;
-                $pPage->description = "The page number to switch to. Only applies if pagination is configured for the data source"; //TODO: Localize
+                $pPage->description = $app->localizer->getText("L_REST_PAGE_NO_DESC");
 
                 array_push($params, $pPage);
             }

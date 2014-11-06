@@ -363,7 +363,13 @@ class MgFeatureServiceController extends MgBaseController {
             if ($sessionId === "") {
                 if ($perms->allowInsert === false) {
                     $e = new Exception();
-                    $this->OutputException("Forbidden", "Operation not allowed", "The resource ".$resId->ToString()." is not configured to allow feature updates", $e->getTraceAsString(), 403, MgMimeType::Xml); //TODO: Localize
+                    $this->OutputException(
+                        "Forbidden", 
+                        $this->app->localizer->getText("E_OPERATION_NOT_ALLOWED"),
+                        $this->app->localizer->getText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
+                        $e->getTraceAsString(),
+                        403,
+                        MgMimeType::Xml);
                 }
             }
 
@@ -413,7 +419,13 @@ class MgFeatureServiceController extends MgBaseController {
             if ($sessionId === "") {
                 if ($perms->allowUpdate === false) {
                     $e = new Exception();
-                    $this->OutputException("Forbidden", "Operation not allowed", "The resource ".$resId->ToString()." is not configured to allow feature updates", $e->getTraceAsString(), 403, MgMimeType::Xml);
+                    $this->OutputException(
+                        "Forbidden", 
+                        $this->app->localizer->getText("E_OPERATION_NOT_ALLOWED"),
+                        $this->app->localizer->getText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
+                        $e->getTraceAsString(),
+                        403,
+                        MgMimeType::Xml);
                 }
             }
 
@@ -469,7 +481,13 @@ class MgFeatureServiceController extends MgBaseController {
             if ($sessionId === "") {
                 if ($perms->allowDelete === false) {
                     $e = new Exception();
-                    $this->OutputException("Forbidden", "Operation not allowed", "The resource ".$resId->ToString()." is not configured to allow feature updates", $e->getTraceAsString(), 403, MgMimeType::Xml);
+                    $this->OutputException(
+                        "Forbidden", 
+                        $this->app->localizer->getText("E_OPERATION_NOT_ALLOWED"),
+                        $this->app->localizer->getText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
+                        $e->getTraceAsString(),
+                        403,
+                        MgMimeType::Xml);
                 }
             }
 

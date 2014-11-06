@@ -68,7 +68,7 @@ $app->error(function($err) use ($app) {
     }
     $details = $app->localizer->getText("E_PHP_EXCEPTION_DETAILS", $err->getMessage(), $err->getFile(), $err->getLine());
     $app->response->header("Content-Type", $mimeType);
-    $app->response->setBody(MgUtils::FormatException($title, $err->getMessage(), $details, $err->getTraceAsString(), 500, $mimeType));
+    $app->response->setBody(MgUtils::FormatException($app, "UnhandledError", $title, $details, $err->getTraceAsString(), 500, $mimeType));
 });
 $app->localizer = new Localizer($strings);
 $app->config("SelfUrl", $app->request->getUrl() . $app->request->getRootUri());

@@ -21,15 +21,15 @@ require_once "restadapter.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
-    protected function GetAdditionalParameters($bSingle, $method) {
-        $params = parent::GetAdditionalParameters($bSingle, $method);
+    protected function GetAdditionalParameters($app, $bSingle, $method) {
+        $params = parent::GetAdditionalParameters($app, $bSingle, $method);
         if ($method == "POST") {
             $pPostBody = new stdClass();
             $pPostBody->paramType = "body";
             $pPostBody->name = "body";
             $pPostBody->type = "string";
             $pPostBody->required = true;
-            $pPostBody->description = "The XML envelope describing the features to be inserted"; //TODO: Localize
+            $pPostBody->description = $app->localizer->getText("L_REST_POST_BODY_DESC");
 
             array_push($params, $pPostBody);
         } else if ($method == "PUT") {
@@ -38,7 +38,7 @@ class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
             $pPutBody->name = "body";
             $pPutBody->type = "string";
             $pPutBody->required = true;
-            $pPutBody->description = "The XML envelope describing the features to be updated"; //TODO: Localize
+            $pPutBody->description = $app->localizer->getText("L_REST_PUT_BODY_DESC");
 
             array_push($params, $pPutBody);
         } else if ($method == "DELETE") {
@@ -47,7 +47,7 @@ class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
             $pFilter->name = "filter";
             $pFilter->type = "string";
             $pFilter->required = false;
-            $pFilter->description = "The FDO Filter string that will determine what features are deleted"; //TODO: Localize
+            $pFilter->description = $app->localizer->getText("L_REST_DELETE_FILTER_DESC");
 
             array_push($params, $pFilter);
         }
