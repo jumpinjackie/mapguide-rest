@@ -584,9 +584,9 @@ class MgMapController extends MgBaseController {
             $reader = $selection->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), $bMapped);
             if ($pageSize > 0) {
                 $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo, $total);
-                $result = new MgReaderChunkedResult($featSvc, $pageReader, -1, $owriter);
+                $result = new MgReaderChunkedResult($featSvc, $pageReader, -1, $owriter, $this->app->localizer);
             } else {
-                $result = new MgReaderChunkedResult($featSvc, $reader, -1, $owriter);
+                $result = new MgReaderChunkedResult($featSvc, $reader, -1, $owriter, $this->app->localizer);
             }
             $result->CheckAndSetDownloadHeaders($this->app, $format);
             if ($transform != null)

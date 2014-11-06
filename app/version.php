@@ -17,7 +17,7 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-define("MG_REST_API_VERSION", "0.11");
+define("MG_REST_API_VERSION", "0.11.1");
 define("SWAGGER_API_VERSION", "1.2");
 
 ?>

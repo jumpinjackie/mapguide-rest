@@ -116,12 +116,15 @@ class MgReaderChunkedResult
     private $thisReqParams;
     private $orientation;
 
-    public function __construct($featSvc, $reader, $limit, $writer = NULL) {
+    private $localizer;
+
+    public function __construct($featSvc, $reader, $limit, $writer, $localizer) {
         $this->featSvc = $featSvc;
         $this->reader = $reader;
         $this->limit = $limit;
         $this->baseUrl = null;
-        $transform = null;
+        $this->transform = null;
+        $this->localizer = $localizer;
         $this->orientation = "h";
         $this->thisReqParams = array();
         if ($writer != null)
@@ -264,7 +267,7 @@ class MgReaderChunkedResult
         $this->writer->StartChunking();
 
         $output = "<!DOCTYPE html>";
-        $output .= "<html><head>";
+        $output .= "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">";
         if ($this->baseUrl != null) {
             $bsUrl = $this->baseUrl . "/assets/common/css/bootstrap.min.css";
             $output .= "<link rel='stylesheet' href='".$bsUrl."' />";

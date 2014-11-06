@@ -829,9 +829,9 @@ class MgFeatureServiceController extends MgBaseController {
                             $reader = $featSvc->SelectFeatures($fsId, "$schemaName:$className", $query);
                             if ($pageSize > 0) {
                                 $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo);
-                                $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, $owriter);
+                                $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, $owriter, $this->app->localizer);
                             } else {
-                                $result = new MgReaderChunkedResult($featSvc, $reader, $limit, $owriter);
+                                $result = new MgReaderChunkedResult($featSvc, $reader, $limit, $owriter, $this->app->localizer);
                             }
                             $result->CheckAndSetDownloadHeaders($this->app, $format);
                             if ($transform != null)
@@ -929,9 +929,9 @@ class MgFeatureServiceController extends MgBaseController {
                     $pageNo = 1;
                 }
                 $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo);
-                $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, $owriter);
+                $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, $owriter, $this->app->localizer);
             } else {
-                $result = new MgReaderChunkedResult($featSvc, $reader, $limit, $owriter);
+                $result = new MgReaderChunkedResult($featSvc, $reader, $limit, $owriter, $this->app->localizer);
             }
             $result->CheckAndSetDownloadHeaders($this->app, $format);
             if ($transform != null)
