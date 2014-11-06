@@ -26,7 +26,7 @@ class MgResourceServiceController extends MgBaseController {
 
     public function ApplyResourcePackage() {
         if (!array_key_exists("package", $_FILES))
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "package"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "package"), MgMimeType::Html);
         
         $this->EnsureAuthenticationForSite();
         $siteConn = new MgSiteConnection();

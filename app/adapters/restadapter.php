@@ -233,9 +233,13 @@ abstract class MgRestAdapter extends MgResponseHandler
         return strtoupper($method) === "GET";
     }
 
+    public function GetMimeType() {
+        return MgMimeType::Html;   
+    }
+
     public function HandleMethod($method, $single = false) {
         if (!$this->SupportsMethod($method)) {
-            $this->app->halt(405, $this->app->localizer->getText("E_METHOD_NOT_SUPPORTED", $method));
+            $this->MethodNotSupported($method, $this->GetMimeType());
         } else {
             $mth = strtoupper($method);
             switch ($mth) {
@@ -252,7 +256,7 @@ abstract class MgRestAdapter extends MgResponseHandler
                     $this->HandleDelete($single);
                     break;
                 default:
-                    $this->app->halt(405, $this->app->localizer->getText("E_METHOD_NOT_SUPPORTED", $method));
+                    $this->MethodNotSupported($method, $this->GetMimeType());
                     break;
             }
         }

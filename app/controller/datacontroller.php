@@ -31,7 +31,7 @@ class MgDataController extends MgBaseController {
         $this->EnsureAuthenticationForSite();
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->app->halt(404, $this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+            $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
         } else {
             $this->app->response->setBody(file_get_contents($path));
         }
@@ -41,7 +41,7 @@ class MgDataController extends MgBaseController {
         $uriPath = implode("/", $uriParts);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->app->halt(404, $this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+            $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
         } else {
             $docUrl = $this->app->config("SelfUrl")."/data/$uriPath/apidoc";
             $assetUrlRoot = $this->app->config("SelfUrl")."/doc";
@@ -63,7 +63,7 @@ class MgDataController extends MgBaseController {
         $uriPath = implode("/", $uriParts);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->app->halt(404, $this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+            $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath), MgMimeType::Json);
         } else {
             $config = json_decode(file_get_contents($path), true);
             
@@ -314,7 +314,7 @@ class MgDataController extends MgBaseController {
         $uriPath = implode("/", $uriParts);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->app->halt(404, $this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+            $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath), MgMimeType::Json);
         } else {
             $config = json_decode(file_get_contents($path), true);
             $result = $this->ValidateConfiguration($config, $extension, $method);
@@ -352,7 +352,7 @@ class MgDataController extends MgBaseController {
                     $adapter = $this->app->container[$result->adapterName];
                     $adapter->HandleMethod($method, false);
                 } else {
-                    $this->app->halt(403, $this->app->localizer->getText("E_FORBIDDEN_ACCESS"));
+                    $this->Forbidden($this->app->localizer->getText("E_FORBIDDEN_ACCESS"), $this->GetMimeTypeForFormat($extension));
                 }
             } catch (MgException $ex) {
                 $this->OnException($ex);
@@ -364,7 +364,7 @@ class MgDataController extends MgBaseController {
         $uriPath = implode("/", $uriParts);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->app->halt(404, $this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+            $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath), MgMimeType::Json);
         } else {
             $config = json_decode(file_get_contents($path), true);
             $result = $this->ValidateConfiguration($config, $extension, $method);
@@ -403,7 +403,7 @@ class MgDataController extends MgBaseController {
                     $adapter->SetFeatureId($id);
                     $adapter->HandleMethod($method, true);
                 } else {
-                    $this->app->halt(403, $this->app->localizer->getText("E_FORBIDDEN_ACCESS"));
+                    $this->Forbidden($this->app->localizer->getText("E_FORBIDDEN_ACCESS"), $this->GetMimeTypeForFormat($extension));
                 }
             } catch (MgException $ex) {
                 $this->OnException($ex);

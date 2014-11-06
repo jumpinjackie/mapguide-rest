@@ -361,13 +361,13 @@ class MgKmlServiceController extends MgBaseController {
         $extents = null;
 
         if ($width == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "width"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "width"), $this->GetMimeTypeForFormat($format));
         if ($height == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "height"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "height"), $this->GetMimeTypeForFormat($format));
         if ($drawOrder == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "draworder"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "draworder"), $this->GetMimeTypeForFormat($format));
         if ($bbox == null) {
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "bbox"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "bbox"), $this->GetMimeTypeForFormat($format));
         } else {
             $parts = explode(",", $bbox);
             if (count($parts) == 4) {
@@ -467,14 +467,21 @@ class MgKmlServiceController extends MgBaseController {
         $height = $this->GetRequestParameter("height", null);
         $drawOrder = $this->GetRequestParameter("draworder", null);
 
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        } else {
+            $sessionId = $this->GetRequestParameter("session", "");
+        }
+
         if ($width == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "width"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "width"), $this->GetMimeTypeForFormat($format));
         if ($height == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "height"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "height"), $this->GetMimeTypeForFormat($format));
         if ($drawOrder == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "draworder"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "draworder"), $this->GetMimeTypeForFormat($format));
         if ($bbox == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "bbox"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "bbox"), $this->GetMimeTypeForFormat($format));
 
         //We still need the mapagent URL so that GETFEATURESKML can generate legend icons from
         //within the operation
@@ -493,7 +500,7 @@ class MgKmlServiceController extends MgBaseController {
             $param->AddParameter("FORMAT", strtoupper($fmt));
             $param->AddParameter("X-CHUNK-RESPONSE", "true");
             $that->ExecuteHttpRequest($req);
-        }, true, $agentUri);
+        }, true, $agentUri, $sessionId);
     }
 }
 

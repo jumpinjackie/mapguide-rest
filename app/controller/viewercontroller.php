@@ -301,7 +301,7 @@ class MgViewerController extends MgBaseController {
                 }
                 break;
             default:
-                $this->app->halt(400, "Resource type is not previewable");
+                $this->BadRequest($this->app->localizer->getText("E_UNPREVIEWABLE_RESOURCE_TYPE"), MgMimeType::Html);
                 break;
         }
     }

@@ -45,6 +45,8 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
 
     protected function GetFileExtension() { return "csv"; }
 
+    public function GetMimeType() { return "text/csv"; }
+
     /**
      * Writes the GET response header based on content of the given MgReader
      */
@@ -52,7 +54,7 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
         $this->agfRw = new MgAgfReaderWriter();
         $this->wktRw = new MgWktReaderWriter();
 
-        $this->app->response->header("Content-Type", "text/csv");
+        $this->app->response->header("Content-Type", $this->GetMimeType());
         $values = array();
         $propCount = $reader->GetPropertyCount();
         for ($i = 0; $i < $propCount; $i++) {

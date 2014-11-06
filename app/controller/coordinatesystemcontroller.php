@@ -118,11 +118,11 @@ class MgCoordinateSystemController extends MgBaseController {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
         if ($source == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "from"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "from"), $this->GetMimeTypeForFormat($format));
         if ($target == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "to"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "to"), $this->GetMimeTypeForFormat($format));
         if ($coordList == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "coords"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "coords"), $this->GetMimeTypeForFormat($format));
 
         try {
             $factory = new MgCoordinateSystemFactory();

@@ -43,6 +43,8 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
 
     protected function GetFileExtension() { return "json"; }
 
+    public function GetMimeType() { return MgMimeType::Json; }
+
     /**
      * Writes the GET response header based on content of the given MgReader
      */

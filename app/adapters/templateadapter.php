@@ -282,6 +282,10 @@ class MgTemplateRestAdapter extends MgRestAdapter
         parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
     }
 
+    public function GetMimeType() {
+        return $this->mimeType;
+    }
+
     /**
      * Initializes the adapater with the given REST configuration
      */
@@ -484,7 +488,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
                 $smarty->assign("helper", new MgTemplateHelper($this->app));
                 $output = $smarty->fetch($this->manyViewPath);
             }
-            $this->app->response->header("Content-Type", $this->mimeType);
+            $this->app->response->header("Content-Type", $this->GetMimeType());
 
             //Apply download headers
             $downloadFlag = $this->app->request->params("download");
@@ -493,7 +497,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
                 if (!$name) {
                     $name = "download";
                 }
-                $this->app->response->header("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($name, $this->mimeType));
+                $this->app->response->header("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($name, $this->GetMimeType()));
             }
 
             $this->app->response->write($output);

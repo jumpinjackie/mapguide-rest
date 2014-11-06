@@ -97,15 +97,15 @@ class MgRenderingServiceController extends MgBaseController {
         $height = $this->GetRequestParameter("height", null);
 
         if ($x == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "x"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "x"), $this->GetMimeTypeForFormat($format));
         if ($y == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "y"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "y"), $this->GetMimeTypeForFormat($format));
         if ($scale == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "scale"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "scale"), $this->GetMimeTypeForFormat($format));
         if ($width == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "width"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "width"), $this->GetMimeTypeForFormat($format));
         if ($height == null)
-            $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "height"));
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "height"), $this->GetMimeTypeForFormat($format));
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr, $format, $x, $y, $scale, $width, $height) {

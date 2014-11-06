@@ -104,6 +104,8 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     }
 
     protected function GetFileExtension() { return "xml"; }
+
+    public function GetMimeType() { return MgMimeType::Xml; }
     
     /**
      * Writes the GET response header based on content of the given MgReader

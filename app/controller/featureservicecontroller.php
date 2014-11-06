@@ -502,10 +502,10 @@ class MgFeatureServiceController extends MgBaseController {
         try {
             //Check for unsupported representations
             $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
-            $aggType = $this->ValidateValueInDomain($type, array("count", "bbox", "distinctvalues"));
+            $aggType = $this->ValidateValueInDomain($type, array("count", "bbox", "distinctvalues"), $this->GetMimeTypeForFormat($format));
             $distinctPropName = $this->GetRequestParameter("property", "");
             if ($aggType === "distinctvalues" && $distinctPropName === "") {
-                $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "property"));
+                $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "property"), $this->GetMimeTypeForFormat($format));
             }
 
             $sessionId = "";
@@ -660,11 +660,11 @@ class MgFeatureServiceController extends MgBaseController {
             $chunk = $this->GetBooleanRequestParameter("chunk", true);
 
             if ($pageNo >= 0 && $pageSize === -1) {
-                $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "pagesize"));
+                $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "pagesize"), $this->GetMimeTypeForFormat($format));
             } else {
                 //The way that CZML output is done means we cannot support pagination
                 if ($pageNo >= 0 && $pageSize > 0 && $fmt === "czml") {
-                    $this->app->halt(400, $this->app->localizer->getText("E_CZML_PAGINATION_NOT_SUPPORTED"));
+                    $this->BadRequest($this->app->localizer->getText("E_CZML_PAGINATION_NOT_SUPPORTED"), $this->GetMimeTypeForFormat($format));
                 }
             }
 
@@ -863,7 +863,7 @@ class MgFeatureServiceController extends MgBaseController {
             $chunk = $this->GetBooleanRequestParameter("chunk", true);
 
             if ($pageNo >= 0 && $pageSize === -1) {
-                $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "pagesize"));
+                $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "pagesize"), $this->GetMimeTypeForFormat($format));
             }
 
             if ($filter !== "") {

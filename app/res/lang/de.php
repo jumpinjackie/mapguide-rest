@@ -25,12 +25,20 @@
 // localization functionality
 
 return array(
+    "E_SERVICE_UNAVAILABLE" => "Dienst nicht verfügbar",
+    "E_SERVER_ERROR" => "Server Error",
+    "E_FORBIDDEN" => "verboten",
+    "E_NOT_FOUND" => "nicht gefunden",
+    "E_UNPREVIEWABLE_RESOURCE_TYPE" => "Ressourcentyp ist nicht vorhersehbare",
+    "E_BAD_REQUEST" => "Ungültige Anforderung",
     "E_CZML_PAGINATION_NOT_SUPPORTED" => "Paginierung czml Ausgang nicht unterstützt",
     "E_FORBIDDEN_ACCESS" => "Sie sind nicht berechtigt, diesen Bereich zugreifen",
-    "E_UNAUTHORIZED" => "Sie müssen einen gültigen Benutzernamen und Passwort eingeben, um auf diese Website zuzugreifen",
+    "E_UNAUTHORIZED" => "unbefugt",
+    "E_UNAUTHORIZED_DESC" => "Sie müssen einen gültigen Benutzernamen und Passwort eingeben, um auf diese Website zuzugreifen",
     "E_MISSING_REQUIRED_PARAMETER" => "Fehlende erforderliche Parameter: %s",
     "E_UNRECOGNIZED_VALUE_IN_DOMAIN" => "Nicht erkannte Wert: %s. Zulässige Werte sind (%s)",
-    "E_METHOD_NOT_SUPPORTED" => "Methode nicht unterstützt: %s",
+    "E_METHOD_NOT_SUPPORTED" => "Methode nicht unterstützt",
+    "E_METHOD_NOT_SUPPORTED_DESC" => "Methode nicht unterstützt: %s",
     "E_UNSUPPORTED_SOURCE_TYPE" => "Nicht unterstützte Quelltyp: %s",
     "E_UNSUPPORTED_REPRESENTATION" => "Nicht unterstützte Darstellung: %s",
     "E_ADAPTER_NOT_REGISTERED" => "Adapter (%s) ist nicht definiert oder eingetragene",

@@ -25,12 +25,20 @@
 // specified order here
 
 return array(
+    "E_SERVICE_UNAVAILABLE" => "Service Unavailable",
+    "E_SERVER_ERROR" => "Server Error",
+    "E_FORBIDDEN" => "Forbidden",
+    "E_NOT_FOUND" => "Not Found",
+    "E_UNPREVIEWABLE_RESOURCE_TYPE" => "Resource type is not previewable",
+    "E_BAD_REQUEST" => "Bad Request",
     "E_CZML_PAGINATION_NOT_SUPPORTED" => "Pagination of czml output not supported",
     "E_FORBIDDEN_ACCESS" => "You are not authorized to access this resource",
-    "E_UNAUTHORIZED" => "You must enter a valid login ID and password to access this site",
+    "E_UNAUTHORIZED" => "Unauthorized",
+    "E_UNAUTHORIZED_DESC" => "You must enter a valid login ID and password to access this site",
     "E_MISSING_REQUIRED_PARAMETER" => "Missing required parameter: %s",
     "E_UNRECOGNIZED_VALUE_IN_DOMAIN" => "Unrecognized value: %s. Allowed values are (%s)",
-    "E_METHOD_NOT_SUPPORTED" => "Method not supported: %s",
+    "E_METHOD_NOT_SUPPORTED" => "Method not supported",
+    "E_METHOD_NOT_SUPPORTED_DESC" => "Method not supported: %s",
     "E_UNSUPPORTED_SOURCE_TYPE" => "Unsupported source type: %s",
     "E_UNSUPPORTED_REPRESENTATION" => "Unsupported representation: %s",
     "E_ADAPTER_NOT_REGISTERED" => "Adapter (%s) is not defined or registered",

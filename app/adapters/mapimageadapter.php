@@ -87,6 +87,21 @@ class MgMapImageRestAdapter extends MgRestAdapter {
         parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
     }
 
+    public function GetMimeType() {
+        $fmt = strtoupper($this->imgFormat);
+        switch ($fmt) {
+            case "PNG":
+            case "PNG8":
+                return MgMimeType::Png;
+            case "JPG":
+                return MgMimeType::Jpeg;
+            case "GIF":
+                return MgMimeType::Gif;
+            default:
+                return MgMimeType::Binary;
+        }
+    }
+
     /**
      * Initializes the adapater with the given REST configuration
      */

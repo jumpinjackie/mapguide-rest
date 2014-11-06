@@ -94,6 +94,8 @@ abstract class MgResponseHandler
             $format = $param->GetParameterValue("FORMAT");
             if ($param->ContainsParameter("XSLSTYLESHEET"))
                 $format = MgMimeType::Html;
+            else
+                $format = $this->GetMimeTypeForFormat($format);
 
             if ($format != "") {
                 $this->OutputError($result, $format);
@@ -104,11 +106,33 @@ abstract class MgResponseHandler
         return $status;
     }
 
+    protected function GetMimeTypeForFormat($format) {
+        $fmt = strtoupper($format);
+        switch ($fmt) {
+            case "PNG":
+            case "PNG8":
+                return MgMimeType::Png;
+            case "GIF":
+                return MgMimeType::Gif;
+            case "JPG":
+                return MgMimeType::Jpeg;
+            case "KML":
+                return MgMimeType::Kml;
+            case "XML":
+                return MgMimeType::Xml;
+            case "JSON":
+            case "GEOJSON":
+            case "CZML":
+                return MgMimeType::Json;
+        }
+        return $format;
+    }
+
     private function OutputError($result, $mimeType = MgMimeType::Html) {
         $statusMessage = $result->GetHttpStatusMessage();
         $e = new Exception();
         if ($statusMessage === "MgAuthenticationFailedException" || $statusMessage === "MgUnauthorizedAccessException" || $statusMessage == "MgPermissionDeniedException") {
-            $this->Unauthorized();
+            $this->Unauthorized($mimeType);
         } else {
             $this->app->response->header("Content-Type", $mimeType);
             //Amend error code for certain classes of errors
@@ -317,7 +341,7 @@ abstract class MgResponseHandler
         $writer->EndChunking();
     }
 
-    protected function ValidateValueInDomain($value, $allowedValues = null) {
+    protected function ValidateValueInDomain($value, $allowedValues = null, $mimeType = MgMimeType::Html) {
         if ($allowedValues == null) {
             return $value;
         } else {
@@ -328,7 +352,7 @@ abstract class MgResponseHandler
                     return $fmt;
             }
         }
-        $this->app->halt(400, $this->app->localizer->getText("E_UNRECOGNIZED_VALUE_IN_DOMAIN", $value, implode(", ", $allowedValues)));
+        $this->BadRequest($this->app->localizer->getText("E_UNRECOGNIZED_VALUE_IN_DOMAIN", $value, implode(", ", $allowedValues)), $mimeType);
     }
 
     protected function ValidateRepresentation($format, $validRepresentations = null) {
@@ -342,7 +366,8 @@ abstract class MgResponseHandler
                     return $fmt;
             }
         }
-        $this->app->halt(400, $this->app->localizer->getText("E_UNSUPPORTED_REPRESENTATION", $format));
+        //Since we dont recognize the representation, we don't exactly know the ideal output format of this error. So default to HTML
+        $this->BadRequest($this->app->localizer->getText("E_UNSUPPORTED_REPRESENTATION", $format), MgMimeType::Html);
     }
 
     protected function OutputMgPropertyCollection($props, $mimeType = MgMimeType::Xml) {
@@ -460,9 +485,9 @@ abstract class MgResponseHandler
         $this->OutputException(get_class($ex), $ex->GetExceptionMessage(), $ex->GetDetails(), $e->getTraceAsString(), $status, $mimeType);
     }
 
-    protected function OutputException($statusMessage, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
+    protected function FormatException($statusMessage, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
         $errResponse = "";
-        if ($mimeType === MgMimeType::Xml) {
+        if ($mimeType === MgMimeType::Xml || $mimeType == MgMimeType::Kml) {
             $errResponse = sprintf(
                 "<?xml version=\"1.0\"?><Error><Type>%s</Type><Message>%s</Message><Details>%s</Details><StackTrace>%s</StackTrace></Error>",
                 MgUtils::EscapeXmlChars($statusMessage),
@@ -484,17 +509,71 @@ abstract class MgResponseHandler
                 $details,
                 $phpTrace);
         }
+        return $errResponse;
+    }
+
+    protected function OutputException($statusMessage, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
+        $errResponse = $this->FormatException($statusMessage, $errorMessage, $details, $phpTrace, $status, $mimeType);
+        $this->app->response->header("Content-Type", $mimeType);
         $this->app->halt($status, $errResponse);
     }
 
-    protected function Unauthorized() {
+    protected function BadRequest($msg, $mimeType = MgMimeType::Html) {
+        $e = new Exception();
+        $errResponse = $this->FormatException($this->app->localizer->getText("E_BAD_REQUEST"), $msg, $msg, $e->getTraceAsString(), 400, $mimeType);
+        $this->app->response->header("Content-Type", $mimeType);
+        $this->app->halt(400, $errResponse);
+    }
+
+    protected function MethodNotSupported($method, $mimeType = MgMimeType::Html) {
+        $e = new Exception();
+        $msg = $this->app->localizer->getText("E_METHOD_NOT_SUPPORTED_DESC", $method);
+        $errResponse = $this->FormatException($this->app->localizer->getText("E_METHOD_NOT_SUPPORTED"), $msg, $msg, $e->getTraceAsString(), 405, $mimeType);
+        $this->app->response->header("Content-Type", $mimeType);
+        $this->app->halt(405, $errResponse);
+    }
+
+    protected function NotFound($msg, $mimeType = MgMimeType::Html) {
+        $e = new Exception();
+        $errResponse = $this->FormatException($this->app->localizer->getText("E_NOT_FOUND"), $msg, $msg, $e->getTraceAsString(), 404, $mimeType);
+        $this->app->response->header("Content-Type", $mimeType);
+        $this->app->halt(404, $errResponse);
+    }
+
+    protected function Forbidden($msg, $mimeType = MgMimeType::Html) {
+        $e = new Exception();
+        $errResponse = $this->FormatException($this->app->localizer->getText("E_FORBIDDEN"), $msg, $msg, $e->getTraceAsString(), 403, $mimeType);
+        $this->app->response->header("Content-Type", $mimeType);
+        $this->app->halt(403, $errResponse);
+    }
+
+    protected function ServerError($msg, $mimeType = MgMimeType::Html) {
+        $e = new Exception();
+        $errResponse = $this->FormatException($this->app->localizer->getText("E_SERVER_ERROR"), $msg, $msg, $e->getTraceAsString(), 500, $mimeType);
+        $this->app->response->header("Content-Type", $mimeType);
+        $this->app->halt(500, $errResponse);
+    }
+
+    protected function ServiceUnavailable($msg, $mimeType = MgMimeType::Html) {
+        $e = new Exception();
+        $errResponse = $this->FormatException($this->app->localizer->getText("E_SERVICE_UNAVAILABLE"), $msg, $msg, $e->getTraceAsString(), 503, $mimeType);
+        $this->app->response->header("Content-Type", $mimeType);
+        $this->app->halt(503, $errResponse);
+    }
+
+    protected function Unauthorized($mimeType = MgMimeType::Html) {
         //Send back 401
         //HACK: But don't put the WWW-Authenticate header so the test harness doesn't trip up
         $fromTestHarness = $this->app->request->headers->get("x-mapguide-test-harness");
         if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
             $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
         $e = new Exception();
-        $this->app->halt(401, $this->app->localizer->getText("E_UNAUTHORIZED", $e->getTraceAsString()));
+        $title = $this->app->localizer->getText("E_UNAUTHORIZED");
+        $message = $this->app->localizer->getText("E_UNAUTHORIZED_DESC");
+        $errResponse = $this->FormatException($title, $message, $message, $e->getTraceAsString(), 401, $mimeType);
+        
+        $this->app->response->header("Content-Type", $mimeType);
+        $this->app->halt(401, $errResponse);
     }
 }
 

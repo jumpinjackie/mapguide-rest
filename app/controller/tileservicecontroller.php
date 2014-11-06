@@ -346,7 +346,7 @@ class MgTileServiceController extends MgBaseController {
                 $attempts++;
                 //Bail after MAX_RETRY_ATTEMPTS
                 if ($attempts >= self::MAX_RETRY_ATTEMPTS)
-                    $this->app->halt(500, "Failed to create directory after $attempts attempts");
+                    $this->ServerError("Failed to create directory after $attempts attempts", $this->GetMimeTypeForFormat($type)); //TODO: Localize
             }
         }
 
@@ -366,7 +366,7 @@ class MgTileServiceController extends MgBaseController {
         while (!file_exists($path)) {
             //Bail after MAX_RETRY_ATTEMPTS
             if ($attempts >= self::MAX_RETRY_ATTEMPTS)
-                $this->app->halt(500, "Failed to generate tile after $attempts attempts");
+                $this->ServerError("Failed to generate tile after $attempts attempts", $this->GetMimeTypeForFormat($type)); //TODO: Localize
             $attempts++;
 
             //error_log("($requestId) $path does not exist. Locking for writing");
@@ -475,10 +475,10 @@ class MgTileServiceController extends MgBaseController {
                         $bLocked = false;
                     }
                     if ($ex instanceof MgResourceNotFoundException) {
-                        $this->app->halt(404, $ex->GetExceptionMessage());
+                        $this->NotFound($ex->GetExceptionMessage(), $this->GetMimeTypeForFormat($fmt));
                     }
                     else if ($ex instanceof MgConnectionFailedException) {
-                        $this->app->halt(503, $ex->GetExceptionMessage());
+                        $this->ServiceUnavailable($ex->GetExceptionMessage(), $this->GetMimeTypeForFormat($fmt));
                     }
                 } catch (Exception $ex) {
                     if ($bLocked) {
