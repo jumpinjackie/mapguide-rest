@@ -19,6 +19,11 @@
 
 return array(
     //
+    //debug
+    //
+    //Enable/disable debugging facilities in the slim framework
+    "debug" => false,
+    //
     //GeoRest.ConfigPath
     //
     //The root path where RESTful data source configuration files are stored

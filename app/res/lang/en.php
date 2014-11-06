@@ -25,6 +25,8 @@
 // specified order here
 
 return array(
+    "E_UNHANDLED_EXCEPTION" => "Unhandled Exception",
+    "E_PHP_EXCEPTION_DETAILS" => "%s at %s:%s",
     "E_SERVICE_UNAVAILABLE" => "Service Unavailable",
     "E_SERVER_ERROR" => "Server Error",
     "E_FORBIDDEN" => "Forbidden",

@@ -25,6 +25,8 @@
 // localization functionality
 
 return array(
+    "E_UNHANDLED_EXCEPTION" => "Unbehandelte Ausnahme",
+    "E_PHP_EXCEPTION_DETAILS" => "%s bei %s:%s",
     "E_SERVICE_UNAVAILABLE" => "Dienst nicht verfügbar",
     "E_SERVER_ERROR" => "Server Error",
     "E_FORBIDDEN" => "verboten",

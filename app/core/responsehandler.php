@@ -357,13 +357,16 @@ abstract class MgResponseHandler
 
     protected function ValidateRepresentation($format, $validRepresentations = null) {
         if ($validRepresentations == null) {
+            $this->app->requestedMimeType = $this->GetMimeTypeForFormat($format);
             return $format;
         } else {
             $fmt = strtolower($format);
             foreach ($validRepresentations as $vr) {
                 $rep = strtolower($vr);
-                if ($rep === $fmt)
+                if ($rep === $fmt) {
+                    $this->app->requestedMimeType = $this->GetMimeTypeForFormat($format);
                     return $fmt;
+                }
             }
         }
         //Since we dont recognize the representation, we don't exactly know the ideal output format of this error. So default to HTML
@@ -486,30 +489,7 @@ abstract class MgResponseHandler
     }
 
     protected function FormatException($statusMessage, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
-        $errResponse = "";
-        if ($mimeType === MgMimeType::Xml || $mimeType == MgMimeType::Kml) {
-            $errResponse = sprintf(
-                "<?xml version=\"1.0\"?><Error><Type>%s</Type><Message>%s</Message><Details>%s</Details><StackTrace>%s</StackTrace></Error>",
-                MgUtils::EscapeXmlChars($statusMessage),
-                MgUtils::EscapeXmlChars($errorMessage),
-                MgUtils::EscapeXmlChars($details),
-                MgUtils::EscapeXmlChars($phpTrace));
-        } else if ($mimeType === MgMimeType::Json) {
-            $errResponse = sprintf(
-                "{ \"Type\": \"%s\", \"Message\": \"%s\", \"Details\": \"%s\", \"StackTrace\": \"%s\" }",
-                MgUtils::EscapeJsonString($statusMessage),
-                MgUtils::EscapeJsonString($errorMessage),
-                MgUtils::EscapeJsonString($details),
-                MgUtils::EscapeJsonString($phpTrace));
-        } else {
-            $errResponse = sprintf(
-                "<html><head><title>%s</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><h2>%s</h2>%s<h2>Stack Trace</h2><pre>%s</pre></body></html>",
-                $statusMessage,
-                $errorMessage,
-                $details,
-                $phpTrace);
-        }
-        return $errResponse;
+        return MgUtils::FormatException($statusMessage, $errorMessage, $details, $phpTrace, $status, $mimeType);
     }
 
     protected function OutputException($statusMessage, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {

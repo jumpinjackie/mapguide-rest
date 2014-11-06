@@ -52,10 +52,24 @@ $webConfigPath = dirname(__FILE__)."/../webconfig.ini";
 MgInitializeWebTier($webConfigPath);
 
 require_once dirname(__FILE__)."/app/util/localizer.php";
+require_once dirname(__FILE__)."/app/util/utils.php";
 $config = require_once dirname(__FILE__)."/app/config.php";
 //Pull in the appropriate string bundle
 $strings = require_once dirname(__FILE__)."/app/res/lang/".$config["Locale"].".php";
 $app = new \Slim\Slim($config);
+//Override error handler for unhandled exceptions
+$app->error(function($err) use ($app) {
+    $title = $app->localizer->getText("E_UNHANDLED_EXCEPTION");
+    $mimeType = MgMimeType::Html;
+    //As part of validating the desired representation, this variable will be set, this will tell us
+    //what mime type to shape the response
+    if (isset($app->requestedMimeType)) {
+        $mimeType = $app->requestedMimeType;
+    }
+    $details = $app->localizer->getText("E_PHP_EXCEPTION_DETAILS", $err->getMessage(), $err->getFile(), $err->getLine());
+    $app->response->header("Content-Type", $mimeType);
+    $app->response->setBody(MgUtils::FormatException($title, $err->getMessage(), $details, $err->getTraceAsString(), 500, $mimeType));
+});
 $app->localizer = new Localizer($strings);
 $app->config("SelfUrl", $app->request->getUrl() . $app->request->getRootUri());
 /*

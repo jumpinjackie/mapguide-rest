@@ -24,6 +24,33 @@
 //
 class MgUtils
 {
+    public static function FormatException($statusMessage, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
+        $errResponse = "";
+        if ($mimeType === MgMimeType::Xml || $mimeType == MgMimeType::Kml) {
+            $errResponse = sprintf(
+                "<?xml version=\"1.0\"?><Error><Type>%s</Type><Message>%s</Message><Details>%s</Details><StackTrace>%s</StackTrace></Error>",
+                MgUtils::EscapeXmlChars($statusMessage),
+                MgUtils::EscapeXmlChars($errorMessage),
+                MgUtils::EscapeXmlChars($details),
+                MgUtils::EscapeXmlChars($phpTrace));
+        } else if ($mimeType === MgMimeType::Json) {
+            $errResponse = sprintf(
+                "{ \"Type\": \"%s\", \"Message\": \"%s\", \"Details\": \"%s\", \"StackTrace\": \"%s\" }",
+                MgUtils::EscapeJsonString($statusMessage),
+                MgUtils::EscapeJsonString($errorMessage),
+                MgUtils::EscapeJsonString($details),
+                MgUtils::EscapeJsonString($phpTrace));
+        } else {
+            $errResponse = sprintf(
+                "<html><head><title>%s</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><style>body{margin:0;padding:30px;font:12px/1.5 Helvetica,Arial,Verdana,sans-serif;}h1{margin:0;font-size:48px;font-weight:normal;line-height:48px;}strong{display:inline-block;width:65px;}</style></head><body><h2>%s</h2>%s<h2>Stack Trace</h2><pre>%s</pre></body></html>",
+                $statusMessage,
+                $errorMessage,
+                $details,
+                $phpTrace);
+        }
+        return $errResponse;
+    }
+
     public static function GetApiVersionNamespace($app, $prefix) {
         $pi = $app->request->getPathInfo();
         if (strpos($pi, $prefix) > 0) {
