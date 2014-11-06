@@ -10,7 +10,10 @@
     - Add informative placeholders for resources with no data items or references
     - Fix permission issue in preview route
     - Add missing CSS for some XSL stylesheets
- - #78: mapguide-rest is now localization-ready
+ - New sample application
+    - Basic OpenLayers viewer with property palette (demonstrating HTML representation of selected features)
+ - #78: mapguide-rest is now localization-ready. Error messages and system templates can be translated to your desired language and be used by setting the "Locale" property in your mapguide-rest configuration.
+ - #80: Errors will not be returned in the appropriate response format (eg. If you get an error for a request to an XML resource, the error will be in XML)
 
 0.10
 ====
