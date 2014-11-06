@@ -445,6 +445,53 @@
             ]
         },
         {
+            "path": "/session/{session}/{mapName}.Map/kml",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Gets the KML for the specified map definition",
+                    "nickname": "GetMapKml",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "mapName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The name of the runtime map"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "native",
+                            "type": "boolean",
+                            "required": false,
+                            "description": "If true, this operation will simply pass through to the mapagent. This is much faster, but note that all network link URLs will be referring to the mapagent instead of downstream RESTful layer KML URLs."
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "path": "/session/{session}/{mapName}.Map/layergroups",
             "operations": [
                 {
@@ -3086,6 +3133,163 @@
             ]
         },
         {
+            "path": "/session/{session}/{resName}.LayerDefinition/kml",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Gets the KML for the specified layer definition",
+                    "nickname": "GetMapKml",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The feature source name"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "bbox",
+                            "type": "string",
+                            "required": true,
+                            "description": "A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry. Coordinates must be LL84 coordinates"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "dpi",
+                            "type": "integer",
+                            "required": true,
+                            "description": "Display DPI. Default is 96"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "width",
+                            "type": "integer",
+                            "required": true,
+                            "description": "The display width of the KML viewport"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "height",
+                            "type": "integer",
+                            "required": true,
+                            "description": "The display height of the KML viewport"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "draworder",
+                            "type": "integer",
+                            "required": true,
+                            "description": "The draw order of this layer"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/session/{session}/{resName}.LayerDefinition/kmlfeatures",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Gets the features KML for the specified layer definition",
+                    "nickname": "GetFeaturesKml",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The feature source name"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "bbox",
+                            "type": "string",
+                            "required": true,
+                            "description": "A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry. Coordinates must be LL84 coordinates"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "dpi",
+                            "type": "integer",
+                            "required": true,
+                            "description": "Display DPI. Default is 96"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "width",
+                            "type": "integer",
+                            "required": true,
+                            "description": "The display width of the KML viewport"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "height",
+                            "type": "integer",
+                            "required": true,
+                            "description": "The display height of the KML viewport"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "draworder",
+                            "type": "integer",
+                            "required": true,
+                            "description": "The draw order of this layer"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "path": "/session/{session}/{resName}.LayerDefinition/legend/{scale}/{geomType}/{themecat}/icon.{type}",
             "operations": [
                 {
@@ -3303,6 +3507,53 @@
                                 "JPG",
                                 "GIF"
                             ]
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/session/{session}/{resName}.MapDefinition/kml",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Gets the KML for the specified map definition",
+                    "nickname": "GetMapKml",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The feature source name"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "native",
+                            "type": "boolean",
+                            "required": false,
+                            "description": "If true, this operation will simply pass through to the mapagent. This is much faster, but note that all network link URLs will be referring to the mapagent instead of downstream RESTful layer KML URLs."
                         }
                     ],
                     "responseMessages": [

@@ -656,6 +656,9 @@ class MgFeatureServiceController extends MgBaseController {
             $pageSize = $this->GetRequestParameter("pagesize", -1);
             $pageNo = $this->GetRequestParameter("page", -1);
 
+            //Internal debugging flag
+            $chunk = $this->GetBooleanRequestParameter("chunk", true);
+
             if ($pageNo >= 0 && $pageSize === -1) {
                 $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "pagesize"));
             } else {
@@ -788,8 +791,14 @@ class MgFeatureServiceController extends MgBaseController {
                             }
                         }
 
+                        $owriter = null;
+                        if ($chunk === "0")
+                            $owriter = new MgSlimChunkWriter($this->app);
+                        else
+                            $owriter = new MgHttpChunkWriter();
+
                         if ($fmt == "czml") {
-                            $result = new MgCzmlResult($featSvc, $fsId, "$schemaName:$className", $query, $limit, $baseFilter, $vlNode, new MgHttpChunkWriter());
+                            $result = new MgCzmlResult($featSvc, $fsId, "$schemaName:$className", $query, $limit, $baseFilter, $vlNode, $owriter);
                             $result->CheckAndSetDownloadHeaders($this->app, $format);
                             if ($transform != null)
                                 $result->SetTransform($transform);
@@ -798,9 +807,9 @@ class MgFeatureServiceController extends MgBaseController {
                             $reader = $featSvc->SelectFeatures($fsId, "$schemaName:$className", $query);
                             if ($pageSize > 0) {
                                 $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo);
-                                $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, new MgHttpChunkWriter());
+                                $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, $owriter);
                             } else {
-                                $result = new MgReaderChunkedResult($featSvc, $reader, $limit, new MgHttpChunkWriter());
+                                $result = new MgReaderChunkedResult($featSvc, $reader, $limit, $owriter);
                             }
                             $result->CheckAndSetDownloadHeaders($this->app, $format);
                             if ($transform != null)
@@ -850,6 +859,9 @@ class MgFeatureServiceController extends MgBaseController {
             $pageSize = $this->GetRequestParameter("pagesize", -1);
             $pageNo = $this->GetRequestParameter("page", -1);
 
+            //Internal debugging flag
+            $chunk = $this->GetBooleanRequestParameter("chunk", true);
+
             if ($pageNo >= 0 && $pageSize === -1) {
                 $this->app->halt(400, $this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "pagesize"));
             }
@@ -884,14 +896,20 @@ class MgFeatureServiceController extends MgBaseController {
 
             $reader = $featSvc->SelectFeatures($resId, "$schemaName:$className", $query);
 
+            $owriter = null;
+            if ($chunk === "0")
+                $owriter = new MgSlimChunkWriter($this->app);
+            else
+                $owriter = new MgHttpChunkWriter();
+
             if ($pageSize > 0) {
                 if ($pageNo < 1) {
                     $pageNo = 1;
                 }
                 $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo);
-                $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, new MgHttpChunkWriter());
+                $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, $owriter);
             } else {
-                $result = new MgReaderChunkedResult($featSvc, $reader, $limit, new MgHttpChunkWriter());
+                $result = new MgReaderChunkedResult($featSvc, $reader, $limit, $owriter);
             }
             $result->CheckAndSetDownloadHeaders($this->app, $format);
             if ($transform != null)

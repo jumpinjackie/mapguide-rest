@@ -27,7 +27,7 @@
 return array(
     "E_CZML_PAGINATION_NOT_SUPPORTED" => "Pagination of czml output not supported",
     "E_FORBIDDEN_ACCESS" => "You are not authorized to access this resource",
-    "E_UNAUTHORIZED" => "You must enter a valid login ID and password to access this site<br/>%s",
+    "E_UNAUTHORIZED" => "You must enter a valid login ID and password to access this site",
     "E_MISSING_REQUIRED_PARAMETER" => "Missing required parameter: %s",
     "E_UNRECOGNIZED_VALUE_IN_DOMAIN" => "Unrecognized value: %s. Allowed values are (%s)",
     "E_METHOD_NOT_SUPPORTED" => "Method not supported: %s",

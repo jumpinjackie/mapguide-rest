@@ -148,7 +148,7 @@ class MgReaderChunkedResult
     }
 
     public function SetTransform($tx) {
-        $transform = $tx;
+        $this->transform = $tx;
     }
 
     public function SetBaseUrl($baseUrl) {
@@ -185,7 +185,7 @@ class MgReaderChunkedResult
             if (!$firstFeature) {
                 $output .= ",";
             }
-            $output .= MgGeoJsonWriter::FeatureToGeoJson($this->reader, $agfRw, $transform, ($idProp != NULL ? $idProp->GetName() : NULL));
+            $output .= MgGeoJsonWriter::FeatureToGeoJson($this->reader, $agfRw, $this->transform, ($idProp != NULL ? $idProp->GetName() : NULL));
             $this->writer->WriteChunk($output);
             $output = "";
 
@@ -473,7 +473,7 @@ class MgReaderChunkedResult
                             {
                                 try {
                                     $agf = $this->reader->GetGeometry($i);
-                                    $geom = ($transform != null) ? $agfRw->Read($agf, $transform) : $agfRw->Read($agf);
+                                    $geom = ($this->transform != null) ? $agfRw->Read($agf, $this->transform) : $agfRw->Read($agf);
                                     $output .= $wktRw->Write($geom);
                                 } catch (MgException $ex) {
 

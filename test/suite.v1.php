@@ -6604,7 +6604,7 @@
 
             });
 
-            module("KML Service - Library", {
+            module("KML Service", {
                 setup: function() {
                     var self = this;
                     api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result) {
@@ -6628,7 +6628,7 @@
                     });
                 }
             });
-            test("GetMapKml", function() {
+            test("GetMapKml - Library", function() {
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Expected KML response");
                     ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
@@ -6672,7 +6672,7 @@
                     ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
                 });
             });
-            test("GetLayerKml", function() {
+            test("GetLayerKml - Library", function() {
                 //Various missing parameters
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kml", "GET", null, function(status, result, mimeType) {
                     ok(status == 400, "(" + status + ") - Expected missing parameter response");
@@ -6748,7 +6748,7 @@
                     ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
                 });
             });
-            test("GetFeaturesKml", function() {
+            test("GetFeaturesKml - Library", function() {
                 //Various missing parameters
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", null, function(status, result, mimeType) {
                     ok(status == 400, "(" + status + ") - Expected missing parameter response");
@@ -6819,6 +6819,229 @@
                     ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
                 });
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+            });
+            test("GetMapKml - Session", function() {
+                api_test(rest_root_url + "/services/copyresource", "POST", {
+                    session: this.anonymousSessionId,
+                    source: "Library://Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition",
+                    destination: "Session:" + this.anonymousSessionId + "//Sheboygan.MapDefinition",
+                    overwrite: 1
+                }, function(status, result) {
+                    ok(status == 200, "(" + status + ") copy operation should've succeeded");
+                });
+
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+
+                //Pass thru
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/kml", "GET", { "native": 1 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/kml", "GET", { "native": 1 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/kml", "GET", { "native": 1 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/kml", "GET", { "native": 1 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
+                });
+            });
+            test("GetLayerKml - Session", function() {
+                api_test(rest_root_url + "/services/copyresource", "POST", {
+                    session: this.anonymousSessionId,
+                    source: "Library://Samples/Sheboygan/Layers/Districts.LayerDefinition",
+                    destination: "Session:" + this.anonymousSessionId + "//Districts.LayerDefinition",
+                    overwrite: 1
+                }, function(status, result) {
+                    ok(status == 200, "(" + status + ") copy operation should've succeeded");
+                });
+
+                //Various missing parameters
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                //The actual valid requests
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kml", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+            });
+            test("GetFeaturesKml - Session", function() {
+                api_test(rest_root_url + "/services/copyresource", "POST", {
+                    session: this.anonymousSessionId,
+                    source: "Library://Samples/Sheboygan/Layers/Districts.LayerDefinition",
+                    destination: "Session:" + this.anonymousSessionId + "//Districts.LayerDefinition",
+                    overwrite: 1
+                }, function(status, result) {
+                    ok(status == 200, "(" + status + ") copy operation should've succeeded");
+                });
+
+                //Various missing parameters
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1 }, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
+                });
+
+                //The actual valid requests
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected KML response");
+                    ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
+                    ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Districts.LayerDefinition/kmlfeatures", "GET", { width: 640, height: 480, draworder: 1, bbox: "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569" }, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Expected KML response");
                     ok(mimeType == MgMimeType.Kml, "(" + mimeType + ") Expected KML mime type");
                     ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");

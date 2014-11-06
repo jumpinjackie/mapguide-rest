@@ -1667,4 +1667,110 @@ $app->get("/session/:sessionId/:resName.WatermarkDefinition/preview", function($
     $ctrl->LaunchResourcePreview($resId);
 });
 
+// =========================================== KML Service APIs ====================================================
+
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{mapName}.Map/kml",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetMapKml",
+ *        summary="Gets the KML for the specified map definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map"),
+ *          @SWG\parameter(name="native", paramType="query", required=false, type="boolean", description="If true, this operation will simply pass through to the mapagent. This is much faster, but note that all network link URLs will be referring to the mapagent instead of downstream RESTful layer KML URLs.")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:mapName.map/kml", function($sessionId, $mapName) use ($app) {
+    $ctrl = new MgKmlServiceController($app);
+    $ctrl->GetMapKml($resId, "kml");
+});
+
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{resName}.MapDefinition/kml",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetMapKml",
+ *        summary="Gets the KML for the specified map definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
+ *          @SWG\parameter(name="native", paramType="query", required=false, type="boolean", description="If true, this operation will simply pass through to the mapagent. This is much faster, but note that all network link URLs will be referring to the mapagent instead of downstream RESTful layer KML URLs.")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:resName.MapDefinition/kml", function($sessionId, $resName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
+    $ctrl = new MgKmlServiceController($app);
+    $ctrl->GetMapKml($resId, "kml");
+});
+
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{resName}.LayerDefinition/kml",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetMapKml",
+ *        summary="Gets the KML for the specified layer definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="bbox", paramType="query", required=true, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry. Coordinates must be LL84 coordinates"),
+ *          @SWG\parameter(name="dpi", paramType="query", required=true, type="integer", description="Display DPI. Default is 96"),
+ *          @SWG\parameter(name="width", paramType="query", required=true, type="integer", description="The display width of the KML viewport"),
+ *          @SWG\parameter(name="height", paramType="query", required=true, type="integer", description="The display height of the KML viewport"),
+ *          @SWG\parameter(name="draworder", paramType="query", required=true, type="integer", description="The draw order of this layer")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:resName.LayerDefinition/kml", function($sessionId, $resName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
+    $ctrl = new MgKmlServiceController($app);
+    $ctrl->GetLayerKml($resId, "kml");
+});
+
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{resName}.LayerDefinition/kmlfeatures",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetFeaturesKml",
+ *        summary="Gets the features KML for the specified layer definition",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
+ *          @SWG\parameter(name="bbox", paramType="query", required=true, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry. Coordinates must be LL84 coordinates"),
+ *          @SWG\parameter(name="dpi", paramType="query", required=true, type="integer", description="Display DPI. Default is 96"),
+ *          @SWG\parameter(name="width", paramType="query", required=true, type="integer", description="The display width of the KML viewport"),
+ *          @SWG\parameter(name="height", paramType="query", required=true, type="integer", description="The display height of the KML viewport"),
+ *          @SWG\parameter(name="draworder", paramType="query", required=true, type="integer", description="The draw order of this layer")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:resName.LayerDefinition/kmlfeatures", function($sessionId, $resName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
+    $ctrl = new MgKmlServiceController($app);
+    $ctrl->GetFeaturesKml($resId, "kml");
+});
+
 ?>

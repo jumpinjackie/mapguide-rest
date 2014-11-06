@@ -27,7 +27,7 @@
 return array(
     "E_CZML_PAGINATION_NOT_SUPPORTED" => "Paginierung czml Ausgang nicht unterstützt",
     "E_FORBIDDEN_ACCESS" => "Sie sind nicht berechtigt, diesen Bereich zugreifen",
-    "E_UNAUTHORIZED" => "Sie müssen einen gültigen Benutzernamen und Passwort eingeben, um auf diese Website zuzugreifen<br/>%s",
+    "E_UNAUTHORIZED" => "Sie müssen einen gültigen Benutzernamen und Passwort eingeben, um auf diese Website zuzugreifen",
     "E_MISSING_REQUIRED_PARAMETER" => "Fehlende erforderliche Parameter: %s",
     "E_UNRECOGNIZED_VALUE_IN_DOMAIN" => "Nicht erkannte Wert: %s. Zulässige Werte sind (%s)",
     "E_METHOD_NOT_SUPPORTED" => "Methode nicht unterstützt: %s",

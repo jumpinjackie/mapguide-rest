@@ -535,6 +535,9 @@ class MgMapController extends MgBaseController {
         $pageNo = $this->GetRequestParameter("page", -1);
         $orientation = $this->GetRequestParameter("orientation", "h");
 
+        //Internal debugging flag
+        $chunk = $this->GetBooleanRequestParameter("chunk", true);
+
         $this->EnsureAuthenticationForSite($sessionId);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
@@ -569,14 +572,21 @@ class MgMapController extends MgBaseController {
                 $tokens = explode(":", $layer->GetFeatureClassName());
                 $transform = MgUtils::GetTransform($featSvc, $resId, $tokens[0], $tokens[1], $transformto);
             }
+
+            $owriter = null;
+            if ($chunk === "0")
+                $owriter = new MgSlimChunkWriter($this->app);
+            else
+                $owriter = new MgHttpChunkWriter();
+
             //NOTE: This does not do a query to ascertain a total, this is already a pre-computed property of the selection set.
             $total = $selection->GetSelectedFeaturesCount($layer, $layer->GetFeatureClassName());
             $reader = $selection->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), $bMapped);
             if ($pageSize > 0) {
                 $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo, $total);
-                $result = new MgReaderChunkedResult($featSvc, $pageReader, -1, new MgHttpChunkWriter());
+                $result = new MgReaderChunkedResult($featSvc, $pageReader, -1, $owriter);
             } else {
-                $result = new MgReaderChunkedResult($featSvc, $reader, -1, new MgHttpChunkWriter());
+                $result = new MgReaderChunkedResult($featSvc, $reader, -1, $owriter);
             }
             $result->CheckAndSetDownloadHeaders($this->app, $format);
             if ($transform != null)
