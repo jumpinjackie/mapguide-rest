@@ -26,6 +26,7 @@ class MgCoordinateSystemController extends MgBaseController {
 
     public function EnumerateCategories($format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
+        $sessionId = $this->app->request->params("session");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
@@ -40,11 +41,12 @@ class MgCoordinateSystemController extends MgBaseController {
                 $param->AddParameter("XSLSTYLESHEET", "CoordinateSystemCategoryList.xsl");
             }
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
     public function EnumerateCoordinateSystemsByCategory($category, $format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
+        $sessionId = $this->app->request->params("session");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $category) {
@@ -62,7 +64,7 @@ class MgCoordinateSystemController extends MgBaseController {
             }
             $param->AddParameter("CSCATEGORY", $category);
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
     public function ConvertCsCodeToEpsg($cscode) {
@@ -142,7 +144,7 @@ class MgCoordinateSystemController extends MgBaseController {
                 } else {
                     //TODO: We should accept a partial response, but there's currently no way an empty <Coordinate/> tag survives the
                     //XML to JSON conversion, so we have to throw lest we return an inconsisten partial result
-                    throw new Exception($this->app->localizer->getText("E_INVALID_COORDINATE_PAIR", $coordPair, $tokenCount));
+                    $this->ServerError($this->app->localizer->getText("E_INVALID_COORDINATE_PAIR", $coordPair, $tokenCount), $this->GetMimeTypeForFormat($format));
                 }
             }
             $output .= "</CoordinateCollection>";
@@ -157,7 +159,7 @@ class MgCoordinateSystemController extends MgBaseController {
             }
         }
         catch (MgException $ex) {
-            $this->OnException($ex);
+            $this->OnException($ex, $this->GetMimeTypeForFormat($format));
         }
     }
 }

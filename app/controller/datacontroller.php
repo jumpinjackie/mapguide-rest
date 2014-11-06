@@ -355,7 +355,7 @@ class MgDataController extends MgBaseController {
                     $this->Forbidden($this->app->localizer->getText("E_FORBIDDEN_ACCESS"), $this->GetMimeTypeForFormat($extension));
                 }
             } catch (MgException $ex) {
-                $this->OnException($ex);
+                $this->OnException($ex, $this->GetMimeTypeForFormat($extension));
             }
         }
     }
@@ -406,7 +406,7 @@ class MgDataController extends MgBaseController {
                     $this->Forbidden($this->app->localizer->getText("E_FORBIDDEN_ACCESS"), $this->GetMimeTypeForFormat($extension));
                 }
             } catch (MgException $ex) {
-                $this->OnException($ex);
+                $this->OnException($ex, $this->GetMimeTypeForFormat($extension));
             }
         }
     }

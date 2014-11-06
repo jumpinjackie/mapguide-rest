@@ -431,6 +431,10 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 return api_test_with_credentials(url, type, data, "<?= $adminUser ?>", "<?= $adminPass ?>", callback);
             }
 
+            function assertMimeType(expected, actual) {
+                ok(actual == expected, "(" + actual + ") Expected mime type of: " + expected);
+            }
+
             <? if ($namespace != null) {
             include "suite.$namespace.php";
             } else {

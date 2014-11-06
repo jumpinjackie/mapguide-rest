@@ -42,7 +42,7 @@ class MgBaseController extends MgResponseHandler
         return $val;
     }
 
-    protected function EnsureAuthenticationForHttp($callback, $allowAnonymous = false, $agentUri = "", $nominatedSessionId = "") {
+    protected function EnsureAuthenticationForHttp($callback, $allowAnonymous = false, $agentUri = "", $nominatedSessionId = "", $mimeType = MgMimeType::Html) {
         //agent URI is only required if responses must contain a reference
         //back to the mapagent. This is not the case for most, if not all
         //our scenarios so the passed URI can be assumed to be empty most of the
@@ -54,7 +54,7 @@ class MgBaseController extends MgResponseHandler
         if ($session != null) {
             $param->AddParameter("SESSION", $session);
         } else {
-            if ($nominatedSessionId !== "") {
+            if ($nominatedSessionId !== "" && $nominatedSessionId !== null) {
                 $param->AddParameter("SESSION", $nominatedSessionId);
             } else {
                 $username = null;
@@ -110,7 +110,7 @@ class MgBaseController extends MgResponseHandler
                         $username = "Anonymous";
                         $param->AddParameter("USERNAME", $username);
                     } else {
-                        $this->Unauthorized();
+                        $this->Unauthorized($mimeType);
                     }
                 }
             }
@@ -130,7 +130,7 @@ class MgBaseController extends MgResponseHandler
         $callback($req, $param);
     }
 
-    protected function EnsureAuthenticationForSite($nominatedSessionId = "", $allowAnonymous = false) {
+    protected function EnsureAuthenticationForSite($nominatedSessionId = "", $allowAnonymous = false, $mimeType = MgMimeType::Html) {
         if ($this->userInfo == null) {
             $this->userInfo = new MgUserInformation();
             $this->userInfo->SetClientAgent("MapGuide REST Extension");
@@ -195,7 +195,7 @@ class MgBaseController extends MgResponseHandler
                             $this->userInfo->SetMgUsernamePassword("Anonymous", "");
                             $this->userName = "Anonymous";
                         } else {
-                            $this->Unauthorized();
+                            $this->Unauthorized($mimeType);
                         }
                     }
                 }

@@ -39,6 +39,7 @@ class MgFeatureServiceController extends MgBaseController {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
         $partialConnStr = $this->GetRequestParameter("connection", "");
+        $sessionId = $this->app->request->params("session");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $providerName, $propName, $partialConnStr) {
@@ -54,7 +55,7 @@ class MgFeatureServiceController extends MgBaseController {
                 $param->AddParameter("CONNECTIONSTRING", $partialConnStr);
             }
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
     public function EnumerateDataStores($providerName, $format) {
@@ -62,6 +63,7 @@ class MgFeatureServiceController extends MgBaseController {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
         $partialConnStr = $this->GetRequestParameter("connection", "");
+        $sessionId = $this->app->request->params("session");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $providerName, $partialConnStr) {
@@ -76,7 +78,7 @@ class MgFeatureServiceController extends MgBaseController {
                 $param->AddParameter("CONNECTIONSTRING", $partialConnStr);
             }
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
     public function GetProviderCapabilities($providerName, $format) {
@@ -84,6 +86,7 @@ class MgFeatureServiceController extends MgBaseController {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
         $partialConnStr = $this->GetRequestParameter("connection", "");
+        $sessionId = $this->app->request->params("session");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $providerName, $partialConnStr) {
@@ -98,12 +101,13 @@ class MgFeatureServiceController extends MgBaseController {
                 $param->AddParameter("CONNECTIONSTRING", $partialConnStr);
             }
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
     public function GetFeatureProviders($format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
+        $sessionId = $this->app->request->params("session");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
@@ -118,7 +122,7 @@ class MgFeatureServiceController extends MgBaseController {
                 $param->AddParameter("XSLSTYLESHEET", "FdoProviderList.xsl");
             }
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
     public function GetSchemaMapping($format) {
@@ -139,7 +143,7 @@ class MgFeatureServiceController extends MgBaseController {
             $param->AddParameter("PROVIDER", $provider);
             $param->AddParameter("CONNECTIONSTRING", $connStr);
             $that->ExecuteHttpRequest($req);
-        }, false, "", $sessionId);
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
     public function GetSpatialContexts($resId, $format) {
@@ -162,7 +166,7 @@ class MgFeatureServiceController extends MgBaseController {
             $param->AddParameter("RESOURCEID", $resIdStr);
             $param->AddParameter("ACTIVEONLY", "0");
             $that->ExecuteHttpRequest($req);
-        }, false, "", $sessionId);
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
     public function GetSchemaNames($resId, $format) {
@@ -197,7 +201,7 @@ class MgFeatureServiceController extends MgBaseController {
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
-        }, false, "", $sessionId);
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
     public function DescribeSchema($resId, $schemaName, $format) {
@@ -224,7 +228,7 @@ class MgFeatureServiceController extends MgBaseController {
             $param->AddParameter("RESOURCEID", $resIdStr);
             $param->AddParameter("SCHEMA", $schemaName);
             $that->ExecuteHttpRequest($req);
-        }, false, "", $sessionId);
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
     public function GetClassNames($resId, $schemaName, $format) {
@@ -253,7 +257,7 @@ class MgFeatureServiceController extends MgBaseController {
             $param->AddParameter("RESOURCEID", $resIdStr);
             $param->AddParameter("SCHEMA", $schemaName);
             $that->ExecuteHttpRequest($req);
-        }, false, "", $sessionId);
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
     public function GetClassDefinition($resId, $schemaName, $className, $format) {
@@ -277,7 +281,7 @@ class MgFeatureServiceController extends MgBaseController {
             $param->AddParameter("SCHEMA", $schemaName);
             $param->AddParameter("CLASSNAMES", $className);
             $that->ExecuteHttpRequest($req);
-        }, false, "", $sessionId);
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
     private static function CheckPermissions($resSvc, $resId) {
@@ -828,7 +832,7 @@ class MgFeatureServiceController extends MgBaseController {
                 }
             }
         } catch (MgException $ex) {
-            $this->OnException($ex);
+            $this->OnException($ex, $this->GetMimeTypeForFormat($format));
         }
     }
 
@@ -920,7 +924,7 @@ class MgFeatureServiceController extends MgBaseController {
             }
             $result->Output($format);
         } catch (MgException $ex) {
-            $this->OnException($ex);
+            $this->OnException($ex, $this->GetMimeTypeForFormat($format));
         }
     }
 }

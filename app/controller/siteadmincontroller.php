@@ -27,29 +27,38 @@ class MgSiteAdminController extends MgBaseController {
     public function GetSiteStatus($format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $sessionId = $this->app->request->params("session");
+        try {
+            $this->EnsureAuthenticationForSite($sessionId, false, $this->GetMimeTypeForFormat($format));
+            $admin = new MgServerAdmin();
+            $admin->Open($this->userInfo);
+            $status = $admin->GetSiteStatus();
 
-        $this->EnsureAuthenticationForSite();
-        $admin = new MgServerAdmin();
-        $admin->Open($this->userInfo);
-        $status = $admin->GetSiteStatus();
-
-        $mimeType = MgMimeType::Xml;
-        if ($fmt === "json") {
-            $mimeType = MgMimeType::Json;
+            $mimeType = MgMimeType::Xml;
+            if ($fmt === "json") {
+                $mimeType = MgMimeType::Json;
+            }
+            $this->OutputMgPropertyCollection($status, $mimeType);
+        } catch (MgException $ex) {
+            $this->OnException($ex, $this->GetMimeTypeForFormat($format));
         }
-        $this->OutputMgPropertyCollection($status, $mimeType);
     }
 
     public function GetSiteVersion() {
-        $this->EnsureAuthenticationForSite();
-        $admin = new MgServerAdmin();
-        $admin->Open($this->userInfo);
-        $this->app->response->setBody($admin->GetSiteVersion());
+        try {
+            $this->EnsureAuthenticationForSite();
+            $admin = new MgServerAdmin();
+            $admin->Open($this->userInfo);
+            $this->app->response->setBody($admin->GetSiteVersion());
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
     }
 
     public function EnumerateGroups($format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $sessionId = $this->app->request->params("session");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
@@ -66,12 +75,13 @@ class MgSiteAdminController extends MgBaseController {
                 $param->AddParameter("X-FORCE-JSON-CONVERSION", "true");
             }
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
     public function EnumerateUsersForGroup($groupName, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $sessionId = $this->app->request->params("session");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $groupName) {
@@ -83,15 +93,16 @@ class MgSiteAdminController extends MgBaseController {
             else
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             $that->ExecuteHttpRequest($req);
-        });
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
     public function EnumerateGroupsForUser($userName, $format) {
+        $sessionId = $this->app->request->params("session");
         try {
             //Check for unsupported representations
             $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
-            $this->EnsureAuthenticationForSite();
+            $this->EnsureAuthenticationForSite($sessionId, false, $this->GetMimeTypeForFormat($format));
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
@@ -100,7 +111,7 @@ class MgSiteAdminController extends MgBaseController {
                 $user = $site->GetUserForSession();
                 //Hmmm. Should we allow Anonymous to discover its own roles?
                 if($user === "Anonymous" && $userName !== "Anonymous") {
-                    $this->Unauthorized();
+                    $this->Unauthorized($this->GetMimeTypeForFormat($format));
                 }
             } catch (MgException $ex) {
                 //Could happen if we have non-anonymous credentials in the http authentication header
@@ -113,16 +124,17 @@ class MgSiteAdminController extends MgBaseController {
                 $this->OutputByteReader($content);
             }
         } catch (MgException $ex) {
-            $this->OnException($ex);
+            $this->OnException($ex, $this->GetMimeTypeForFormat($format));
         }
     }
 
     public function EnumerateRolesForUser($userName, $format) {
+        $sessionId = $this->app->request->params("session");
         try {
             //Check for unsupported representations
             $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
-            $this->EnsureAuthenticationForSite();
+            $this->EnsureAuthenticationForSite($sessionId, false, $this->GetMimeTypeForFormat($format));
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
@@ -131,7 +143,7 @@ class MgSiteAdminController extends MgBaseController {
                 $user = $site->GetUserForSession();
                 //Hmmm. Should we allow Anonymous to discover its own roles?
                 if($user === "Anonymous" && $userName !== "Anonymous") {
-                    $this->Unauthorized();
+                    $this->Unauthorized($this->GetMimeTypeForFormat($format));
                 }
             } catch (MgException $ex) {
                 //Could happen if we have non-anonymous credentials in the http authentication header
@@ -145,7 +157,7 @@ class MgSiteAdminController extends MgBaseController {
             $this->app->response->header("Content-Type", $mimeType);
             $this->OutputMgStringCollection($content, $mimeType);
         } catch (MgException $ex) {
-            $this->OnException($ex);
+            $this->OnException($ex, $this->GetMimeTypeForFormat($format));
         }
     }
 }
