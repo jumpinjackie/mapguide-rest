@@ -338,7 +338,7 @@ class MgReaderChunkedResult
             }
             $maxPages = $this->reader->GetMaxPages();
             if ($maxPages >= 0) {
-                $pageNoHtml = "<strong>(".$this->localizer->getText("L_PAGE_X_OF_Y", $pageNo, $maxPage).")</strong>";
+                $pageNoHtml = "<strong>(".$this->localizer->getText("L_PAGE_X_OF_Y", $pageNo, $maxPages).")</strong>";
             } else {
                 $pageNoHtml = "<strong>(".$this->localizer->getText("L_PAGE_NO", $pageNo).")</strong>";
             }
