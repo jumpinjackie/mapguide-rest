@@ -157,6 +157,74 @@
             ]
         },
         {
+            "path": "/site/info",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Gets the information of the current Site Server",
+                    "nickname": "GetSiteInformation",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/site/info.{type}",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Gets the information of the current Site Server",
+                    "nickname": "GetSiteInformation",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "response output format",
+                            "enum": [
+                                "xml"
+                            ]
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "path": "/site/status",
             "operations": [
                 {

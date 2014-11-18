@@ -32,6 +32,31 @@ require_once dirname(__FILE__)."/../../controller/mappingservicecontroller.php";
 
 /**
  * @SWG\Api(
+ *     path="/services/listunmanageddata.{responseType}",
+ *     @SWG\Operation(
+ *        method="POST",
+ *        nickname="EnumerateUnmanagedData",
+ *        summary="Enumerates files in an unmanaged aliased directory",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="path", paramType="form", required=false, type="string", description=""),
+ *          @SWG\parameter(name="type", paramType="form", required=true, type="string", description="", enum="['Folders','Files','Both']"),
+ *          @SWG\parameter(name="filter", paramType="form", required=false, type="string", description=""),
+ *          @SWG\parameter(name="recursive", paramType="form", required=true, type="boolean", description=""),
+ *          @SWG\parameter(name="responseType", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->post("/services/listunmanageddata.:format", function($format) use ($app) {
+    $ctrl = new MgResourceServiceController($app);
+    $ctrl->EnumerateUnmanagedData($format);
+});
+/**
+ * @SWG\Api(
  *     path="/services/getschemamapping",
  *     @SWG\Operation(
  *        method="GET",

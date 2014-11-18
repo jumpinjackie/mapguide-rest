@@ -24,6 +24,29 @@ class MgSiteAdminController extends MgBaseController {
         parent::__construct($app);
     }
 
+    public function GetSiteInformation($format) {
+        //Check for unsupported representations (FIXME: Actual mapagent operation doesn't support JSON output. This is a bug)
+        $fmt = $this->ValidateRepresentation($format, array("xml")); //, "json"));
+        $sessionId = $this->app->request->params("session");
+
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
+            $param->AddParameter("OPERATION", "GETSITEINFO");
+            $param->AddParameter("VERSION", "2.2.0");
+            if ($fmt === "json")
+                $param->AddParameter("FORMAT", MgMimeType::Json);
+            else
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+            if ($fmt === "json") {
+                //Instructs ExecuteHttpRequest to force convert the XML content to JSON. This is a workaround
+                //for mapagent APIs that do not support the FORMAT request parameter to let us specify a JSON
+                //response (which is a bug, because they should!)
+                $param->AddParameter("X-FORCE-JSON-CONVERSION", "true");
+            }
+            $that->ExecuteHttpRequest($req);
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
+    }
+
     public function GetSiteStatus($format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));

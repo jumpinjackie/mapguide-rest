@@ -69,7 +69,45 @@ $app->get("/site/status.:format", function($format) use ($app) {
     $ctrl = new MgSiteAdminController($app);
     $ctrl->GetSiteStatus($format);
 });
-
+/**
+ * @SWG\Api(
+ *     path="/site/info",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetSiteInformation",
+ *        summary="Gets the information of the current Site Server",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/site/info", function() use ($app) {
+    $ctrl = new MgSiteAdminController($app);
+    $ctrl->GetSiteInformation("xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/site/info.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetSiteInformation",
+ *        summary="Gets the information of the current Site Server",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="response output format", enum="['xml']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/site/info.:format", function($format) use ($app) {
+    $ctrl = new MgSiteAdminController($app);
+    $ctrl->GetSiteInformation($format);
+});
 /**
  * @SWG\Api(
  *     path="/site/version",
