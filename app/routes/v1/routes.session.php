@@ -629,6 +629,28 @@ $app->post("/session/:sessionId/:resName", function($sessionId, $resName) use($a
 
 /**
  * @SWG\Api(
+ *     path="/session/{session}/{resName}.FeatureSource/status",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="TestConnection",
+ *        summary="Tests the connection status of a feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:resName.FeatureSource/status", function($sessionId, $resName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->TestConnection($resId);
+});
+/**
+ * @SWG\Api(
  *     path="/session/{session}/{resName}.FeatureSource/spatialcontexts",
  *     @SWG\Operation(
  *        method="GET",

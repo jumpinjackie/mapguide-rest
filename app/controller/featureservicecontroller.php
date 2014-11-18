@@ -146,6 +146,21 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
+    public function TestConnection($resId) {
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
+        $resIdStr = $resId->ToString();
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr) {
+            $param->AddParameter("OPERATION", "TESTCONNECTION");
+            $param->AddParameter("VERSION", "1.0.0");
+            $param->AddParameter("RESOURCEID", $resIdStr);
+            $that->ExecuteHttpRequest($req);
+        }, false, "", $sessionId);
+    }
+
     public function GetSpatialContexts($resId, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
