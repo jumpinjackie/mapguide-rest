@@ -8,43 +8,78 @@
 <xsl:param name="sessionId"/>
 <xsl:param name="viewer"/>
 
+<xsl:param name="ROOTPATH" />
+<xsl:param name="FOLDERPATH" />
+<xsl:param name="BASEPATH" />
+<xsl:param name="ASSETPATH" />
+
 <!--Globalized strings used in this XSL doc-->
-<xsl:param name="stringSchema"/>
-<xsl:param name="stringClassTitle"/>
-<xsl:param name="stringViewData"/>
-<xsl:param name="stringViewFeature"/>
-<xsl:param name="stringDataProperties"/>
-<xsl:param name="stringGeometricProperties"/>
-<xsl:param name="stringPropertyName"/>
-<xsl:param name="stringPropertyType"/>
-<xsl:param name="stringHasMeasures"/>
-<xsl:param name="stringHasElevation"/>
-<xsl:param name="stringNoGeometry"/>
-<xsl:param name="stringNoData"/>
-<xsl:param name="stringSrsName"/>
+<xsl:param name="stringTitle">Schema Preview</xsl:param>
+<xsl:param name="stringSchema">Schema</xsl:param>
+<xsl:param name="stringClassTitle">Class</xsl:param>
+<xsl:param name="stringViewData">View Data</xsl:param>
+<xsl:param name="stringViewFeature">View Features</xsl:param>
+<xsl:param name="stringDataProperties">Data Properties</xsl:param>
+<xsl:param name="stringGeometricProperties">Geometric Properties</xsl:param>
+<xsl:param name="stringPropertyName">Property Name</xsl:param>
+<xsl:param name="stringPropertyType">Property Type</xsl:param>
+<xsl:param name="stringHasMeasures">Has Measure</xsl:param>
+<xsl:param name="stringHasElevation">Has Elevation</xsl:param>
+<xsl:param name="stringNoGeometry">No Geometry</xsl:param>
+<xsl:param name="stringNoData">No Data</xsl:param>
+<xsl:param name="stringSrsName">SRS Name</xsl:param>
 
 
 <xsl:template match="/">
-    <xsl:apply-templates select="//xs:schema"/>
+<html>
+    <head>
+        <title><xsl:value-of select="$stringTitle"/></title>
+        <link rel="stylesheet" href="{$ASSETPATH}/common/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="{$ASSETPATH}/fa/css/font-awesome.min.css" />
+        <style type="text/css">
+            #previewPane { width: 100%; height: 100%; border: 0; }
+        </style>
+        <script type="text/javascript" src="{$ASSETPATH}/common/js/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="{$ASSETPATH}/common/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4">
+                    <xsl:apply-templates select="//xs:schema"/>
+                </div>
+                <div class="col-md-8">
+                    <iframe id="previewPane" name="previewPane" />
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
 </xsl:template>
 
 <xsl:template match="xs:schema">
     <xsl:if test="contains(@targetNamespace,$schemaName) or $schemaName=''">
         <xsl:if test="$className=./xs:element/@name or $className=''">
-            <h1><xsl:value-of select="$stringSchema"/>
+            <xsl:variable name="currSchemaName">
                 <xsl:call-template name="getSchemaName">
                     <xsl:with-param name="nameSpace" select="@targetNamespace"/>
                 </xsl:call-template>
-            </h1>
+            </xsl:variable>
+            <h4><xsl:value-of select="$stringSchema"/>:&#160;
+                <xsl:value-of select="$currSchemaName" />
+            </h4>
             <xsl:for-each select="xs:element">
                 <xsl:if test="$className=@name or $className=''">
                     <xsl:variable name="selector" select="@type"/>
                     <xsl:variable name="identity" select="xs:key/xs:field/@xpath"/>
                     <xsl:variable name="currclassname" select="@name"/>
-                    <h2><xsl:value-of select="$stringClassTitle"/> <xsl:value-of select="$currclassname"/></h2>
+                    <h4><xsl:value-of select="$stringClassTitle"/>:&#160;<xsl:value-of select="$currclassname"/></h4>
                     <xsl:choose>
                         <xsl:when test="@abstract='false'">
-                            <span><a><xsl:attribute name="href">showclass.php?resId=<xsl:value-of select="$resName"/>&amp;schemaName=<xsl:value-of select="../@targetNamespace"/>&amp;className=<xsl:value-of select="$currclassname"/>&amp;sessionId=<xsl:value-of select="$sessionId"/>&amp;index=0</xsl:attribute><xsl:attribute name="target">viewFrame</xsl:attribute><xsl:value-of select="$stringViewData"/></a></span>
+                            <a class="btn btn-primary" target="previewPane">
+                                <xsl:attribute name="href"><xsl:value-of select="$BASEPATH" />/features.html/<xsl:value-of select="$currSchemaName" />/<xsl:value-of select="$currclassname" />?pagesize=100&amp;page=1</xsl:attribute>
+                                <xsl:value-of select="$stringViewData"/>
+                            </a>
                         </xsl:when>
                         <xsl:otherwise>
                             <span class="gray"><xsl:value-of select="$stringNoData"/></span>
@@ -62,7 +97,6 @@
                         <xsl:with-param name="currclassname" select="$currclassname"/>
                         <xsl:with-param name="namespace" select="../@targetNamespace"/>
                     </xsl:apply-templates>
-                    <hr/>
                 </xsl:if>
             </xsl:for-each>
         </xsl:if>
@@ -88,47 +122,80 @@
     <xsl:param name="identity"/>
     <xsl:param name="currclassname"/>
     <xsl:param name="namespace"/>
+    <xsl:param name="dataPanelID">DataPanel_<xsl:call-template name="getSchemaName"><xsl:with-param name="nameSpace" select="$namespace"/></xsl:call-template>_<xsl:value-of select="$currclassname"/></xsl:param>
+    <xsl:param name="dataCollapseID">DataCollapse_<xsl:call-template name="getSchemaName"><xsl:with-param name="nameSpace" select="$namespace"/></xsl:call-template>_<xsl:value-of select="$currclassname"/></xsl:param>
+    <xsl:param name="dataBodyID">DataBody_<xsl:call-template name="getSchemaName"><xsl:with-param name="nameSpace" select="$namespace"/></xsl:call-template>_<xsl:value-of select="$currclassname"/></xsl:param>
+    <xsl:param name="geomPanelID">GeomPanel_<xsl:call-template name="getSchemaName"><xsl:with-param name="nameSpace" select="$namespace"/></xsl:call-template>_<xsl:value-of select="$currclassname"/></xsl:param>
+    <xsl:param name="geomCollapseID">GeomCollapse_<xsl:call-template name="getSchemaName"><xsl:with-param name="nameSpace" select="$namespace"/></xsl:call-template>_<xsl:value-of select="$currclassname"/></xsl:param>
+    <xsl:param name="geomBodyID">GeomBody_<xsl:call-template name="getSchemaName"><xsl:with-param name="nameSpace" select="$namespace"/></xsl:call-template>_<xsl:value-of select="$currclassname"/></xsl:param>
     <!--select only the complexType that matches the selector key field-->
     <xsl:if test="substring-after($selector, ':')=@name">
         <xsl:choose>
             <xsl:when test="$identity">
+                <div class="panel-group">
+                    <xsl:attribute name="id"><xsl:value-of select="$dataPanelID"/></xsl:attribute>
                 <!--create table for data properties-->
                 <xsl:if test="count(.//xs:element/@type) &lt; count(.//xs:element)">
-                    <h3><img src="./images/expand_pane.png"><xsl:attribute name="onclick">Toggle("Data_"+"<xsl:call-template name="getSchemaName"><xsl:with-param name="nameSpace" select="$namespace"/></xsl:call-template>"+"_"+"<xsl:value-of select="$currclassname"/>")</xsl:attribute></img> <xsl:value-of select="$stringDataProperties"/></h3>
-                    <div style="display:none">
-                        <xsl:attribute name="id">Data_<xsl:call-template name="getSchemaName"><xsl:with-param name="nameSpace" select="$namespace"/></xsl:call-template>_<xsl:value-of select="$currclassname"/></xsl:attribute>
-                        <table cellspacing="0">
-                            <tr>
-                                <td class="heading"><xsl:value-of select="$stringPropertyName"/></td>
-                                <td class="heading"><xsl:value-of select="$stringPropertyType"/></td>
-                            </tr>
-                            <!--apply template to elements-->
-                            <xsl:apply-templates select=".//xs:element">
-                                <xsl:with-param name="identity" select="$identity"/>
-                            </xsl:apply-templates>
-                        </table>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse">
+                                <xsl:attribute name="data-parent">#<xsl:value-of select="$dataPanelID"/></xsl:attribute>
+                                <xsl:attribute name="href">#<xsl:value-of select="$dataBodyID"/></xsl:attribute>
+                                <xsl:value-of select="$stringDataProperties"/>
+                            </a>
+                        </h4>
                     </div>
+                    <div class="panel-collapse collapse">
+                        <xsl:attribute name="id"><xsl:value-of select="$dataBodyID"/></xsl:attribute>
+                        <div class="panel-body">
+                            <table class="table table-hover table-condensed">
+                                <tr>
+                                    <td class="heading"><xsl:value-of select="$stringPropertyName"/></td>
+                                    <td class="heading"><xsl:value-of select="$stringPropertyType"/></td>
+                                </tr>
+                                <!--apply template to elements-->
+                                <xsl:apply-templates select=".//xs:element">
+                                    <xsl:with-param name="identity" select="$identity"/>
+                                </xsl:apply-templates>
+                            </table>
+                        </div>
+                    </div>
+                </div>
                 </xsl:if>
                 <!--create table for geometric properties-->
                 <xsl:if test=".//xs:element/@type='gml:AbstractGeometryType'">
-                    <h3><img src="./images/expand_pane.png"><xsl:attribute name="onclick">Toggle("Geom_"+"<xsl:call-template name="getSchemaName"><xsl:with-param name="nameSpace" select="$namespace"/></xsl:call-template>"+"_"+"<xsl:value-of select="$currclassname"/>")</xsl:attribute></img> <xsl:value-of select="$stringGeometricProperties"/></h3>
-                    <div style="display:none">
-                        <xsl:attribute name="id">Geom_<xsl:call-template name="getSchemaName"><xsl:with-param name="nameSpace" select="$namespace"/></xsl:call-template>_<xsl:value-of select="$currclassname"/></xsl:attribute>
-                        <table cellspacing="0"><tr>
-                            <td class="data">
-                                <table class="data" cellspacing="0">
-                                <tr><td class="heading"><xsl:value-of select="$stringPropertyName"/></td></tr>
-                                <tr><td class="heading"><xsl:value-of select="$stringPropertyType"/></td></tr>
-                                <tr><td class="heading"><xsl:value-of select="$stringHasMeasures"/></td></tr>
-                                <tr><td class="heading"><xsl:value-of select="$stringHasElevation"/></td></tr>
-                                <tr><td class="heading"><xsl:value-of select="$stringSrsName"/></td></tr>
-                                </table>
-                            </td>
-                            <!--apply template to elements-->
-                            <xsl:apply-templates select=".//xs:element"/>
-                        </tr></table>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse">
+                                <xsl:attribute name="data-parent">#<xsl:value-of select="$geomPanelID"/></xsl:attribute>
+                                <xsl:attribute name="href">#<xsl:value-of select="$geomBodyID"/></xsl:attribute>
+                                <xsl:value-of select="$stringGeometricProperties"/>
+                            </a>
+                        </h4>
                     </div>
+                    <div class="panel-collapse collapse">
+                        <xsl:attribute name="id"><xsl:value-of select="$geomBodyID"/></xsl:attribute>
+                        <div class="panel-body">
+                            <table><tr>
+                                <td class="data">
+                                    <table class="table table-hover table-condensed" cellspacing="0">
+                                    <tr><td class="heading"><xsl:value-of select="$stringPropertyName"/></td></tr>
+                                    <tr><td class="heading"><xsl:value-of select="$stringPropertyType"/></td></tr>
+                                    <tr><td class="heading"><xsl:value-of select="$stringHasMeasures"/></td></tr>
+                                    <tr><td class="heading"><xsl:value-of select="$stringHasElevation"/></td></tr>
+                                    <tr><td class="heading"><xsl:value-of select="$stringSrsName"/></td></tr>
+                                    </table>
+                                </td>
+                                <!--apply template to elements-->
+                                <xsl:apply-templates select=".//xs:element"/>
+                            </tr></table>
+                        </div>
+                    </div>
+                </div>
                 </xsl:if>
+            </div>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:choose>
@@ -141,8 +208,8 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <span class="gray"><xsl:value-of select="$stringNoGeometry"/></span>
-            </xsl:otherwise>
-        </xsl:choose>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:if>
@@ -154,10 +221,9 @@
     <xsl:param name="namespace"/>
     <xsl:for-each select=".//xs:element">
         <xsl:if test="@type='gml:AbstractGeometryType'">
-            <span>
-                <a><xsl:attribute name="href">showgeom.php?resId=<xsl:value-of select="$resName"/>&amp;schemaName=<xsl:value-of select="$namespace"/>&amp;className=<xsl:value-of select="$currclassname"/>&amp;geomname=<xsl:value-of select="@name"/>&amp;geomtype=<xsl:value-of select="@fdo:geometricTypes"/>&amp;sessionId=<xsl:value-of select="$sessionId"/>&amp;viewer=<xsl:value-of select="$viewer"/></xsl:attribute>
-                <xsl:attribute name="target">viewFrame</xsl:attribute><xsl:value-of select="$stringViewFeature"/></a>
-            </span>
+            <!--
+            <a class="btn btn-primary" href="${BASEPATH}"><xsl:value-of select="$stringViewFeature"/></a>
+            -->
         </xsl:if>
     </xsl:for-each>
 </xsl:template>
@@ -179,7 +245,7 @@
         <xsl:otherwise>
             <xsl:if test="@type='gml:AbstractGeometryType'">
                 <td class="data">
-                    <table class="data" cellspacing="0">
+                    <table class="table table-hover table-condensed" cellspacing="0">
                     <tr><td><xsl:value-of select="@name"/></td></tr>
                     <tr><td><xsl:value-of select="@fdo:geometricTypes"/></td></tr>
                     <tr><td><xsl:value-of select="@fdo:hasMeasure"/></td></tr>

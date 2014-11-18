@@ -254,8 +254,11 @@ class MgFeatureServiceController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
         }
         $resIdStr = $resId->ToString();
+        $resName = $resId->GetName().".".$resId->GetResourceType();
+        $pathInfo = $this->app->request->getPathInfo();
+        $selfUrl = $this->app->config("SelfUrl");
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $resIdStr) {
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $resIdStr, $resName, $selfUrl, $pathInfo) {
             $param->AddParameter("OPERATION", "DESCRIBEFEATURESCHEMA");
             $param->AddParameter("VERSION", "1.0.0");
             if ($fmt === "json") {
@@ -263,8 +266,22 @@ class MgFeatureServiceController extends MgBaseController {
             } else if ($fmt === "xml") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             } else if ($fmt === "html") {
-                $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $thisUrl = $selfUrl.$pathInfo;
+                $rootPath = substr($thisUrl, 0, strlen($thisUrl) - strlen("schemas.html"));
+                $folderPath = substr($pathInfo, 0, strlen($pathInfo) - strlen("schemas.html"));
+                $tokens = explode("/", $pathInfo);
+                if (count($tokens) > 3) {
+                    //Pop off schemas.html and current folder name
+                    array_pop($tokens);
+                    array_pop($tokens);
+                    $parentPath = implode("/", $tokens);
+                    $param->AddParameter("XSLPARAM.BASEPATH", $selfUrl.$parentPath);
+                }
+                $param->AddParameter("FORMAT", MgMimeType::Html);
                 $param->AddParameter("XSLSTYLESHEET", "FeatureSchema.xsl");
+                $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
+                $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
+                $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $param->AddParameter("SCHEMA", $schemaName);

@@ -46,13 +46,13 @@
             </head>
             <body>
                 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-                    <div class="container">
+                    <div class="container-fluid">
                         <xsl:if test="string-length($FOLDERPATH) > 0">
                             <a class="navbar-brand" href="javascript:void(0)"><xsl:value-of select="$FOLDERPATH"/></a>
                         </xsl:if>
                     </div>
                 </div>
-                <div class="container">
+                <div class="container-fluid">
                     <div class="row">
                         <div class="col-xs-3">
                             <ul class="itemlist list-group">
