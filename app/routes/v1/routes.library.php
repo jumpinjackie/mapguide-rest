@@ -92,6 +92,61 @@ $app->get("/library/:resourcePath+.FeatureSource/spatialcontexts.:format", funct
 });
 /**
  * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/longtransactions",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetLongTransactions",
+ *        summary="Gets long transactions of a feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="active", paramType="query", required=false, type="boolean", description="Return only active long transactions if true, otherwise returns all long transactions")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/library/:resourcePath+.FeatureSource/longtransactions", function($resourcePath) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->GetLongTransactions($resId, "xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/longtransactions.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetLongTransactions",
+ *        summary="Gets long transactions of a feature source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']"),
+ *          @SWG\parameter(name="active", paramType="query", required=false, type="boolean", description="Return only active long transactions if true, otherwise returns all long transactions")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/library/:resourcePath+.FeatureSource/longtransactions.:format", function($resourcePath, $format) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->GetLongTransactions($resId, $format);
+});
+/**
+ * @SWG\Api(
  *     path="/library/{resourcePath}.FeatureSource/schemas",
  *     @SWG\Operation(
  *        method="GET",

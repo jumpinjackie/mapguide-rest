@@ -169,6 +169,32 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
+    public function GetLongTransactions($resId, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
+        $resIdStr = $resId->ToString();
+
+        $active = $this->GetBooleanRequestParameter("active", false);
+
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr, $active) {
+            $param->AddParameter("OPERATION", "GETLONGTRANSACTIONS");
+            $param->AddParameter("VERSION", "1.0.0");
+            if ($fmt === "json")
+                $param->AddParameter("FORMAT", MgMimeType::Json);
+            else
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+            $param->AddParameter("RESOURCEID", $resIdStr);
+            $param->AddParameter("ACTIVEONLY", ($active ? "1" : "0"));
+            $that->ExecuteHttpRequest($req);
+        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
+    }
+
     public function GetSchemaNames($resId, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
