@@ -24,6 +24,26 @@ class MgResourceServiceController extends MgBaseController {
         parent::__construct($app);
     }
 
+    public function EnumerateUnmanagedData($format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
+            $param->AddParameter("OPERATION", "ENUMERATEUNMANAGEDDATA");
+            $param->AddParameter("VERSION", "1.0.0");
+            $param->AddParameter("TYPE", $that->GetRequestParameter("type"));
+            $param->AddParameter("RECURSIVE", $that->GetBooleanRequestParameter("recursive", "0"));
+            $param->AddParameter("PATH", $that->GetRequestParameter("path"));
+            $param->AddParameter("FILTER", $that->GetRequestParameter("filter"));
+            if ($fmt === "json") {
+                $param->AddParameter("FORMAT", MgMimeType::Json);
+            } else if ($fmt === "xml") {
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+            }
+            $that->ExecuteHttpRequest($req);
+        });
+    }
+
     public function ApplyResourcePackage() {
         if (!array_key_exists("package", $_FILES))
             $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "package"), MgMimeType::Html);

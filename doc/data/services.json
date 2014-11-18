@@ -344,6 +344,83 @@
             ]
         },
         {
+            "path": "/services/listunmanageddata.{responseType}",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "Enumerates files in an unmanaged aliased directory",
+                    "nickname": "EnumerateUnmanagedData",
+                    "parameters": [
+                        {
+                            "paramType": "form",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "path",
+                            "type": "string",
+                            "required": false,
+                            "description": ""
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "",
+                            "enum": [
+                                "Folders",
+                                "Files",
+                                "Both"
+                            ]
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "filter",
+                            "type": "string",
+                            "required": false,
+                            "description": ""
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "recursive",
+                            "type": "boolean",
+                            "required": true,
+                            "description": ""
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "responseType",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "path": "/services/moveresource",
             "operations": [
                 {

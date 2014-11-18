@@ -84,6 +84,24 @@
                 }
             }
         },
+        "pdf": {
+            "Adapter": "Pdf",
+            "Methods": {
+                "GET": {
+                    "PageSize": 100,
+                    "MaxCount": 500,
+                    "MimeType": "application/pdf",
+                    "Templates": {
+                        "Single": "property_pdf_single.tpl",
+                        "Many": "property_pdf_many.tpl",
+                        "None": "property_pdf_none.tpl",
+                        "Error": "property_pdf_error.tpl"
+                    },
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
+                }
+            }
+        },
         "html": {
             "Adapter": "Template",
             "Methods": {
