@@ -207,7 +207,8 @@
                             "required": true,
                             "description": "response output format",
                             "enum": [
-                                "xml"
+                                "xml",
+                                "json"
                             ]
                         }
                     ],

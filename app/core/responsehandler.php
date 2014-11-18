@@ -82,10 +82,21 @@ abstract class MgResponseHandler
                 } else if ($resultObj instanceof MgStringCollection) {
                     $this->OutputMgStringCollection($resultObj, $param->GetParameterValue("FORMAT"));
                 } else if ($resultObj instanceof MgHttpPrimitiveValue) {
-                    $this->app->response->setBody($resultObj->ToString());
+                    if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
+                        $str = $resultObj->ToString();
+                        $source = new MgByteSource($str, strlen($str));
+                        $rdr = $source->GetReader();
+                        $this->OutputXmlByteReaderAsJson($rdr);
+                    } else {
+                        $this->app->response->setBody($resultObj->ToString());
+                    }
                 } else if (method_exists($resultObj, "ToXml")) {
                     $byteReader = $resultObj->ToXml();
-                    $this->OutputByteReader($byteReader, ($param->GetParameterValue("X-CHUNK-RESPONSE") === "true"));
+                    if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
+                        $this->OutputXmlByteReaderAsJson($byteReader);
+                    } else {
+                        $this->OutputByteReader($byteReader, ($param->GetParameterValue("X-CHUNK-RESPONSE") === "true"));
+                    }
                 } else {
                     $this->ServerError($this->app->localizer->getText("E_DONT_KNOW_HOW_TO_OUTPUT", $resultObj->ToString()));
                 }

@@ -25,8 +25,8 @@ class MgSiteAdminController extends MgBaseController {
     }
 
     public function GetSiteInformation($format) {
-        //Check for unsupported representations (FIXME: Actual mapagent operation doesn't support JSON output. This is a bug)
-        $fmt = $this->ValidateRepresentation($format, array("xml")); //, "json"));
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $sessionId = $this->app->request->params("session");
 
         $that = $this;

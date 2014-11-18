@@ -97,7 +97,7 @@ $app->get("/site/info", function() use ($app) {
  *        summary="Gets the information of the current Site Server",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="response output format", enum="['xml']")
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="response output format", enum="['xml','json']")
  *        ),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
  *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
