@@ -53,6 +53,7 @@ return array(
     "E_SERVER_ERROR" => "Server Error",
     "E_FORBIDDEN" => "Forbidden",
     "E_NOT_FOUND" => "Not Found",
+    "E_RESOURCE_NOT_FOUND" => "Resource not found: %s",
     "E_UNPREVIEWABLE_RESOURCE_TYPE" => "Resource type is not previewable",
     "E_BAD_REQUEST" => "Bad Request",
     "E_CZML_PAGINATION_NOT_SUPPORTED" => "Pagination of czml output not supported",

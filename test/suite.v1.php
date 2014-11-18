@@ -3147,6 +3147,196 @@
                     assertMimeType(mimeType, MgMimeType.Html);
                 });
             });
+            test("Set/Delete Resource Data", function() {
+                var params = {
+                    type: "File",
+                    data: new Blob(["<Test></Test>"], { type: "text/xml" })
+                };
+                //Various bad requests
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/data/test.xml", "POST", params, "Foo", "Bar", function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                    assertMimeType(mimeType, MgMimeType.Html);
+                });
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/data/test.xml", "POST", params, function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") - Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Html);
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/data/test.xml", "POST", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected bad parameters response");
+                    assertMimeType(mimeType, MgMimeType.Html);
+                });
+                //Load the data item
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/data/test.xml", "POST", $.extend(params, { session: this.anonymousSessionId }), function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") - Expected denial");
+                    assertMimeType(mimeType, MgMimeType.Html);
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/data/test.xml", "POST", $.extend(params, { session: this.adminSessionId }), function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Html);
+                });
+                //Check the data item is on the list
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    ok(result.indexOf(">test.xml<") >= 0, "Expected test.xml in data list");
+                });
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    ok(result.indexOf(">test.xml<") >= 0, "Expected test.xml in data list");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    ok(result.indexOf(">test.xml<") >= 0, "Expected test.xml in data list");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    ok(result.indexOf(">test.xml<") >= 0, "Expected test.xml in data list");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var resp = JSON.parse(result);
+                    var bFound = false;
+                    for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
+                        var data = resp.ResourceDataList.ResourceData[i];
+                        if (data.Name[0] == "test.xml") {
+                            bFound = true;
+                            break;
+                        }
+                    }
+                    ok(bFound, "Expected test.xml in data list");
+                });
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var resp = JSON.parse(result);
+                    var bFound = false;
+                    for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
+                        var data = resp.ResourceDataList.ResourceData[i];
+                        if (data.Name[0] == "test.xml") {
+                            bFound = true;
+                            break;
+                        }
+                    }
+                    ok(bFound, "Expected test.xml in data list");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.json", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var resp = JSON.parse(result);
+                    var bFound = false;
+                    for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
+                        var data = resp.ResourceDataList.ResourceData[i];
+                        if (data.Name[0] == "test.xml") {
+                            bFound = true;
+                            break;
+                        }
+                    }
+                    ok(bFound, "Expected test.xml in data list");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.json", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var resp = JSON.parse(result);
+                    var bFound = false;
+                    for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
+                        var data = resp.ResourceDataList.ResourceData[i];
+                        if (data.Name[0] == "test.xml") {
+                            bFound = true;
+                            break;
+                        }
+                    }
+                    ok(bFound, "Expected test.xml in data list");
+                });
+                //Delete the item
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/data/test.xml", "DELETE", null, function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") - Expected denial");
+                    assertMimeType(mimeType, MgMimeType.Html);
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/data/test.xml", "DELETE", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                });
+                //Now check the data item is no longer there
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    ok(result.indexOf(">test.xml<") < 0, "Expected test.xml to not be in data list");
+                });
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    ok(result.indexOf(">test.xml<") < 0, "Expected test.xml to not be in data list");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    ok(result.indexOf(">test.xml<") < 0, "Expected test.xml to not be in data list");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    ok(result.indexOf(">test.xml<") < 0, "Expected test.xml to not be in data list");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var resp = JSON.parse(result);
+                    var bFound = false;
+                    for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
+                        var data = resp.ResourceDataList.ResourceData[i];
+                        if (data.Name[0] == "test.xml") {
+                            bFound = true;
+                            break;
+                        }
+                    }
+                    ok(!bFound, "Expected test.xml to not be in data list");
+                });
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var resp = JSON.parse(result);
+                    var bFound = false;
+                    for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
+                        var data = resp.ResourceDataList.ResourceData[i];
+                        if (data.Name[0] == "test.xml") {
+                            bFound = true;
+                            break;
+                        }
+                    }
+                    ok(!bFound, "Expected test.xml to not be in data list");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.json", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var resp = JSON.parse(result);
+                    var bFound = false;
+                    for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
+                        var data = resp.ResourceDataList.ResourceData[i];
+                        if (data.Name[0] == "test.xml") {
+                            bFound = true;
+                            break;
+                        }
+                    }
+                    ok(!bFound, "Expected test.xml to not be in data list");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.json", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var resp = JSON.parse(result);
+                    var bFound = false;
+                    for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
+                        var data = resp.ResourceDataList.ResourceData[i];
+                        if (data.Name[0] == "test.xml") {
+                            bFound = true;
+                            break;
+                        }
+                    }
+                    ok(!bFound, "Expected test.xml to not be in data list");
+                });
+            });
             test("Enumerate Resource References", function() {
                 api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
                     ok(status == 401, "(" + status + ") - Request should've required authentication");
@@ -6282,6 +6472,106 @@
                 });
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource", "DELETE", xml, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Should've deleted resource");
+                });
+            });
+            test("Set/Delete Resource Data", function() {
+                var params = {
+                    type: "File",
+                    data: new Blob(["<Test></Test>"], { type: "text/xml" })
+                };
+                var xml = '<?= $emptyFeatureSourceXml ?>';
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/content", "POST", xml, function(status, result, mimeType) {
+                    ok(status == 201, "(" + status + ") - Should've saved resource by anon");
+                });
+                //Various bad requests
+                api_test_admin(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/data/test.xml", "POST", null, function(status, result, mimeType) {
+                    ok(status == 400, "(" + status + ") - Expected bad parameters response");
+                    assertMimeType(mimeType, MgMimeType.Html);
+                });
+                //Load the data item - All tests should work because the session id in the resource id is enough to provide valid credentials and is first under consideration
+                api_test_with_credentials(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/data/test.xml", "POST", params, "Foo", "Bar", function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Html);
+                });
+                api_test_anon(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/data/test.xml", "POST", params, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Html);
+                });
+                api_test_anon(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/data/test.xml", "POST", params, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Html);
+                });
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/data/test.xml", "POST", params, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Html);
+                });
+                //Check the data item is on the list
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/datalist.xml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    ok(result.indexOf(">test.xml<") >= 0, "Expected test.xml in data list");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/datalist.xml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    ok(result.indexOf(">test.xml<") >= 0, "Expected test.xml in data list");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/datalist.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var resp = JSON.parse(result);
+                    var bFound = false;
+                    for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
+                        var data = resp.ResourceDataList.ResourceData[i];
+                        if (data.Name[0] == "test.xml") {
+                            bFound = true;
+                            break;
+                        }
+                    }
+                    ok(bFound, "Expected test.xml in data list");
+                });
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/datalist.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var resp = JSON.parse(result);
+                    var bFound = false;
+                    for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
+                        var data = resp.ResourceDataList.ResourceData[i];
+                        if (data.Name[0] == "test.xml") {
+                            bFound = true;
+                            break;
+                        }
+                    }
+                    ok(bFound, "Expected test.xml in data list");
+                });
+                //Delete the item
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/data/test.xml", "DELETE", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                });
+                //Now check the data item is no longer there
+                api_test_admin(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/datalist.xml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    ok(result.indexOf(">test.xml<") < 0, "Expected test.xml to not be in data list");
+                });
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/datalist.xml", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    ok(result.indexOf(">test.xml<") < 0, "Expected test.xml to not be in data list");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/datalist.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var resp = JSON.parse(result);
+                    var resData = resp.ResourceDataList.ResourceData;
+                    ok(typeof(resData) == 'undefined', "Expected undefined resource data list (no elements)");
+                });
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/datalist.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expected OK");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var resp = JSON.parse(result);
+                    var resData = resp.ResourceDataList.ResourceData;
+                    ok(typeof(resData) == 'undefined', "Expected undefined resource data list (no elements)");
                 });
             });
 

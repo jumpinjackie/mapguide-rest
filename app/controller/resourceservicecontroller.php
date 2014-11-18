@@ -28,20 +28,74 @@ class MgResourceServiceController extends MgBaseController {
         if (!array_key_exists("package", $_FILES))
             $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "package"), MgMimeType::Html);
         
-        $this->EnsureAuthenticationForSite();
-        $siteConn = new MgSiteConnection();
-        $siteConn->Open($this->userInfo);
+        try {
+            $this->EnsureAuthenticationForSite();
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
 
-        $err = $_FILES["package"]["error"];
-        if ($err == 0) {
-            $source = new MgByteSource($_FILES["package"]["tmp_name"]);
-            $reader = $source->GetReader();
+            $err = $_FILES["package"]["error"];
+            if ($err == 0) {
+                $source = new MgByteSource($_FILES["package"]["tmp_name"]);
+                $reader = $source->GetReader();
 
-            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-            $resSvc->ApplyResourcePackage($reader);
-        } else {
-            $this->app->response->setBody($this->app->localizer->getText("E_PHP_FILE_UPLOAD_ERROR", $err));
+                $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+                $resSvc->ApplyResourcePackage($reader);
+            } else {
+                $this->app->response->setStatus(500);
+                $this->app->response->setBody($this->app->localizer->getText("E_PHP_FILE_UPLOAD_ERROR", $err));
+            }
+        } catch (MgException $ex) {
+            $this->OnException($ex);
         }
+    }
+
+    public function SetResourceData($resId, $dataName) {
+        if (!array_key_exists("data", $_FILES))
+            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "data"), MgMimeType::Html);
+
+        $type = $this->GetRequestParameter("type", MgResourceDataType::File);
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
+        try {
+            $this->EnsureAuthenticationForSite($sessionId);
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+
+            $err = $_FILES["data"]["error"];
+            if ($err == 0) {
+                $source = new MgByteSource($_FILES["data"]["tmp_name"]);
+                $reader = $source->GetReader();
+
+                $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+                if (!$resSvc->ResourceExists($resId))
+                    $this->NotFound($this->app->localizer->getText("E_RESOURCE_NOT_FOUND", $resId->ToString()));
+
+                $resSvc->SetResourceData($resId, $dataName, $type, $reader);
+            } else {
+                $this->app->response->setStatus(500);
+                $this->app->response->setBody($this->app->localizer->getText("E_PHP_FILE_UPLOAD_ERROR", $err));
+            }
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
+    }
+
+    public function DeleteResourceData($resId, $dataName) {
+        $resIdStr = $resId->ToString();
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr, $dataName) {
+            $param->AddParameter("OPERATION", "DELETERESOURCEDATA");
+            $param->AddParameter("VERSION", "1.0.0");
+            $param->AddParameter("RESOURCEID", $resIdStr);
+            $param->AddParameter("DATANAME", $dataName);
+            $that->ExecuteHttpRequest($req);
+        }, false, "", $sessionId);
     }
 
     public function DeleteResource($resId) {

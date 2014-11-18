@@ -1235,6 +1235,54 @@ $app->get("/session/:sessionId/:resName/data/:dataName", function($sessionId, $r
     $ctrl = new MgResourceServiceController($app);
     $ctrl->GetResourceData($resId, $dataName);
 });
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{resName}/data/{dataName}",
+ *     @SWG\Operation(
+ *        method="POST",
+ *        nickname="SetResourceData",
+ *        summary="Sets the specified resource data item for the given resource",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The resource name (including extension)"),
+ *          @SWG\parameter(name="dataName", paramType="path", required=true, type="string", description="The name of the resource data to retrieve"),
+ *          @SWG\parameter(name="type", paramType="form", required=true, type="string", description="The type of resource data", enum="['File','Stream','String']"),
+ *          @SWG\parameter(name="data", paramType="form", required=true, type="file", description="The resource data file to load")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->post("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+    $ctrl = new MgResourceServiceController($app);
+    $ctrl->SetResourceData($resId, $dataName);
+});
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{resName}/data/{dataName}",
+ *     @SWG\Operation(
+ *        method="DELETE",
+ *        nickname="DeleteResourceData",
+ *        summary="Delete the specified resource data item for the given resource",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The resource name (including extension)"),
+ *          @SWG\parameter(name="dataName", paramType="path", required=true, type="string", description="The name of the resource data to retrieve")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->delete("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+    $ctrl = new MgResourceServiceController($app);
+    $ctrl->DeleteResourceData($resId, $dataName);
+});
 /*
 //Need to confirm if like EnumerateResources, this is not permitted on session repos
 $app->get("/session/:sessionId/:resName/header", function($sessionId, $resName) use ($app) {

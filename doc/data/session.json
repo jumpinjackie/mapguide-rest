@@ -354,14 +354,14 @@
                             "paramType": "query",
                             "name": "width",
                             "type": "integer",
-                            "required": false,
+                            "required": true,
                             "description": "The width of the image"
                         },
                         {
                             "paramType": "query",
                             "name": "height",
                             "type": "integer",
-                            "required": false,
+                            "required": true,
                             "description": "The height of the image"
                         },
                         {
@@ -3464,14 +3464,14 @@
                             "paramType": "query",
                             "name": "width",
                             "type": "integer",
-                            "required": false,
+                            "required": true,
                             "description": "The width of the image"
                         },
                         {
                             "paramType": "query",
                             "name": "height",
                             "type": "integer",
-                            "required": false,
+                            "required": true,
                             "description": "The height of the image"
                         },
                         {
@@ -3873,6 +3873,109 @@
                     "method": "GET",
                     "summary": "Gets the specified resource data item for the given resource",
                     "nickname": "GetResourceData",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The resource name (including extension)"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "dataName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The name of the resource data to retrieve"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                },
+                {
+                    "method": "POST",
+                    "summary": "Sets the specified resource data item for the given resource",
+                    "nickname": "SetResourceData",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The resource name (including extension)"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "dataName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The name of the resource data to retrieve"
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "The type of resource data",
+                            "enum": [
+                                "File",
+                                "Stream",
+                                "String"
+                            ]
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "data",
+                            "type": "file",
+                            "required": true,
+                            "description": "The resource data file to load"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                },
+                {
+                    "method": "DELETE",
+                    "summary": "Delete the specified resource data item for the given resource",
+                    "nickname": "DeleteResourceData",
                     "parameters": [
                         {
                             "paramType": "path",

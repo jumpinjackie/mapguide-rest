@@ -288,6 +288,10 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 alert("Please use a browser that supports the FormData API");
                 throw "Please use a browser that supports the FormData API";
             }
+            if (typeof(Blob) == 'undefined') {
+                alert("Please use a browser that supports the Blob API");
+                throw "Please use a browser that supports the Blob API";
+            }
 
             // Sue me!
             QUnit.config.reorder = false;

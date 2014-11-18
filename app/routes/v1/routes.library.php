@@ -869,13 +869,61 @@ $app->get("/library/:resourcePath+/data/:dataName", function($resourcePath, $dat
 });
 /**
  * @SWG\Api(
+ *     path="/library/{resourcePath}/data/{dataName}",
+ *     @SWG\Operation(
+ *        method="POST",
+ *        nickname="SetResourceData",
+ *        summary="Sets the specified resource data item for the given resource",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="dataName", paramType="path", required=true, type="string", description="The name of the resource data to retrieve"),
+ *          @SWG\parameter(name="type", paramType="form", required=true, type="string", description="The type of resource data", enum="['File','Stream','String']"),
+ *          @SWG\parameter(name="data", paramType="form", required=true, type="file", description="The resource data file to load")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->post("/library/:resourcePath+/data/:dataName", function($resourcePath, $dataName) use ($app) {
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgResourceServiceController($app);
+    $ctrl->SetResourceData($resId, $dataName);
+});
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}/data/{dataName}",
+ *     @SWG\Operation(
+ *        method="DELETE",
+ *        nickname="DeleteResourceData",
+ *        summary="Deletes the specified resource data item for the given resource",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="dataName", paramType="path", required=true, type="string", description="The name of the resource data to retrieve")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->delete("/library/:resourcePath+/data/:dataName", function($resourcePath, $dataName) use ($app) {
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgResourceServiceController($app);
+    $ctrl->DeleteResourceData($resId, $dataName);
+});
+/**
+ * @SWG\Api(
  *     path="/library/{resourcePath}/header",
  *     @SWG\Operation(
  *        method="POST",
  *        nickname="SetResourceHeader",
  *        summary="Sets the resource header for the given resource",
  *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The resource XML header")
  *        ),
@@ -943,7 +991,7 @@ $app->get("/library/:resourcePath+/header.:format", function($resourcePath, $for
  *        nickname="SetResourceContent",
  *        summary="Sets the resource content for the given resource",
  *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
  *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The resource XML content")
  *        ),
