@@ -1,5 +1,22 @@
 <?php
 
+//
+//  Copyright (C) 2014 by Jackie Ng
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of version 2.1 of the GNU Lesser
+//  General Public License as published by the Free Software Foundation.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+
 require_once "restadapter.php";
 
 class MgTemplateRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
@@ -369,6 +386,22 @@ class MgTemplateRestAdapter extends MgRestAdapter
         }
     }
 
+    protected function WriteOutput($output) {
+        $this->app->response->header("Content-Type", $this->GetMimeType());
+
+        //Apply download headers
+        $downloadFlag = $this->app->request->params("download");
+        if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
+            $name = $this->app->request->params("downloadname");
+            if (!$name) {
+                $name = "download";
+            }
+            $this->app->response->header("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($name, $this->GetMimeType()));
+        }
+
+        $this->app->response->write($output);
+    }
+
     /**
      * Handles GET requests for this adapter. Overridable. Does nothing if not overridden.
      */
@@ -488,19 +521,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
                 $smarty->assign("helper", new MgTemplateHelper($this->app));
                 $output = $smarty->fetch($this->manyViewPath);
             }
-            $this->app->response->header("Content-Type", $this->GetMimeType());
-
-            //Apply download headers
-            $downloadFlag = $this->app->request->params("download");
-            if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
-                $name = $this->app->request->params("downloadname");
-                if (!$name) {
-                    $name = "download";
-                }
-                $this->app->response->header("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($name, $this->GetMimeType()));
-            }
-
-            $this->app->response->write($output);
+            $this->WriteOutput($output);
         } catch (MgException $ex) {
             $err = new stdClass();
             $err->code = get_class($ex);
