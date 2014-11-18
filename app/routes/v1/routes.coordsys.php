@@ -31,6 +31,89 @@ require_once dirname(__FILE__)."/../../util/utils.php";
 
 /**
  * @SWG\Api(
+ *     path="/coordsys/baselibrary",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetBaseLibrary",
+ *        summary="Returns the base library name for this coordinate system library",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/coordsys/baselibrary", function() use ($app) {
+    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl->GetBaseLibrary();
+});
+/**
+ * @SWG\Api(
+ *     path="/coordsys/validatewkt",
+ *     @SWG\Operation(
+ *        method="POST",
+ *        nickname="ValidateWkt",
+ *        summary="Checks if the given coordinate system WKT string is valid",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="wkt", paramType="form", required=false, type="string", description="The Coordinate System WKT string")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->post("/coordsys/validatewkt", function() use ($app) {
+    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl->ValidateWkt();
+});
+/**
+ * @SWG\Api(
+ *     path="/coordsys/wkttoepsg",
+ *     @SWG\Operation(
+ *        method="POST",
+ *        nickname="WktToEpsg",
+ *        summary="Converts the given Coordinate System WKT string to its equivalent EPSG code",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="wkt", paramType="form", required=false, type="string", description="The Coordinate System WKT string")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->post("/coordsys/wkttoepsg", function() use ($app) {
+    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl->WktToEpsg();
+});
+/**
+ * @SWG\Api(
+ *     path="/coordsys/wkttomentor",
+ *     @SWG\Operation(
+ *        method="POST",
+ *        nickname="WktToMentor",
+ *        summary="Converts the given Coordinate System WKT string to its equivalent CS-Map coordinate system code",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="wkt", paramType="form", required=false, type="string", description="The Coordinate System WKT string")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->post("/coordsys/wkttomentor", function() use ($app) {
+    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl->WktToMentor();
+});
+/**
+ * @SWG\Api(
  *     path="/coordsys/categories",
  *     @SWG\Operation(
  *        method="GET",

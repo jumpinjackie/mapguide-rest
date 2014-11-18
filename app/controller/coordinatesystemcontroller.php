@@ -24,6 +24,56 @@ class MgCoordinateSystemController extends MgBaseController {
         parent::__construct($app);
     }
 
+    public function GetBaseLibrary() {
+        $sessionId = $this->app->request->params("session");
+
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that) {
+            $param->AddParameter("OPERATION", "CS.GETBASELIBRARY");
+            $param->AddParameter("VERSION", "1.0.0");
+            $that->ExecuteHttpRequest($req);
+        }, false, "", $sessionId);
+    }
+
+    public function ValidateWkt() {
+        $sessionId = $this->app->request->params("session");
+        $wkt = $this->app->request->params("wkt");
+
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $wkt) {
+            $param->AddParameter("OPERATION", "CS.ISVALID");
+            $param->AddParameter("VERSION", "1.0.0");
+            $param->AddParameter("CSWKT", $wkt);
+            $that->ExecuteHttpRequest($req);
+        }, false, "", $sessionId);
+    }
+
+    public function WktToEpsg() {
+        $sessionId = $this->app->request->params("session");
+        $wkt = $this->app->request->params("wkt");
+
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $wkt) {
+            $param->AddParameter("OPERATION", "CS.CONVERTWKTTOEPSGCODE");
+            $param->AddParameter("VERSION", "1.0.0");
+            $param->AddParameter("CSWKT", $wkt);
+            $that->ExecuteHttpRequest($req);
+        }, false, "", $sessionId);
+    }
+
+    public function WktToMentor() {
+        $sessionId = $this->app->request->params("session");
+        $wkt = $this->app->request->params("wkt");
+
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $wkt) {
+            $param->AddParameter("OPERATION", "CS.CONVERTWKTTOCOORDINATESYSTEMCODE");
+            $param->AddParameter("VERSION", "1.0.0");
+            $param->AddParameter("CSWKT", $wkt);
+            $that->ExecuteHttpRequest($req);
+        }, false, "", $sessionId);
+    }
+
     public function EnumerateCategories($format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
         $sessionId = $this->app->request->params("session");
