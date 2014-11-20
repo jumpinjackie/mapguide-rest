@@ -24,6 +24,51 @@ class MgRestServiceController extends MgBaseController {
         parent::__construct($app);
     }
 
+    public function EnumerateApplicationTemplates($format) {
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
+            $param->AddParameter("OPERATION", "ENUMERATEAPPLICATIONTEMPLATES");
+            $param->AddParameter("VERSION", "1.0.0");
+            if ($fmt === "json") {
+                $param->AddParameter("FORMAT", MgMimeType::Json);
+            } else if ($fmt === "xml") {
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+            }
+            $that->ExecuteHttpRequest($req);
+        });
+    }
+
+    public function EnumerateApplicationWidgets($format) {
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
+            $param->AddParameter("OPERATION", "ENUMERATEAPPLICATIONWIDGETS");
+            $param->AddParameter("VERSION", "1.0.0");
+            if ($fmt === "json") {
+                $param->AddParameter("FORMAT", MgMimeType::Json);
+            } else if ($fmt === "xml") {
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+            }
+            $that->ExecuteHttpRequest($req);
+        });
+    }
+
+    public function EnumerateApplicationContainers($format) {
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $that = $this;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
+            $param->AddParameter("OPERATION", "ENUMERATEAPPLICATIONCONTAINERS");
+            $param->AddParameter("VERSION", "1.0.0");
+            if ($fmt === "json") {
+                $param->AddParameter("FORMAT", MgMimeType::Json);
+            } else if ($fmt === "xml") {
+                $param->AddParameter("FORMAT", MgMimeType::Xml);
+            }
+            $that->ExecuteHttpRequest($req);
+        });
+    }
+
     public function GetSessionTimeout($sessionId, $format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 

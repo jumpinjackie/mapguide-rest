@@ -20,6 +20,7 @@
 require_once dirname(__FILE__)."/../../controller/coordinatesystemcontroller.php";
 require_once dirname(__FILE__)."/../../controller/resourceservicecontroller.php";
 require_once dirname(__FILE__)."/../../controller/mappingservicecontroller.php";
+require_once dirname(__FILE__)."/../../controller/restservicecontroller.php";
 
 /**
  * @SWG\Resource(
@@ -30,6 +31,129 @@ require_once dirname(__FILE__)."/../../controller/mappingservicecontroller.php";
  * )
  */
 
+/**
+ * @SWG\Api(
+ *     path="/services/fusiontemplates",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="EnumerateApplicationTemplates",
+ *        summary="Enumerates available templates for a fusion application",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/services/fusiontemplates", function() use ($app) {
+    $ctrl = new MgRestServiceController($app);
+    $ctrl->EnumerateApplicationTemplates("xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/services/fusiontemplates.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="EnumerateApplicationTemplates",
+ *        summary="Enumerates available templates for a fusion application",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/services/fusiontemplates.:format", function($format) use ($app) {
+    $ctrl = new MgRestServiceController($app);
+    $ctrl->EnumerateApplicationTemplates($format);
+});
+/**
+ * @SWG\Api(
+ *     path="/services/fusionwidgets",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="EnumerateApplicationWidgets",
+ *        summary="Enumerates available widgets for a fusion application",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/services/fusionwidgets", function() use ($app) {
+    $ctrl = new MgRestServiceController($app);
+    $ctrl->EnumerateApplicationWidgets("xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/services/fusionwidgets.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="EnumerateApplicationWidgets",
+ *        summary="Enumerates available widgets for a fusion application",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/services/fusionwidgets.:format", function($format) use ($app) {
+    $ctrl = new MgRestServiceController($app);
+    $ctrl->EnumerateApplicationWidgets($format);
+});
+/**
+ * @SWG\Api(
+ *     path="/services/fusioncontainers",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="EnumerateApplicationContainers",
+ *        summary="Enumerates available containers for a fusion application",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/services/fusioncontainers", function() use ($app) {
+    $ctrl = new MgRestServiceController($app);
+    $ctrl->EnumerateApplicationContainers("xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/services/fusioncontainers.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="EnumerateApplicationContainers",
+ *        summary="Enumerates available containers for a fusion application",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/services/fusioncontainers.:format", function($format) use ($app) {
+    $ctrl = new MgRestServiceController($app);
+    $ctrl->EnumerateApplicationContainers($format);
+});
 /**
  * @SWG\Api(
  *     path="/services/listunmanageddata.{responseType}",
