@@ -3535,14 +3535,55 @@
                 api_test_admin(rest_root_url + "/library/RestUnitTests/Empty.FeatureSource/content", "POST", xml, function(status, result, mimeType) {
                     ok(status == 201, "(" + status + ") - Should've saved resource");
                 });
-                api_test_anon(rest_root_url + "/library/RestUnitTests/Empty.FeatureSource", "DELETE", xml, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/Empty.FeatureSource", "DELETE", null, function(status, result, mimeType) {
                     ok(status == 401, "(" + status + ") - Anonymous shouldn't be able to delete library resources");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty.FeatureSource", "DELETE", xml, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty.FeatureSource", "DELETE", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Should've deleted resource");
                 });
             });
-
+            test("Set/Get/Delete resource alt", function() {
+                function createHeaderXml() {
+                    var xml = '<ResourceDocumentHeader xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="ResourceDocumentHeader-1.0.0.xsd">'
+                    xml += '<Security><Inherited>true</Inherited></Security>';
+                    xml += '<Metadata><Simple>';
+                    xml += "<Property><Name>HelloWorld</Name><Value>1</Value></Property>";
+                    xml += '</Simple></Metadata>';
+                    xml += '</ResourceDocumentHeader>';
+                    return xml;
+                }
+                var xml = '<?= $emptyFeatureSourceXml ?>';
+                api_test_with_credentials(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/contentorheader", "POST", {}, "Foo", "Bar", function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") - Request should've required authentication");
+                });
+                api_test_anon(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/contentorheader", "POST", { content: new Blob([xml], { type: "text/xml" }) }, function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") - Anonymous shouldn't be able to save to library repo");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/contentorheader", "POST", { content: new Blob([xml], { type: "text/xml" }) }, function(status, result, mimeType) {
+                    ok(status == 201, "(" + status + ") - Should've saved resource");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/header", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expect success");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    var header = result || "";
+                    ok(header.indexOf("<Name>HelloWorld</Name>") < 0, "Expected no header");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/contentorheader", "POST", { content: new Blob([xml], { type: "text/xml" }), header: new Blob([createHeaderXml()], { type: "text/xml" }) }, function(status, result, mimeType) {
+                    ok(status == 201, "(" + status + ") - Should've saved resource content and header");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/header", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expect success");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    var header = result || "";
+                    ok(header.indexOf("<Name>HelloWorld</Name>") >= 0, "Expected header set");
+                });
+                api_test_anon(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource", "DELETE", null, function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") - Anonymous shouldn't be able to delete library resources");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource", "DELETE", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Should've deleted resource");
+                });
+            });
             module("Feature Service - Library", {
                 setup: function() {
                     var self = this;
@@ -6467,10 +6508,45 @@
                     ok(status == 200, "(" + status + ") - Empty2 fs should exist");
                 });
                 //Even if admin saved it, controller always uses session id as first priority so this should be a delete on anon's behalf
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource", "DELETE", xml, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource", "DELETE", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Should've deleted resource");
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource", "DELETE", xml, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource", "DELETE", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Should've deleted resource");
+                });
+            });
+            test("Set/Get/Delete resource - anon session alt", function() {
+                function createHeaderXml(str) {
+                    var xml = '<ResourceDocumentHeader xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="ResourceDocumentHeader-1.0.0.xsd">'
+                    xml += '<Security><Inherited>true</Inherited></Security>';
+                    xml += '<Metadata><Simple>';
+                    xml += "<Property><Name>" + str + "</Name><Value>1</Value></Property>";
+                    xml += '</Simple></Metadata>';
+                    xml += '</ResourceDocumentHeader>';
+                    return xml;
+                }
+                var xml = '<?= $emptyFeatureSourceXml ?>';
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource/contentorheader", "POST", { content: new Blob([xml], { type: "text/xml" }) }, function(status, result, mimeType) {
+                    ok(status == 201, "(" + status + ") - Should've saved resource by anon");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource/contentorheader", "POST", { content: new Blob([xml], { type: "text/xml" }) }, function(status, result, mimeType) {
+                    ok(status == 201, "(" + status + ") - Should've saved resource by admin");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource/content", "GET", null, function(status, result, mimeType) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    ok(status == 200, "(" + status + ") - Empty fs should exist");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource/content", "GET", null, function(status, result, mimeType) {
+                    ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                    ok(status == 200, "(" + status + ") - Empty2 fs should exist");
+                });
+                //Even if admin saved it, controller always uses session id as first priority so this should be a delete on anon's behalf
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource", "DELETE", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Should've deleted resource");
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource", "DELETE", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Should've deleted resource");
                 });
             });

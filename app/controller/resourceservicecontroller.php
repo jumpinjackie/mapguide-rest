@@ -272,6 +272,44 @@ class MgResourceServiceController extends MgBaseController {
         }
     }
 
+    public function SetResourceContentOrHeader($resId) {
+        try {
+            $sessionId = "";
+            if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+                $sessionId = $resId->GetRepositoryName();
+            }
+            $this->EnsureAuthenticationForSite($sessionId);
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+
+            $contentFilePath = $this->GetFileUploadPath("content");
+            $headerFilePath = null;
+            //Header not supported for session-based resources
+            if ($resId->GetRepositoryType() != MgRepositoryType::Session) {
+                $headerFilePath = $this->GetFileUploadPath("header");
+            }
+            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+            
+            $content = null;
+            $header = null;
+            if ($contentFilePath != null) {
+                $cntSource = new MgByteSource($contentFilePath);
+                $content = $cntSource->GetReader();
+            }
+            if ($headerFilePath != null) {
+                $hdrSource = new MgByteSource($headerFilePath);
+                $header = $hdrSource->GetReader();
+            }
+
+            $resSvc->SetResource($resId, $content, $header);
+
+            $this->app->response->setStatus(201);
+            $this->app->response->setBody($resId->ToString());
+        } catch (MgException $ex) {
+            $this->OnException($ex);
+        }
+    }
+
     public function GetResourceContent($resId, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));

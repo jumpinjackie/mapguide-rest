@@ -4026,6 +4026,53 @@
             ]
         },
         {
+            "path": "/session/{session}/{resName}/contentorheader",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "Sets the resource content for the given resource. This API exists to provide consistency with the library-based version",
+                    "nickname": "SetResourceContentOrHeader",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The resource name (including extension)"
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "content",
+                            "type": "file",
+                            "required": true,
+                            "description": "The resource XML content"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "path": "/session/{session}/{resName}/data/{dataName}",
             "operations": [
                 {

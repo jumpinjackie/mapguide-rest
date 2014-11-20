@@ -207,6 +207,20 @@ abstract class MgResponseHandler
         return $value;
     }
 
+    protected function GetFileUploadPath($paramName) {
+        if (!array_key_exists($paramName, $_FILES))
+            return null;
+        $err = $_FILES[$paramName]["error"];
+        $fileName = null;
+        if ($err == 0) {
+            $fileName = $_FILES[$paramName]["tmp_name"];
+        } else {
+            $this->app->response->setStatus(500);
+            $this->app->response->setBody($this->app->localizer->getText("E_PHP_FILE_UPLOAD_ERROR", $err));
+        }
+        return $fileName;
+    }
+
     protected function OutputUpdateFeaturesResult($commands, $result, $classDef) {
         $bHasError = false;
         $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?><UpdateFeaturesResult>";
@@ -494,9 +508,8 @@ abstract class MgResponseHandler
         } else if ($ex instanceof MgResourceNotFoundException || $ex instanceof MgResourceDataNotFoundException) {
             $status = 404;
         }
-        $e = new Exception();
         $this->app->response->header("Content-Type", $mimeType);
-        $this->OutputException(get_class($ex), $ex->GetExceptionMessage(), $ex->GetDetails(), $e->getTraceAsString(), $status, $mimeType);
+        $this->OutputException(get_class($ex), $ex->GetExceptionMessage(), $ex->GetDetails(), $ex->getTraceAsString(), $status, $mimeType);
     }
 
     protected function FormatException($type, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {

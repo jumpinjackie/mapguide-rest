@@ -1401,6 +1401,29 @@ $app->post("/session/:sessionId/:resName/content", function($sessionId, $resName
 });
 /**
  * @SWG\Api(
+ *     path="/session/{session}/{resName}/contentorheader",
+ *     @SWG\Operation(
+ *        method="POST",
+ *        nickname="SetResourceContentOrHeader",
+ *        summary="Sets the resource content for the given resource. This API exists to provide consistency with the library-based version",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The resource name (including extension)"),
+ *          @SWG\parameter(name="content", paramType="form", required=true, type="file", description="The resource XML content")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->post("/session/:sessionId/:resName/contentorheader", function($sessionId, $resName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+    $ctrl = new MgResourceServiceController($app);
+    $ctrl->SetResourceContentOrHeader($resId);
+});
+/**
+ * @SWG\Api(
  *     path="/session/{session}/{resName}/content",
  *     @SWG\Operation(
  *        method="GET",
