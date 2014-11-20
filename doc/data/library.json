@@ -1354,6 +1354,13 @@
                                 "xml",
                                 "json"
                             ]
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "classnames",
+                            "type": "string",
+                            "required": false,
+                            "description": "The dot-separated list of class names"
                         }
                     ],
                     "responseMessages": [
@@ -1401,6 +1408,13 @@
                             "type": "string",
                             "required": true,
                             "description": "The FDO schema name"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "classnames",
+                            "type": "string",
+                            "required": false,
+                            "description": "The dot-separated list of class names"
                         }
                     ],
                     "responseMessages": [

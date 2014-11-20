@@ -2833,6 +2833,13 @@
                                 "xml",
                                 "json"
                             ]
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "classnames",
+                            "type": "string",
+                            "required": false,
+                            "description": "The dot-separated list of class names"
                         }
                     ],
                     "responseMessages": [
@@ -2880,6 +2887,13 @@
                             "type": "string",
                             "required": true,
                             "description": "The name of the schema to describe"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "classnames",
+                            "type": "string",
+                            "required": false,
+                            "description": "The dot-separated list of class names"
                         }
                     ],
                     "responseMessages": [

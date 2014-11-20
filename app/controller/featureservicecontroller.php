@@ -285,6 +285,9 @@ class MgFeatureServiceController extends MgBaseController {
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $param->AddParameter("SCHEMA", $schemaName);
+            $classNames = $that->GetRequestParameter("classnames", null);
+            if ($classNames != null)
+                $param->AddParameter("CLASSNAMES", $classNames);
             $that->ExecuteHttpRequest($req);
         }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }

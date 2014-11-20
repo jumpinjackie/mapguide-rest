@@ -804,7 +804,8 @@ $app->get("/session/:sessionId/:resName.FeatureSource/schemas.:format", function
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
- *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The name of the schema to describe")
+ *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The name of the schema to describe"),
+ *          @SWG\parameter(name="classnames", paramType="query", required=false, type="string", description="The dot-separated list of class names")
  *        ),
  *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
@@ -828,7 +829,8 @@ $app->get("/session/:sessionId/:resName.FeatureSource/schema/:schemaName", funct
  *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
  *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The name of the schema to describe"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']"),
+ *          @SWG\parameter(name="classnames", paramType="query", required=false, type="string", description="The dot-separated list of class names")
  *        ),
  *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
