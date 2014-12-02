@@ -315,8 +315,199 @@ class MgUtils
         return $newStr;
     }
 
-    private static function DomElementToJson($domElement) {
+    //This is the definitive list of XML element paths where the leaf element can exist in multiples (according to its respective)
+    //XML schema. In new JSON output mode, we check if the current DOMNode path is in this list. If so, we array-ify the resulting
+    //JSON property. Otherwise we output that property as-is (whether it be a JSON primitive or JSON object value)
+    static $MULTI_ELEMENT_PATHS = array(
+        //FeatureSource-1.0.0.xsd
+        "/FeatureSource/Parameter" => "abcd1234",
+        "/FeatureSource/SupplementalSpatialContextInfo" => "abcd1234",
+        "/FeatureSource/Extension" => "abcd1234",
+        "/FeatureSource/Extension/CalculatedProperty" => "abcd1234",
+        "/FeatureSource/Extension/AttributeRelate" => "abcd1234",
+        "/FeatureSource/Extension/AttributeRelate/RelateProperty" => "abcd1234",
+        //DrawingSource-1.0.0.xsd
+        "/DrawingSource/Sheet" => "abcd1234",
+        //LayerDefinition-2.4.0.xsd (schema has been additive, so this includes older versions as well)
+        "/LayerDefinition/VectorLayerDefinition/PropertyMapping" => "abcd1234",
+        "/LayerDefinition/VectorLayerDefinition/VectorScaleRange" => "abcd1234",
+        "/LayerDefinition/VectorLayerDefinition/VectorScaleRange/AreaTypeStyle/AreaRule" => "abcd1234",
+        "/LayerDefinition/VectorLayerDefinition/VectorScaleRange/LineTypeStyle/LineRule" => "abcd1234",
+        "/LayerDefinition/VectorLayerDefinition/VectorScaleRange/LineTypeStyle/LineRule/LineSymbolization2D" => "abcd1234",
+        "/LayerDefinition/VectorLayerDefinition/VectorScaleRange/PointTypeStyle/PointRule" => "abcd1234",
+        "/LayerDefinition/VectorLayerDefinition/VectorScaleRange/CompositeTypeStyle/CompositeRule" => "abcd1234",
+        "/LayerDefinition/VectorLayerDefinition/VectorScaleRange/CompositeTypeStyle/CompositeRule/CompositeSymbolization/SymbolInstance" => "abcd1234",
+        "/LayerDefinition/VectorLayerDefinition/VectorScaleRange/CompositeTypeStyle/CompositeRule/CompositeSymbolization/SymbolInstance/ParameterOverrides/Override" => "abcd1234",
+        "/LayerDefinition/GridLayerDefinition/GridScaleRange" => "abcd1234",
+        "/LayerDefinition/GridLayerDefinition/GridScaleRange/ColorStyle/ColorRule" => "abcd1234",
+        //SymbolDefinition-2.4.0.xsd (schema has been additive, so this includes older versions as well)
+        "/SimpleSymbolDefinition/ParameterDefinition/Parameter" => "abcd1234",
+        "/CompoundSymbolDefinition/SimpleSymbol" => "abcd1234",
+        "/SimpleSymbolDefinition/Graphics/Path" => "abcd1234",
+        "/SimpleSymbolDefinition/Graphics/Image" => "abcd1234",
+        "/SimpleSymbolDefinition/Graphics/Text" => "abcd1234",
+        //MapDefinition-2.4.0.xsd (schema has been additive, so this includes older versions as well)
+        "/MapDefinition/MapLayer" => "abcd1234",
+        "/MapDefinition/MapLayerGroup" => "abcd1234",
+        "/MapDefinition/BaseMapDefinition/BaseLayerGroup" => "abcd1234",
+        "/MapDefinition/BaseMapDefinition/BaseLayerGroup/BaseMapLayer" => "abcd1234",
+        "/MapDefinition/Watermarks/Watermark" => "abcd1234",
+        //WebLayout-2.6.0.xsd (schema has been additive, so this includes older versions as well)
+        "/WebLayout/ToolBar/Button" => "abcd1234",
+        "/WebLayout/ToolBar/Button/SubItem" => "abcd1234",
+        "/WebLayout/ContextMenu/MenuItem" => "abcd1234",
+        "/WebLayout/ContextMenu/MenuItem/SubItem" => "abcd1234",
+        "/WebLayout/TaskPane/TaskBar/MenuButton" => "abcd1234",
+        "/WebLayout/CommandSet/Command" => "abcd1234",
+        //LoadProcedure-2.2.0.xsd (schema has been additive, so this includes older versions as well)
+        "/LoadProcedure/SdfLoadProcedure/SourceFile" => "abcd1234",
+        "/LoadProcedure/SdfLoadProcedure/ResourceId" => "abcd1234",
+        "/LoadProcedure/DwfLoadProcedure/SourceFile" => "abcd1234",
+        "/LoadProcedure/DwfLoadProcedure/ResourceId" => "abcd1234",
+        "/LoadProcedure/ShpLoadProcedure/SourceFile" => "abcd1234",
+        "/LoadProcedure/ShpLoadProcedure/ResourceId" => "abcd1234",
+        "/LoadProcedure/DwgLoadProcedure/SourceFile" => "abcd1234",
+        "/LoadProcedure/DwgLoadProcedure/ResourceId" => "abcd1234",
+        "/LoadProcedure/DwgLoadProcedure/FileComponents/FileComponent" => "abcd1234",
+        "/LoadProcedure/DwgLoadProcedure/LayerComponents/LayerComponent" => "abcd1234",
+        "/LoadProcedure/RasterLoadProcedure/SourceFile" => "abcd1234",
+        "/LoadProcedure/RasterLoadProcedure/ResourceId" => "abcd1234",
+        "/LoadProcedure/RasterLoadProcedure/GeoReferenceOverride" => "abcd1234",
+        "/LoadProcedure/SQLiteLoadProcedure/SourceFile" => "abcd1234",
+        "/LoadProcedure/SQLiteLoadProcedure/ResourceId" => "abcd1234",
+        //PrintLayout-1.0.0.xsd
+        "/PrintLayout/CustomLogos/Logo" => "abcd1234",
+        "/PrintLayout/CustomText/Text" => "abcd1234",
+        //ApplicationDefinition-1.0.0.xsd
+        "/ApplicationDefinition/WidgetSet" => "abcd1234",
+        "/ApplicationDefinition/WidgetSet/Container" => "abcd1234",
+        "/ApplicationDefinition/WidgetSet/Container/Item" => "abcd1234",
+        "/ApplicationDefinition/WidgetSet/Container/Item/Item" => "abcd1234",
+        //"/ApplicationDefinition/WidgetSet/Widget" => "abcd1234",
+        "/ApplicationDefinition/MapSet/MapGroup" => "abcd1234",
+        "/ApplicationDefinition/MapSet/MapGroup/Map" => "abcd1234",
+        //ApplicationDefinitionInfo-1.0.0.xsd
+        "/ApplicationDefinitionWidgetInfoSet/WidgetInfo" => "abcd1234",
+        "/ApplicationDefinitionWidgetInfoSet/WidgetInfo/ContainableBy" => "abcd1234",
+        "/ApplicationDefinitionWidgetInfoSet/WidgetInfo/Parameter" => "abcd1234",
+        "/ApplicationDefinitionWidgetInfoSet/WidgetInfo/Parameter/AllowedValue" => "abcd1234",
+        "/ApplicationDefinitionContainerInfoSet/ContainerInfo" => "abcd1234",
+        "/ApplicationDefinitionTemplateInfoSet/TemplateInfo" => "abcd1234",
+        "/ApplicationDefinitionTemplateInfoSet/TemplateInfo/Panel" => "abcd1234",
+        //BatchPropertyCollection-1.0.0.xsd
+        "/BatchPropertyCollection/PropertyCollection" => "abcd1234",
+        "/BatchPropertyCollection/PropertyCollection/Property" => "abcd1234",
+        //DataStoreList-1.0.0.xsd
+        "/DataStoreList/DataStore" => "abcd1234",
+        //DrawingSectionList-1.0.0.xsd
+        "/DrawingSectionList/Section" => "abcd1234",
+        //DrawingSectionResourceList-1.0.0.xsd
+        "/DrawingSectionResourceList/SectionResource" => "abcd1234",
+        //FdoLongTransactionList-1.0.0.xsd
+        "/FdoLongTransactionList/LongTransaction" => "abcd1234",
+        //FdoProviderCapabilities-1.0.0.xsd
+        "/FeatureProviderCapabilities/Connection/SpatialContextExtent/Type" => "abcd1234",
+        "/FeatureProviderCapabilities/Schema/Class/Type" => "abcd1234",
+        "/FeatureProviderCapabilities/Schema/Data/Type" => "abcd1234",
+        "/FeatureProviderCapabilities/Command/SupportedCommands/Type" => "abcd1234",
+        "/FeatureProviderCapabilities/Filter/Condition/Type" => "abcd1234",
+        "/FeatureProviderCapabilities/Filter/Spatial/Operation" => "abcd1234",
+        "/FeatureProviderCapabilities/Filter/Distance/Operation" => "abcd1234",
+        "/FeatureProviderCapabilities/Expression/Type/Name" => "abcd1234",
+        "/FeatureProviderCapabilities/Expression/FunctionDefinitionList/FunctionDefinition" => "abcd1234",
+        "/FeatureProviderCapabilities/Expression/FunctionDefinitionList/FunctionDefinition/ArgumentDefinitionList/ArgumentDefinition" => "abcd1234",
+        "/FeatureProviderCapabilities/Geometry/Types/Type" => "abcd1234",
+        "/FeatureProviderCapabilities/Geometry/Components/Type" => "abcd1234",
+        //FdoProviderCapabilities-1.1.0.xsd
+        "/FeatureProviderCapabilities/Schema/SupportedAutoGeneratedTypes" => "abcd1234",
+        "/FeatureProviderCapabilities/Expression/FunctionDefinitionList/FunctionDefinition/SignatureDefinitionCollection/SignatureDefinition" => "abcd1234",
+        "/FeatureProviderCapabilities/Expression/FunctionDefinitionList/FunctionDefinition/SignatureDefinitionCollection/SignatureDefinition/ArgumentDefinitionList/ArgumentDefinition" => "abcd1234",
+        "/FeatureProviderCapabilities/Expression/FunctionDefinitionList/FunctionDefinition/SignatureDefinitionCollection/SignatureDefinition/ArgumentDefinitionList/ArgumentDefinition/PropertyValueConstraintList/Value" => "abcd1234",
+        //FdoSpatialContextList-1.0.0.xsd
+        "/FdoSpatialContextList/SpatialContext" => "abcd1234",
+        //FeatureProviderRegistry-1.0.0.xsd
+        "/FeatureProviderRegistry/FeatureProvider" => "abcd1234",
+        "/FeatureProviderRegistry/FeatureProvider/ConnectionProperties/ConnectionProperty" => "abcd1234",
+        "/FeatureProviderRegistry/FeatureProvider/ConnectionProperties/ConnectionProperty/Value" => "abcd1234",
+        //Group-1.0.0.xsd
+        "/Group/Users/User" => "abcd1234",
+        //GroupList-1.0.0.xsd
+        "/GroupList/Group" => "abcd1234",
+        //ProfileResult-2.4.0.xsd
+        "/ProfileResult/ProfileRenderMap/ProfileRenderLayers/ProfileRenderLayer" => "abcd1234",
+        "/ProfileResult/ProfileRenderMap/ProfileRenderSelection/ProfileSelectedRenderLayer" => "abcd1234",
+        "/ProfileResult/ProfileRenderMap/ProfileRenderWatermarks/ProfileRenderWatermark" => "abcd1234",
+        //RepositoryList-1.0.0.xsd
+        "/RepositoryList/Repository" => "abcd1234",
+        //ResourceDataList-1.0.0.xsd
+        "/ResourceDataList/ResourceData" => "abcd1234",
+        //ResourceDocumentHeader-1.0.0.xsd
+        "/ResourceDocumentHeader/Metadata/Simple/Property" => "abcd1234",
+        //ResourceList-1.0.0.xsd
+        "/ResourceList/ResourceFolder" => "abcd1234",
+        "/ResourceList/ResourceFolder/ResourceFolderHeader/Security/Users/User" => "abcd1234", //ResourceSecurity-1.0.0.xsd
+        "/ResourceList/ResourceFolder/ResourceFolderHeader/Security/Groups/Group" => "abcd1234", //ResourceSecurity-1.0.0.xsd
+        "/ResourceList/ResourceDocument" => "abcd1234",
+        "/ResourceList/ResourceDocument/ResourceDocumentHeader/Security/Users/User" => "abcd1234", //ResourceSecurity-1.0.0.xsd
+        "/ResourceList/ResourceDocument/ResourceDocumentHeader/Security/Groups/Group" => "abcd1234", //ResourceSecurity-1.0.0.xsd
+        "/ResourceList/ResourceDocument/ResourceDocumentHeader/Metadata/Simple/Property" => "abcd1234",
+        //ResourcePackageManifest-1.0.0.xsd
+        "/ResourcePackageManifest/Operations/Operation" => "abcd1234",
+        "/ResourcePackageManifest/Operations/Operation/Parameters/Parameter" => "abcd1234",
+        //ResourceReferenceList-1.0.0.xsd
+        "/ResourceReferenceList/ResourceId" => "abcd1234",
+        //RuntimeMap-2.6.0.xsd
+        "/RuntimeMap/Group" => "abcd1234",
+        "/RuntimeMap/Layer" => "abcd1234",
+        "/RuntimeMap/Layer/ScaleRange" => "abcd1234",
+        "/RuntimeMap/Layer/ScaleRange/FeatureStyle" => "abcd1234",
+        "/RuntimeMap/Layer/ScaleRange/FeatureStyle/Rule" => "abcd1234",
+        "/RuntimeMap/FiniteDisplayScale" => "abcd1234",
+        //SelectAggregate-1.0.0.xsd
+        "/PropertySet/PropertyDefinitions/PropertyDefinition" => "abcd1234",
+        "/PropertySet/Properties/PropertyCollection" => "abcd1234",
+        "/PropertySet/Properties/PropertyCollection/Property" => "abcd1234",
+        //ServerList-1.0.0.xsd
+        "/ServerList/Server" => "abcd1234",
+        //SqlSelect-1.0.0.xsd
+        "/RowSet/ColumnDefinitions" => "abcd1234",
+        "/RowSet/ColumnDefinitions/Column" => "abcd1234",
+        "/RowSet/Rows/Row" => "abcd1234",
+        "/RowSet/Rows/Row/Column" => "abcd1234",
+        //StringCollection-1.0.0.xsd
+        "/StringCollection/Item" => "abcd1234",
+        //UnmanagedDataList-1.0.0.xsd
+        "/UnmanagedDataList/UnmanagedDataFolder" => "abcd1234",
+        "/UnmanagedDataList/UnmanagedDataFile" => "abcd1234",
+        //UserList-1.0.0.xsd
+        "/UserList/User" => "abcd1234",
+        "/UserList/Group" => "abcd1234"
+    );
 
+    private static function IsMultiple($domElement, $suffix = "") {
+        $path = "/" . $domElement->nodeName . $suffix;
+        $currNode = $domElement->parentNode;
+        while ($currNode != null) {
+            if ($currNode->nodeType != XML_DOCUMENT_NODE) {
+                $path = "/" . $currNode->nodeName . $path;
+                $currNode = $currNode->parentNode;
+                if ($currNode == null)
+                    break;
+            } else {
+                break;
+            }
+        }
+        $result = array_key_exists($path, self::$MULTI_ELEMENT_PATHS);
+        /*
+        if (self::StringEndsWith($path, "/AreaRule")) {
+            var_dump($path);
+            var_dump($result);
+            die;
+        }*/
+        return $result;
+    }
+
+    private static function DomElementToJson($domElement, $bLegacyOutputMode = false) {
         //Need to de-escape any escaped ' characters because an escaped ' is an illegal character under a double-quoted string in JSON
         $deEscape = function($str) {
             return str_replace("\\'", "'", $str);
@@ -365,7 +556,7 @@ class MgUtils
                         array_push($aValues, array('"'.$deEscape($text).'"'));
                     } else {
                         $childTag = $child->tagName;
-                        $json = MgUtils::DomElementToJson($child);
+                        $json = MgUtils::DomElementToJson($child, $bLegacyOutputMode);
                         if ($json == '') {
                             continue;
                         }
@@ -401,20 +592,28 @@ class MgUtils
                     $aValue = $aValues[$i];
                     $result .= $sep;
                 
+                    $childNodeName = $deEscape($aChildren[$i]);
+                    $childNodeCanBeMulti = self::IsMultiple($domElement, "/$childNodeName");
                     if (isset($aChildren[$i])) {
                         if (!$bIsObject) {
                             $result .= '{';
                         }
-                        $result .= '"'.$deEscape($aChildren[$i]).'":';
+                        $result .= '"'.$childNodeName.'":';
                     }
-                    //if (count($aValue) > 1) {
+                    if (count($aValue) > 1) {
+                        //$result .= '[{"_comment":"value ('.count($aValue).')"},';
                         $result .= '[';
                         //Need to de-escape \' because an escaped ' is an illegal character under double-quoted strings in JSON
                         $result .= $deEscape(implode(',', $aValue));
                         $result .= ']';
-                    //} else {
-                    //    $result .= $aValue[0];
-                    //}
+                    } else {
+                        if ($childNodeCanBeMulti) {
+                            //$result .= '[{"_comment": "multi-node ('.$childNodeName.')"},' . $aValue[0] . ']';
+                            $result .= '[' . $aValue[0] . ']';
+                        } else {
+                            $result .= $aValue[0];
+                        }
+                    }
                     if (isset($aChildren[$i]) && !$bIsObject) {
                         $result .= '}';
                     }
@@ -431,7 +630,7 @@ class MgUtils
         $doc = new DOMDocument();
         $doc->loadXML($xml);
         $root = $doc->documentElement;
-        echo '{"'.$root->tagName.'":'.MgUtils::DomElementToJson($root).'}'; 
+        return '{"'.$root->tagName.'":'.MgUtils::DomElementToJson($root).'}'; 
     }
 
     public static function XslTransformByteReader($app, $byteReader, $xslStylesheet, $xslParams) {

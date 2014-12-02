@@ -3202,7 +3202,7 @@
                     var bFound = false;
                     for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
                         var data = resp.ResourceDataList.ResourceData[i];
-                        if (data.Name[0] == "test.xml") {
+                        if (data.Name == "test.xml") {
                             bFound = true;
                             break;
                         }
@@ -3216,7 +3216,7 @@
                     var bFound = false;
                     for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
                         var data = resp.ResourceDataList.ResourceData[i];
-                        if (data.Name[0] == "test.xml") {
+                        if (data.Name == "test.xml") {
                             bFound = true;
                             break;
                         }
@@ -3230,7 +3230,7 @@
                     var bFound = false;
                     for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
                         var data = resp.ResourceDataList.ResourceData[i];
-                        if (data.Name[0] == "test.xml") {
+                        if (data.Name == "test.xml") {
                             bFound = true;
                             break;
                         }
@@ -3244,7 +3244,7 @@
                     var bFound = false;
                     for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
                         var data = resp.ResourceDataList.ResourceData[i];
-                        if (data.Name[0] == "test.xml") {
+                        if (data.Name == "test.xml") {
                             bFound = true;
                             break;
                         }
@@ -3287,7 +3287,7 @@
                     var bFound = false;
                     for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
                         var data = resp.ResourceDataList.ResourceData[i];
-                        if (data.Name[0] == "test.xml") {
+                        if (data.Name == "test.xml") {
                             bFound = true;
                             break;
                         }
@@ -3301,7 +3301,7 @@
                     var bFound = false;
                     for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
                         var data = resp.ResourceDataList.ResourceData[i];
-                        if (data.Name[0] == "test.xml") {
+                        if (data.Name == "test.xml") {
                             bFound = true;
                             break;
                         }
@@ -3315,7 +3315,7 @@
                     var bFound = false;
                     for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
                         var data = resp.ResourceDataList.ResourceData[i];
-                        if (data.Name[0] == "test.xml") {
+                        if (data.Name == "test.xml") {
                             bFound = true;
                             break;
                         }
@@ -3329,7 +3329,7 @@
                     var bFound = false;
                     for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
                         var data = resp.ResourceDataList.ResourceData[i];
-                        if (data.Name[0] == "test.xml") {
+                        if (data.Name == "test.xml") {
                             bFound = true;
                             break;
                         }
@@ -6599,7 +6599,7 @@
                     var bFound = false;
                     for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
                         var data = resp.ResourceDataList.ResourceData[i];
-                        if (data.Name[0] == "test.xml") {
+                        if (data.Name == "test.xml") {
                             bFound = true;
                             break;
                         }
@@ -6613,7 +6613,7 @@
                     var bFound = false;
                     for (var i = 0; i < resp.ResourceDataList.ResourceData.length; i++) {
                         var data = resp.ResourceDataList.ResourceData[i];
-                        if (data.Name[0] == "test.xml") {
+                        if (data.Name == "test.xml") {
                             bFound = true;
                             break;
                         }
