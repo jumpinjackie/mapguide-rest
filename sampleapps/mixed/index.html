@@ -67,14 +67,14 @@
         
         function loadMap(rtMapInfo) {
             if (rtMapInfo.RuntimeMap.IconMimeType) {
-                gMimeType = rtMapInfo.RuntimeMap.IconMimeType[0];
+                gMimeType = rtMapInfo.RuntimeMap.IconMimeType;
                 $("#iconFormat").html(gMimeType);
             }
             var extent = new OpenLayers.Bounds(
-                parseFloat(rtMapInfo.RuntimeMap.Extents[0].LowerLeftCoordinate[0].X[0]),
-                parseFloat(rtMapInfo.RuntimeMap.Extents[0].LowerLeftCoordinate[0].Y[0]),
-                parseFloat(rtMapInfo.RuntimeMap.Extents[0].UpperRightCoordinate[0].X[0]),
-                parseFloat(rtMapInfo.RuntimeMap.Extents[0].UpperRightCoordinate[0].Y[0]));
+                rtMapInfo.RuntimeMap.Extents.LowerLeftCoordinate.X,
+                rtMapInfo.RuntimeMap.Extents.LowerLeftCoordinate.Y,
+                rtMapInfo.RuntimeMap.Extents.UpperRightCoordinate.X,
+                rtMapInfo.RuntimeMap.Extents.UpperRightCoordinate.Y);
             
             OpenLayers.Control.CustomNavToolbar = OpenLayers.Class(OpenLayers.Control.Panel, {
                 /**
@@ -109,7 +109,7 @@
             var finiteScales = [];
             if (rtMapInfo.RuntimeMap.FiniteDisplayScale) {
                 for (var i = rtMapInfo.RuntimeMap.FiniteDisplayScale.length - 1; i >= 0; i--) {
-                    finiteScales.push(parseFloat(rtMapInfo.RuntimeMap.FiniteDisplayScale[i]));
+                    finiteScales.push(rtMapInfo.RuntimeMap.FiniteDisplayScale[i]);
                 }
             }
             
@@ -129,8 +129,8 @@
                 ]
             };
             
-            if (rtMapInfo.RuntimeMap.CoordinateSystem[0].EpsgCode[0].length > 0) {
-                mapOptions.projection = "EPSG:" + rtMapInfo.RuntimeMap.CoordinateSystem[0].EpsgCode[0];
+            if (rtMapInfo.RuntimeMap.CoordinateSystem.EpsgCode.length > 0) {
+                mapOptions.projection = "EPSG:" + rtMapInfo.RuntimeMap.CoordinateSystem.EpsgCode;
             }
             
             var options = {
@@ -140,13 +140,13 @@
                 useOverlay: true,
                 useAsyncOverlay: true,
                 singleTile: true,
-                mapname: rtMapInfo.RuntimeMap.Name[0],
-                session: rtMapInfo.RuntimeMap.SessionId[0],
+                mapname: rtMapInfo.RuntimeMap.Name,
+                session: rtMapInfo.RuntimeMap.SessionId,
                 selectioncolor: '0xFF000000',
                 behavior: 2
             };
             
-            sessionId = rtMapInfo.RuntimeMap.SessionId[0];
+            sessionId = rtMapInfo.RuntimeMap.SessionId;
             
             //Adjust the scale assumptions for MapGuide layers
             //Tiled layers MUST use a DPI value of 96, untiled layers can use a 
@@ -156,7 +156,7 @@
             
             //You'll still need to do these adjustments manually, but CREATERUNTIMEMAP
             //now provides the necessary meters-per-unit value for you to do this.
-            var metersPerUnit = parseFloat(rtMapInfo.RuntimeMap.CoordinateSystem[0].MetersPerUnit[0]);
+            var metersPerUnit = rtMapInfo.RuntimeMap.CoordinateSystem.MetersPerUnit;
             var inPerUnit = OpenLayers.INCHES_PER_UNIT.m * metersPerUnit;
             OpenLayers.INCHES_PER_UNIT["dd"] = inPerUnit;
             OpenLayers.INCHES_PER_UNIT["degrees"] = inPerUnit;
@@ -168,15 +168,15 @@
             //Iterate in reverse order so any base layer groups are added in correct draw order
             for (var i = rtMapInfo.RuntimeMap.Group.length - 1; i >= 0; i--) {
                 var group = rtMapInfo.RuntimeMap.Group[i];
-                if (group.Type[0] == "2") { //MgLayerGroupType.BaseMap
-                    var layer = new OpenLayers.Layer.MapGuideREST("MapGuide base layer group via REST API: " + group.Name[0], restUrl, {
-                        mapdefinition: rtMapInfo.RuntimeMap.MapDefinition[0],
-                        basemaplayergroupname: group.Name[0],
+                if (group.Type == "2") { //MgLayerGroupType.BaseMap
+                    var layer = new OpenLayers.Layer.MapGuideREST("MapGuide base layer group via REST API: " + group.Name, restUrl, {
+                        mapdefinition: rtMapInfo.RuntimeMap.MapDefinition,
+                        basemaplayergroupname: group.Name,
                         isBaseLayer: false,
                         singleTile: false
                     });
                     map.addLayer(layer);
-                    tiledLayers[group.Name[0]] = layer;
+                    tiledLayers[group.Name] = layer;
                 }
             }
             
@@ -195,9 +195,9 @@
             });
             legend.update();
             
-            $("#mapName").html("MapGuide mapname: " + rtMapInfo.RuntimeMap.Name[0]);
+            $("#mapName").html("MapGuide mapname: " + rtMapInfo.RuntimeMap.Name);
             $("#mgSession").html("MapGuide session ID: " + sessionId);
-            $("div.olMap").css("background-color", "#" + rtMapInfo.RuntimeMap.BackgroundColor[0].substring(2));
+            $("div.olMap").css("background-color", "#" + rtMapInfo.RuntimeMap.BackgroundColor.substring(2));
             startKeepAlive();
         }
         
@@ -205,7 +205,7 @@
             var keepAlive = function() {
                 $.getJSON(restUrl + "/session/" + sessionId + "/timeout.json", function(data, textStatus, jxXHR) {
                     $("#mgSession").html("MapGuide session ID: " + sessionId + " (last checked at: " + (new Date()) + ")");
-                    setTimeout(keepAlive, parseInt(data.SessionTimeout.Value[0]) * 1000);
+                    setTimeout(keepAlive, data.SessionTimeout.Value * 1000);
                 });
             };
             keepAlive();

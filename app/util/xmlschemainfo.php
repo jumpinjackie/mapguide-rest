@@ -324,12 +324,27 @@ class MgXmlSchemaInfo
         "/WatermarkDefinition/Position/TilePosition/TileHeight" => self::XML_DATA_TYPE_NUMBER,
         "/WatermarkDefinition/Appearance/Transparency" => self::XML_DATA_TYPE_NUMBER,
         "/WatermarkDefinition/Appearance/Rotation" => self::XML_DATA_TYPE_NUMBER,
+        //Miscellaneous MapGuide response types that don't have a formal schema
+        "/SessionTimeout/Value" => self::XML_DATA_TYPE_NUMBER,
+        "/FeatureInformation/SelectedFeatures/SelectedLayer/LayerMetadata/Property/Type" => self::XML_DATA_TYPE_NUMBER,
         //Response types unique to mapguide-rest
         "/AggregateResult/Total" => self::XML_DATA_TYPE_NUMBER,
         "/AggregateResult/BoundingBox/LowerLeft/X" => self::XML_DATA_TYPE_NUMBER,
         "/AggregateResult/BoundingBox/LowerLeft/Y" => self::XML_DATA_TYPE_NUMBER,
         "/AggregateResult/BoundingBox/UpperRight/X" => self::XML_DATA_TYPE_NUMBER,
         "/AggregateResult/BoundingBox/UpperRight/Y" => self::XML_DATA_TYPE_NUMBER,
+        "/SelectedLayerCollection/SelectedLayer/Count" => self::XML_DATA_TYPE_NUMBER,
+        "/LayerCollection/Layer/Type" => self::XML_DATA_TYPE_NUMBER,
+        "/LayerCollection/Layer/Selectable" => self::XML_DATA_TYPE_BOOLEAN,
+        "/LayerCollection/Layer/DisplayInLegend" => self::XML_DATA_TYPE_BOOLEAN,
+        "/LayerCollection/Layer/ExpandInLegend" => self::XML_DATA_TYPE_BOOLEAN,
+        "/LayerCollection/Layer/Visible" => self::XML_DATA_TYPE_BOOLEAN,
+        "/LayerCollection/Layer/ActuallyVisible" => self::XML_DATA_TYPE_BOOLEAN,
+        "/GroupCollection/Group/Type" => self::XML_DATA_TYPE_NUMBER,
+        "/GroupCollection/Group/DisplayInLegend" => self::XML_DATA_TYPE_BOOLEAN,
+        "/GroupCollection/Group/ExpandInLegend" => self::XML_DATA_TYPE_BOOLEAN,
+        "/GroupCollection/Group/Visible" => self::XML_DATA_TYPE_BOOLEAN,
+        "/GroupCollection/Group/ActuallyVisible" => self::XML_DATA_TYPE_BOOLEAN
     );
 
     //This is the definitive list of XML element paths where the leaf element can exist in multiples (according to its respective)
@@ -501,7 +516,16 @@ class MgXmlSchemaInfo
         "/UnmanagedDataList/UnmanagedDataFile" => "abcd1234",
         //UserList-1.0.0.xsd
         "/UserList/User" => "abcd1234",
-        "/UserList/Group" => "abcd1234"
+        "/UserList/Group" => "abcd1234",
+        //Miscellaneous MapGuide response types that don't have a formal schema
+        "/FeatureInformation/FeatureSet/Layer" => "abcd1234",
+        "/FeatureInformation/FeatureSet/Layer/Class/ID" => "abcd1234",
+        "/FeatureInformation/SelectedFeatures/SelectedLayer" => "abcd1234",
+        "/FeatureInformation/SelectedFeatures/SelectedLayer/LayerMetadata/Property" => "abcd1234",
+        "/FeatureInformation/SelectedFeatures/SelectedLayer/Feature" => "abcd1234",
+        "/FeatureInformation/SelectedFeatures/SelectedLayer/Feature/Property" => "abcd1234",
+        "/SelectedLayerCollection/SelectedLayer" => "abcd1234",
+        "/LayerCollection/Layer" => "abcd1234"
     );
 
     private static function GetXmlPath($domElement, $suffix = "") {
@@ -549,7 +573,13 @@ class MgXmlSchemaInfo
         {
             case self::XML_DATA_TYPE_BOOLEAN:
                 {
-                    $result = boolval(strtolower($text)) ? "true" : "false";
+                    $bv = strtolower($text);
+                    if ($bv == "1")
+                        $bv = "true";
+                    if ($bv == "0")
+                        $bv = "false";
+
+                    $result = $bv;
                 }
                 break;
             case self::XML_DATA_TYPE_NUMBER:

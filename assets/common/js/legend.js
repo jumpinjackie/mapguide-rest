@@ -1,7 +1,7 @@
 //A simple legend to toggle MapGuide Layer visbility for a OpenLayers.Layer.MapGuide instance
 //
 //NOTE: Only tested with the Sheboygan dataset. Probably doesn't handle all corner cases that can be possible with a MapGuide Map Definition
-
+//NOTE: This uses the "clean" mapguide-rest JSON APIs which does not blindly array-ify every JSON property
 //Requires: OpenLayers, jQuery
 
 function Legend(options)
@@ -13,7 +13,7 @@ function Legend(options)
     this.mgTiledLayers = options.mgTiledLayers || {};
     this.debug = false;
 
-    this.iconMimeType = rtMapInfo.RuntimeMap.IconMimeType[0];
+    this.iconMimeType = rtMapInfo.RuntimeMap.IconMimeType;
     
     this.stdIconRoot = options.stdIconRoot || "../../stdicons";
     this.rootEl = $(legendSelector);
@@ -29,11 +29,11 @@ function Legend(options)
         for (var i = 0; i < rtMapInfo.RuntimeMap.Group.length; i++) {
             var group = rtMapInfo.RuntimeMap.Group[i];
             if (group.ParentId) {
-                remainingGroups[group.ObjectId[0]] = group;
+                remainingGroups[group.ObjectId] = group;
                 continue;
             }
             var el = this.createGroupElement(group);
-            groupElMap[group.ObjectId[0]] = el;
+            groupElMap[group.ObjectId] = el;
             this.rootEl.append(el);
         }
         //2nd pass, parented groups
@@ -47,10 +47,10 @@ function Legend(options)
             for (var objId in remainingGroups) {
                 var group = remainingGroups[objId];
                 //Do we have a parent?
-                if (typeof(groupElMap[group.ParentId[0]]) != 'undefined') {
+                if (typeof(groupElMap[group.ParentId]) != 'undefined') {
                     var el = this.createGroupElement(group);
-                    groupElMap[group.ParentId[0]].find("ul.groupChildren").append(el);
-                    removeIds.push(group.ObjectId[0]);
+                    groupElMap[group.ParentId].find("ul.groupChildren").append(el);
+                    removeIds.push(group.ObjectId);
                 }
             }
             for (var i = 0; i < removeIds.length; i++) {
@@ -69,7 +69,7 @@ function Legend(options)
             var els = this.createLayerElements(layer);
             for (var j = 0; j < els.length; j++) {
                 if (layer.ParentId) {
-                    groupElMap[layer.ParentId[0]].find("ul.groupChildren").append(els[j]);
+                    groupElMap[layer.ParentId].find("ul.groupChildren").append(els[j]);
                 } else {
                     this.rootEl.append(els[j]);
                 }
@@ -149,7 +149,7 @@ Legend.prototype.update = function() {
 };
 
 Legend.prototype.createGroupElement = function(group) {
-    return $("<li><input type='checkbox' class='group-checkbox' data-is-tiled='" + (group.Type[0] == 2) + "' data-group-name='" + group.Name[0] + "' value='" + group.ObjectId[0] + "' " + ((group.Visible[0] == "true") ? "checked='checked'" : "") + " /><img src='" + this.stdIconRoot + "/lc_group.gif' /> " + group.LegendLabel[0] + "<ul class='groupChildren'></ul></li>");
+    return $("<li><input type='checkbox' class='group-checkbox' data-is-tiled='" + (group.Type == 2) + "' data-group-name='" + group.Name + "' value='" + group.ObjectId + "' " + ((group.Visible) ? "checked='checked'" : "") + " /><img src='" + this.stdIconRoot + "/lc_group.gif' /> " + group.LegendLabel + "<ul class='groupChildren'></ul></li>");
 };
 
 Legend.prototype.getIconUri = function(iconBase64) {
@@ -158,7 +158,7 @@ Legend.prototype.getIconUri = function(iconBase64) {
 
 Legend.prototype.createLayerElements = function(layer) {
     var icon = "legend-layer.png";
-    var label = layer.LegendLabel ? layer.LegendLabel[0] : "";
+    var label = layer.LegendLabel ? layer.LegendLabel : "";
     var text = label;
     var childHtml = "";
     //This is using the first scale range and the first geometry type. To do this proper you'd find the matching scale range
@@ -170,7 +170,7 @@ Legend.prototype.createLayerElements = function(layer) {
             var scaleRange = layer.ScaleRange[i];
             if (scaleRange.FeatureStyle) {
                 if (this.debug)
-                    text = label + " (" + scaleRange.MinScale[0] + " - " + scaleRange.MaxScale[0] + ")";
+                    text = label + " (" + scaleRange.MinScale + " - " + scaleRange.MaxScale + ")";
                 var fts = scaleRange.FeatureStyle[0];
                 var ruleCount = fts.Rule.length;
                 if (ruleCount > 1) {
@@ -182,23 +182,23 @@ Legend.prototype.createLayerElements = function(layer) {
                         bCompressed = !(fts.Rule[1].Icon);
                     }
                     if (bCompressed) {
-                        childHtml += "<li><img src='" + this.getIconUri(fts.Rule[0].Icon[0]) + "' /> " + (fts.Rule[0].LegendLabel ? fts.Rule[0].LegendLabel[0] : "") + "</li>";
+                        childHtml += "<li><img src='" + this.getIconUri(fts.Rule.Icon) + "' /> " + (fts.Rule.LegendLabel ? fts.Rule.LegendLabel : "") + "</li>";
                         childHtml += "<li>... (" + (ruleCount - 2) + " other theme rules)</li>";
-                        childHtml += "<li><img src='" + this.getIconUri(fts.Rule[ruleCount-1].Icon[0]) + "' /> " + (fts.Rule[ruleCount-1].LegendLabel ? fts.Rule[ruleCount-1].LegendLabel[0] : "") + "</li>";
+                        childHtml += "<li><img src='" + this.getIconUri(fts.Rule[ruleCount-1].Icon) + "' /> " + (fts.Rule[ruleCount-1].LegendLabel ? fts.Rule[ruleCount-1].LegendLabel : "") + "</li>";
                     } else {
                         for (var i = 0; i < ruleCount; i++) {
                             var rule = fts.Rule[i];
-                            childHtml += "<li><img src='" + this.getIconUri(rule.Icon[0]) + "' /> " + (rule.LegendLabel ? rule.LegendLabel[0] : "") + "</li>";
+                            childHtml += "<li><img src='" + this.getIconUri(rule.Icon) + "' /> " + (rule.LegendLabel ? rule.LegendLabel : "") + "</li>";
                         }
                     }
                     childHtml += "</ul>";
                 } else {
-                    icon = this.getIconUri(fts.Rule[0].Icon[0]);
+                    icon = this.getIconUri(fts.Rule[0].Icon);
                 }
                 var chkBoxHtml = "";
-                if (layer.Type[0] == 1) //Dynamic
-                    chkBoxHtml = "<input type='checkbox' class='layer-checkbox' value='" + layer.ObjectId[0] + "' " + ((layer.Visible[0] == "true") ? "checked='checked'" : "") + " />";
-                els.push($("<li class='layer-node' data-layer-min-scale='" + scaleRange.MinScale[0] + "' data-layer-max-scale='" + scaleRange.MaxScale[0] + "'>" + chkBoxHtml + "<img src='" + icon + "' /> " + text + childHtml + "</li>"));
+                if (layer.Type == 1) //Dynamic
+                    chkBoxHtml = "<input type='checkbox' class='layer-checkbox' value='" + layer.ObjectId + "' " + ((layer.Visible == true) ? "checked='checked'" : "") + " />";
+                els.push($("<li class='layer-node' data-layer-min-scale='" + scaleRange.MinScale + "' data-layer-max-scale='" + scaleRange.MaxScale + "'>" + chkBoxHtml + "<img src='" + icon + "' /> " + text + childHtml + "</li>"));
             }
         }
     }

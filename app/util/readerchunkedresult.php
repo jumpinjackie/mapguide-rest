@@ -20,6 +20,28 @@
 require_once "geojsonwriter.php";
 require_once "utils.php";
 
+class MgNullPropertyDefinitionCollection
+{
+    public function GetCount() { return 0; }
+}
+
+class MgNullClassDefinition
+{
+    public function GetName() { return ""; }
+    public function GetProperties() { return new MgNullPropertyDefinitionCollection(); }
+    public function GetIdentityProperties() { return new MgNullPropertyDefinitionCollection(); }
+}
+
+class MgNullFeatureReader
+{
+    public function GetClassDefinition() {
+        return new MgNullClassDefinition();
+    }
+    public function GetPropertyCount() { return 0; }
+    public function ReadNext() { return false; }
+    public function Close() {}
+}
+
 abstract class MgChunkWriter
 {
     public abstract function SetHeader($name, $value);
@@ -423,6 +445,16 @@ class MgReaderChunkedResult
         $this->reader->Close();
     }
 
+    private function IsEmpty($schemas) {
+        $count = 0;
+        for ($i = 0; $i < $schemas->GetCount(); $i++) {
+            $schema = $schemas->GetItem($i);
+            $classes = $schema->GetClasses();
+            $count += $classes->GetCount();
+        }
+        return $count == 0;
+    }
+
     private function OutputXml($schemas) {
         $read = 0;
         $agfRw = new MgAgfReaderWriter();
@@ -432,17 +464,22 @@ class MgReaderChunkedResult
         $this->writer->StartChunking();
 
         $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?><FeatureSet>";
-        $classXml = $this->featSvc->SchemaToXml($schemas);
-        $classXml = substr($classXml, strpos($classXml, "<xs:schema"));
+        if (!$this->IsEmpty($schemas)) {
+            $classXml = $this->featSvc->SchemaToXml($schemas);
+            $classXml = substr($classXml, strpos($classXml, "<xs:schema"));
 
-        $output .= $classXml;
-        $output .= "<Features>";
-
-        $this->writer->WriteChunk($output);
-        $output = "";
-
+            $output .= $classXml;
+        }
+        $hasMoreFeatures = $this->reader->ReadNext();
+        $writeXmlFooter = false;
+        if ($hasMoreFeatures) {
+            $output .= "<Features>";
+            $this->writer->WriteChunk($output);
+            $output = "";
+            $writeXmlFooter = true;
+        }
         $propCount = $this->reader->GetPropertyCount();
-        while ($this->reader->ReadNext()) {
+        while ($hasMoreFeatures) {
             $read++;
             if ($this->limit > 0 && $read > $this->limit) {
                 break;
@@ -509,9 +546,13 @@ class MgReaderChunkedResult
 
             $this->writer->WriteChunk($output);
             $output = "";
+            $hasMoreFeatures = $this->reader->ReadNext();
         }
 
-        $output .= "</Features></FeatureSet>";
+        if ($writeXmlFooter) {
+            $output .= "</Features>";    
+        }
+        $output .= "</FeatureSet>";
         $this->writer->WriteChunk($output);
         $this->writer->EndChunking();
         $this->reader->Close();
@@ -523,7 +564,11 @@ class MgReaderChunkedResult
         $schemas->Add($schema);
         $classes = $schema->GetClasses();
         $clsDef = $this->reader->GetClassDefinition();
-        $classes->Add($clsDef);
+
+        //We may be plugging in a MgNullFeatureReader here, which may quack
+        //like a duck, but is no duck.
+        if ($clsDef instanceof MgClassDefinition)
+            $classes->Add($clsDef);
 
         if ($format === "geojson") {
             $this->OutputGeoJson($schemas);

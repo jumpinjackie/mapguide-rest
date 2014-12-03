@@ -81,10 +81,10 @@
         
         function loadMap(rtMapInfo) {
             var extent = new OpenLayers.Bounds(
-                parseFloat(rtMapInfo.RuntimeMap.Extents[0].LowerLeftCoordinate[0].X[0]),
-                parseFloat(rtMapInfo.RuntimeMap.Extents[0].LowerLeftCoordinate[0].Y[0]),
-                parseFloat(rtMapInfo.RuntimeMap.Extents[0].UpperRightCoordinate[0].X[0]),
-                parseFloat(rtMapInfo.RuntimeMap.Extents[0].UpperRightCoordinate[0].Y[0]));
+                rtMapInfo.RuntimeMap.Extents.LowerLeftCoordinate.X,
+                rtMapInfo.RuntimeMap.Extents.LowerLeftCoordinate.Y,
+                rtMapInfo.RuntimeMap.Extents.UpperRightCoordinate.X,
+                rtMapInfo.RuntimeMap.Extents.UpperRightCoordinate.Y);
             
             wktFormat = new OpenLayers.Format.WKT();
             navControl = new OpenLayers.Control.Navigation();
@@ -115,7 +115,7 @@
                  */
                 draw: function() {
                     var div = OpenLayers.Control.Panel.prototype.draw.apply(this, arguments);
-                    this.defaultControl = this.controls[0];
+                    this.defaultControl = this.controls;
                     return div;
                 }
             });
@@ -134,12 +134,12 @@
                 ]
             };
             
-            if (rtMapInfo.RuntimeMap.CoordinateSystem[0].EpsgCode[0].length > 0) {
-                mapOptions.projection = "EPSG:" + rtMapInfo.RuntimeMap.CoordinateSystem[0].EpsgCode[0];
+            if (rtMapInfo.RuntimeMap.CoordinateSystem.EpsgCode.length > 0) {
+                mapOptions.projection = "EPSG:" + rtMapInfo.RuntimeMap.CoordinateSystem.EpsgCode;
             }
 
-            mapName = rtMapInfo.RuntimeMap.Name[0];
-            sessionId = rtMapInfo.RuntimeMap.SessionId[0];
+            mapName = rtMapInfo.RuntimeMap.Name;
+            sessionId = rtMapInfo.RuntimeMap.SessionId;
             
             var options = {
                 transitionEffect: "resize",
@@ -171,7 +171,7 @@
             
             //You'll still need to do these adjustments manually, but CREATERUNTIMEMAP
             //now provides the necessary meters-per-unit value for you to do this.
-            var metersPerUnit = parseFloat(rtMapInfo.RuntimeMap.CoordinateSystem[0].MetersPerUnit[0]);
+            var metersPerUnit = rtMapInfo.RuntimeMap.CoordinateSystem.MetersPerUnit;
             var inPerUnit = OpenLayers.INCHES_PER_UNIT.m * metersPerUnit;
             OpenLayers.INCHES_PER_UNIT["dd"] = inPerUnit;
             OpenLayers.INCHES_PER_UNIT["degrees"] = inPerUnit;
@@ -211,7 +211,7 @@
             });
             legend.update();
             
-            $("div.olMap").css("background-color", "#" + rtMapInfo.RuntimeMap.BackgroundColor[0].substring(2));
+            $("div.olMap").css("background-color", "#" + rtMapInfo.RuntimeMap.BackgroundColor.substring(2));
             $(".olMapViewport").append($("<img class='selOverlay' />"));
             map.events.register("click", this, onMapClick);
             writeRestUrls(mapName, sessionId);
@@ -305,7 +305,7 @@
             var keepAlive = function() {
                 $.getJSON(restUrl + "/session/" + sessionId + "/timeout.json", function(data, textStatus, jxXHR) {
                     $("#mgSession").html("MapGuide session ID: " + sessionId + " (last checked at: " + (new Date()) + ")");
-                    setTimeout(keepAlive, parseInt(data.SessionTimeout.Value[0]) * 1000);
+                    setTimeout(keepAlive, data.SessionTimeout.Value * 1000);
                 });
             };
             keepAlive();

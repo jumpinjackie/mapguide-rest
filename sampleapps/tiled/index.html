@@ -68,14 +68,14 @@
         
         function loadMap(rtMapInfo) {
             if (rtMapInfo.RuntimeMap.IconMimeType) {
-                gMimeType = rtMapInfo.RuntimeMap.IconMimeType[0];
+                gMimeType = rtMapInfo.RuntimeMap.IconMimeType;
                 $("#iconFormat").html(gMimeType);
             }
             var extent = new OpenLayers.Bounds(
-                parseFloat(rtMapInfo.RuntimeMap.Extents[0].LowerLeftCoordinate[0].X[0]),
-                parseFloat(rtMapInfo.RuntimeMap.Extents[0].LowerLeftCoordinate[0].Y[0]),
-                parseFloat(rtMapInfo.RuntimeMap.Extents[0].UpperRightCoordinate[0].X[0]),
-                parseFloat(rtMapInfo.RuntimeMap.Extents[0].UpperRightCoordinate[0].Y[0]));
+                rtMapInfo.RuntimeMap.Extents.LowerLeftCoordinate.X,
+                rtMapInfo.RuntimeMap.Extents.LowerLeftCoordinate.Y,
+                rtMapInfo.RuntimeMap.Extents.UpperRightCoordinate.X,
+                rtMapInfo.RuntimeMap.Extents.UpperRightCoordinate.Y);
             
             OpenLayers.Control.CustomNavToolbar = OpenLayers.Class(OpenLayers.Control.Panel, {
                 /**
@@ -102,14 +102,14 @@
                  */
                 draw: function() {
                     var div = OpenLayers.Control.Panel.prototype.draw.apply(this, arguments);
-                    this.defaultControl = this.controls[0];
+                    this.defaultControl = this.controls;
                     return div;
                 }
             });
             var finiteScales = [];
             if (rtMapInfo.RuntimeMap.FiniteDisplayScale) {
                 for (var i = rtMapInfo.RuntimeMap.FiniteDisplayScale.length - 1; i >= 0; i--) {
-                    finiteScales.push(parseFloat(rtMapInfo.RuntimeMap.FiniteDisplayScale[i]));
+                    finiteScales.push(rtMapInfo.RuntimeMap.FiniteDisplayScale[i]);
                 }
             }
             var mapOptions = {
@@ -128,8 +128,8 @@
                 ]
             };
             
-            if (rtMapInfo.RuntimeMap.CoordinateSystem[0].EpsgCode[0].length > 0) {
-                mapOptions.projection = "EPSG:" + rtMapInfo.RuntimeMap.CoordinateSystem[0].EpsgCode[0];
+            if (rtMapInfo.RuntimeMap.CoordinateSystem.EpsgCode.length > 0) {
+                mapOptions.projection = "EPSG:" + rtMapInfo.RuntimeMap.CoordinateSystem.EpsgCode;
             }
             
             var options = {
@@ -146,14 +146,14 @@
             //Iterate in reverse order so any base layer groups are added in correct draw order
             for (var i = rtMapInfo.RuntimeMap.Group.length - 1; i >= 0; i--) {
                 var group = rtMapInfo.RuntimeMap.Group[i];
-                if (group.Type[0] == "2") { //MgLayerGroupType.BaseMap
-                    var layer = new OpenLayers.Layer.MapGuideREST("MapGuide Base Layer Group (via REST): " + group.Name[0], restUrl, {
-                        mapdefinition: rtMapInfo.RuntimeMap.MapDefinition[0],
-                        basemaplayergroupname: group.Name[0],
+                if (group.Type == "2") { //MgLayerGroupType.BaseMap
+                    var layer = new OpenLayers.Layer.MapGuideREST("MapGuide Base Layer Group (via REST): " + group.Name, restUrl, {
+                        mapdefinition: rtMapInfo.RuntimeMap.MapDefinition,
+                        basemaplayergroupname: group.Name,
                         singleTile: false
                     });
                     map.addLayer(layer);
-                    tiledLayers[group.Name[0]] = layer;
+                    tiledLayers[group.Name] = layer;
                 }
             }
             map.zoomToMaxExtent();
