@@ -681,9 +681,9 @@ class MgPdfPlotter
                     $mapGroups->GetItem($prevGroupName)->SetVisible(false);
                 }
                 $mapGroups->GetItem($groupName)->SetVisible(true);
-				$print = true;
-				$view = true;
-				$lock = false;
+                $print = true;
+                $view = true;
+                $lock = false;
                 $this->pdf->startLayer($groupName,$print,$view,$lock);
 
                 $filelocation = $this->RenderMap(MgUtils::InToPx($this->printSize->width, $this->dpi),
@@ -722,10 +722,10 @@ class MgPdfPlotter
                 }
                 $mapLayers->GetItem($layerName)->SetVisible(true);
                 
-				$print = true;
-				$view = true;
-				$lock = false;
-                $this->pdf->startLayer($groupName,$print,$view,$lock);
+                $print = true;
+                $view = true;
+                $lock = false;
+                $this->pdf->startLayer($layerName,$print,$view,$lock);
 
                 $filelocation = $this->RenderMap(MgUtils::InToPx($this->printSize->width, $this->dpi),
                                                  MgUtils::InToPx($this->printSize->height, $this->dpi),
@@ -790,6 +790,7 @@ class MgPdfPlotter
             $mExt = $this->DrawExtentCS($legendWidthIn);
         }
         
+        $this->app->response->header("Content-Type", "application/pdf");
         $mode = 'I';
         $name = 'Map.pdf';
         if (strlen($this->title) > 0)
