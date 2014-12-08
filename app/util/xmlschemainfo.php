@@ -47,6 +47,7 @@ class MgXmlSchemaInfo
         "/FdoLongTransactionList/LongTransaction/@IsActive" => self::XML_DATA_TYPE_BOOLEAN,
         "/FdoLongTransactionList/LongTransaction/@IsFrozen" => self::XML_DATA_TYPE_BOOLEAN,
         //FdoSpatialContextList-1.0.0.xsd
+        "/FdoSpatialContextList/SpatialContext/@IsActive" => self::XML_DATA_TYPE_BOOLEAN,
         "/FdoSpatialContextList/SpatialContext/XYTolerance" => self::XML_DATA_TYPE_NUMBER,
         "/FdoSpatialContextList/SpatialContext/ZTolerance" => self::XML_DATA_TYPE_NUMBER,
         "/FdoSpatialContextList/SpatialContext/Extent/LowerLeftCoordinate/X" => self::XML_DATA_TYPE_NUMBER,
@@ -555,6 +556,42 @@ class MgXmlSchemaInfo
             return self::$XML_ELEMENT_TYPES[$path];
         }
         return self::XML_DATA_TYPE_STRING;
+    }
+
+    public static function GetAttributeValue($domAttr) {
+        $parent = $domAttr->ownerElement;
+        $type = self::GetXmlType($parent, "/@" . $domAttr->name);
+        $result = null;
+        $text = addslashes($domAttr->value);
+        switch($type)
+        {
+            case self::XML_DATA_TYPE_BOOLEAN:
+                {
+                    $bv = strtolower($text);
+                    if ($bv == "1")
+                        $bv = "true";
+                    if ($bv == "0")
+                        $bv = "false";
+
+                    $result = $bv;
+                }
+                break;
+            case self::XML_DATA_TYPE_NUMBER:
+                {
+                    $result = $text;
+                }
+                break;
+            default:
+                {
+                    if ($text != '') {
+                        $result = '"'.self::DeEscape($text).'"';
+                    } else {
+                        $text = '""';
+                    }
+                }
+                break;
+        }
+        return $result;
     }
 
     public static function GetValue($domElement) {

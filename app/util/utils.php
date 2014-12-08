@@ -335,7 +335,7 @@ class MgUtils
                starting with @ */
             if ($domElement->hasAttributes()) {
                 foreach($domElement->attributes as $key => $attr) {
-                    $len = array_push($aValues, array('"'.MgXmlSchemaInfo::DeEscape($attr->value).'"'));
+                    $len = array_push($aValues, array(MgXmlSchemaInfo::GetAttributeValue($attr)));
                     $aChildren['@'.$key] = $len-1;
                 }
             }
