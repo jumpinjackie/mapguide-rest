@@ -318,6 +318,64 @@ class MgUtils
         return $newStr;
     }
 
+    static function DEBUG_NEWLINE() {
+        return "\n";
+    }
+
+    public static function Json2Xml($value, $nodeName = null) {
+        //NOTE: This is not a generic JSON to XML conversion function. It is specialized for MapGuide's
+        //case and makes several assumptions that do not apply to general conversion
+        
+        $xml = "";
+        if ($nodeName == null) {
+            $props = get_object_vars($value);
+            if (count($props) != 1) {
+                throw new Exception("No parent node was passed, assuming this method was invoked with a JSON object with one top-level property. However, the following top-level properties were found: ".implode(",", array_keys($props)));
+            }
+            foreach ($props as $name => $val) {
+                $nodeName = $name;
+                $xml .= self::Json2Xml($val, $name);
+            }
+        } else {
+            if (is_object($value)) {
+                $xml .= "<$nodeName" . self::DEBUG_NEWLINE();
+                $props = get_object_vars($value);
+                //Process attributes first
+                foreach ($props as $name => $val) {
+                    if (self::StringStartsWith($name, "@")) { //Is attribute
+                        $attName = substr($name, 1);
+                        $xml .= ' '.$attName.'="'.$val.'"' . self::DEBUG_NEWLINE();
+                    }
+                }
+                $xml .= ">" . self::DEBUG_NEWLINE();
+                //$xml .= "<!--- START OBJECT -->" . self::DEBUG_NEWLINE();
+                //Now process other values
+                foreach ($props as $name => $val) {
+                    if (!self::StringStartsWith($name, "@")) {
+                        $xml .= self::Json2Xml($val, $name);
+                    }
+                }
+                //$xml .= "<!--- END OBJECT -->" . self::DEBUG_NEWLINE();
+                $xml .= "</$nodeName>" . self::DEBUG_NEWLINE();
+            } else if (is_array($value)) {
+                //$xml .= "<$nodeName>\n";
+                //$xml .= "<!--- START ARRAY -->" . self::DEBUG_NEWLINE();
+                foreach ($value as $val) {
+                    $xml .= self::Json2Xml($val, $nodeName);
+                }
+                //$xml .= "<!--- END ARRAY -->" . self::DEBUG_NEWLINE();
+                //$xml .= "</$nodeName>\n";
+            } else {
+                //$xml .= "<!--- START VALUE -->" . self::DEBUG_NEWLINE();
+                $xml .= "<$nodeName>" . self::DEBUG_NEWLINE();
+                $xml .= self::EscapeXmlChars(strval($value));
+                //$xml .= "<!--- END VALUE -->" . self::DEBUG_NEWLINE();
+                $xml .= "</$nodeName>" . self::DEBUG_NEWLINE();
+            }
+        }
+        return $xml;
+    }
+
     private static function DomElementToJson($domElement, $bLegacyOutputMode = false) {
         $result = '';
         if ($domElement->nodeType == XML_COMMENT_NODE) {
@@ -339,7 +397,6 @@ class MgUtils
                     $aChildren['@'.$key] = $len-1;
                 }
             }
-            
             if ($domElement->hasChildNodes()) {
                 //has children
                 foreach($domElement->childNodes as $child) {
@@ -357,7 +414,7 @@ class MgUtils
                         $childTag = $child->tagName;
                         $json = MgUtils::DomElementToJson($child, $bLegacyOutputMode);
                         if ($json == '') {
-                            continue;
+                            $json = 'null';
                         }
                         if (array_key_exists($childTag, $aChildren)) {
                             array_push($aValues[$aChildren[$childTag]], $json);

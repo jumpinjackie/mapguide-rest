@@ -345,19 +345,158 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
+    public function GetEditCapabilities($resId, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
+        $this->EnsureAuthenticationForSite($sessionId);
+        $siteConn = new MgSiteConnection();
+        $siteConn->Open($this->userInfo);
+
+        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+        $perms = self::CheckPermissions($resSvc, $resId);
+
+        if ($fmt == "json") {
+            $resp = new stdClass();
+            //This is for consistency with the XML version
+            $resp->RestCapabilities = $perms;
+            $this->app->response->header("Content-Type", MgMimeType::Json);
+            $this->app->response->write(json_encode($resp));
+        } else { //xml
+            $resp = '<?xml version="1.0" encoding="utf-8"?>';
+            $resp .= "<RestCapabilities>";
+            $resp .= "<AllowInsert>".($perms->AllowInsert ? "true" : "false")."</AllowInsert>";
+            $resp .= "<AllowUpdate>".($perms->AllowUpdate ? "true" : "false")."</AllowUpdate>";
+            $resp .= "<AllowDelete>".($perms->AllowDelete ? "true" : "false")."</AllowDelete>";
+            $resp .= "<UseTransaction>".($perms->UseTransaction ? "true" : "false")."</UseTransaction>";
+            $resp .= "</RestCapabilities>";
+            $this->app->response->header("Content-Type", MgMimeType::Xml);
+            $this->app->response->write($resp);
+        }
+    }
+
+    /*
+    public function SetEditCapabilities($resId) {
+        $sessionId = "";
+        if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
+            $sessionId = $resId->GetRepositoryName();
+        }
+        $this->EnsureAuthenticationForSite($sessionId);
+        $siteConn = new MgSiteConnection();
+        $siteConn->Open($this->userInfo);
+
+        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+        
+        $body = $this->app->request->getBody();
+        $doc = new DOMDocument($body);
+        $insertNodes = $doc->getElementsByTagName("AllowInsert");
+        $updateNodes = $doc->getElementsByTagName("AllowUpdate");
+        $deleteNodes = $doc->getElementsByTagName("AllowDelete");
+        $useTransactionNodes = $doc->getElementsByTagName("UseTransaction");
+
+        $perms = new stdClass();
+        $perms->AllowInsert = false;
+        $perms->AllowUpdate = false;
+        $perms->AllowDelete = false;
+        $perms->UseTransaction = false;
+        if ($insertNodes->length == 1) {
+            if ($insertNodes->item(0)->nodeValue === "1") {
+                $perms->AllowInsert = true;
+            }
+        }
+        if ($updateNodes->length == 1) {
+            if ($updateNodes->item(0)->nodeValue === "1") {
+                $perms->AllowUpdate = true;
+            }
+        }
+        if ($deleteNodes->length == 1) {
+            if ($deleteNodes->item(0)->nodeValue === "1") {
+                $perms->AllowDelete = true;
+            }
+        }
+        if ($useTransactionNodes->length == 1) {
+            if ($useTransactionNodes->item(0)->nodeValue === "1") {
+                $perms->UseTransaction = true;
+            }
+        }
+        self::PutEditPermissions($resSvc, $resId, $perms);
+        $this->app->response->setStatus(201);
+    }
+    */
+
+    private static function PutEditPermissions($resSvc, $resId, $perms) {
+        $resHeader = $resSvc->GetResourceHeader($resId);
+        $resHeaderDoc = new DOMDocument();
+        $resHeaderDoc->loadXML($resHeader->ToString());
+        $propNodes = $resHeaderDoc->getElementsByTagName("Property");
+
+        $removeInsertNode = null;
+        $removeUpdateNode = null;
+        $removeDeleteNode = null;
+        $removeTransactionNode = null;
+
+        //Remove existing metadata nodes
+        for ($i = 0; $i < $propNodes->length; $i++) {
+            $propNode = $propNodes->item($i);
+            $nameNode = $propNode->getElementsByTagName("Name");
+            if ($nameNode->length == 1) {
+                if ($nameNode->item(0)->nodeValue === self::PROP_ALLOW_INSERT) {
+                    $removeInsertNode = $propNode;
+                }
+                else if ($nameNode->item(0)->nodeValue === self::PROP_ALLOW_UPDATE) {
+                    $removeUpdateNode = $propNode;
+                }
+                else if ($nameNode->item(0)->nodeValue === self::PROP_ALLOW_DELETE) {
+                    $removeDeleteNode = $propNode;
+                }
+                else if ($nameNode->item(0)->nodeValue === self::PROP_USE_TRANSACTION) {
+                    $removeTransactionNode = $propNode;
+                }
+            }
+        }
+
+        if ($removeInsertNode != null) {
+            $removeInsertNode->parentNode->removeChild($removeInsertNode);
+        }
+        if ($removeUpdateNode != null) {
+            $removeUpdateNode->parentNode->removeChild($removeUpdateNode);
+        }
+        if ($removeDeleteNode != null) {
+            $removeDeleteNode->parentNode->removeChild($removeDeleteNode);
+        }
+        if ($removeTransactionNode != null) {
+            $removeTransactionNode->parentNode->removeChild($removeTransactionNode);
+        }
+
+        //Set new nodes
+        $metaNode = null;
+        //Make metadata node if it doesn't already exist
+        $metaNodes = $resHeaderDoc->getElementsByTagName("Metadata");
+        if ($metaNodes->length == 1) {
+            $metaNode = $metaNodes->item(0);
+        } else {
+            $metaNode = $resHeaderDoc->createElement("Metadata");
+            $resHeaderDoc->documentElement->appendChild($metaNode);
+        }
+    }
+
     private static function CheckPermissions($resSvc, $resId) {
         $perms = new stdClass();
-        $perms->allowInsert = false;
-        $perms->allowUpdate = false;
-        $perms->allowDelete = false;
-        $perms->useTransaction = false;
+        $perms->AllowInsert = false;
+        $perms->AllowUpdate = false;
+        $perms->AllowDelete = false;
+        $perms->UseTransaction = false;
 
         //A session-based user can do whatever they want on a session-based Feature Source
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
-            $perms->allowInsert = true;
-            $perms->allowUpdate = true;
-            $perms->allowDelete = true;
-            $perms->useTransaction = false;
+            $perms->AllowInsert = true;
+            $perms->AllowUpdate = true;
+            $perms->AllowDelete = true;
+            $perms->UseTransaction = false;
             return $perms;
         }
 
@@ -373,7 +512,7 @@ class MgFeatureServiceController extends MgBaseController {
                     $valueNodes = $propNode->getElementsByTagName("Value");
                     if ($valueNodes->length == 1) {
                         if ($valueNodes->item(0)->nodeValue === "1") {
-                            $perms->allowInsert = true;
+                            $perms->AllowInsert = true;
                         }
                     }
                 }
@@ -381,7 +520,7 @@ class MgFeatureServiceController extends MgBaseController {
                     $valueNodes = $propNode->getElementsByTagName("Value");
                     if ($valueNodes->length == 1) {
                         if ($valueNodes->item(0)->nodeValue === "1") {
-                            $perms->allowUpdate = true;
+                            $perms->AllowUpdate = true;
                         }
                     }
                 }
@@ -389,7 +528,7 @@ class MgFeatureServiceController extends MgBaseController {
                     $valueNodes = $propNode->getElementsByTagName("Value");
                     if ($valueNodes->length == 1) {
                         if ($valueNodes->item(0)->nodeValue === "1") {
-                            $perms->allowDelete = true;
+                            $perms->AllowDelete = true;
                         }
                     }
                 }
@@ -397,7 +536,7 @@ class MgFeatureServiceController extends MgBaseController {
                     $valueNodes = $propNode->getElementsByTagName("Value");
                     if ($valueNodes->length == 1) {
                         if ($valueNodes->item(0)->nodeValue === "1") {
-                            $perms->useTransaction = true;
+                            $perms->UseTransaction = true;
                         }
                     }
                 }
@@ -422,7 +561,7 @@ class MgFeatureServiceController extends MgBaseController {
 
             //Not a session-based resource, must check for appropriate flag in header before we continue
             if ($sessionId === "") {
-                if ($perms->allowInsert === false) {
+                if ($perms->AllowInsert === false) {
                     $e = new Exception();
                     $this->OutputException(
                         "Forbidden", 
@@ -442,7 +581,7 @@ class MgFeatureServiceController extends MgBaseController {
             $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
             $commands->Add($insertCmd);
 
-            if ($perms->useTransaction === true)
+            if ($perms->UseTransaction === true)
                 $trans = $featSvc->BeginTransaction($resId);
 
             //HACK: Due to #2252, we can't call UpdateFeatures() with NULL MgTransaction, so to workaround
@@ -478,7 +617,7 @@ class MgFeatureServiceController extends MgBaseController {
 
             //Not a session-based resource, must check for appropriate flag in header before we continue
             if ($sessionId === "") {
-                if ($perms->allowUpdate === false) {
+                if ($perms->AllowUpdate === false) {
                     $e = new Exception();
                     $this->OutputException(
                         "Forbidden", 
@@ -504,7 +643,7 @@ class MgFeatureServiceController extends MgBaseController {
             $updateCmd = new MgUpdateFeatures("$schemaName:$className", $props, $filter);
             $commands->Add($updateCmd);
 
-            if ($perms->useTransaction === true)
+            if ($perms->UseTransaction === true)
                 $trans = $featSvc->BeginTransaction($resId);
 
             //HACK: Due to #2252, we can't call UpdateFeatures() with NULL MgTransaction, so to workaround
@@ -540,7 +679,7 @@ class MgFeatureServiceController extends MgBaseController {
 
             //Not a session-based resource, must check for appropriate flag in header before we continue
             if ($sessionId === "") {
-                if ($perms->allowDelete === false) {
+                if ($perms->AllowDelete === false) {
                     $e = new Exception();
                     $this->OutputException(
                         "Forbidden", 
@@ -561,7 +700,7 @@ class MgFeatureServiceController extends MgBaseController {
             $deleteCmd = new MgDeleteFeatures("$schemaName:$className", $filter);
             $commands->Add($deleteCmd);
 
-            if ($perms->useTransaction === true)
+            if ($perms->UseTransaction === true)
                 $trans = $featSvc->BeginTransaction($resId);
 
             //HACK: Due to #2252, we can't call UpdateFeatures() with NULL MgTransaction, so to workaround
