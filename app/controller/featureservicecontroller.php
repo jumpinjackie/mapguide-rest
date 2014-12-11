@@ -385,110 +385,139 @@ class MgFeatureServiceController extends MgBaseController {
 
         $sessionId = "";
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
-            $sessionId = $resId->GetRepositoryName();
+            $this->BadRequest($this->app->localizer->getText("E_NOT_SUPPORTED_FOR_SESSION_RESOURCES"), $this->GetMimeTypeForFormat($fmt));
         }
         $this->EnsureAuthenticationForSite($sessionId);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
 
         $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-        
-        $body = $this->app->request->getBody();
-        if ($fmt == "json") {
-            $json = json_decode($body);
-            if ($json == NULL)
-                throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
-            $body = MgUtils::Json2Xml($json);
-        }
-        $doc = new DOMDocument($body);
-        $insertNodes = $doc->getElementsByTagName("AllowInsert");
-        $updateNodes = $doc->getElementsByTagName("AllowUpdate");
-        $deleteNodes = $doc->getElementsByTagName("AllowDelete");
-        $useTransactionNodes = $doc->getElementsByTagName("UseTransaction");
 
         $perms = new stdClass();
         $perms->AllowInsert = false;
         $perms->AllowUpdate = false;
         $perms->AllowDelete = false;
         $perms->UseTransaction = false;
-        if ($insertNodes->length == 1) {
-            if ($insertNodes->item(0)->nodeValue === "1") {
-                $perms->AllowInsert = true;
+
+        
+        if ($fmt == "json") {
+            $body = $this->app->request->getBody();
+            $json = json_decode($body);
+            if ($json == NULL)
+                throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+            
+            if (isset($json->RestCapabilities)) {
+                if (isset($json->RestCapabilities->AllowInsert)) {
+                    $perms->AllowInsert = $json->RestCapabilities->AllowInsert;
+                } 
+                if (isset($json->RestCapabilities->AllowUpdate)) {
+                    $perms->AllowUpdate = $json->RestCapabilities->AllowUpdate;
+                }
+                if (isset($json->RestCapabilities->AllowDelete)) {
+                    $perms->AllowDelete = $json->RestCapabilities->AllowDelete;
+                }
+                if (isset($json->RestCapabilities->UseTransaction)) {
+                    $perms->UseTransaction = $json->RestCapabilities->UseTransaction;
+                }
+            } else {
+                throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+            }
+        } else {
+            $body = $this->app->request->getBody();
+            $jsonStr = MgUtils::Xml2Json($body);
+            $json = json_decode($jsonStr);
+
+            if (isset($json->RestCapabilities)) {
+                if (isset($json->RestCapabilities->AllowInsert)) {
+                    $perms->AllowInsert = $json->RestCapabilities->AllowInsert;
+                } 
+                if (isset($json->RestCapabilities->AllowUpdate)) {
+                    $perms->AllowUpdate = $json->RestCapabilities->AllowUpdate;
+                }
+                if (isset($json->RestCapabilities->AllowDelete)) {
+                    $perms->AllowDelete = $json->RestCapabilities->AllowDelete;
+                }
+                if (isset($json->RestCapabilities->UseTransaction)) {
+                    $perms->UseTransaction = $json->RestCapabilities->UseTransaction;
+                }
             }
         }
-        if ($updateNodes->length == 1) {
-            if ($updateNodes->item(0)->nodeValue === "1") {
-                $perms->AllowUpdate = true;
+
+        try {
+            self::PutEditPermissions($resSvc, $resId, $perms);
+            $this->app->response->setStatus(201);
+            /*
+            $perms = self::CheckPermissions($resSvc, $resId);
+
+            if ($fmt == "json") {
+                $resp = new stdClass();
+                //This is for consistency with the XML version
+                $resp->RestCapabilities = $perms;
+                $this->app->response->header("Content-Type", MgMimeType::Json);
+                $this->app->response->write(json_encode($resp));
+            } else { //xml
+                $resp = '<?xml version="1.0" encoding="utf-8"?>';
+                $resp .= "<RestCapabilities>";
+                $resp .= "<AllowInsert>".($perms->AllowInsert ? "true" : "false")."</AllowInsert>";
+                $resp .= "<AllowUpdate>".($perms->AllowUpdate ? "true" : "false")."</AllowUpdate>";
+                $resp .= "<AllowDelete>".($perms->AllowDelete ? "true" : "false")."</AllowDelete>";
+                $resp .= "<UseTransaction>".($perms->UseTransaction ? "true" : "false")."</UseTransaction>";
+                $resp .= "</RestCapabilities>";
+                $this->app->response->header("Content-Type", MgMimeType::Xml);
+                $this->app->response->write($resp);
             }
+            */
+        } catch (MgException $ex) {
+            $this->OnException($ex, $this->GetMimeTypeForFormat($fmt));
         }
-        if ($deleteNodes->length == 1) {
-            if ($deleteNodes->item(0)->nodeValue === "1") {
-                $perms->AllowDelete = true;
-            }
-        }
-        if ($useTransactionNodes->length == 1) {
-            if ($useTransactionNodes->item(0)->nodeValue === "1") {
-                $perms->UseTransaction = true;
-            }
-        }
-        self::PutEditPermissions($resSvc, $resId, $perms);
-        $this->app->response->setStatus(201);
     }
 
     private static function PutEditPermissions($resSvc, $resId, $perms) {
         $resHeader = $resSvc->GetResourceHeader($resId);
-        $resHeaderDoc = new DOMDocument();
-        $resHeaderDoc->loadXML($resHeader->ToString());
-        $propNodes = $resHeaderDoc->getElementsByTagName("Property");
+        $jsonStr = MgUtils::Xml2Json($resHeader->ToString());
+        $json = json_decode($jsonStr);
 
-        $removeInsertNode = null;
-        $removeUpdateNode = null;
-        $removeDeleteNode = null;
-        $removeTransactionNode = null;
+        if (!isset($json->ResourceDocumentHeader->Metadata))
+            $json->ResourceDocumentHeader->Metadata = new stdClass();
 
-        //Remove existing metadata nodes
-        for ($i = 0; $i < $propNodes->length; $i++) {
-            $propNode = $propNodes->item($i);
-            $nameNode = $propNode->getElementsByTagName("Name");
-            if ($nameNode->length == 1) {
-                if ($nameNode->item(0)->nodeValue === self::PROP_ALLOW_INSERT) {
-                    $removeInsertNode = $propNode;
+        if (!isset($json->ResourceDocumentHeader->Metadata->Simple))
+            $json->ResourceDocumentHeader->Metadata->Simple = new stdClass();
+
+        $props = array();
+        if (isset($json->ResourceDocumentHeader->Metadata->Simple->Property)) {
+            foreach ($json->ResourceDocumentHeader->Metadata->Simple->Property as $prop) {
+                if ($prop->Name == "_MgRestAllowInsert" ||
+                    $prop->Name == "_MgRestAllowUpdate" ||
+                    $prop->Name == "_MgRestAllowDelete" ||
+                    $prop->Name == "_MgRestUseTransaction") {
+                    continue;
                 }
-                else if ($nameNode->item(0)->nodeValue === self::PROP_ALLOW_UPDATE) {
-                    $removeUpdateNode = $propNode;
-                }
-                else if ($nameNode->item(0)->nodeValue === self::PROP_ALLOW_DELETE) {
-                    $removeDeleteNode = $propNode;
-                }
-                else if ($nameNode->item(0)->nodeValue === self::PROP_USE_TRANSACTION) {
-                    $removeTransactionNode = $propNode;
-                }
+                array_push($props, $prop);
             }
         }
+        $insert = new stdClass();
+        $update = new stdClass();
+        $delete = new stdClass();
+        $trans = new stdClass();
+        $insert->Name = "_MgRestAllowInsert";
+        $insert->Value = ($perms->AllowInsert === true) ? "1" : "0";
+        $update->Name = "_MgRestAllowUpdate";
+        $update->Value = ($perms->AllowUpdate === true) ? "1" : "0";
+        $delete->Name = "_MgRestAllowDelete";
+        $delete->Value = ($perms->AllowDelete === true) ? "1" : "0";
+        $trans->Name = "_MgRestUseTransaction";
+        $trans->Value = ($perms->UseTransaction === true) ? "1" : "0";
+        array_push($props, $insert);
+        array_push($props, $update);
+        array_push($props, $delete);
+        array_push($props, $trans);
 
-        if ($removeInsertNode != null) {
-            $removeInsertNode->parentNode->removeChild($removeInsertNode);
-        }
-        if ($removeUpdateNode != null) {
-            $removeUpdateNode->parentNode->removeChild($removeUpdateNode);
-        }
-        if ($removeDeleteNode != null) {
-            $removeDeleteNode->parentNode->removeChild($removeDeleteNode);
-        }
-        if ($removeTransactionNode != null) {
-            $removeTransactionNode->parentNode->removeChild($removeTransactionNode);
-        }
+        $json->ResourceDocumentHeader->Metadata->Simple->Property = $props;
+        $newHeaderXml = MgUtils::Json2Xml($json);
 
-        //Set new nodes
-        $metaNode = null;
-        //Make metadata node if it doesn't already exist
-        $metaNodes = $resHeaderDoc->getElementsByTagName("Metadata");
-        if ($metaNodes->length == 1) {
-            $metaNode = $metaNodes->item(0);
-        } else {
-            $metaNode = $resHeaderDoc->createElement("Metadata");
-            $resHeaderDoc->documentElement->appendChild($metaNode);
-        }
+        $bs = new MgByteSource($newHeaderXml, strlen($newHeaderXml));
+        $br = $bs->GetReader();
+        $resSvc->SetResource($resId, null, $br);
     }
 
     private static function CheckPermissions($resSvc, $resId) {
@@ -508,51 +537,36 @@ class MgFeatureServiceController extends MgBaseController {
         }
 
         $resHeader = $resSvc->GetResourceHeader($resId);
-        $resHeaderDoc = new DOMDocument();
-        $resHeaderDoc->loadXML($resHeader->ToString());
-        $propNodes = $resHeaderDoc->getElementsByTagName("Property");
-        for ($i = 0; $i < $propNodes->length; $i++) {
-            $propNode = $propNodes->item($i);
-            $nameNode = $propNode->getElementsByTagName("Name");
-            if ($nameNode->length == 1) {
-                if ($nameNode->item(0)->nodeValue === self::PROP_ALLOW_INSERT) {
-                    $valueNodes = $propNode->getElementsByTagName("Value");
-                    if ($valueNodes->length == 1) {
-                        if ($valueNodes->item(0)->nodeValue === "1") {
-                            $perms->AllowInsert = true;
-                        }
-                    }
-                }
-                else if ($nameNode->item(0)->nodeValue === self::PROP_ALLOW_UPDATE) {
-                    $valueNodes = $propNode->getElementsByTagName("Value");
-                    if ($valueNodes->length == 1) {
-                        if ($valueNodes->item(0)->nodeValue === "1") {
-                            $perms->AllowUpdate = true;
-                        }
-                    }
-                }
-                else if ($nameNode->item(0)->nodeValue === self::PROP_ALLOW_DELETE) {
-                    $valueNodes = $propNode->getElementsByTagName("Value");
-                    if ($valueNodes->length == 1) {
-                        if ($valueNodes->item(0)->nodeValue === "1") {
-                            $perms->AllowDelete = true;
-                        }
-                    }
-                }
-                else if ($nameNode->item(0)->nodeValue === self::PROP_USE_TRANSACTION) {
-                    $valueNodes = $propNode->getElementsByTagName("Value");
-                    if ($valueNodes->length == 1) {
-                        if ($valueNodes->item(0)->nodeValue === "1") {
-                            $perms->UseTransaction = true;
+
+        $headerStr = MgUtils::Xml2Json($resHeader->ToString());
+        $header = json_decode($headerStr);
+
+        if (isset($header->ResourceDocumentHeader)) {
+            if (isset($header->ResourceDocumentHeader->Metadata)) {
+                if (isset($header->ResourceDocumentHeader->Metadata->Simple)) {
+                    if (isset($header->ResourceDocumentHeader->Metadata->Simple->Property)) {
+                        foreach ($header->ResourceDocumentHeader->Metadata->Simple->Property as $prop) {
+                            if ($prop->Name === self::PROP_ALLOW_INSERT && $prop->Value === "1") {
+                                $perms->AllowInsert = true;
+                            } else if ($prop->Name === self::PROP_ALLOW_UPDATE && $prop->Value === "1") {
+                                $perms->AllowUpdate = true;
+                            } else if ($prop->Name === self::PROP_ALLOW_DELETE && $prop->Value === "1") {
+                                $perms->AllowDelete = true;
+                            } else if ($prop->Name === self::PROP_USE_TRANSACTION && $prop->Value === "1") {
+                                $perms->UseTransaction = true;
+                            }
                         }
                     }
                 }
             }
         }
+
         return $perms;
     }
 
-    public function InsertFeatures($resId, $schemaName, $className) {
+    public function InsertFeatures($resId, $schemaName, $className, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $trans = null;
         try {
             $sessionId = "";
@@ -563,9 +577,17 @@ class MgFeatureServiceController extends MgBaseController {
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
+            $body = $this->app->request->getBody();
+            if ($fmt == "json") {
+                $json = json_decode($body);
+                if ($json == NULL)
+                    throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+                $body = MgUtils::Json2Xml($json);
+            }
+
             $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
             $perms = self::CheckPermissions($resSvc, $resId);
-
+            
             //Not a session-based resource, must check for appropriate flag in header before we continue
             if ($sessionId === "") {
                 if ($perms->AllowInsert === false) {
@@ -576,7 +598,7 @@ class MgFeatureServiceController extends MgBaseController {
                         $this->app->localizer->getText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
                         $e->getTraceAsString(),
                         403,
-                        MgMimeType::Xml);
+                        $this->GetMimeTypeForFormat($fmt));
                 }
             }
 
@@ -584,7 +606,7 @@ class MgFeatureServiceController extends MgBaseController {
 
             $commands = new MgFeatureCommandCollection();
             $classDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
-            $batchProps = MgUtils::ParseMultiFeatureXml($this->app, $classDef, $this->app->request->getBody());
+            $batchProps = MgUtils::ParseMultiFeatureXml($this->app, $classDef, $body);
             $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
             $commands->Add($insertCmd);
 
@@ -600,15 +622,17 @@ class MgFeatureServiceController extends MgBaseController {
                 $result = $featSvc->UpdateFeatures($resId, $commands, $trans);
             if ($trans != null)
                 $trans->Commit();
-            $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
+            $this->OutputUpdateFeaturesResult($commands, $result, $classDef, ($fmt == "json"));
         } catch (MgException $ex) {
             if ($trans != null)
                 $trans->Rollback();
-            $this->OnException($ex, MgMimeType::Xml);
+            $this->OnException($ex, $this->GetMimeTypeForFormat($fmt));
         }
     }
 
-    public function UpdateFeatures($resId, $schemaName, $className) {
+    public function UpdateFeatures($resId, $schemaName, $className, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $trans = null;
         try {
             $sessionId = "";
@@ -618,6 +642,14 @@ class MgFeatureServiceController extends MgBaseController {
             $this->EnsureAuthenticationForSite($sessionId);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
+
+            $body = $this->app->request->getBody();
+            if ($fmt == "json") {
+                $json = json_decode($body);
+                if ($json == NULL)
+                    throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+                $body = MgUtils::Json2Xml($json);
+            }
 
             $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
             $perms = self::CheckPermissions($resSvc, $resId);
@@ -632,13 +664,13 @@ class MgFeatureServiceController extends MgBaseController {
                         $this->app->localizer->getText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
                         $e->getTraceAsString(),
                         403,
-                        MgMimeType::Xml);
+                        $this->GetMimeTypeForFormat($fmt));
                 }
             }
 
             $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
             $doc = new DOMDocument();
-            $doc->loadXML($this->app->request->getBody());
+            $doc->loadXML($body);
 
             $commands = new MgFeatureCommandCollection();
             $filter = "";
@@ -662,15 +694,17 @@ class MgFeatureServiceController extends MgBaseController {
                 $result = $featSvc->UpdateFeatures($resId, $commands, $trans);
             if ($trans != null)
                 $trans->Commit();
-            $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
+            $this->OutputUpdateFeaturesResult($commands, $result, $classDef, ($fmt == "json"));
         } catch (MgException $ex) {
             if ($trans != null)
                 $trans->Rollback();
-            $this->OnException($ex, MgMimeType::Xml);
+            $this->OnException($ex, $this->GetMimeTypeForFormat($fmt));
         }
     }
 
-    public function DeleteFeatures($resId, $schemaName, $className) {
+    public function DeleteFeatures($resId, $schemaName, $className, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $trans = null;
         try {
             $sessionId = "";
@@ -694,7 +728,7 @@ class MgFeatureServiceController extends MgBaseController {
                         $this->app->localizer->getText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
                         $e->getTraceAsString(),
                         403,
-                        MgMimeType::Xml);
+                        $this->GetMimeTypeForFormat($fmt));
                 }
             }
 
@@ -719,11 +753,11 @@ class MgFeatureServiceController extends MgBaseController {
                 $result = $featSvc->UpdateFeatures($resId, $commands, $trans);
             if ($trans != null)
                 $trans->Commit();
-            $this->OutputUpdateFeaturesResult($commands, $result, $classDef);
+            $this->OutputUpdateFeaturesResult($commands, $result, $classDef, ($fmt == "json"));
         } catch (MgException $ex) {
             if ($trans != null)
                 $trans->Rollback();
-            $this->OnException($ex, MgMimeType::Xml);
+            $this->OnException($ex, $this->GetMimeTypeForFormat($fmt));
         }
     }
 

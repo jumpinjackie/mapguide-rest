@@ -118,6 +118,61 @@ $app->get("/library/:resourcePath+.FeatureSource/editcapabilities.:format", func
 });
 /**
  * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/editcapabilities",
+ *     @SWG\Operation(
+ *        method="POST",
+ *        nickname="SetRestEditCapabilities",
+ *        summary="Sets the REST API edit capabilities of the given Feature Source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The edit capabilities XML")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->post("/library/:resourcePath+.FeatureSource/editcapabilities", function($resourcePath) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->SetEditCapabilities($resId, "xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/editcapabilities.{type}",
+ *     @SWG\Operation(
+ *        method="POST",
+ *        nickname="SetRestEditCapabilities",
+ *        summary="Sets the REST API edit capabilities of the given Feature Source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']"),
+ *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The edit capabilities XML or JSON")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->post("/library/:resourcePath+.FeatureSource/editcapabilities.:format", function($resourcePath, $format) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->SetEditCapabilities($resId, $format);
+});
+/**
+ * @SWG\Api(
  *     path="/library/{resourcePath}.FeatureSource/spatialcontexts",
  *     @SWG\Operation(
  *        method="GET",
@@ -547,7 +602,38 @@ $app->post("/library/:resourcePath+.FeatureSource/features/:schemaName/:classNam
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->InsertFeatures($resId, $schemaName, $className);
+    $ctrl->InsertFeatures($resId, $schemaName, $className, "xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/features.{type}/{schemaName}/{className}",
+ *     @SWG\Operation(
+ *        method="POST",
+ *        nickname="InsertFeatures",
+ *        summary="Inserts one or more features into the given feature class for the specified feature source. The Feature Source in question must have _MgRestAllowInsert=1 in its resource header otherwise inserts will be forbidden. If _MgRestUseTransaction=1 in the resource header, transactions will be used.",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
+ *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']"),
+ *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The Feature Set XML describing the features to be inserted")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=403, message="Feature Source is not configured to allow inserts"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->post("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->InsertFeatures($resId, $schemaName, $className, $format);
 });
 /**
  * @SWG\Api(
@@ -577,7 +663,38 @@ $app->put("/library/:resourcePath+.FeatureSource/features/:schemaName/:className
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->UpdateFeatures($resId, $schemaName, $className);
+    $ctrl->UpdateFeatures($resId, $schemaName, $className, "xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/features.{type}/{schemaName}/{className}",
+ *     @SWG\Operation(
+ *        method="PUT",
+ *        nickname="UpdateFeatures",
+ *        summary="Updates one or more features into the given feature class for the specified feature source. The Feature Source in question must have _MgRestAllowUpdate=1 in its resource header otherwise updates will be forbidden. If _MgRestUseTransaction=1 in the resource header, transactions will be used.",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
+ *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']"),
+ *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The XML envelope describing the features to be update")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=403, message="Feature Source is not configured to allow updates"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->put("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->UpdateFeatures($resId, $schemaName, $className, $format);
 });
 /**
  * @SWG\Api(
@@ -607,7 +724,38 @@ $app->delete("/library/:resourcePath+.FeatureSource/features/:schemaName/:classN
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->DeleteFeatures($resId, $schemaName, $className);
+    $ctrl->DeleteFeatures($resId, $schemaName, $className, "xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/library/{resourcePath}.FeatureSource/features/{schemaName}/{className}",
+ *     @SWG\Operation(
+ *        method="DELETE",
+ *        nickname="DeleteFeatures",
+ *        summary="Deletes one or more features from the given feature class for the specified feature source. The Feature Source in question must have _MgRestAllowDelete=1 in its resource header otherwise deletes will be forbidden. If _MgRestUseTransaction=1 in the resource header, transactions will be used.",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The path of the resource ID"),
+ *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
+ *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']"),
+ *          @SWG\parameter(name="filter", paramType="form", required=true, type="string", description="The FDO filter determining what features to delete")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=403, message="Feature Source is not configured to allow deletes"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->delete("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->DeleteFeatures($resId, $schemaName, $className, $format);
 });
 /**
  * @SWG\Api(

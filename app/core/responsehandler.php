@@ -238,7 +238,7 @@ abstract class MgResponseHandler
         return $fileName;
     }
 
-    protected function OutputUpdateFeaturesResult($commands, $result, $classDef) {
+    protected function OutputUpdateFeaturesResult($commands, $result, $classDef, $convertToJson = false) {
         $bHasError = false;
         $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?><UpdateFeaturesResult>";
         $ccount = $commands->GetCount();
@@ -342,8 +342,14 @@ abstract class MgResponseHandler
         if ($bHasError === true) {
             $this->app->response->setStatus(500);
         }
-        $this->app->response->header("Content-Type", MgMimeType::Xml);
-        $this->app->response->write($output);
+        if ($convertToJson) {
+            $output = MgUtils::Xml2Json($output);
+            $this->app->response->header("Content-Type", MgMimeType::Json);
+            $this->app->response->write($output);
+        } else {
+            $this->app->response->header("Content-Type", MgMimeType::Xml);
+            $this->app->response->write($output);
+        }
     }
 
     protected function OutputXmlByteReaderAsJson($byteReader) {

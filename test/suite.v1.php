@@ -5446,7 +5446,205 @@
                     ok(gj.features.length == 0, "Expected 0 inserted features. Got " + gj.features.length);
                 });
             });
+            test("Insert/Update/Delete Features - JSON", function() {
 
+                function createEditCapsJson(bInsert, bUpdate, bDelete, bUseTransaction) {
+                    var caps = {
+                        "RestCapabilities": {
+                            "AllowInsert": bInsert,
+                            "AllowUpdate": bUpdate,
+                            "AllowDelete": bDelete,
+                            "UseTransaction": bUseTransaction
+                        }
+                    };
+                    return JSON.stringify(caps);
+                }
+
+                function createInsertJson(text, geomWkt) {
+                    var json = {
+                        "FeatureSet": {
+                            "Features": {
+                                "Feature": [
+                                    {
+                                        "Property": [
+                                            { "Name": "Text", "Value": text },
+                                            { "Name": "Geometry", "Value": geomWkt }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    };
+                    return JSON.stringify(json);
+                }
+
+                function createUpdateJson(filter, text, geomWkt) {
+                    var json = {
+                        "UpdateOperation": {
+                            "Filter": filter,
+                            "UpdateProperties": {
+                                "Property": [
+                                    { "Name": "Text", "Value": text },
+                                    { "Name": "Geometry", "Value": geomWkt }
+                                ]
+                            }
+                        }
+                    };
+                    return JSON.stringify(json);
+                }
+
+                //Disable everything
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/editcapabilities.json", "POST", createEditCapsJson(false, false, false, false), function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") - Expect anon editcapabilities denial");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/editcapabilities.json", "POST", createEditCapsJson(false, false, false, false), function(status, result, mimeType) {
+                    ok(status == 201, "(" + status + ") - Expect admin editcapabilities success");
+                });
+
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "POST", createInsertJson("anon credential insert", "POINT (0 0)"), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") - Expect anon insert denial");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "POST", createInsertJson("admin credential insert", "POINT (1 1)"), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") - Expect admin insert denial");
+                });
+
+                //Enable insert
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/editcapabilities.json", "POST", createEditCapsJson(true, false, false, true), function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") - Expect anon editcapabilities denial");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/editcapabilities.json", "POST", createEditCapsJson(true, false, false, true), function(status, result, mimeType) {
+                    ok(status == 201, "(" + status + ") - Expect admin editcapabilities success");
+                });
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "POST", createInsertJson("anon credential insert", "POINT (0 0)"), function(status, result, mimeType) {
+                    ok(status == 500, "(" + status + ") - Expect anon insert failure. Transactions not supported");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "POST", createInsertJson("admin credential insert", "POINT (1 1)"), function(status, result, mimeType) {
+                    ok(status == 500, "(" + status + ") - Expect admin insert failure. Transactions not supported");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/editcapabilities.json", "POST", createEditCapsJson(true, false, false, false), function(status, result, mimeType) {
+                    ok(status == 201, "(" + status + ") - Expect admin editcapabilities success");
+                });
+
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "POST", createInsertJson("anon credential insert", "POINT (0 0)"), function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expect anon insert success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "POST", createInsertJson("admin credential insert", "POINT (1 1)"), function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expect admin insert success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 2, "Expected 2 inserted features");
+                    for (var i = 0; i < gj.features.length; i++) {
+                        if (gj.features[i].id == 1) {
+                            ok(gj.features[i].properties.Text == "anon credential insert", "expected correct feature text for ID 1");
+                        } else if (gj.features[i].id == 2) {
+                            ok(gj.features[i].properties.Text == "admin credential insert", "expected correct feature text for ID 2");
+                        }
+                    }
+                });
+
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "PUT", createUpdateJson("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") - Expect anon update denial");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "PUT", createUpdateJson("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") - Expect admin update denial");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+
+                //Enable update
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/editcapabilities.json", "POST", createEditCapsJson(true, true, false, false), function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") - Expect anon editcapabilities denial");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/editcapabilities.json", "POST", createEditCapsJson(true, true, false, true), function(status, result, mimeType) {
+                    ok(status == 201, "(" + status + ") - Expect admin editcapabilities success - Enable insert/update/transactions");
+                });
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "PUT", createUpdateJson("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result, mimeType) {
+                    ok(status == 500, "(" + status + ") - Expect anon update failure - Transactions not supported");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "PUT", createUpdateJson("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result, mimeType) {
+                    ok(status == 500, "(" + status + ") - Expect admin update failure - Transactions not supported");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/editcapabilities.json", "POST", createEditCapsJson(true, true, false, false), function(status, result, mimeType) {
+                    ok(status == 201, "(" + status + ") - Expect admin editcapabilities success - Enable insert/update. Disable transactions");
+                });
+
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "PUT", createUpdateJson("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expect anon update success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "PUT", createUpdateJson("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expect admin update success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 2, "Expected 2 inserted features");
+                    for (var i = 0; i < gj.features.length; i++) {
+                        if (gj.features[i].id == 1) {
+                            ok(gj.features[i].properties.Text == "anon credential update", "expected correct updated feature text for ID 1");
+                        } else if (gj.features[i].id == 2) {
+                            ok(gj.features[i].properties.Text == "admin credential update", "expected correct updated feature text for ID 2");
+                        }
+                    }
+                });
+
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") - Expect admin delete denial");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") - Expect admin delete denial");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+
+                //Enable everything
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/editcapabilities.json", "POST", createEditCapsJson(true, true, true, false), function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") - Expect anon setresourceheader denial");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/editcapabilities.json", "POST", createEditCapsJson(true, true, true, true), function(status, result, mimeType) {
+                    ok(status == 201, "(" + status + ") - Expect admin setresourceheader success. Enable everything");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result, mimeType) {
+                    ok(status == 500, "(" + status + ") - Expect admin delete failure. Transactions not supported");
+                });
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result, mimeType) {
+                    ok(status == 500, "(" + status + ") - Expect anon delete failure. Transactions not supported");
+                });
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/editcapabilities.json", "POST", createEditCapsJson(true, true, true, false), function(status, result, mimeType) {
+                    ok(status == 201, "(" + status + ") - Expect admin editcapabilities success. Enable everything except transactions");
+                });
+
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expect admin delete success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 1, "Expected 1 inserted features. Got " + gj.features.length);
+                    ok(gj.features[0].id == 1, "expected feature ID 2 to be deleted");
+                });
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expect anon delete success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 0, "Expected 0 inserted features. Got " + gj.features.length);
+                });
+            });
             module("Site Service", {
                 setup: function() {
                     var self = this;
