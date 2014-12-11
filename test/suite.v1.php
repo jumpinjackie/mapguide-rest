@@ -2954,6 +2954,17 @@
                     assertMimeType(mimeType, MgMimeType.Json);
                 });
             });
+            test("JSON resource content roundtripping", function() {
+                var test = null;
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Should've got resource content back");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    test = JSON.parse(result);
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.json", "POST", JSON.stringify(test), function(status, result, mimeType) {
+                    ok(status == 201, "(" + status + ") - Should've posted resource JSON");
+                });
+            });
             test("Enumerate Resource Data", function() {
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "POST", null, function(status, result, mimeType) {
                     ok(status == 404, "(" + status + ") - Route should not be legal");

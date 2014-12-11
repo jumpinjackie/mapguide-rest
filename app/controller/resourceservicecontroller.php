@@ -228,7 +228,9 @@ class MgResourceServiceController extends MgBaseController {
         });
     }
 
-    public function SetResourceHeader($resId) {
+    public function SetResourceHeader($resId, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         try {
             $this->EnsureAuthenticationForSite();
             $siteConn = new MgSiteConnection();
@@ -236,19 +238,26 @@ class MgResourceServiceController extends MgBaseController {
 
             $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
             $body = $this->app->request->getBody();
+            if ($fmt == "json") {
+                $json = json_decode($body);
+                if ($json == NULL)
+                    throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+                $body = MgUtils::Json2Xml($json);
+            }
             $bs = new MgByteSource($body, strlen($body));
             $header = $bs->GetReader();
-
             $resSvc->SetResource($resId, null, $header);
 
             //$this->app->response->setStatus(201);
             $this->app->response->setBody($resId->ToString());
         } catch (MgException $ex) {
-            $this->OnException($ex);
+            $this->OnException($ex, $this->GetMimeTypeForFormat($fmt));
         }
     }
 
-    public function SetResourceContent($resId) {
+    public function SetResourceContent($resId, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         try {
             $sessionId = "";
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
@@ -260,6 +269,12 @@ class MgResourceServiceController extends MgBaseController {
 
             $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
             $body = $this->app->request->getBody();
+            if ($fmt == "json") {
+                $json = json_decode($body);
+                if ($json == NULL)
+                    throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+                $body = MgUtils::Json2Xml($json);
+            }
             $bs = new MgByteSource($body, strlen($body));
             $content = $bs->GetReader();
 
@@ -268,11 +283,13 @@ class MgResourceServiceController extends MgBaseController {
             $this->app->response->setStatus(201);
             $this->app->response->setBody($resId->ToString());
         } catch (MgException $ex) {
-            $this->OnException($ex);
+            $this->OnException($ex, $this->GetMimeTypeForFormat($fmt));
         }
     }
 
-    public function SetResourceContentOrHeader($resId) {
+    public function SetResourceContentOrHeader($resId, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         try {
             $sessionId = "";
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
@@ -299,6 +316,27 @@ class MgResourceServiceController extends MgBaseController {
             if ($headerFilePath != null) {
                 $hdrSource = new MgByteSource($headerFilePath);
                 $header = $hdrSource->GetReader();
+            }
+
+            if ($fmt == "json") {
+                if ($content != null) {
+                    $body = $content->ToString();
+                    $json = json_decode($body);
+                    if ($json == NULL)
+                        throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+                    $body = MgUtils::Json2Xml($json);
+                    $cntSource = new MgByteSource($body, strlen($body));
+                    $content = $cntSource->GetReader();
+                }
+                if ($header != null) {
+                    $body = $header->ToString();
+                    $json = json_decode($body);
+                    if ($json == NULL)
+                        throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+                    $body = MgUtils::Json2Xml($json);
+                    $hdrSource = new MgByteSource($body, strlen($body));
+                    $header = $hdrSource->GetReader();
+                }
             }
 
             $resSvc->SetResource($resId, $content, $header);

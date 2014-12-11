@@ -319,7 +319,7 @@ class MgUtils
     }
 
     static function DEBUG_NEWLINE() {
-        return "\n";
+        return ""; //"\n";
     }
 
     public static function Json2Xml($value, $nodeName = null) {
@@ -328,6 +328,7 @@ class MgUtils
         
         $xml = "";
         if ($nodeName == null) {
+            $xml .= '<?xml version="1.0" encoding="utf-8"?>';
             $props = get_object_vars($value);
             if (count($props) != 1) {
                 throw new Exception("No parent node was passed, assuming this method was invoked with a JSON object with one top-level property. However, the following top-level properties were found: ".implode(",", array_keys($props)));
@@ -376,7 +377,7 @@ class MgUtils
         return $xml;
     }
 
-    private static function DomElementToJson($domElement, $bLegacyOutputMode = false) {
+    private static function DomElementToJson($domElement, $rootNode = true) {
         $result = '';
         if ($domElement->nodeType == XML_COMMENT_NODE) {
             return '';
@@ -388,11 +389,21 @@ class MgUtils
             
             $aChildren = array();
             $aValues = array();
-            
+
+            //HACK: Write these attributes ourselves, because DOMNode's brain-dead API won't let
+            //us iterate namespaced attributes!
+            if ($rootNode) {
+                $len = array_push($aValues, array('"'.MgXmlSchemaInfo::NS_XSI.'"'));
+                $aChildren['@xmlns:xsi'] = $len-1;
+            }
+
             /* attributes are considered child nodes with a special key name
                starting with @ */
             if ($domElement->hasAttributes()) {
                 foreach($domElement->attributes as $key => $attr) {
+                    if ($key == "noNamespaceSchemaLocation") {
+                        $key = "xsi:$key";
+                    }
                     $len = array_push($aValues, array(MgXmlSchemaInfo::GetAttributeValue($attr)));
                     $aChildren['@'.$key] = $len-1;
                 }
@@ -412,7 +423,7 @@ class MgUtils
                         array_push($aValues, array(MgXmlSchemaInfo::GetValue($child)));
                     } else {
                         $childTag = $child->tagName;
-                        $json = MgUtils::DomElementToJson($child, $bLegacyOutputMode);
+                        $json = MgUtils::DomElementToJson($child, false);
                         if ($json == '') {
                             $json = 'null';
                         }

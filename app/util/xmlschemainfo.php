@@ -19,6 +19,9 @@
 
 class MgXmlSchemaInfo
 {
+    const NS_XSD = "http://www.w3.org/2001/XMLSchema";
+    const NS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
+
     const XML_DATA_TYPE_NUMBER = 1;
     const XML_DATA_TYPE_BOOLEAN = 2;
     const XML_DATA_TYPE_STRING = 3;

@@ -40,6 +40,7 @@ return array(
     "L_REST_POST_BODY_DESC" => "The XML envelope describing the features to be inserted",
     "L_REST_PUT_BODY_DESC" => "The XML envelope describing the features to be updated",
     "L_REST_DELETE_FILTER_DESC" => "The FDO Filter string that will determine what features are deleted",
+    "E_MALFORMED_JSON_BODY" => "Malformed JSON body",
     "E_DONT_KNOW_HOW_TO_OUTPUT" => "Could not determine how to output: %s",
     "E_FAILED_TO_GENERATE_TILE_AFTER_N_ATTEMPTS" => "Failed to generate tile after %d attempts",
     "E_FAILED_TO_CREATE_DIR_AFTER_N_ATTEMPTS" => "Failed to create directory after %d attempts",

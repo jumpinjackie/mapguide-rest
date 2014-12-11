@@ -40,6 +40,7 @@ return array(
     "L_REST_POST_BODY_DESC" => "Die XML-Umschlag der Beschreibung der Funktionen eingefügt werden",
     "L_REST_PUT_BODY_DESC" => "Die XML-Umschlag der Beschreibung der Funktionen, die aktualisiert werden",
     "L_REST_DELETE_FILTER_DESC" => "Der FDO Filter String, festzustellen, welche Funktionen gelöscht werden",
+    "E_MALFORMED_JSON_BODY" => "Malformed JSON Körper",
     "E_DONT_KNOW_HOW_TO_OUTPUT" => "Konnte nicht ermittelt werden, wie die Ausgabe: %s",
     "E_FAILED_TO_GENERATE_TILE_AFTER_N_ATTEMPTS" => "Fehler beim Fliesen nach %d Versuche erzeugen",
     "E_FAILED_TO_CREATE_DIR_AFTER_N_ATTEMPTS" => "Konnte Verzeichnis nach %d Versuche erstellen",

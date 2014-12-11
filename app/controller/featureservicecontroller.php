@@ -379,8 +379,10 @@ class MgFeatureServiceController extends MgBaseController {
         }
     }
 
-    /*
-    public function SetEditCapabilities($resId) {
+    public function SetEditCapabilities($resId, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
         $sessionId = "";
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
@@ -392,6 +394,12 @@ class MgFeatureServiceController extends MgBaseController {
         $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
         
         $body = $this->app->request->getBody();
+        if ($fmt == "json") {
+            $json = json_decode($body);
+            if ($json == NULL)
+                throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+            $body = MgUtils::Json2Xml($json);
+        }
         $doc = new DOMDocument($body);
         $insertNodes = $doc->getElementsByTagName("AllowInsert");
         $updateNodes = $doc->getElementsByTagName("AllowUpdate");
@@ -426,7 +434,6 @@ class MgFeatureServiceController extends MgBaseController {
         self::PutEditPermissions($resSvc, $resId, $perms);
         $this->app->response->setStatus(201);
     }
-    */
 
     private static function PutEditPermissions($resSvc, $resId, $perms) {
         $resHeader = $resSvc->GetResourceHeader($resId);
