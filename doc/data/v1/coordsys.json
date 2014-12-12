@@ -246,6 +246,57 @@
             ]
         },
         {
+            "path": "/coordsys/epsg/{epsg}/mentor.{type}",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Converts the given EPSG code to its CS-Map coordinate system code",
+                    "nickname": "ConvertEpsgToCsCode",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "epsg",
+                            "type": "string",
+                            "required": true,
+                            "description": "The EPSG code"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "path": "/coordsys/epsg/{epsg}/wkt",
             "operations": [
                 {
@@ -266,6 +317,57 @@
                             "type": "string",
                             "required": true,
                             "description": "The EPSG code"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/coordsys/epsg/{epsg}/wkt.{type}",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Converts the given EPSG code to WKT",
+                    "nickname": "ConvertEpsgToCsCode",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "epsg",
+                            "type": "string",
+                            "required": true,
+                            "description": "The EPSG code"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
                         }
                     ],
                     "responseMessages": [
@@ -326,6 +428,57 @@
             ]
         },
         {
+            "path": "/coordsys/mentor/{cscode}/epsg.{type}",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Converts the given CS-Map coordinate system code to EPSG",
+                    "nickname": "ConvertCsCodeToEpsg",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "cscode",
+                            "type": "string",
+                            "required": true,
+                            "description": "The CS-Map Coordinate System Code"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "path": "/coordsys/mentor/{cscode}/wkt",
             "operations": [
                 {
@@ -346,6 +499,57 @@
                             "type": "string",
                             "required": true,
                             "description": "The CS-Map Coordinate System Code"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/coordsys/mentor/{cscode}/wkt.{type}",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Converts the given CS-Map coordinate system code to WKT",
+                    "nickname": "ConvertCsCodeToWkt",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "cscode",
+                            "type": "string",
+                            "required": true,
+                            "description": "The CS-Map Coordinate System Code"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
                         }
                     ],
                     "responseMessages": [

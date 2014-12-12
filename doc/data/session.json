@@ -25,6 +25,39 @@
             ]
         },
         {
+            "path": "/session.{type}",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "Creates a new MapGuide session",
+                    "nickname": "CreateSession",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "path": "/session/{session}",
             "operations": [
                 {
@@ -2184,118 +2217,6 @@
                             "message": "An error occurred during the operation"
                         }
                     ]
-                },
-                {
-                    "method": "PUT",
-                    "summary": "Updates one or more features into the given feature class for th specified feature source",
-                    "nickname": "UpdateFeatures",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "schemaName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The FDO schema name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "className",
-                            "type": "string",
-                            "required": true,
-                            "description": "The class name"
-                        },
-                        {
-                            "paramType": "body",
-                            "name": "body",
-                            "type": "string",
-                            "required": true,
-                            "description": "The XML envelope describing the features to be update"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                },
-                {
-                    "method": "DELETE",
-                    "summary": "Deletes one or more features from the given feature class for th specified feature source",
-                    "nickname": "DeleteFeatures",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "schemaName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The FDO schema name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "className",
-                            "type": "string",
-                            "required": true,
-                            "description": "The class name"
-                        },
-                        {
-                            "paramType": "form",
-                            "name": "filter",
-                            "type": "string",
-                            "required": true,
-                            "description": "The FDO filter determining what features to delete"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
                 }
             ]
         },
@@ -2407,6 +2328,207 @@
         {
             "path": "/session/{session}/{resName}.FeatureSource/features.{type}/{schemaName}/{className}",
             "operations": [
+                {
+                    "method": "POST",
+                    "summary": "Inserts one or more features into the given feature class for th specified feature source",
+                    "nickname": "InsertFeatures",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The feature source name"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "schemaName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The FDO schema name"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "className",
+                            "type": "string",
+                            "required": true,
+                            "description": "The class name"
+                        },
+                        {
+                            "paramType": "body",
+                            "name": "body",
+                            "type": "string",
+                            "required": true,
+                            "description": "The Feature Set XML describing the features to be inserted"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                },
+                {
+                    "method": "PUT",
+                    "summary": "Updates one or more features into the given feature class for th specified feature source",
+                    "nickname": "UpdateFeatures",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The feature source name"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "schemaName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The FDO schema name"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "className",
+                            "type": "string",
+                            "required": true,
+                            "description": "The class name"
+                        },
+                        {
+                            "paramType": "body",
+                            "name": "body",
+                            "type": "string",
+                            "required": true,
+                            "description": "The XML envelope describing the features to be update"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                },
+                {
+                    "method": "DELETE",
+                    "summary": "Deletes one or more features from the given feature class for th specified feature source",
+                    "nickname": "DeleteFeatures",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The feature source name"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "schemaName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The FDO schema name"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "className",
+                            "type": "string",
+                            "required": true,
+                            "description": "The class name"
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "filter",
+                            "type": "string",
+                            "required": true,
+                            "description": "The FDO filter determining what features to delete"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                },
                 {
                     "method": "GET",
                     "summary": "Queries features from the specified feature source",
@@ -2546,6 +2668,118 @@
                             "type": "string",
                             "required": true,
                             "description": "The Feature Set XML describing the features to be inserted"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                },
+                {
+                    "method": "PUT",
+                    "summary": "Updates one or more features into the given feature class for th specified feature source",
+                    "nickname": "UpdateFeatures",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The feature source name"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "schemaName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The FDO schema name"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "className",
+                            "type": "string",
+                            "required": true,
+                            "description": "The class name"
+                        },
+                        {
+                            "paramType": "body",
+                            "name": "body",
+                            "type": "string",
+                            "required": true,
+                            "description": "The XML envelope describing the features to be update"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                },
+                {
+                    "method": "DELETE",
+                    "summary": "Deletes one or more features from the given feature class for th specified feature source",
+                    "nickname": "DeleteFeatures",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The feature source name"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "schemaName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The FDO schema name"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "className",
+                            "type": "string",
+                            "required": true,
+                            "description": "The class name"
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "filter",
+                            "type": "string",
+                            "required": true,
+                            "description": "The FDO filter determining what features to delete"
                         }
                     ],
                     "responseMessages": [
@@ -3978,6 +4212,59 @@
             "path": "/session/{session}/{resName}/content.{type}",
             "operations": [
                 {
+                    "method": "POST",
+                    "summary": "Sets the resource content for the given resource",
+                    "nickname": "SetResourceContent",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The resource name (including extension)"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
+                        },
+                        {
+                            "paramType": "body",
+                            "name": "body",
+                            "type": "string",
+                            "required": true,
+                            "description": "The resource XML content"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                },
+                {
                     "method": "GET",
                     "summary": "Gets the specified resource content for the given resource ID",
                     "nickname": "GetResourceContent",
@@ -4046,6 +4333,64 @@
                             "type": "string",
                             "required": true,
                             "description": "The resource name (including extension)"
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "content",
+                            "type": "file",
+                            "required": true,
+                            "description": "The resource XML content"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/session/{session}/{resName}/contentorheader.{type}",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "Sets the resource content for the given resource. This API exists to provide consistency with the library-based version",
+                    "nickname": "SetResourceContentOrHeader",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The resource name (including extension)"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
                         },
                         {
                             "paramType": "form",
