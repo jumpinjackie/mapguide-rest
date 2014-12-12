@@ -8468,6 +8468,107 @@
                 });
             });
 
+            test("Insert/Update/Delete Features - JSON", function() {
+
+                function createInsertJson(text, geomWkt) {
+                    var json = {
+                        "FeatureSet": {
+                            "Features": {
+                                "Feature": [
+                                    {
+                                        "Property": [
+                                            { "Name": "Text", "Value": text },
+                                            { "Name": "Geometry", "Value": geomWkt }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    };
+                    return JSON.stringify(json);
+                }
+
+                function createUpdateJson(filter, text, geomWkt) {
+                    var json = {
+                        "UpdateOperation": {
+                            "Filter": filter,
+                            "UpdateProperties": {
+                                "Property": [
+                                    { "Name": "Text", "Value": text },
+                                    { "Name": "Geometry", "Value": geomWkt }
+                                ]
+                            }
+                        }
+                    };
+                    return JSON.stringify(json);
+                }
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "POST", createInsertJson("anon credential insert", "POINT (0 0)"), function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expect anon insert success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "POST", createInsertJson("admin credential insert", "POINT (1 1)"), function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expect admin insert success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 2, "Expected 2 inserted features");
+                    for (var i = 0; i < gj.features.length; i++) {
+                        if (gj.features[i].id == 1) {
+                            ok(gj.features[i].properties.Text == "anon credential insert", "expected correct feature text for ID 1");
+                        } else if (gj.features[i].id == 2) {
+                            ok(gj.features[i].properties.Text == "admin credential insert", "expected correct feature text for ID 2");
+                        }
+                    }
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "PUT", createUpdateJson("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expect anon update success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "PUT", createUpdateJson("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expect admin update success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 2, "Expected 2 inserted features");
+                    for (var i = 0; i < gj.features.length; i++) {
+                        if (gj.features[i].id == 1) {
+                            ok(gj.features[i].properties.Text == "anon credential update", "expected correct updated feature text for ID 1");
+                        } else if (gj.features[i].id == 2) {
+                            ok(gj.features[i].properties.Text == "admin credential update", "expected correct updated feature text for ID 2");
+                        }
+                    }
+                });
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expect admin delete success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 1, "Expected 1 inserted features. Got " + gj.features.length);
+                    ok(gj.features[0].id == 1, "expected feature ID 2 to be deleted");
+                });
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.json/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Expect admin delete success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var gj = JSON.parse(result);
+                    ok(gj.features.length == 0, "Expected 0 inserted features. Got " + gj.features.length);
+                });
+            });
+
             module("Rendering Service - Library", {
                 setup: function() {
                     var self = this;
