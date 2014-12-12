@@ -96,13 +96,28 @@ abstract class MgResponseHandler
                     } else if ($resultObj instanceof MgStringCollection) {
                         $this->OutputMgStringCollection($resultObj, $param->GetParameterValue("FORMAT"));
                     } else if ($resultObj instanceof MgHttpPrimitiveValue) {
+                        $fmt = "xml";
                         if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
-                            $str = $resultObj->ToString();
-                            $source = new MgByteSource($str, strlen($str));
-                            $rdr = $source->GetReader();
-                            $this->OutputXmlByteReaderAsJson($rdr);
+                            $fmt = "json";
+                            $this->app->response->header("Content-Type", MgMimeType::Json);
                         } else {
-                            $this->app->response->setBody($resultObj->ToString());
+                            $this->app->response->header("Content-Type", MgMimeType::Xml);
+                        }
+                        $body = null;
+                        switch ($resultObj->GetType())
+                        {
+                            case 1:
+                                $body = MgBoxedValue::Boolean($resultObj->GetBoolValue(), $fmt);
+                                break;
+                            case 2:
+                                $body = MgBoxedValue::Integer($resultObj->GetIntegerValue(), $fmt);
+                                break;
+                            case 3:
+                                $body = MgBoxedValue::String($resultObj->GetStringValue(), $fmt);
+                                break;
+                        }
+                        if ($body != null) {
+                            $this->app->response->setBody($body);
                         }
                     } else if (method_exists($resultObj, "ToXml")) {
                         $byteReader = $resultObj->ToXml();

@@ -50,7 +50,26 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  */
 $app->post("/session", function() use ($app) {
     $ctrl = new MgRestServiceController($app);
-    $ctrl->CreateSession();
+    $ctrl->CreateSession("xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/session.{type}",
+ *     @SWG\Operation(
+ *        method="POST",
+ *        nickname="CreateSession",
+ *        summary="Creates a new MapGuide session",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->post("/session.:format", function($format) use ($app) {
+    $ctrl = new MgRestServiceController($app);
+    $ctrl->CreateSession($format);
 });
 /**
  * @SWG\Api(

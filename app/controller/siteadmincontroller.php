@@ -67,12 +67,20 @@ class MgSiteAdminController extends MgBaseController {
         }
     }
 
-    public function GetSiteVersion() {
+    public function GetSiteVersion($format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         try {
             $this->EnsureAuthenticationForSite();
             $admin = new MgServerAdmin();
             $admin->Open($this->userInfo);
-            $this->app->response->setBody($admin->GetSiteVersion());
+            $body = MgBoxedValue::String($admin->GetSiteVersion(), $fmt);
+            if ($fmt == "xml") {
+                $this->app->response->header("Content-Type", MgMimeType::Xml);
+            } else {
+                $this->app->response->header("Content-Type", MgMimeType::Json);
+            }
+            $this->app->response->setBody($body);
         } catch (MgException $ex) {
             $this->OnException($ex);
         }

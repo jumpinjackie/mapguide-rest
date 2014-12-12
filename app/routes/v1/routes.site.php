@@ -125,7 +125,27 @@ $app->get("/site/info.:format", function($format) use ($app) {
  */
 $app->get("/site/version", function() use ($app) {
     $ctrl = new MgSiteAdminController($app);
-    $ctrl->GetSiteVersion();
+    $ctrl->GetSiteVersion("xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/site/version.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetSiteVersion",
+ *        summary="Gets the version of the current Site Server",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="response output format", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/site/version.:format", function($format) use ($app) {
+    $ctrl = new MgSiteAdminController($app);
+    $ctrl->GetSiteVersion($format);
 });
 /**
  * @SWG\Api(

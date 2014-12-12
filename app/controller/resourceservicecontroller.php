@@ -249,7 +249,13 @@ class MgResourceServiceController extends MgBaseController {
             $resSvc->SetResource($resId, null, $header);
 
             //$this->app->response->setStatus(201);
-            $this->app->response->setBody($resId->ToString());
+            $body = MgBoxedValue::String($resId->ToString(), $fmt);
+            if ($fmt == "xml") {
+                $this->app->response->header("Content-Type", MgMimeType::Xml);
+            } else {
+                $this->app->response->header("Content-Type", MgMimeType::Json);
+            }
+            $this->app->response->setBody($body);
         } catch (MgException $ex) {
             $this->OnException($ex, $this->GetMimeTypeForFormat($fmt));
         }
@@ -281,7 +287,13 @@ class MgResourceServiceController extends MgBaseController {
             $resSvc->SetResource($resId, $content, null);
 
             $this->app->response->setStatus(201);
-            $this->app->response->setBody($resId->ToString());
+            $body = MgBoxedValue::String($resId->ToString(), $fmt);
+            if ($fmt == "xml") {
+                $this->app->response->header("Content-Type", MgMimeType::Xml);
+            } else {
+                $this->app->response->header("Content-Type", MgMimeType::Json);
+            }
+            $this->app->response->setBody($body);
         } catch (MgException $ex) {
             $this->OnException($ex, $this->GetMimeTypeForFormat($fmt));
         }
@@ -342,7 +354,13 @@ class MgResourceServiceController extends MgBaseController {
             $resSvc->SetResource($resId, $content, $header);
 
             $this->app->response->setStatus(201);
-            $this->app->response->setBody($resId->ToString());
+            $body = MgBoxedValue::String($resId->ToString(), $fmt);
+            if ($fmt == "xml") {
+                $this->app->response->header("Content-Type", MgMimeType::Xml);
+            } else {
+                $this->app->response->header("Content-Type", MgMimeType::Json);
+            }
+            $this->app->response->setBody($body);
         } catch (MgException $ex) {
             $this->OnException($ex);
         }

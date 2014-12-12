@@ -78,18 +78,17 @@ class MgRestServiceController extends MgBaseController {
         $site = $siteConn->GetSite();
         $timeout = $site->GetSessionTimeout();
 
-        $output = "<SessionTimeout><Value>$timeout</Value></SessionTimeout>";
-        $bs = new MgByteSource($output, strlen($output));
-        $bs->SetMimeType(MgMimeType::Xml);
-        $br = $bs->GetReader();
-        if ($fmt === "json") {
-            $this->OutputXmlByteReaderAsJson($br);
+        $body = MgBoxedValue::Int32($timeout, $fmt);
+        if ($fmt == "xml") {
+            $this->app->response->header("Content-Type", MgMimeType::Xml);
         } else {
-            $this->OutputByteReader($br);
+            $this->app->response->header("Content-Type", MgMimeType::Json);
         }
+        $this->app->response->setBody($body);
     }
 
-    public function CreateSession() {
+    public function CreateSession($format) {
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         try {
             $this->EnsureAuthenticationForSite();
             $siteConn = new MgSiteConnection();
@@ -98,7 +97,13 @@ class MgRestServiceController extends MgBaseController {
             $session = $site->CreateSession();
 
             $this->app->response->setStatus(201);
-            $this->app->response->setBody($session);
+            $body = MgBoxedValue::String($session, $fmt);
+            if ($fmt == "xml") {
+                $this->app->response->header("Content-Type", MgMimeType::Xml);
+            } else {
+                $this->app->response->header("Content-Type", MgMimeType::Json);
+            }
+            $this->app->response->setBody($body);
         } catch (MgException $ex) {
             $this->OnException($ex);
         }

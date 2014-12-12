@@ -439,6 +439,14 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
                 ok(actual == expected, "(" + actual + ") Expected mime type of: " + expected);
             }
 
+            function encodeHTML(str) {
+                return str.replace(/&/g, '&amp;')
+                          .replace(/</g, '&lt;')
+                          .replace(/>/g, '&gt;')
+                          .replace(/"/g, '&quot;')
+                          .replace(/'/g, '&apos;');
+            }
+
             <? if ($namespace != null) {
             include "suite.$namespace.php";
             } else {

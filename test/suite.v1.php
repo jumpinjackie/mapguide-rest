@@ -4,33 +4,33 @@
             module("REST publishing", {
                 setup: function() {
                     var self = this;
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.anonymousSessionId = result;
+                        self.anonymousSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.wfsSessionId = result;
+                        self.wfsSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.wmsSessionId = result;
+                        self.wmsSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.authorSessionId = result;
+                        self.authorSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.adminSessionId = result;
+                        self.adminSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.user1SessionId = result;
+                        self.user1SessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.user2SessionId = result;
+                        self.user2SessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
                 },
                 teardown: function() {
@@ -2418,20 +2418,22 @@
                 api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Foo", "Bar", function(status, result, mimeType) {
                     ok(status == 401, "(" + status+ ") - Request should've required authentication");
                 });
-                api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
                     ok(status != 401, "(" + status+ ") - Request should've been authenticated");
                     ok(status == 201, "(" + status+ ") - Expected created response");
-                    ok(result.match(/^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}_[A-Za-z]{2}_\w+[A-Fa-f0-9]{12}$/g) != null, "Expected session id pattern");
+                    var sessionId = JSON.parse(result).PrimitiveValue.Value;
+                    ok(sessionId.match(/^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}_[A-Za-z]{2}_\w+[A-Fa-f0-9]{12}$/g) != null, "Expected session id pattern");
 
-                    api_test(rest_root_url + "/session/" + result, "DELETE", null, function(status, result, mimeType) {
+                    api_test(rest_root_url + "/session/" + sessionId, "DELETE", null, function(status, result, mimeType) {
                         ok(status == 200, "Expected OK on session destruction");
                     });
                 });
-                api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
                     ok(status != 401, "(" + status+ ") - Request should've been authenticated");
                     ok(status == 201, "(" + status+ ") - Expected created response");
-                    ok(result.match(/^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}_[A-Za-z]{2}_\w+[A-Fa-f0-9]{12}$/g) != null, "Expected session id pattern");
-                    api_test(rest_root_url + "/session/" + result, "DELETE", null, function(status, result, mimeType) {
+                    var sessionId = JSON.parse(result).PrimitiveValue.Value;
+                    ok(sessionId.match(/^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}_[A-Za-z]{2}_\w+[A-Fa-f0-9]{12}$/g) != null, "Expected session id pattern");
+                    api_test(rest_root_url + "/session/" + sessionId, "DELETE", null, function(status, result, mimeType) {
                         ok(status == 200, "Expected OK on session destruction");
                     });
                 });
@@ -2440,13 +2442,13 @@
             module("Resource Service - Library", {
                 setup: function() {
                     var self = this;
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.anonymousSessionId = result;
+                        self.anonymousSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.adminSessionId = result;
+                        self.adminSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
                 },
                 teardown: function() {
@@ -3598,13 +3600,13 @@
             module("Feature Service - Library", {
                 setup: function() {
                     var self = this;
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.anonymousSessionId = result;
+                        self.anonymousSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.adminSessionId = result;
+                        self.adminSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
                 },
                 teardown: function() {
@@ -5648,13 +5650,13 @@
             module("Site Service", {
                 setup: function() {
                     var self = this;
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.anonymousSessionId = result;
+                        self.anonymousSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.adminSessionId = result;
+                        self.adminSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
                 },
                 teardown: function() {
@@ -5895,13 +5897,13 @@
             module("REST Services", {
                 setup: function() {
                     var self = this;
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.anonymousSessionId = result;
+                        self.anonymousSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.adminSessionId = result;
+                        self.adminSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
                 },
                 teardown: function() {
@@ -6017,13 +6019,13 @@
             module("Resource Service - Session", {
                 setup: function() {
                     var self = this;
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.anonymousSessionId = result;
+                        self.anonymousSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.adminSessionId = result;
+                        self.adminSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
                     api_test(rest_root_url + "/services/copyresource", "POST", {
                         session: this.anonymousSessionId,
@@ -6863,13 +6865,13 @@
             module("Feature Service - Session", {
                 setup: function() {
                     var self = this;
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.anonymousSessionId = result;
+                        self.anonymousSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.adminSessionId = result;
+                        self.adminSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
                     api_test(rest_root_url + "/services/copyresource", "POST", {
                         session: this.anonymousSessionId,
@@ -8572,13 +8574,13 @@
             module("Rendering Service - Library", {
                 setup: function() {
                     var self = this;
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.anonymousSessionId = result;
+                        self.anonymousSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.adminSessionId = result;
+                        self.adminSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
                 },
                 teardown: function() {
@@ -8699,13 +8701,13 @@
             module("KML Service", {
                 setup: function() {
                     var self = this;
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.anonymousSessionId = result;
+                        self.anonymousSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.adminSessionId = result;
+                        self.adminSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
                 },
                 teardown: function() {
@@ -9258,13 +9260,13 @@
             module("Plotting - Library", {
                 setup: function() {
                     var self = this;
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.anonymousSessionId = result;
+                        self.anonymousSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.adminSessionId = result;
+                        self.adminSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
                 },
                 teardown: function() {
@@ -9389,9 +9391,9 @@
             module("Tile Service", {
                 setup: function() {
                     var self = this;
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.anonymousSessionId = result;
+                        self.anonymousSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
                 },
                 teardown: function() {
@@ -9437,13 +9439,13 @@
             module("Coordinate System", {
                 setup: function() {
                     var self = this;
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.anonymousSessionId = result;
+                        self.anonymousSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
-                    api_test_with_credentials(rest_root_url + "/session", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
                         ok(status != 401, "(" + status+ ") - Request should've been authenticated");
-                        self.adminSessionId = result;
+                        self.adminSessionId = JSON.parse(result).PrimitiveValue.Value;
                     });
                 },
                 teardown: function() {
@@ -9846,21 +9848,49 @@
                 //With raw credentials
                 api_test_anon(rest_root_url + "/coordsys/mentor/LL84/epsg", "GET", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == "4326", "Expected EPSG of 4326. Got: " + result);
+                    ok(result.indexOf('4326') >= 0, "Expected EPSG of 4326. Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 api_test_admin(rest_root_url + "/coordsys/mentor/LL84/epsg", "GET", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == "4326", "Expected EPSG of 4326. Got: " + result);
+                    ok(result.indexOf('4326') >= 0, "Expected EPSG of 4326. Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test_anon(rest_root_url + "/coordsys/mentor/LL84/epsg.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == 4326, "Expected EPSG of 4326. Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/coordsys/mentor/LL84/epsg.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == 4326, "Expected EPSG of 4326. Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Json);
                 });
 
                 //With session id
                 api_test(rest_root_url + "/coordsys/mentor/LL84/epsg", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == "4326", "Expected EPSG of 4326. Got: " + result);
+                    ok(result.indexOf('4326') >= 0, "Expected EPSG of 4326. Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 api_test(rest_root_url + "/coordsys/mentor/LL84/epsg", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == "4326", "Expected EPSG of 4326. Got: " + result);
+                    ok(result.indexOf('4326') >= 0, "Expected EPSG of 4326. Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test(rest_root_url + "/coordsys/mentor/LL84/epsg.json", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == 4326, "Expected EPSG of 4326. Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/coordsys/mentor/LL84/epsg.json", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == 4326, "Expected EPSG of 4326. Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Json);
                 });
             });
             test("WKT for LL84", function() {
@@ -9873,21 +9903,49 @@
                 //With raw credentials
                 api_test_anon(rest_root_url + "/coordsys/mentor/LL84/wkt", "GET", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected WKT of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 api_test_admin(rest_root_url + "/coordsys/mentor/LL84/wkt", "GET", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected WKT of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test_anon(rest_root_url + "/coordsys/mentor/LL84/wkt.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == expect, "Expected WKT of " + expect + ". Got: " + value);
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/coordsys/mentor/LL84/wkt.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == expect, "Expected WKT of " + expect + ". Got: " + value);
+                    assertMimeType(mimeType, MgMimeType.Json);
                 });
 
                 //With session id
                 api_test(rest_root_url + "/coordsys/mentor/LL84/wkt", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected WKT of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 api_test(rest_root_url + "/coordsys/mentor/LL84/wkt", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected WKT of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test(rest_root_url + "/coordsys/mentor/LL84/wkt.json", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == expect, "Expected WKT of " + expect + ". Got: " + value);
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/coordsys/mentor/LL84/wkt.json", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == expect, "Expected WKT of " + expect + ". Got: " + value);
+                    assertMimeType(mimeType, MgMimeType.Json);
                 });
             });
             test("Mentor code for EPSG:4326", function() {
@@ -9900,21 +9958,49 @@
                 //With raw credentials
                 api_test_anon(rest_root_url + "/coordsys/epsg/4326/mentor", "GET", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected code of " + expect + ". Got: " + result);
+                    ok(result.indexOf(expect) >= 0, "Expected code of " + expect + ". Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 api_test_admin(rest_root_url + "/coordsys/epsg/4326/mentor", "GET", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected code of " + expect + ". Got: " + result);
+                    ok(result.indexOf(expect) >= 0, "Expected code of " + expect + ". Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test_anon(rest_root_url + "/coordsys/epsg/4326/mentor.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == expect, "Expected code of " + expect + ". Got: " + value);
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/coordsys/epsg/4326/mentor.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == expect, "Expected code of " + expect + ". Got: " + value);
+                    assertMimeType(mimeType, MgMimeType.Json);
                 });
 
                 //With session id
                 api_test(rest_root_url + "/coordsys/epsg/4326/mentor", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected code of " + expect + ". Got: " + result);
+                    ok(result.indexOf(expect) >= 0, "Expected code of " + expect + ". Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 api_test(rest_root_url + "/coordsys/epsg/4326/mentor", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected code of " + expect + ". Got: " + result);
+                    ok(result.indexOf(expect) >= 0, "Expected code of " + expect + ". Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test(rest_root_url + "/coordsys/epsg/4326/mentor.json", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == expect, "Expected code of " + expect + ". Got: " + value);
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/coordsys/epsg/4326/mentor.json", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == expect, "Expected code of " + expect + ". Got: " + value);
+                    assertMimeType(mimeType, MgMimeType.Json);
                 });
             });
             test("WKT for EPSG:4326", function() {
@@ -9927,21 +10013,49 @@
                 //With raw credentials
                 api_test_anon(rest_root_url + "/coordsys/epsg/4326/wkt", "GET", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected WKT of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 api_test_admin(rest_root_url + "/coordsys/epsg/4326/wkt", "GET", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected WKT of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test_anon(rest_root_url + "/coordsys/epsg/4326/wkt.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == expect, "Expected WKT of " + expect + ". Got: " + value);
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/coordsys/epsg/4326/wkt.json", "GET", null, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == expect, "Expected WKT of " + expect + ". Got: " + value);
+                    assertMimeType(mimeType, MgMimeType.Json);
                 });
 
                 //With session id
                 api_test(rest_root_url + "/coordsys/epsg/4326/wkt", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected WKT of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 api_test(rest_root_url + "/coordsys/epsg/4326/wkt", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected WKT of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
+                    assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test(rest_root_url + "/coordsys/epsg/4326/wkt.json", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == expect, "Expected WKT of " + expect + ". Got: " + value);
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/coordsys/epsg/4326/wkt.json", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    var value = JSON.parse(result).PrimitiveValue.Value;
+                    ok(value == expect, "Expected WKT of " + expect + ". Got: " + value);
+                    assertMimeType(mimeType, MgMimeType.Json);
                 });
             });
             /*
@@ -9955,21 +10069,21 @@
                 //With raw credentials
                 api_test_anon(rest_root_url + "/coordsys/tomentor/" + wkt, "GET", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected code of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected code of " + expect + ". Got: " + result);
                 });
                 api_test_admin(rest_root_url + "/coordsys/tomentor/" + wkt, "GET", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected code of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected code of " + expect + ". Got: " + result);
                 });
 
                 //With session id
                 api_test(rest_root_url + "/coordsys/tomentor/" + wkt, "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected code of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected code of " + expect + ". Got: " + result);
                 });
                 api_test(rest_root_url + "/coordsys/tomentor/" + wkt, "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected code of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected code of " + expect + ". Got: " + result);
                 });
             });
             test("WKT to epsg", function() {
@@ -9982,21 +10096,21 @@
                 //With raw credentials
                 api_test_anon(rest_root_url + "/coordsys/toepsg/" + wkt, "GET", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected EPSG of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected EPSG of " + expect + ". Got: " + result);
                 });
                 api_test_admin(rest_root_url + "/coordsys/toepsg/" + wkt, "GET", null, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected EPSG of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected EPSG of " + expect + ". Got: " + result);
                 });
 
                 //With session id
                 api_test(rest_root_url + "/coordsys/toepsg/" + wkt, "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected EPSG of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected EPSG of " + expect + ". Got: " + result);
                 });
                 api_test(rest_root_url + "/coordsys/toepsg/" + wkt, "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     ok(status == 200, "(" + status + ") - Response should've been ok");
-                    ok(result == expect, "Expected EPSG of " + expect + ". Got: " + result);
+                    ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected EPSG of " + expect + ". Got: " + result);
                 });
             });
             */

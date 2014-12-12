@@ -17,6 +17,7 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+require_once dirname(__FILE__)."/../util/boxedvalue.php";
 require_once "controller.php";
 
 class MgCoordinateSystemController extends MgBaseController {
@@ -117,47 +118,101 @@ class MgCoordinateSystemController extends MgBaseController {
         }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
     }
 
-    public function ConvertCsCodeToEpsg($cscode) {
+    public function ConvertCsCodeToEpsg($cscode, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
         $factory = new MgCoordinateSystemFactory();
         $cs = $factory->CreateFromCode($cscode);
 
-        $this->app->response->setBody($cs->GetEpsgCode()."");
+        $body = MgBoxedValue::Int32($cs->GetEpsgCode(), $fmt);
+        if ($fmt == "xml") {
+            $this->app->response->header("Content-Type", MgMimeType::Xml);
+        } else {
+            $this->app->response->header("Content-Type", MgMimeType::Json);
+        }
+        $this->app->response->setBody($body);
     }
 
-    public function ConvertCsCodeToWkt($cscode) {
+    public function ConvertCsCodeToWkt($cscode, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
         $factory = new MgCoordinateSystemFactory();
         $wkt = $factory->ConvertCoordinateSystemCodeToWkt($cscode);
 
-        $this->app->response->setBody($wkt);
+        $body = MgBoxedValue::String($wkt, $fmt);
+        if ($fmt == "xml") {
+            $this->app->response->header("Content-Type", MgMimeType::Xml);
+        } else {
+            $this->app->response->header("Content-Type", MgMimeType::Json);
+        }
+        $this->app->response->setBody($body);
     }
 
-    public function ConvertEpsgToCsCode($epsg) {
+    public function ConvertEpsgToCsCode($epsg, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
         $factory = new MgCoordinateSystemFactory();
         $wkt = $factory->ConvertEpsgCodeToWkt($epsg);
         $cs = $factory->Create($wkt);
 
-        $this->app->response->setBody($cs->GetCsCode());
+        $body = MgBoxedValue::String($cs->GetCsCode(), $fmt);
+        if ($fmt == "xml") {
+            $this->app->response->header("Content-Type", MgMimeType::Xml);
+        } else {
+            $this->app->response->header("Content-Type", MgMimeType::Json);
+        }
+        $this->app->response->setBody($body);
     }
 
-    public function ConvertEpsgToWkt($epsg) {
+    public function ConvertEpsgToWkt($epsg, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
         $factory = new MgCoordinateSystemFactory();
         $wkt = $factory->ConvertEpsgCodeToWkt($epsg);
 
-        $this->app->response->setBody($wkt);
+        $body = MgBoxedValue::String($wkt, $fmt);
+        if ($fmt == "xml") {
+            $this->app->response->header("Content-Type", MgMimeType::Xml);
+        } else {
+            $this->app->response->header("Content-Type", MgMimeType::Json);
+        }
+        $this->app->response->setBody($body);
     }
 
-    public function ConvertWktToCsCode($wkt) {
+    public function ConvertWktToCsCode($wkt, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
         $factory = new MgCoordinateSystemFactory();
         $cs = $factory->Create($wkt);
 
-        $this->app->response->setBody($cs->GetCsCode());
+        $body = MgBoxedValue::String($cs->GetCsCode(), $fmt);
+        if ($fmt == "xml") {
+            $this->app->response->header("Content-Type", MgMimeType::Xml);
+        } else {
+            $this->app->response->header("Content-Type", MgMimeType::Json);
+        }
+        $this->app->response->setBody($body);
     }
 
-    public function ConvertWktToEpsg($wkt) {
+    public function ConvertWktToEpsg($wkt, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+
         $factory = new MgCoordinateSystemFactory();
         $cs = $factory->Create($wkt);
 
-        $this->app->response->setBody($cs->GetEpsgCode()."");
+        $body = MgBoxedValue::Int32($cs->GetEpsgCode(), $fmt);
+        if ($fmt == "xml") {
+            $this->app->response->header("Content-Type", MgMimeType::Xml);
+        } else {
+            $this->app->response->header("Content-Type", MgMimeType::Json);
+        }
+        $this->app->response->setBody($body);
     }
 
     public function TransformCoordinates() {
