@@ -520,6 +520,11 @@ class MgUtils
         return $xslt->transformToXml($doc);
     }
 
+    public static function StringToBool($str) {
+        //boolval was only introduced in PHP 5.5, so this is the next best thing for older releases
+        return filter_var($str, FILTER_VALIDATE_BOOLEAN);
+    }
+
     private static function ParseFeatureNode($app, $propNodes, $agfRw, $wktRw, $classProps) {
         $props = new MgPropertyCollection();
         for ($j = 0; $j < $propNodes->length; $j++) {
@@ -554,7 +559,7 @@ class MgUtils
                                     $boolVal = new MgBooleanProperty($name, false);
                                     $boolVal->SetNull(true);
                                 } else {
-                                    $boolVal = new MgBooleanProperty($name, boolval($value));
+                                    $boolVal = new MgBooleanProperty($name, self::StringToBool($value));
                                 }
                                 $props->Add($boolVal);
                             }
