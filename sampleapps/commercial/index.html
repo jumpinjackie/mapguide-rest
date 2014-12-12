@@ -203,7 +203,7 @@
             var keepAlive = function() {
                 $.getJSON(restUrl + "/session/" + sessionId + "/timeout.json", function(data, textStatus, jxXHR) {
                     $("#mgSession").html("MapGuide session ID: " + sessionId + " (last checked at: " + (new Date()) + ")");
-                    setTimeout(keepAlive, data.SessionTimeout.Value * 1000);
+                    setTimeout(keepAlive, data.PrimitiveValue.Value * 1000);
                 });
             };
             keepAlive();
