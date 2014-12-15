@@ -5,7 +5,6 @@ require_once "featurexmladapter.php";
 require_once "geojsonadapter.php";
 require_once "mapimageadapter.php";
 require_once "templateadapter.php";
-require_once "pdfadapter.php";
 require_once "csvadapter.php";
 
 $app->container->FeatureSetXml = function() use ($app) {
@@ -75,19 +74,6 @@ $app->container->FeatureSetCsv = function() use ($app) {
 };
 $app->container->FeatureSetCsvDoc = function() use ($app) {
     return MgCsvRestAdapter::GetDocumentor();
-};
-$app->container->Pdf = function() use ($app) {
-    return new MgPdfRestAdapter(
-        $app, 
-        $app->container->MgSiteConnection, 
-        $app->container->FeatureSource,
-        $app->container->FeatureClass,
-        $app->container->AdapterConfig,
-        $app->container->ConfigPath,
-        $app->container->IdentityProperty);
-};
-$app->container->PdfDoc = function() use ($app) {
-    return MgPdfRestAdapter::GetDocumentor();
 };
 
 ?>
