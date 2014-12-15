@@ -257,39 +257,68 @@ class MgFeatureServiceController extends MgBaseController {
         $resName = $resId->GetName().".".$resId->GetResourceType();
         $pathInfo = $this->app->request->getPathInfo();
         $selfUrl = $this->app->config("SelfUrl");
-        $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $resIdStr, $resName, $selfUrl, $pathInfo) {
-            $param->AddParameter("OPERATION", "DESCRIBEFEATURESCHEMA");
-            $param->AddParameter("VERSION", "1.0.0");
-            if ($fmt === "json") {
-                $param->AddParameter("FORMAT", MgMimeType::Json);
-            } else if ($fmt === "xml") {
-                $param->AddParameter("FORMAT", MgMimeType::Xml);
-            } else if ($fmt === "html") {
-                $thisUrl = $selfUrl.$pathInfo;
-                $rootPath = substr($thisUrl, 0, strlen($thisUrl) - strlen("schemas.html"));
-                $folderPath = substr($pathInfo, 0, strlen($pathInfo) - strlen("schemas.html"));
-                $tokens = explode("/", $pathInfo);
-                if (count($tokens) > 3) {
-                    //Pop off schemas.html and current folder name
-                    array_pop($tokens);
-                    array_pop($tokens);
-                    $parentPath = implode("/", $tokens);
-                    $param->AddParameter("XSLPARAM.BASEPATH", $selfUrl.$parentPath);
+
+        if ($fmt == "json") {
+            //For JSON, we are defining a completely new response format. No point trying to transform the XML version, which is just a plain
+            //XML schema. Do we really want to serve a JSON-ified version of that?
+            $this->EnsureAuthenticationForSite($sessionId);
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+
+            $classNames = explode(",", $this->GetRequestParameter("classnames", ""));
+            $collClassNames = null;
+            if (count($classNames) > 0)
+            {
+                $collClassNames = new MgStringCollection();
+                for ($i = 0; $i < count($classNames); $i++) {
+                    $collClassNames->Add($classNames[$i]);
                 }
-                $param->AddParameter("FORMAT", MgMimeType::Html);
-                $param->AddParameter("XSLSTYLESHEET", "FeatureSchema.xsl");
-                $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
-                $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
-                $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
             }
-            $param->AddParameter("RESOURCEID", $resIdStr);
-            $param->AddParameter("SCHEMA", $schemaName);
-            $classNames = $that->GetRequestParameter("classnames", null);
-            if ($classNames != null)
-                $param->AddParameter("CLASSNAMES", $classNames);
-            $that->ExecuteHttpRequest($req);
-        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
+
+            $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
+            $schemas = $featSvc->DescribeSchema($resId, $schemaName, $collClassNames);
+
+            if ($collClassNames != null && $collClassNames->GetCount() > 0) {
+                MgUtils::EnsurePartialSchema($schemas, $schemaName, $collClassNames);
+            }
+
+            $this->app->response->header("Content-Type", MgMimeType::Json);
+            $this->app->response->setBody(MgUtils::SchemasToJson($schemas));
+        } else {
+            $that = $this;
+            $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $resIdStr, $resName, $selfUrl, $pathInfo) {
+                $param->AddParameter("OPERATION", "DESCRIBEFEATURESCHEMA");
+                $param->AddParameter("VERSION", "1.0.0");
+                if ($fmt === "json") {
+                    $param->AddParameter("FORMAT", MgMimeType::Json);
+                } else if ($fmt === "xml") {
+                    $param->AddParameter("FORMAT", MgMimeType::Xml);
+                } else if ($fmt === "html") {
+                    $thisUrl = $selfUrl.$pathInfo;
+                    $rootPath = substr($thisUrl, 0, strlen($thisUrl) - strlen("schemas.html"));
+                    $folderPath = substr($pathInfo, 0, strlen($pathInfo) - strlen("schemas.html"));
+                    $tokens = explode("/", $pathInfo);
+                    if (count($tokens) > 3) {
+                        //Pop off schemas.html and current folder name
+                        array_pop($tokens);
+                        array_pop($tokens);
+                        $parentPath = implode("/", $tokens);
+                        $param->AddParameter("XSLPARAM.BASEPATH", $selfUrl.$parentPath);
+                    }
+                    $param->AddParameter("FORMAT", MgMimeType::Html);
+                    $param->AddParameter("XSLSTYLESHEET", "FeatureSchema.xsl");
+                    $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
+                    $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
+                    $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
+                }
+                $param->AddParameter("RESOURCEID", $resIdStr);
+                $param->AddParameter("SCHEMA", $schemaName);
+                $classNames = $that->GetRequestParameter("classnames", null);
+                if ($classNames != null)
+                    $param->AddParameter("CLASSNAMES", $classNames);
+                $that->ExecuteHttpRequest($req);
+            }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
+        }
     }
 
     public function GetClassNames($resId, $schemaName, $format) {
@@ -330,19 +359,33 @@ class MgFeatureServiceController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
         }
         $resIdStr = $resId->ToString();
-        $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $className, $resIdStr) {
-            $param->AddParameter("OPERATION", "DESCRIBEFEATURESCHEMA");
-            $param->AddParameter("VERSION", "1.0.0");
-            if ($fmt === "json")
-                $param->AddParameter("FORMAT", MgMimeType::Json);
-            else
-                $param->AddParameter("FORMAT", MgMimeType::Xml);
-            $param->AddParameter("RESOURCEID", $resIdStr);
-            $param->AddParameter("SCHEMA", $schemaName);
-            $param->AddParameter("CLASSNAMES", $className);
-            $that->ExecuteHttpRequest($req);
-        }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
+        if ($fmt == "json") {
+            //For JSON, we are defining a completely new response format. No point trying to transform the XML version, which is just a plain
+            //XML schema. Do we really want to serve a JSON-ified version of that?
+            $this->EnsureAuthenticationForSite($sessionId);
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+
+            $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
+            $clsDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
+
+            $this->app->response->header("Content-Type", MgMimeType::Json);
+            $this->app->response->setBody(MgUtils::ClassDefinitionToJson($clsDef));
+        } else {
+            $that = $this;
+            $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $className, $resIdStr) {
+                $param->AddParameter("OPERATION", "DESCRIBEFEATURESCHEMA");
+                $param->AddParameter("VERSION", "1.0.0");
+                if ($fmt === "json")
+                    $param->AddParameter("FORMAT", MgMimeType::Json);
+                else
+                    $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("RESOURCEID", $resIdStr);
+                $param->AddParameter("SCHEMA", $schemaName);
+                $param->AddParameter("CLASSNAMES", $className);
+                $that->ExecuteHttpRequest($req);
+            }, false, "", $sessionId, $this->GetMimeTypeForFormat($format));
+        }
     }
 
     public function GetEditCapabilities($resId, $format) {
