@@ -93,7 +93,8 @@ abstract class MgResponseHandler
                             }
                         } else {
                             if ($result->GetResultContentType() === MgMimeType::Xml && $param->ContainsParameter("XSLSTYLESHEET")) {
-                                $this->app->response->header("Content-Type", MgMimeType::Html);
+                                if ($param->ContainsParameter("X-OVERRIDE-CONTENT-TYPE"))
+                                    $this->app->response->header("Content-Type", $param->GetParameterValue("X-OVERRIDE-CONTENT-TYPE"));
                                 $this->app->response->setBody(MgUtils::XslTransformByteReader($this->app, $resultObj, $param->GetParameterValue("XSLSTYLESHEET"), $this->CollectXslParameters($param)));
                             } else {
                                 $this->OutputByteReader($resultObj, ($param->GetParameterValue("X-CHUNK-RESPONSE") === "true"), ($param->GetParameterValue("X-PREPEND-XML-PROLOG") === "true"));

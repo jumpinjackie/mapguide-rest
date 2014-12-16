@@ -170,6 +170,7 @@ class MgResourceServiceController extends MgBaseController {
                 //Chop off the list.html
                 $rootPath = substr($thisUrl, 0, strlen($thisUrl) - strlen("data/list.html"));
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("X-OVERRIDE-CONTENT-TYPE", MgMimeType::Html);
                 $param->AddParameter("XSLSTYLESHEET", "ResourceDataList.xsl");
                 $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
                 $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
@@ -197,6 +198,7 @@ class MgResourceServiceController extends MgBaseController {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             } else if ($fmt === "html") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("X-OVERRIDE-CONTENT-TYPE", MgMimeType::Html);
                 $param->AddParameter("XSLSTYLESHEET", "ResourceReferenceList.xsl");
                 $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
                 $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
@@ -221,6 +223,7 @@ class MgResourceServiceController extends MgBaseController {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             } else if ($fmt === "html") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("X-OVERRIDE-CONTENT-TYPE", MgMimeType::Html);
                 $param->AddParameter("XSLSTYLESHEET", "ResourceHeader.xsl");
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
@@ -453,6 +456,7 @@ class MgResourceServiceController extends MgBaseController {
                 $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
 
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("X-OVERRIDE-CONTENT-TYPE", MgMimeType::Html);
                 $param->AddParameter("XSLSTYLESHEET", "ResourceList.xsl");
             }
             $param->AddParameter("RESOURCEID", $resIdStr);

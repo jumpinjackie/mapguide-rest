@@ -89,6 +89,7 @@ class MgCoordinateSystemController extends MgBaseController {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             } else if ($fmt === "html") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("X-OVERRIDE-CONTENT-TYPE", MgMimeType::Html);
                 $param->AddParameter("XSLSTYLESHEET", "CoordinateSystemCategoryList.xsl");
             }
             $that->ExecuteHttpRequest($req);
@@ -111,6 +112,7 @@ class MgCoordinateSystemController extends MgBaseController {
                 $param->AddParameter("X-PREPEND-XML-PROLOG", "true");
             } else if ($fmt === "html") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("X-OVERRIDE-CONTENT-TYPE", MgMimeType::Html);
                 $param->AddParameter("XSLSTYLESHEET", "CoordinateSystemList.xsl");
             }
             $param->AddParameter("CSCATEGORY", $category);

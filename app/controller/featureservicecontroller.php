@@ -119,6 +119,7 @@ class MgFeatureServiceController extends MgBaseController {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             } else if ($fmt === "html") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("X-OVERRIDE-CONTENT-TYPE", MgMimeType::Html);
                 $param->AddParameter("XSLSTYLESHEET", "FdoProviderList.xsl");
             }
             $that->ExecuteHttpRequest($req);
@@ -235,6 +236,7 @@ class MgFeatureServiceController extends MgBaseController {
                 //Chop off the schemas.html
                 $rootPath = substr($thisUrl, 0, strlen($thisUrl) - strlen("schemas.html"));
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("X-OVERRIDE-CONTENT-TYPE", MgMimeType::Html);
                 $param->AddParameter("XSLSTYLESHEET", "FeatureSchemaNameList.xsl");
                 $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
                 $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
@@ -305,7 +307,8 @@ class MgFeatureServiceController extends MgBaseController {
                         $parentPath = implode("/", $tokens);
                         $param->AddParameter("XSLPARAM.BASEPATH", $selfUrl.$parentPath);
                     }
-                    $param->AddParameter("FORMAT", MgMimeType::Html);
+                    $param->AddParameter("FORMAT", MgMimeType::Xml);
+                    $param->AddParameter("X-OVERRIDE-CONTENT-TYPE", MgMimeType::Html);
                     $param->AddParameter("XSLSTYLESHEET", "FeatureSchema.xsl");
                     $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
                     $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
@@ -341,6 +344,7 @@ class MgFeatureServiceController extends MgBaseController {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             } else if ($fmt === "html") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $param->AddParameter("X-OVERRIDE-CONTENT-TYPE", MgMimeType::Html);
                 $param->AddParameter("XSLSTYLESHEET", "ClassNameList.xsl");
                 $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
             }

@@ -33,6 +33,7 @@ class MgRestServiceController extends MgBaseController {
             $param->AddParameter("XSLSTYLESHEET", "FusionTemplateInfo.xsl");
             if ($fmt === "json") {
                 $param->AddParameter("FORMAT", MgMimeType::Json);
+                $param->AddParameter("X-OVERRIDE-CONTENT-TYPE", MgMimeType::Json);
             } else if ($fmt === "xml") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             }
