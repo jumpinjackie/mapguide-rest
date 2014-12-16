@@ -74,6 +74,113 @@ class MgSlimChunkWriter extends MgChunkWriter
     public function EndChunking() { }
 }
 
+class MgHtmlHeaderFooterModel
+{
+    public $baseUrl;
+    public $className;
+    public $maxPages;
+    public $pageNo;
+    public $total;
+    public $hasMorePages;
+    public $prevPageUrl;
+    public $nextPageUrl;
+
+    public function __construct($className) {
+        $this->className = $className;
+        $this->maxPages = -1;
+        $this->pageNo = 1;
+        $this->total = -1;
+        $this->hasMorePages = true;
+    }
+}
+
+class MgHtmlBodyModel
+{
+    private $reader;
+
+    private $agfRw;
+    private $wktRw;
+    private $transform;
+
+    public $propertyCount;
+
+    public function __construct($reader, $transform = null) {
+        $this->reader = $reader;
+        $this->propertyCount = $this->reader->GetPropertyCount();
+        $this->agfRw = new MgAgfReaderWriter();
+        $this->wktRw = new MgWktReaderWriter();
+        $this->transform = $transform;
+    }
+
+    public function read() {
+        return $this->reader->ReadNext();
+    }
+
+    public function endOfReader() {
+        if (is_callable(array($this->reader, "EndOfReader")))
+            return $this->reader->EndOfReader();
+        else
+            return false;
+    }
+
+    public function propertyName($index) {
+        return $this->reader->GetPropertyName($index);
+    }
+
+    public function getValue($i) {
+        $output = "";
+        $propType = $this->reader->GetPropertyType($i);
+        if (!$this->reader->IsNull($i)) {
+            switch($propType) {
+                case MgPropertyType::Boolean:
+                    //NOTE: It appears PHP booleans are not string-able
+                    $output .= ($this->reader->GetBoolean($i) ? "true" : "false");
+                    break;
+                case MgPropertyType::Byte:
+                    $output .= $this->reader->GetByte($i);
+                    break;
+                case MgPropertyType::DateTime:
+                    $dt = $this->reader->GetDateTime($i);
+                    $output .= $dt->ToString();
+                    break;
+                case MgPropertyType::Decimal:
+                case MgPropertyType::Double:
+                    $output .= $this->reader->GetDouble($i);
+                    break;
+                case MgPropertyType::Geometry:
+                    {
+                        try {
+                            $agf = $this->reader->GetGeometry($i);
+                            $geom = ($this->transform != null) ? $this->agfRw->Read($agf, $this->transform) : $this->agfRw->Read($agf);
+                            $output .= $this->wktRw->Write($geom);
+                        } catch (MgException $ex) {
+
+                        }
+                    }
+                    break;
+                case MgPropertyType::Int16:
+                    $output .= $this->reader->GetInt16($i);
+                    break;
+                case MgPropertyType::Int32:
+                    $output .= $this->reader->GetInt32($i);
+                    break;
+                case MgPropertyType::Int64:
+                    $output .= $this->reader->GetInt64($i);
+                    break;
+                case MgPropertyType::Single:
+                    $output .= $this->reader->GetSingle($i);
+                    break;
+                case MgPropertyType::String:
+                    $output .= MgUtils::EscapeXmlChars($this->reader->GetString($i));
+                    break;
+            }
+        } else {
+            $output .= "(null)";
+        }
+        return $output;
+    }
+}
+
 class MgHttpChunkWriter extends MgChunkWriter
 {
     private $headers;
@@ -137,6 +244,7 @@ class MgReaderChunkedResult
     private $thisUrl;
     private $thisReqParams;
     private $orientation;
+    private $templateRootDir;
 
     private $localizer;
 
@@ -176,13 +284,12 @@ class MgReaderChunkedResult
         $this->transform = $tx;
     }
 
-    public function SetBaseUrl($baseUrl) {
-        $this->baseUrl = $baseUrl;
-    }
-
-    public function SetThisUrl($thisUrl, $reqParams) {
-        $this->thisUrl = $thisUrl;
-        $this->thisReqParams = $reqParams;
+    public function SetHtmlParams($app) {
+        $this->baseUrl = $app->config("SelfUrl");
+        $this->thisUrl = $app->config("SelfUrl").$app->request->getPathInfo();
+        $this->thisReqParams = $app->request->params();
+        $this->templateRootDir = $app->config("Cache.RootDir")."/templates_c";
+        $this->locale = $app->config("Locale");
     }
 
     private function OutputGeoJson($schemas) {
@@ -278,42 +385,37 @@ class MgReaderChunkedResult
 
     private function OutputHtml($schemas) {
         $read = 0;
-        $agfRw = new MgAgfReaderWriter();
-        $wktRw = new MgWktReaderWriter();
 
         $paginated = (is_callable(array($this->reader, "GetPageSize")) && is_callable(array($this->reader, "GetPageNo")));
-
-        //TODO: This should really be offloaded to a smarty template
 
         $this->writer->SetHeader("Content-Type", MgMimeType::Html);
         $this->writer->StartChunking();
 
-        $output = "<!DOCTYPE html>";
-        $output .= "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">";
-        if ($this->baseUrl != null) {
-            $bsUrl = $this->baseUrl . "/assets/common/css/bootstrap.min.css";
-            $output .= "<link rel='stylesheet' href='".$bsUrl."' />";
+        $tplHead = new Smarty();
+        $tplBody = new Smarty();
+        $tplFoot = new Smarty();
+        $tplHead->setCompileDir($this->templateRootDir);
+        $tplBody->setCompileDir($this->templateRootDir);
+        $tplFoot->setCompileDir($this->templateRootDir);
+
+        $clsDef = $this->reader->GetClassDefinition();
+        $hfModel = new MgHtmlHeaderFooterModel($clsDef->GetName());
+        $bodyModel = new MgHtmlBodyModel($this->reader, $this->transform, $this->limit);
+
+        $hfModel->baseUrl = $this->baseUrl;
+
+        if (array_key_exists("page", $this->thisReqParams)) {
+            $this->thisReqParams["page"] = $this->reader->GetPageNo();
         }
-        $output .= "</head><body>";
-
-        $this->writer->WriteChunk($output);
-        $output = "";
-
-        $propCount = $this->reader->GetPropertyCount();
-
-        $pageHtml = "";
-        $totalHtml = "";
-        $pageNoHtml = "";
+        $hfModel->isPaginated = $paginated;
         //Write pagination HTML if this reader is paginated
         if ($paginated === TRUE) {
-            $pageSize = $this->reader->GetPageSize();
-            $pageNo = $this->reader->GetPageNo();
-
-            $params = $this->thisReqParams;
+            $hfModel->pageSize = $this->reader->GetPageSize();
+            $hfModel->pageNo = $this->reader->GetPageNo();
 
             $nextUrl = $this->thisUrl;
             $firstPart = true;
-            foreach ($params as $key => $value) {
+            foreach ($this->thisReqParams as $key => $value) {
                 if ($firstPart === true) {
                     $nextUrl .= "?";
                     $firstPart = false;
@@ -322,14 +424,14 @@ class MgReaderChunkedResult
                 }
 
                 if (strtoupper($key) == "PAGE") {
-                    $nextUrl .= "$key=".($pageNo + 1);
+                    $nextUrl .= "$key=".($hfModel->pageNo + 1);
                 } else {
                     $nextUrl .= "$key=$value";
                 }
             }
             $prevUrl = $this->thisUrl;
             $firstPart = true;
-            foreach ($params as $key => $value) {
+            foreach ($this->thisReqParams as $key => $value) {
                 if ($firstPart === true) {
                     $prevUrl .= "?";
                     $firstPart = false;
@@ -338,109 +440,34 @@ class MgReaderChunkedResult
                 }
 
                 if (strtoupper($key) == "PAGE") {
-                    $prevUrl .= "$key=".($pageNo - 1);
+                    $prevUrl .= "$key=".($hfModel->pageNo - 1);
                 } else {
                     $prevUrl .= "$key=$value";
                 }
             }
 
-            if ($pageNo > 1) {
-                //Write prev/next page links.
-                $pageHtml .= "<a href='".$prevUrl."'>&lt;&lt;&nbsp;".$this->localizer->getText("L_PREV_PAGE")."</a>&nbsp;";
-                if ($this->reader->HasMorePages()) {
-                    $pageHtml .= "|&nbsp;<a href='".$nextUrl."'>".$this->localizer->getText("L_NEXT_PAGE")."&nbsp;&gt;&gt;</a>";
-                }
-            } else {
-                if ($this->reader->HasMorePages()) {
-                    $pageHtml .= "<a href='".$nextUrl."'>".$this->localizer->getText("L_NEXT_PAGE")."&nbsp;&gt;&gt;</a>";
-                }
-            }
-            if ($this->reader->GetTotal() >= 0) {
-                $totalHtml = "<span>".$this->localizer->getText("L_TOTAL_FEATURES", $this->reader->GetTotal())."</span>";
-            }
-            $maxPages = $this->reader->GetMaxPages();
-            if ($maxPages >= 0) {
-                $pageNoHtml = "<strong>(".$this->localizer->getText("L_PAGE_X_OF_Y", $pageNo, $maxPages).")</strong>";
-            } else {
-                $pageNoHtml = "<strong>(".$this->localizer->getText("L_PAGE_NO", $pageNo).")</strong>";
-            }
+            $hfModel->nextPageUrl = $nextUrl;
+            $hfModel->prevPageUrl = $prevUrl;
+            $hfModel->hasMorePages = $this->reader->HasMorePages();
+            $hfModel->maxPages = $this->reader->GetMaxPages();
+            $hfModel->total = $this->reader->GetTotal();
         }
 
+        $locale = $this->locale;
+        $tplHead->assign("model", $hfModel);
+        $tplBody->assign("model", $bodyModel);
+        $tplFoot->assign("model", $hfModel);
 
-        $clsDef = $this->reader->GetClassDefinition();
-        $idProps = $clsDef->GetIdentityProperties();
-        
-        $output .= "<div class='pull-left'><div><strong>".$clsDef->GetName()."</strong> $pageNoHtml</div><div>$totalHtml</div><div>$pageHtml</div></div>";
         if ($this->orientation === "h") {
-            $output .= "<table class='table table-bordered table-condensed table-hover'>";
-            $output .= "<!-- Table header -->";
-            $output .= "<tr>";
-            for ($i = 0; $i < $propCount; $i++) {
-                $name = $this->reader->GetPropertyName($i);
-                if ($idProps->IndexOf($name) >= 0) {
-                    $output .= "<th>$name*</th>"; //Denote identity property
-                } else {
-                    $output .= "<th>$name</th>";
-                }
-            }
-            $output .= "</tr>";
-            $this->writer->WriteChunk($output);
-
-            while ($this->reader->ReadNext()) {
-                $read++;
-                if ($this->limit > 0 && $read > $this->limit) {
-                    break;
-                }
-
-                $output = "<tr>";
-                for ($i = 0; $i < $propCount; $i++) {
-                    $name = $this->reader->GetPropertyName($i);
-
-                    $output .= "<td>";
-                    $output .= self::WriteFeatureAttributeCell($this->reader, $i, $agfRw, $wktRw, $this->transform);
-                    $output .= "</td>";
-
-                }
-
-                $output .= "</tr>";
-
-                $this->writer->WriteChunk($output);
-                $output = "";
-            }
-
-            $output .= "</table>";
-            $output .= "<div class='pull-left'>$pageHtml</div>";
-            $output .= "</body></html>";
-            $this->writer->WriteChunk($output);
+            $this->writer->WriteChunk($tplHead->fetch(dirname(__FILE__)."/../res/templates/$locale/feature_html_horizontal_head.tpl"));
+            $this->writer->WriteChunk($tplBody->fetch(dirname(__FILE__)."/../res/templates/$locale/feature_html_horizontal_body.tpl"));
+            $this->writer->WriteChunk($tplFoot->fetch(dirname(__FILE__)."/../res/templates/$locale/feature_html_horizontal_foot.tpl"));
         } else { //vertical
-            while ($this->reader->ReadNext()) {
-                $read++;
-                if ($this->limit > 0 && $read > $this->limit) {
-                    break;
-                }
-
-                $output .= "<table class='table table-bordered table-condensed table-hover'>";
-                $output .= "<!-- Table header -->";
-                for ($i = 0; $i < $propCount; $i++) {
-                    $output .= "<tr>";
-                    $name = $this->reader->GetPropertyName($i);
-                    $propType = $this->reader->GetPropertyType($i);
-                    $name = $this->reader->GetPropertyName($i);
-                    if ($idProps->IndexOf($name) >= 0) {
-                        $output .= "<td><strong>$name*</strong></td>"; //Denote identity property
-                    } else {
-                        $output .= "<td><strong>$name</strong></td>";
-                    }
-                    $output .= "<td>";
-                    $output .= self::WriteFeatureAttributeCell($this->reader, $i, $agfRw, $wktRw, $this->transform);
-                    $output .= "</td>";
-                    $output .= "</tr>";
-                }
-                $output .= "</table>";
-                $this->writer->WriteChunk($output);
-                $output = "";
-            }
+            $this->writer->WriteChunk($tplHead->fetch(dirname(__FILE__)."/../res/templates/$locale/feature_html_vertical_head.tpl"));
+            $this->writer->WriteChunk($tplBody->fetch(dirname(__FILE__)."/../res/templates/$locale/feature_html_vertical_body.tpl"));
+            $this->writer->WriteChunk($tplFoot->fetch(dirname(__FILE__)."/../res/templates/$locale/feature_html_vertical_foot.tpl"));
         }
+
         $this->writer->EndChunking();
         $this->reader->Close();
     }

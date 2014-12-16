@@ -26,11 +26,6 @@
 
 return array(
     "L_RETURNS_DATA_AS_TYPE" => "Gibt Daten in %s",
-    "L_PREV_PAGE" => "früher",
-    "L_NEXT_PAGE" => "nächste",
-    "L_TOTAL_FEATURES" => "%d features",
-    "L_PAGE_NO" => "Seite %d",
-    "L_PAGE_X_OF_Y" => "Seite %d von %d",
     "L_PRODUCT_API_REFERENCE" => "%s API-Reference",
     "L_ABOUT_MAPGUIDE_REST" => "mapguide-rest ist eine RESTful Web Extension für MapGuide Open Source und Autodesk Infrastructure Map Server<br/><br/><strong>Hinweis:.</strong> Grund Zugangsdaten HTTP-Authentifizierung wird in der Regel vom Web-Browser für eine kurze zwischengespeichert werden Zeitraum sollten Sie sich für diese Methode anstelle der Weitergabe in Session-IDs verwenden",
     "L_REST_GET_ID_DESC" => "Die ID der Funktion zur Rückkehr",

@@ -1112,7 +1112,7 @@ class MgFeatureServiceController extends MgBaseController {
                         } else {
                             $reader = $featSvc->SelectFeatures($fsId, "$schemaName:$className", $query);
                             if ($pageSize > 0) {
-                                $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo);
+                                $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo, $limit);
                                 $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, $owriter, $this->app->localizer);
                             } else {
                                 $result = new MgReaderChunkedResult($featSvc, $reader, $limit, $owriter, $this->app->localizer);
@@ -1121,8 +1121,7 @@ class MgFeatureServiceController extends MgBaseController {
                             if ($transform != null)
                                 $result->SetTransform($transform);
                             if ($fmt === "html") {
-                                $result->SetBaseUrl($this->app->config("SelfUrl"));
-                                $result->SetThisUrl($this->app->config("SelfUrl").$this->app->request->getPathInfo(), $this->app->request->params());
+                                $result->SetHtmlParams($this->app);
                             }
                             $result->Output($format);
                         }
@@ -1212,7 +1211,7 @@ class MgFeatureServiceController extends MgBaseController {
                 if ($pageNo < 1) {
                     $pageNo = 1;
                 }
-                $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo);
+                $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo, $limit);
                 $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, $owriter, $this->app->localizer);
             } else {
                 $result = new MgReaderChunkedResult($featSvc, $reader, $limit, $owriter, $this->app->localizer);
@@ -1221,8 +1220,7 @@ class MgFeatureServiceController extends MgBaseController {
             if ($transform != null)
                 $result->SetTransform($transform);
             if ($fmt === "html") {
-                $result->SetBaseUrl($this->app->config("SelfUrl"));
-                $result->SetThisUrl($this->app->config("SelfUrl").$this->app->request->getPathInfo(), $this->app->request->params());
+                $result->SetHtmlParams($this->app);
             }
             $result->Output($format);
         } catch (MgException $ex) {

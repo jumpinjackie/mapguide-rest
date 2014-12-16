@@ -33,12 +33,15 @@ class MgPaginatedFeatureReader
     private $total;
     private $hasMorePages;
 
+    private $actuallyEndOfReader;
+
     public function __construct($reader, $pageSize, $pageNo, $total = -1) {
         $this->innerReader = $reader;
         $this->pageSize = $pageSize;
         $this->pageNo = $pageNo;
         $this->read = 0;
         $this->total = $total;
+        $this->actuallyEndOfReader = false;
 
         $this->lowerBound = $this->pageSize * ($this->pageNo - 1);
         $this->upperBound = $this->pageSize * $this->pageNo;
@@ -76,10 +79,15 @@ class MgPaginatedFeatureReader
         }
     }
 
+    public function EndOfReader() {
+        return $this->actuallyEndOfReader;
+    }
+
     public function ReadNext() {
         $bResult = $this->innerReader->ReadNext();
         //End of reader
         if ($bResult === FALSE) {
+            $this->actuallyEndOfReader = true;
             return FALSE;
         } else {
             $this->read++;

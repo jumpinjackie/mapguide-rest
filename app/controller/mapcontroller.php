@@ -594,8 +594,7 @@ class MgMapController extends MgBaseController {
                     $result->SetTransform($transform);
                 if ($fmt === "html") {
                     $result->SetAttributeDisplayOrientation($orientation);
-                    $result->SetBaseUrl($this->app->config("SelfUrl"));
-                    $result->SetThisUrl($this->app->config("SelfUrl").$this->app->request->getPathInfo(), $this->app->request->params());
+                    $result->SetHtmlParams($this->app);
                 }
                 $result->Output($format);
             }
@@ -605,8 +604,7 @@ class MgMapController extends MgBaseController {
             $result = new MgReaderChunkedResult($featSvc, $reader, -1, $owriter, $this->app->localizer);
             if ($fmt === "html") {
                 $result->SetAttributeDisplayOrientation($orientation);
-                $result->SetBaseUrl($this->app->config("SelfUrl"));
-                $result->SetThisUrl($this->app->config("SelfUrl").$this->app->request->getPathInfo(), $this->app->request->params());
+                $result->SetHtmlParams($this->app);
             }
             $result->Output($format);
         }
