@@ -30,6 +30,7 @@ class MgRestServiceController extends MgBaseController {
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
             $param->AddParameter("OPERATION", "ENUMERATEAPPLICATIONTEMPLATES");
             $param->AddParameter("VERSION", "1.0.0");
+            $param->AddParameter("XSLSTYLESHEET", "FusionTemplateInfo.xsl");
             if ($fmt === "json") {
                 $param->AddParameter("FORMAT", MgMimeType::Json);
             } else if ($fmt === "xml") {

@@ -84,7 +84,13 @@ abstract class MgResponseHandler
                     }
                     if ($resultObj instanceof MgByteReader) {
                         if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
-                            $this->OutputXmlByteReaderAsJson($resultObj);
+                            if ($result->GetResultContentType() === MgMimeType::Xml && $param->ContainsParameter("XSLSTYLESHEET")) {
+                                $body = MgUtils::XslTransformByteReader($this->app, $resultObj, $param->GetParameterValue("XSLSTYLESHEET"), $this->CollectXslParameters($param));
+                                $this->app->response->header("Content-Type", MgMimeType::Json);
+                                $this->app->response->setBody(MgUtils::Xml2Json($body));
+                            } else {
+                                $this->OutputXmlByteReaderAsJson($resultObj);
+                            }
                         } else {
                             if ($result->GetResultContentType() === MgMimeType::Xml && $param->ContainsParameter("XSLSTYLESHEET")) {
                                 $this->app->response->header("Content-Type", MgMimeType::Html);
