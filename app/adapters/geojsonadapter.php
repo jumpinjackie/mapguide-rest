@@ -22,7 +22,61 @@ require_once dirname(__FILE__)."/../util/geojsonwriter.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgGeoJsonRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
-    
+    protected function GetAdditionalParameters($app, $bSingle, $method) {
+        $params = parent::GetAdditionalParameters($app, $bSingle, $method);
+        if ($method == "POST") {
+            $pPostBody = new stdClass();
+            $pPostBody->paramType = "body";
+            $pPostBody->name = "body";
+            $pPostBody->type = "string";
+            $pPostBody->required = true;
+            $pPostBody->description = $app->localizer->getText("L_REST_POST_BODY_DESC");
+
+            array_push($params, $pPostBody);
+        } else if ($method == "PUT") {
+            $pPutBody = new stdClass();
+            $pPutBody->paramType = "body";
+            $pPutBody->name = "body";
+            $pPutBody->type = "string";
+            $pPutBody->required = true;
+            $pPutBody->description = $app->localizer->getText("L_REST_PUT_BODY_DESC");
+
+            array_push($params, $pPutBody);
+        } else if ($method == "DELETE") {
+            $pFilter = new stdClass();
+            $pFilter->paramType = "form";
+            $pFilter->name = "filter";
+            $pFilter->type = "string";
+            $pFilter->required = false;
+            $pFilter->description = $app->localizer->getText("L_REST_DELETE_FILTER_DESC");
+
+            array_push($params, $pFilter);
+        }
+        return $params;
+    }
+}
+
+class MgJsonSessionIDExtractor extends MgSessionIDExtractor {
+    /**
+     * Tries to return the session id based on the given method. This is for methods that could accept a session id in places
+     * other than the query string, url path or form parameter. If no session id is found, null is returned.
+     */
+    public function TryGetSessionId($app, $method) {
+        if ($method == "POST" || $method == "PUT") {
+            $json = json_decode($app->request->getBody());
+            $body = MgUtils::Json2Xml($json);
+            $doc = new DOMDocument();
+            $doc->loadXML($body);
+
+            //Stash for adapter to grab
+            $app->REQUEST_BODY_DOCUMENT = $doc;
+
+            $sesNodes = $doc->getElementsByTagName("SessionID");
+            if ($sesNodes->length == 1)
+                return $sesNodes->item(0)->nodeValue;
+        }
+        return null;
+    }
 }
 
 class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
@@ -39,6 +93,16 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
      */
     protected function InitAdapterConfig($config) {
 
+    }
+
+    /**
+     * Returns true if the given HTTP method is supported. Overridable.
+     */
+    public function SupportsMethod($method) {
+        return strtoupper($method) === "GET" ||
+               strtoupper($method) === "POST" ||
+               strtoupper($method) === "PUT" ||
+               strtoupper($method) === "DELETE";
     }
 
     protected function GetFileExtension() { return "json"; }
@@ -143,6 +207,188 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
      */
     protected function GetResponseEnd($reader) {
         $this->app->response->write("]}");
+    }
+
+    /**
+     * Handles POST requests for this adapter. Overridable. Does nothing if not overridden.
+     */
+    public function HandlePost($single) {
+        $trans = null;
+        try {
+            $tokens = explode(":", $this->className);
+            $schemaName = $tokens[0];
+            $className = $tokens[1];
+
+            $commands = new MgFeatureCommandCollection();
+            $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
+            if ($this->app->REQUEST_BODY_DOCUMENT != null) {
+                $batchProps = MgUtils::ParseMultiFeatureDocument($this->app, $classDef, $this->app->REQUEST_BODY_DOCUMENT);
+            } else {
+                $json = json_decode($this->app->request->getBody());
+                $body = MgUtils::Json2Xml($json);
+                $batchProps = MgUtils::ParseMultiFeatureXml($this->app, $classDef, $body);
+            }
+            $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
+            $commands->Add($insertCmd);
+
+            if ($this->useTransaction)
+                $trans = $this->featSvc->BeginTransaction($this->featureSourceId);
+
+            //HACK: Due to #2252, we can't call UpdateFeatures() with NULL MgTransaction, so to workaround
+            //that we call the original UpdateFeatures() overload with useTransaction = false if we find a
+            //NULL MgTransaction
+            if ($trans == null)
+                $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, false);
+            else
+                $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, $trans);
+            if ($trans != null)
+                $trans->Commit();
+            $this->OutputUpdateFeaturesResult($commands, $result, $classDef, true);
+        } catch (MgException $ex) {
+            if ($trans != null)
+                $trans->Rollback();
+            $this->OnException($ex, MgMimeType::Json);
+        }
+    }
+
+    /**
+     * Handles PUT requests for this adapter. Overridable. Does nothing if not overridden.
+     */
+    public function HandlePut($single) {
+        $trans = null;
+        try {
+            $tokens = explode(":", $this->className);
+            $schemaName = $tokens[0];
+            $className = $tokens[1];
+
+            if ($this->app->REQUEST_BODY_DOCUMENT == null) {
+                $json = json_decode($this->app->request->getBody());
+                $body = MgUtils::Json2Xml($json);
+                $doc = new DOMDocument();
+                $doc->loadXML($body);
+            } else {
+                $doc = $this->app->REQUEST_BODY_DOCUMENT;
+            }
+
+            $commands = new MgFeatureCommandCollection();
+
+            $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
+            $filter = "";
+            //If single-record, infer filter from URI
+            if ($single === true) {
+                $idProps = $classDef->GetIdentityProperties();
+                if ($idProps->GetCount() != 1) {
+                    $app->halt(400, $this->app->localizer->getText("E_CANNOT_APPLY_UPDATE_CANNOT_UNIQUELY_IDENTIFY", $this->featureId, $idProps->GetCount()));
+                } else {
+                    $idProp = $idProps->GetItem(0);
+                    if ($idProp->GetDataType() == MgPropertyType::String) {
+                        $filter = $idProp->GetName()." = '".$this->featureId."'";
+                    } else {
+                        $filter = $idProp->GetName()." = ".$this->featureId;
+                    }
+                }
+            } else { //Otherwise, use the filter from the request envelope (if specified)
+                $filterNode = $doc->getElementsByTagName("Filter");
+                if ($filterNode->length == 1)
+                    $filter = $filterNode->item(0)->nodeValue;
+            }
+            $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
+            $props = MgUtils::ParseSingleFeatureDocument($this->app, $classDef, $doc, "UpdateProperties");
+            $updateCmd = new MgUpdateFeatures("$schemaName:$className", $props, $filter);
+            $commands->Add($updateCmd);
+
+            if ($this->useTransaction)
+                $trans = $this->featSvc->BeginTransaction($this->featureSourceId);
+
+            //HACK: Due to #2252, we can't call UpdateFeatures() with NULL MgTransaction, so to workaround
+            //that we call the original UpdateFeatures() overload with useTransaction = false if we find a
+            //NULL MgTransaction
+            if ($trans == null)
+                $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, false);
+            else
+                $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, $trans);
+            if ($trans != null)
+                $trans->Commit();
+            $this->OutputUpdateFeaturesResult($commands, $result, $classDef, true);
+        } catch (MgException $ex) {
+            if ($trans != null)
+                $trans->Rollback();
+            $this->OnException($ex, MgMimeType::Json);
+        }
+    }
+
+    /**
+     * Handles DELETE requests for this adapter. Overridable. Does nothing if not overridden.
+     */
+    public function HandleDelete($single) {
+        $trans = null;
+        try {
+            $tokens = explode(":", $this->className);
+            $schemaName = $tokens[0];
+            $className = $tokens[1];
+            $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
+            $commands = new MgFeatureCommandCollection();
+
+            if ($single === true) {
+                if ($this->featureId == null) {
+                    throw new Exception($this->app->localizer->getText("E_NO_FEATURE_ID_SET"));
+                }
+                $idType = MgPropertyType::String;
+                $tokens = explode(":", $this->className);
+                $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $tokens[0], $tokens[1]);
+                if ($this->featureIdProp == null) {
+                    $idProps = $clsDef->GetIdentityProperties();
+                    if ($idProps->GetCount() == 0) {
+                        throw new Exception($this->app->localizer->getText("E_CANNOT_DELETE_NO_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
+                    } else if ($idProps->GetCount() > 1) {
+                        throw new Exception($this->app->localizer->getText("E_CANNOT_DELETE_MULTIPLE_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
+                    } else {
+                        $idProp = $idProps->GetItem(0);
+                        $this->featureIdProp = $idProp->GetName();
+                        $idType = $idProp->GetDataType();
+                    }
+                } else {
+                    $props = $clsDef->GetProperties();
+                    $iidx = $props->IndexOf($this->featureIdProp);
+                    if ($iidx >= 0) {
+                        $propDef = $props->GetItem($iidx);
+                        if ($propDef->GetPropertyType() != MgFeaturePropertyType::DataProperty)
+                            throw new Exception($this->app->localizer->getText("E_ID_PROP_NOT_DATA", $this->featureIdProp));
+                    } else {
+                        throw new Exception($this->app->localizer->getText("E_ID_PROP_NOT_FOUND", $this->featureIdProp));
+                    }
+                }
+                if ($idType == MgPropertyType::String)
+                    $filter = $this->featureIdProp." = '".$this->featureId."'";
+                else
+                    $filter = $this->featureIdProp." = ".$this->featureId;
+            } else {
+                $filter = $this->app->request->params("filter");
+                if ($filter == null)
+                    $filter = "";
+            }
+            
+            $deleteCmd = new MgDeleteFeatures("$schemaName:$className", $filter);
+            $commands->Add($deleteCmd);
+
+            if ($this->useTransaction)
+                $trans = $this->featSvc->BeginTransaction($this->featureSourceId);
+
+            //HACK: Due to #2252, we can't call UpdateFeatures() with NULL MgTransaction, so to workaround
+            //that we call the original UpdateFeatures() overload with useTransaction = false if we find a
+            //NULL MgTransaction
+            if ($trans == null)
+                $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, false);
+            else
+                $result = $this->featSvc->UpdateFeatures($this->featureSourceId, $commands, $trans);
+            if ($trans != null)
+                $trans->Commit();
+            $this->OutputUpdateFeaturesResult($commands, $result, $classDef, true);
+        } catch (MgException $ex) {
+            if ($trans != null)
+                $trans->Rollback();
+            $this->OnException($ex, MgMimeType::Json);
+        }
     }
 
     /**

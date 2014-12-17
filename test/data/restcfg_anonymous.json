@@ -27,6 +27,29 @@
                     "AllowUsers": ["Anonymous"]
                 }
             }
+        },
+        "json": {
+            "Adapter": "FeatureSetGeoJson",
+            "Methods": {
+                "GET": {
+                    "PageSize": 100,
+                    "MaxCount": 500,
+                    "AllowAnonymous": true,
+                    "AllowUsers": ["Anonymous"]
+                },
+                "POST": {
+                    "AllowAnonymous": true,
+                    "AllowUsers": ["Anonymous"]
+                },
+                "PUT": {
+                    "AllowAnonymous": true,
+                    "AllowUsers": ["Anonymous"]
+                },
+                "DELETE": {
+                    "AllowAnonymous": true,
+                    "AllowUsers": ["Anonymous"]
+                }
+            }
         }
     }
 }

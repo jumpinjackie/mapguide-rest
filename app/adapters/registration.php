@@ -36,6 +36,9 @@ $app->container->FeatureSetGeoJson = function() use ($app) {
 $app->container->FeatureSetGeoJsonDoc = function() use ($app) {
     return MgGeoJsonRestAdapter::GetDocumentor();
 };
+$app->container->FeatureSetGeoJsonSessionID = function() use ($app) {
+    return new MgJsonSessionIDExtractor();
+};
 $app->container->MapImage = function() use ($app) {
     return new MgMapImageRestAdapter(
         $app, 

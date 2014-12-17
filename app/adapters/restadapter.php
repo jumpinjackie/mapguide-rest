@@ -57,6 +57,8 @@ abstract class MgRestAdapter extends MgResponseHandler
         $this->propertyList = array();
         $this->computedPropertyList = array();
 
+        $this->EnsureQualifiedClassName();
+        
         if (array_key_exists("Properties", $config)) {
             $cfgProps = $config["Properties"];
             $this->propertyList = $cfgProps;
@@ -73,16 +75,8 @@ abstract class MgRestAdapter extends MgResponseHandler
         }
         if (array_key_exists("TransformTo", $config)) {
             $tokens = explode(":", $this->className);
-            $schemaName = null;
-            $className = null;
-            if (count($tokens) == 2) { //Fully-qualified
-                $schemaName = $tokens[0];
-                $className = $tokens[1];
-            } else { //Not qualified
-                $schemaNames = $this->featSvc->GetSchemas($this->featureSourceId);
-                $schemaName = $schemaNames->GetItem(0);
-                $className = $this->className;
-            }
+            $schemaName = $tokens[0];
+            $className = $tokens[1];
             $this->transform = MgUtils::GetTransform($this->featSvc, $this->featureSourceId, $schemaName, $className, $config["TransformTo"]);
         }
         if (array_key_exists("UseTransaction", $config)) {
@@ -113,15 +107,10 @@ abstract class MgRestAdapter extends MgResponseHandler
      */
     protected function CreateQueryOptions($single) {
         $query = new MgFeatureQueryOptions();
+        $this->EnsureQualifiedClassName();
         $tokens = explode(":", $this->className);
         $clsDef = null;
-        if (count($tokens) == 2) { //Fully-qualified
-            $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $tokens[0], $tokens[1]);
-        } else { //Not qualified
-            $schemaNames = $this->featSvc->GetSchemas($this->featureSourceId);
-            $schemaName = $schemaNames->GetItem(0);
-            $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $this->className);
-        }
+        $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $tokens[0], $tokens[1]);
         if ($single === true) {
             if ($this->featureId == null) {
                 throw new Exception($this->app->localizer->getText("E_NO_FEATURE_ID_SET"));
@@ -235,6 +224,16 @@ abstract class MgRestAdapter extends MgResponseHandler
 
     public function GetMimeType() {
         return MgMimeType::Html;   
+    }
+
+    private function EnsureQualifiedClassName() {
+        $tokens = explode(":", $this->className);
+        if (count($tokens) != 2) {
+            $schemaNames = $this->featSvc->GetSchemas($this->featureSourceId);
+            $schemaName = $schemaNames->GetItem(0);
+            $className = $this->className;
+            $this->className = "$schemaName:$className";
+        }
     }
 
     public function HandleMethod($method, $single = false) {

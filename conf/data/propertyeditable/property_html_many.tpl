@@ -27,7 +27,7 @@
                 if (confirm("Are you sure you want to delete property (" + id + ")?")) {
                     var session = getViewer().GetMapFrame().GetSessionId();
                     var urlWithoutQuery = window.location.href.split("?")[0];
-                    var deleteUrl = urlWithoutQuery.replace(".html", id + ".xml");
+                    var deleteUrl = urlWithoutQuery.replace(".html", id + ".json");
                     var promise = $.ajax({
                         method: "post",
                         url: deleteUrl,

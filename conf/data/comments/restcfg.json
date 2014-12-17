@@ -25,6 +25,26 @@
                 }
             }
         },
+        "json": {
+            "Adapter": "FeatureSetGeoJson",
+            "Methods": {
+                "GET": {
+                    "PageSize": 100,
+                    "MaxCount": 500,
+                    "AllowAnonymous": true,
+                    "AllowGroups": ["Everyone"]
+                },
+                "POST": {
+                    "AllowUsers": ["Author"]
+                },
+                "PUT": {
+                    "AllowUsers": ["Author"]
+                },
+                "DELETE": {
+                    "AllowUsers": ["Author"]
+                }
+            }
+        },
         "html": {
             "Adapter": "Template",
             "Methods": {

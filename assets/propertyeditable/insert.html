@@ -21,6 +21,45 @@
                     return;
                 }
                 var session = getViewer().GetMapFrame().GetSessionId();
+                var properties = [];
+                var editedFields = $("input.form-control[data-edited=true]");
+                for (var i = 0; i < editedFields.length; i++) {
+                    var inputEl = $(editedFields[i]);
+                    properties.push({
+                        "Name": inputEl.attr("name"),
+                        "Value": inputEl.val()
+                    });
+                }
+                var json = {
+                    "FeatureSet": {
+                        "SessionID": session,
+                        "Features": {
+                            "Feature": [
+                                {
+                                    "Property": properties
+                                }
+                            ]
+                        }
+                    }
+                };
+                $("#btnSave").addClass("disabled");
+                var insertUrl = "../../data/propertyeditable/.json";
+                var promise = $.ajax({
+                    method: "post",
+                    url: insertUrl,
+                    data: JSON.stringify(json),
+                    success: onPropertyInserted,
+                    error: onPropertyInsertError
+                });
+            }
+
+            /*
+            function doPropertyInsert() {
+                if ($.trim($("#SHPGEOM").val()) == "") {
+                    alert("A geometry is required for this property. Please draw one");
+                    return;
+                }
+                var session = getViewer().GetMapFrame().GetSessionId();
                 var xml = "<FeatureSet>";
                 xml += "<SessionID>" + session + "</SessionID>";
                 xml += "<Features><Feature>";
@@ -42,6 +81,7 @@
                     error: onPropertyInsertError
                 });
             }
+            */
 
             function onPropertyInsertError(data, textStatus, jqXHR) {
                 try {

@@ -93,6 +93,47 @@
                     return xml;
                 }
 
+                function createInsertJson(text, geom, session) {
+                    var json = {
+                        "FeatureSet": {
+                            "Features": {
+                                "Feature": [
+                                    { 
+                                        "Property": [
+                                            { "Name": "RNAME", "Value": text },
+                                            { "Name": "SHPGEOM", "Value": geom }
+                                        ] 
+                                    }
+                                ]
+                            }
+                        }
+                    };
+                    if (typeof(session) != 'undefined' && session != null && session != "") {
+                        json.FeatureSet.SessionID = session;
+                    }
+                    return JSON.stringify(json);
+                }
+
+                function createUpdateJson(filter, text, geom, session) {
+                    var json = {
+                        "UpdateOperation": {
+                            "UpdateProperties": {
+                                "Property": [
+                                    { "Name": "RNAME", "Value": text },
+                                    { "Name": "SHPGEOM", "Value": geom }
+                                ]
+                            }
+                        }
+                    };
+                    if (typeof(session) != 'undefined' && session != null && session != "") {
+                        json.UpdateOperation.SessionID = session;
+                    }
+                    if (filter != null && filter != "") {
+                        json.UpdateOperation.Filter = filter;
+                    }
+                    return JSON.stringify(json);
+                }
+
                 var testID1 = 42;
                 var testID2 = 43;
                 var testID3 = 1234;
@@ -451,6 +492,356 @@
                     ok(status == 403, "(" + status + ") Expected forbidden");
                     assertMimeType(mimeType, MgMimeType.Xml);
                 });
+
+                ///////////////////////////// JSON VERSION ////////////////////////////////////
+                testID1 = 47;
+                testID2 = 48;
+                testID3 = 2345;
+
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "GET", {}, "Foo", "Bar", function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "GET", {}, "Anonymous", "", function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "GET", { session: this.wfsSessionId }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "GET", { session: this.wmsSessionId }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "GET", { session: this.authorSessionId }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "GET", { session: this.user1SessionId }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "GET", { session: this.user2SessionId }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+
+                //Single access
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", {}, "Foo", "Bar", function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", {}, "Anonymous", "", function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", {}, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", {}, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", {}, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", {}, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", {}, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", { session: this.wfsSessionId }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", { session: this.wmsSessionId }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", { session: this.authorSessionId }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", { session: this.user1SessionId }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/" + testID3 + ".json", "GET", { session: this.user2SessionId }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+
+                //Insert
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+
+                api_test(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("anonymous session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.anonymousSessionId), function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("admin session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.adminSessionId), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("wfsuser session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.wfsSessionId), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("wmsuser session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.wmsSessionId), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("author session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.authorSessionId), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("user1 session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.user1SessionId), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "POST", createInsertJson("user2 session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.user2SessionId), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+
+                //Update
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "PUT", createUpdateJson("Autogenerated_SDF_ID = " + testID1, "invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "PUT", createUpdateJson("Autogenerated_SDF_ID = " + testID1, "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "PUT", createUpdateJson("Autogenerated_SDF_ID = " + testID1, "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "PUT", createUpdateJson("Autogenerated_SDF_ID = " + testID1, "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "PUT", createUpdateJson("Autogenerated_SDF_ID = " + testID1, "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "PUT", createUpdateJson("Autogenerated_SDF_ID = " + testID1, "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "PUT", createUpdateJson("Autogenerated_SDF_ID = " + testID1, "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "PUT", createUpdateJson("Autogenerated_SDF_ID = " + testID1, "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                //Update - single access
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar", function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "", function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+
+                api_test(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "anonymous session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.anonymousSessionId), function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "admin session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.adminSessionId), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "wfsuser session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.wfsSessionId), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "wmsuser session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.wmsSessionId), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "author session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.authorSessionId), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "user1 session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.user1SessionId), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/" + testID2 + ".json", "PUT", createUpdateJson("", "user2 session", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", this.user2SessionId), function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+
+                //Delete
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Foo", "Bar", function(status, result, mimeType) {
+                    ok(status == 401, "(" + status + ") Expected denial");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "Anonymous", "", function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wfsUser ?>", "<?= $wfsPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $wmsUser ?>", "<?= $wmsPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $authorUser ?>", "<?= $authorPass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user1User ?>", "<?= $user1Pass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_with_credentials(rest_root_url + "/data/test_anonymous/.json", "DELETE", { filter: "Autogenerated_SDF_ID = " + testID1 }, "<?= $user2User ?>", "<?= $user2Pass ?>", function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "DELETE", { session: this.anonymousSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") Expected success");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "DELETE", { session: this.wfsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "DELETE", { session: this.wmsSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "DELETE", { session: this.authorSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "DELETE", { session: this.adminSessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "DELETE", { session: this.user1SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/data/test_anonymous/.json", "DELETE", { session: this.user2SessionId, filter: "Autogenerated_SDF_ID = " + testID2 }, function(status, result, mimeType) {
+                    ok(status == 403, "(" + status + ") Expected forbidden");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                });
+
             });
             test("ACL Administrator", function() {
                 function createInsertXml(text, geom, session) {
