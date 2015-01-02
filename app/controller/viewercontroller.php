@@ -18,6 +18,7 @@
 //
 
 require_once "controller.php";
+require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgViewerController extends MgBaseController {
     public function __construct($app) {
@@ -30,7 +31,7 @@ class MgViewerController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
             $sessionPart = "&SESSION=$sessionId";
         }
-        $selfUrl = $this->app->config("SelfUrl");
+        $selfUrl = MgUtils::GetSelfUrlRoot($this->app->config("SelfUrl"));
         $this->app->redirect("$selfUrl/../mapviewerajax/?WEBLAYOUT=".$resId->ToString().$sessionPart);
     }
 
@@ -40,7 +41,7 @@ class MgViewerController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
             $sessionPart = "&session=$sessionId";
         }
-        $selfUrl = $this->app->config("SelfUrl");
+        $selfUrl = MgUtils::GetSelfUrlRoot($this->app->config("SelfUrl"));
         $this->app->redirect("$selfUrl/../fusion/templates/mapguide/$template/index.html?ApplicationDefinition=".$resId->ToString().$sessionPart);
     }
 
@@ -213,7 +214,7 @@ class MgViewerController extends MgBaseController {
             $userInfo = new MgUserInformation($sessionId);
             $siteConn->Open($userInfo);
         }
-        $selfUrl = $this->app->config("SelfUrl");
+        $selfUrl = MgUtils::GetSelfUrlRoot($this->app->config("SelfUrl"));
         switch ($resId->GetResourceType()) {
             case MgResourceType::FeatureSource:
                 {

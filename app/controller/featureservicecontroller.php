@@ -246,7 +246,7 @@ class MgFeatureServiceController extends MgBaseController {
                 $param->AddParameter("XSLSTYLESHEET", "FeatureSchemaNameList.xsl");
                 $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
                 $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
-                $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
+                $param->AddParameter("XSLPARAM.ASSETPATH", MgUtils::GetSelfUrlRoot($selfUrl)."/assets");
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
@@ -318,7 +318,7 @@ class MgFeatureServiceController extends MgBaseController {
                     $param->AddParameter("XSLSTYLESHEET", "FeatureSchema.xsl");
                     $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
                     $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
-                    $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
+                    $param->AddParameter("XSLPARAM.ASSETPATH", MgUtils::GetSelfUrlRoot($selfUrl)."/assets");
                 }
                 $param->AddParameter("RESOURCEID", $resIdStr);
                 $param->AddParameter("SCHEMA", $schemaName);
@@ -352,7 +352,7 @@ class MgFeatureServiceController extends MgBaseController {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
                 $param->AddParameter("X-OVERRIDE-CONTENT-TYPE", MgMimeType::Html);
                 $param->AddParameter("XSLSTYLESHEET", "ClassNameList.xsl");
-                $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
+                $param->AddParameter("XSLPARAM.ASSETPATH", MgUtils::GetSelfUrlRoot($selfUrl)."/assets");
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $param->AddParameter("SCHEMA", $schemaName);

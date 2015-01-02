@@ -174,7 +174,7 @@ class MgResourceServiceController extends MgBaseController {
                 $param->AddParameter("XSLSTYLESHEET", "ResourceDataList.xsl");
                 $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
                 $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
-                $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
+                $param->AddParameter("XSLPARAM.ASSETPATH", MgUtils::GetSelfUrlRoot($selfUrl)."/assets");
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
@@ -201,7 +201,7 @@ class MgResourceServiceController extends MgBaseController {
                 $param->AddParameter("X-OVERRIDE-CONTENT-TYPE", MgMimeType::Html);
                 $param->AddParameter("XSLSTYLESHEET", "ResourceReferenceList.xsl");
                 $param->AddParameter("XSLPARAM.RESOURCENAME", $resName);
-                $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
+                $param->AddParameter("XSLPARAM.ASSETPATH", MgUtils::GetSelfUrlRoot($selfUrl)."/assets");
             }
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
@@ -410,7 +410,7 @@ class MgResourceServiceController extends MgBaseController {
         $smarty = new Smarty();
         $smarty->setCompileDir($this->app->config("Cache.RootDir")."/templates_c");
         $smarty->assign("resId", $resIdStr);
-        $smarty->assign("assetPath", $selfUrl."/assets");
+        $smarty->assign("assetPath", MgUtils::GetSelfUrlRoot($selfUrl)."/assets");
         $smarty->assign("urlRoot", $rootPath);
         $smarty->assign("resourceType", $resId->GetResourceType());
 
@@ -451,7 +451,7 @@ class MgResourceServiceController extends MgBaseController {
                     $parentPath = implode("/", $tokens);
                     $param->AddParameter("XSLPARAM.PARENTPATHROOT", $selfUrl.$parentPath);
                 }
-                $param->AddParameter("XSLPARAM.ASSETPATH", $selfUrl."/assets");
+                $param->AddParameter("XSLPARAM.ASSETPATH", MgUtils::GetSelfUrlRoot($selfUrl)."/assets");
                 $param->AddParameter("XSLPARAM.FOLDERPATH", $folderPath);
                 $param->AddParameter("XSLPARAM.ROOTPATH", $rootPath);
 

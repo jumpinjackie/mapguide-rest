@@ -89,7 +89,6 @@ class MgRenderingServiceController extends MgBaseController {
 
     public function RenderMapDefinition($mdfId, $format) {
         $resIdStr = $mdfId->ToString();
-
         $x = $this->GetRequestParameter("x", null);
         $y = $this->GetRequestParameter("y", null);
         $scale = $this->GetRequestParameter("scale", null);
@@ -110,7 +109,7 @@ class MgRenderingServiceController extends MgBaseController {
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr, $format, $x, $y, $scale, $width, $height) {
             $param->AddParameter("OPERATION", "GETMAPIMAGE");
-            $param->AddParameter("VERSION", "2.0.0");
+            $param->AddParameter("VERSION", "1.0.0");
             $param->AddParameter("MAPDEFINITION", $resIdStr);
             $param->AddParameter("FORMAT", strtoupper($format));
 
@@ -161,7 +160,7 @@ class MgRenderingServiceController extends MgBaseController {
         $param->AddParameter("CLIENTAGENT", "MapGuide REST Extension");
         $param->AddParameter("CLIENTIP", $this->GetClientIp());
         $param->AddParameter("OPERATION", "GETMAPIMAGE");
-        $param->AddParameter("VERSION", "2.0.0");
+        $param->AddParameter("VERSION", "1.0.0");
         $param->AddParameter("MAPNAME", $mapName);
         $param->AddParameter("FORMAT", strtoupper($format));
 

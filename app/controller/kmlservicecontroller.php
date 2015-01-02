@@ -19,6 +19,7 @@
 
 require_once "controller.php";
 require_once dirname(__FILE__)."/../util/readerchunkedresult.php";
+require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgKmlDocument
 {
@@ -302,7 +303,7 @@ class MgKmlServiceController extends MgBaseController {
         }
         if ($native) {
             $mdfIdStr = $resId->ToString();
-            $selfUrl = $this->app->config("SelfUrl");
+            $selfUrl = MgUtils::GetSelfUrlRoot($this->app->config("SelfUrl"));
             $this->app->redirect("$selfUrl/../mapagent/mapagent.fcgi?OPERATION=GETMAPKML&VERSION=1.0.0&SESSION=$sessionId&MAPDEFINITION=$mdfIdStr&CLIENTAGENT=MapGuide REST Extension");
         } else {
             $map = new MgMap($siteConn);
@@ -328,7 +329,7 @@ class MgKmlServiceController extends MgBaseController {
         if ($native) {
             $mdfId = $map->GetMapDefinition();
             $mdfIdStr = $mdfId->ToString();
-            $selfUrl = $this->app->config("SelfUrl");
+            $selfUrl = MgUtils::GetSelfUrlRoot($this->app->config("SelfUrl"));
             $this->app->redirect("$selfUrl/../mapagent/mapagent.fcgi?OPERATION=GETMAPKML&VERSION=1.0.0&SESSION=$sessionId&MAPDEFINITION=$mdfIdStr&CLIENTAGENT=MapGuide REST Extension");
         } else {
             $this->_GetKmlForMap($map, $sessionId, $format, $chunk);
@@ -471,7 +472,7 @@ class MgKmlServiceController extends MgBaseController {
 
         //We still need the mapagent URL so that GETFEATURESKML can generate legend icons from
         //within the operation
-        $agentUri = $this->app->config("SelfUrl")."/../mapagent/mapagent.fcgi";
+        $agentUri = MgUtils::GetSelfUrlRoot($this->app->config("SelfUrl"))."/../mapagent/mapagent.fcgi";
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resId, $bbox, $width, $height, $drawOrder, $dpi) {

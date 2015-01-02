@@ -27,6 +27,14 @@ require_once "xmlschemainfo.php";
 
 class MgUtils
 {
+    public static function GetSelfUrlRoot($url) {
+        //This is the case if no URL rewriting module was installed
+        if (self::StringEndsWith($url, "/index.php")) {
+            $url = substr($url, 0, strlen($url) - strlen("/index.php"));
+        }
+        return $url;
+    }
+
     public static function FormatException($app, $type, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
         $errResponse = "";
         if ($mimeType === MgMimeType::Xml || $mimeType == MgMimeType::Kml) {

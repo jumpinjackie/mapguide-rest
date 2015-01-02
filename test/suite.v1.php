@@ -9007,10 +9007,10 @@
                     ok(status == 400, "(" + status + ") - Expected missing parameter response");
                 });
                 api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png", "GET", { x: -87.73, y: 43.74, scale: 8000 }, function(status, result, mimeType) {
-                    ok(status == 400, "(" + status + ") - Expected image response");
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
                 });
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/image.png", "GET", { x: -87.73, y: 43.74, scale: 8000 }, function(status, result, mimeType) {
-                    ok(status == 400, "(" + status + ") - Expected image response");
+                    ok(status == 400, "(" + status + ") - Expected missing parameter response");
                 });
 
                 //PNG

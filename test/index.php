@@ -20,9 +20,14 @@ $user2User = "User2";
 $user2Pass = "user2";
 $userGroup = "RestUsers";
 
+$selfUrl = "/mapguide/rest";
+
 $namespace = null;
 if (array_key_exists("namespace", $_GET)) {
     $namespace = $_GET["namespace"];
+}
+if (array_key_exists("no_url_rewrite", $_GET) && $_GET["no_url_rewrite"] == "1") {
+    $selfUrl = "/mapguide/rest/index.php";
 }
 
 try {
@@ -278,9 +283,9 @@ $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource x
             // - Do actual content verification in addition to response status verification
 
             <? if ($namespace != null) { ?>
-            var rest_root_url = "/mapguide/rest/<?= $namespace ?>";
+            var rest_root_url = "<?= $selfUrl ?>/<?= $namespace ?>";
             <? } else { ?>
-            var rest_root_url = "/mapguide/rest";
+            var rest_root_url = "<?= $selfUrl ?>";
             <? } ?>
             var badSessionId = "12345678abcdefgh";
 
