@@ -6,6 +6,8 @@ IIS configuration to enable URL rewriting. Requires the Application Request Rout
     <system.webServer>
         <staticContent>
             <mimeMap fileExtension=".woff" mimeType="application/x-woff" />
+            <mimeMap fileExtension=".svg" mimeType="image/svg+xml" />
+            <mimeMap fileExtension=".czml" mimeType="application/json" />
             <mimeMap fileExtension=".kml" mimeType="application/vnd.google-earth.kml+xml" />
         </staticContent>
         <rewrite>
