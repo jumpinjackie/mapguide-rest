@@ -44,7 +44,7 @@ abstract class MgResponseHandler
         return $values;
     }
 
-    public function ExecuteHttpRequest($req) {
+    public function ExecuteHttpRequest($req, $ovHandler = NULL) {
         $param = $req->GetRequestParam();
         $origMimeType = $param->GetParameterValue("FORMAT");
         try {
@@ -62,92 +62,101 @@ abstract class MgResponseHandler
 
             $response = $req->Execute();
             $result = $response->GetResult();
-
-            $bDownload = false;
-            if ($param->GetParameterValue("X-DOWNLOAD-ATTACHMENT") === "true") {
-                $bDownload = true;
-            }
-
             $status = $result->GetStatusCode();
-            if ($status == 200) {
-                $resultObj = $result->GetResultObject();
-                if ($resultObj != null) {
-                    $mimeType = $result->GetResultContentType();
-                    $this->app->response->headers->set("Content-Type", $mimeType);
-                    //Set download response headers if specified
-                    if ($bDownload === true) {
-                        $filebasename = "download";
-                        if ($param->ContainsParameter("X-DOWNLOAD-ATTACHMENT-NAME")) {
-                            $filebasename = $param->GetParameterValue("X-DOWNLOAD-ATTACHMENT-NAME");
-                        }
-                        $this->app->response->headers->set("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($filebasename, $mimeType));
-                    }
-                    if ($resultObj instanceof MgByteReader) {
-                        if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
-                            if ($result->GetResultContentType() === MgMimeType::Xml && $param->ContainsParameter("XSLSTYLESHEET")) {
-                                $body = MgUtils::XslTransformByteReader($this->app, $resultObj, $param->GetParameterValue("XSLSTYLESHEET"), $this->CollectXslParameters($param));
-                                $this->app->response->header("Content-Type", MgMimeType::Json);
-                                $this->app->response->setBody(MgUtils::Xml2Json($body));
-                            } else {
-                                $this->OutputXmlByteReaderAsJson($resultObj);
-                            }
-                        } else {
-                            if ($result->GetResultContentType() === MgMimeType::Xml && $param->ContainsParameter("XSLSTYLESHEET")) {
-                                if ($param->ContainsParameter("X-OVERRIDE-CONTENT-TYPE"))
-                                    $this->app->response->header("Content-Type", $param->GetParameterValue("X-OVERRIDE-CONTENT-TYPE"));
-                                $this->app->response->setBody(MgUtils::XslTransformByteReader($this->app, $resultObj, $param->GetParameterValue("XSLSTYLESHEET"), $this->CollectXslParameters($param)));
-                            } else {
-                                $this->OutputByteReader($resultObj, ($param->GetParameterValue("X-CHUNK-RESPONSE") === "true"), ($param->GetParameterValue("X-PREPEND-XML-PROLOG") === "true"));
-                            }
-                        }
-                    } else if ($resultObj instanceof MgStringCollection) {
-                        $this->OutputMgStringCollection($resultObj, $param->GetParameterValue("FORMAT"));
-                    } else if ($resultObj instanceof MgHttpPrimitiveValue) {
-                        $fmt = "xml";
-                        if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
-                            $fmt = "json";
-                            $this->app->response->header("Content-Type", MgMimeType::Json);
-                        } else {
-                            $this->app->response->header("Content-Type", MgMimeType::Xml);
-                        }
-                        $body = null;
-                        switch ($resultObj->GetType())
-                        {
-                            case 1:
-                                $body = MgBoxedValue::Boolean($resultObj->GetBoolValue(), $fmt);
-                                break;
-                            case 2:
-                                $body = MgBoxedValue::Integer($resultObj->GetIntegerValue(), $fmt);
-                                break;
-                            case 3:
-                                $body = MgBoxedValue::String($resultObj->GetStringValue(), $fmt);
-                                break;
-                        }
-                        if ($body != null) {
-                            $this->app->response->setBody($body);
-                        }
-                    } else if (method_exists($resultObj, "ToXml")) {
-                        $byteReader = $resultObj->ToXml();
-                        if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
-                            $this->OutputXmlByteReaderAsJson($byteReader);
-                        } else {
-                            $this->OutputByteReader($byteReader, ($param->GetParameterValue("X-CHUNK-RESPONSE") === "true"));
-                        }
-                    } else {
-                        $this->ServerError($this->app->localizer->getText("E_DONT_KNOW_HOW_TO_OUTPUT", $resultObj->ToString()));
-                    }
-                }
-            } else {
-                $format = $param->GetParameterValue("FORMAT");
-                if ($param->ContainsParameter("XSLSTYLESHEET"))
-                    $format = MgMimeType::Html;
-                else
-                    $format = $this->GetMimeTypeForFormat($format);
 
-                if ($format != "") {
-                    $this->OutputError($result, $format);
+            //If there's a custom handler passed in, it takes responsibility
+            if ($ovHandler != null && is_callable($ovHandler))
+            {
+                call_user_func_array($ovHandler, array($result, $status));
+                return $status;
+            }
+            else
+            {
+                $bDownload = false;
+                if ($param->GetParameterValue("X-DOWNLOAD-ATTACHMENT") === "true") {
+                    $bDownload = true;
+                }
+
+                if ($status == 200) {
+                    $resultObj = $result->GetResultObject();
+                    if ($resultObj != null) {
+                        $mimeType = $result->GetResultContentType();
+                        $this->app->response->headers->set("Content-Type", $mimeType);
+                        //Set download response headers if specified
+                        if ($bDownload === true) {
+                            $filebasename = "download";
+                            if ($param->ContainsParameter("X-DOWNLOAD-ATTACHMENT-NAME")) {
+                                $filebasename = $param->GetParameterValue("X-DOWNLOAD-ATTACHMENT-NAME");
+                            }
+                            $this->app->response->headers->set("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($filebasename, $mimeType));
+                        }
+                        if ($resultObj instanceof MgByteReader) {
+                            if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
+                                if ($result->GetResultContentType() === MgMimeType::Xml && $param->ContainsParameter("XSLSTYLESHEET")) {
+                                    $body = MgUtils::XslTransformByteReader($this->app, $resultObj, $param->GetParameterValue("XSLSTYLESHEET"), $this->CollectXslParameters($param));
+                                    $this->app->response->header("Content-Type", MgMimeType::Json);
+                                    $this->app->response->setBody(MgUtils::Xml2Json($body));
+                                } else {
+                                    $this->OutputXmlByteReaderAsJson($resultObj);
+                                }
+                            } else {
+                                if ($result->GetResultContentType() === MgMimeType::Xml && $param->ContainsParameter("XSLSTYLESHEET")) {
+                                    if ($param->ContainsParameter("X-OVERRIDE-CONTENT-TYPE"))
+                                        $this->app->response->header("Content-Type", $param->GetParameterValue("X-OVERRIDE-CONTENT-TYPE"));
+                                    $this->app->response->setBody(MgUtils::XslTransformByteReader($this->app, $resultObj, $param->GetParameterValue("XSLSTYLESHEET"), $this->CollectXslParameters($param)));
+                                } else {
+                                    $this->OutputByteReader($resultObj, ($param->GetParameterValue("X-CHUNK-RESPONSE") === "true"), ($param->GetParameterValue("X-PREPEND-XML-PROLOG") === "true"));
+                                }
+                            }
+                        } else if ($resultObj instanceof MgStringCollection) {
+                            $this->OutputMgStringCollection($resultObj, $param->GetParameterValue("FORMAT"));
+                        } else if ($resultObj instanceof MgHttpPrimitiveValue) {
+                            $fmt = "xml";
+                            if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
+                                $fmt = "json";
+                                $this->app->response->header("Content-Type", MgMimeType::Json);
+                            } else {
+                                $this->app->response->header("Content-Type", MgMimeType::Xml);
+                            }
+                            $body = null;
+                            switch ($resultObj->GetType())
+                            {
+                                case 1:
+                                    $body = MgBoxedValue::Boolean($resultObj->GetBoolValue(), $fmt);
+                                    break;
+                                case 2:
+                                    $body = MgBoxedValue::Integer($resultObj->GetIntegerValue(), $fmt);
+                                    break;
+                                case 3:
+                                    $body = MgBoxedValue::String($resultObj->GetStringValue(), $fmt);
+                                    break;
+                            }
+                            if ($body != null) {
+                                $this->app->response->setBody($body);
+                            }
+                        } else if (method_exists($resultObj, "ToXml")) {
+                            $byteReader = $resultObj->ToXml();
+                            if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
+                                $this->OutputXmlByteReaderAsJson($byteReader);
+                            } else {
+                                $this->OutputByteReader($byteReader, ($param->GetParameterValue("X-CHUNK-RESPONSE") === "true"));
+                            }
+                        } else {
+                            $this->ServerError($this->app->localizer->getText("E_DONT_KNOW_HOW_TO_OUTPUT", $resultObj->ToString()));
+                        }
+                    }
                 } else {
-                    $this->OutputError($result);
+                    $format = $param->GetParameterValue("FORMAT");
+                    if ($param->ContainsParameter("XSLSTYLESHEET"))
+                        $format = MgMimeType::Html;
+                    else
+                        $format = $this->GetMimeTypeForFormat($format);
+
+                    if ($format != "") {
+                        $this->OutputError($result, $format);
+                    } else {
+                        $this->OutputError($result);
+                    }
                 }
             }
             return $status;

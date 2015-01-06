@@ -165,6 +165,7 @@ class MgUtils
                 !MgUtils::StringEndsWith($lastPart, ".".MgResourceType::PrintLayout) &&
                 !MgUtils::StringEndsWith($lastPart, ".".MgResourceType::SymbolLibrary) &&
                 !MgUtils::StringEndsWith($lastPart, ".WatermarkDefinition") &&
+                !MgUtils::StringEndsWith($lastPart, ".TileSetDefinition") &&
                 !MgUtils::StringEndsWith($lastPart, ".".MgResourceType::LoadProcedure)) {
                 $appendSlash = true;
             }

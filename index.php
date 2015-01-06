@@ -34,6 +34,10 @@ if (strpos($_SERVER['SERVER_SOFTWARE'], "IIS") !== FALSE)
 
 require 'vendor/autoload.php';
 include dirname(__FILE__)."/../mapadmin/constants.php";
+//This is a quick and dirty way to inject the MapGuide Server version. That version number is stamped on
+//resizableadmin.php from the Site Administrator, since we're already pulling in its constants, we can pull
+//this in as well
+include dirname(__FILE__)."/../mapadmin/resizableadmin.php";
 
 //Shim some constants we know haven't been properly exposed in previous versions of MapGuide
 if (!class_exists("MgImageFormats")) {
@@ -54,6 +58,8 @@ MgInitializeWebTier($webConfigPath);
 require_once dirname(__FILE__)."/app/util/localizer.php";
 require_once dirname(__FILE__)."/app/util/utils.php";
 $config = require_once dirname(__FILE__)."/app/config.php";
+$logConfig = require_once dirname(__FILE__)."/app/log_config.php";
+$config = array_merge($config, $logConfig);
 //Pull in the appropriate string bundle
 $strings = require_once dirname(__FILE__)."/app/res/lang/".$config["Locale"].".php";
 $app = new \Slim\Slim($config);
@@ -71,6 +77,9 @@ $app->error(function($err) use ($app) {
     $app->response->setBody(MgUtils::FormatException($app, "UnhandledError", $title, $details, $err->getTraceAsString(), 500, $mimeType));
 });
 $app->localizer = new Localizer($strings);
+//Set server version
+$ver = explode(".", SITE_ADMINISTRATOR_VERSION, 4);
+$app->MG_VERSION = array(intval($ver[0]), intval($ver[1]), intval($ver[2]), intval($ver[3]));
 $app->config("SelfUrl", $app->request->getUrl() . $app->request->getRootUri());
 /*
 var_dump($app->localizer->getText("E_METHOD_NOT_SUPPORTED"));

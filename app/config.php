@@ -23,6 +23,7 @@ return array(
     //
     //Enable/disable debugging facilities in the slim framework
     "debug" => false,
+
     //
     //GeoRest.ConfigPath
     //
