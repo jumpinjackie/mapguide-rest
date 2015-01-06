@@ -286,9 +286,8 @@ class MgTileServiceController extends MgBaseController {
         return $path;
     }
 
-    private function PutTileImageXYZ($map, $groupName, $siteConn, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames) {
+    private function PutTileImageXYZ($map, $groupName, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames) {
         //We don't use RenderTile (as it uses key parameters that are locked to serverconfig.ini), we use RenderMap instead
-        $renderSvc = $siteConn->CreateService(MgServiceType::RenderingService);
         $env = new MgEnvelope($boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY);
         $strColor = $map->GetBackgroundColor();
         //Make sure the alpha component is transparent
@@ -392,80 +391,95 @@ class MgTileServiceController extends MgBaseController {
                     $map = new MgMap($siteConn);
                     $map->Create($resId, "VectorTileMap");
 
-                    $layerGroups = $map->GetLayerGroups();
-                    $baseGroup = $layerGroups->GetItem($groupName);
-
-                    $factory = new MgCoordinateSystemFactory();
-                    $mapCsWkt = $map->GetMapSRS();
-                    $mapCs = $factory->Create($mapCsWkt);
-
-                    $mapExtent = $map->GetMapExtent();
-                    $mapExLL = $mapExtent->GetLowerLeftCoordinate();
-                    $mapExUR = $mapExtent->GetUpperRightCoordinate();
-
-                    $metersPerUnit = $mapCs->ConvertCoordinateSystemUnitsToMeters(1.0);
-
-                    //error_log("($requestId) Calc bounds from XYZ");
-                    //XYZ to lat/lon math. From this we can convert to the bounds in the map's CS
-                    //
-                    //Source: http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-                    $n = pow(2, $z);
-                    $lonMin = $x / $n * 360.0 - 180.0;
-                    $latMin = rad2deg(atan(sinh(pi() * (1 - 2 * $y / $n))));
-                    $lonMax = ($x + 1) / $n * 360.0 - 180.0;
-                    $latMax = rad2deg(atan(sinh(pi() * (1 - 2 * ($y + 1) / $n))));
-
-                    $boundsMinX = min($lonMin, $lonMax);
-                    $boundsMinY = min($latMin, $latMax);
-                    $boundsMaxX = max($lonMax, $lonMin);
-                    $boundsMaxY = max($latMax, $latMin);
-
-                    if ($mapCs->GetCsCode() != "LL84") {
-                        $llCs = $factory->CreateFromCode("LL84");
-                        $trans = $factory->GetTransform($llCs, $mapCs);
-
-                        $ul = $trans->Transform($lonMin, $latMin);
-                        $lr = $trans->Transform($lonMax, $latMax);
-
-                        $boundsMinX = min($lr->GetX(), $ul->GetX());
-                        $boundsMinY = min($lr->GetY(), $ul->GetY());
-                        $boundsMaxX = max($lr->GetX(), $ul->GetX());
-                        $boundsMaxY = max($lr->GetY(), $ul->GetY());
-                    }
-
-                    //Set all layers under group to be visible
-                    $layers = $map->GetLayers();
-                    $groups = $map->GetLayerGroups();
-                    $layerCount = $layers->GetCount();
-
-                    if ($groups->IndexOf($groupName) < 0) {
-                        throw new Exception($this->app->localizer->getText("E_GROUP_NOT_FOUND", $groupName));
-                    } else {
-                        $grp = $groups->GetItem($groupName);
-                        $grp->SetVisible(true);
-                    }
-
-                    for ($i = 0; $i < $layerCount; $i++) {
-                        $layer = $layers->GetItem($i);
-                        $group = $layer->GetGroup();
-                        if (null == $group) {
-                            continue;
+                    $bLegacyPath = true;
+                    $renderSvc = null;
+                    if ($type != "json") {
+                        $renderSvc = $siteConn->CreateService(MgServiceType::RenderingService);
+                        //if this is MGOS 3.0, we have the RenderTileXYZ API that does this for us.
+                        if (is_callable(array($renderSvc, "RenderTileXYZ"))) {
+                            $tileImg = $renderSvc->RenderTileXYZ($map, $groupName, $x, $y, $z, $map->GetDisplayDpi(), strtoupper($type));
+                            $sink = new MgByteSink($tileImg);
+                            $sink->ToFile($path);
+                            $bLegacyPath = false;
                         }
-                        if ($group->GetName() != $groupName) {
-                            $layer->SetVisible(false);
-                            continue;
-                        }
-                        if ($layer->GetLayerType() == MgLayerType::Dynamic)
-                            $layer->SetVisible(true);
                     }
 
-                    if ($type == "json") {
-                        //error_log("($requestId) Render vector tile");
-                        $this->PutVectorTileXYZ($map, $groupName, $siteConn, $metersPerUnit, $factory, $path, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames);
-                    } else {
-                        $format = strtoupper($type);
-                        //error_log("($requestId) Render image tile");
-                        $this->PutTileImageXYZ($map, $groupName, $siteConn, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames);
+                    if ($bLegacyPath) {
+                        $layerGroups = $map->GetLayerGroups();
+                        $baseGroup = $layerGroups->GetItem($groupName);
+
+                        $factory = new MgCoordinateSystemFactory();
+                        $mapCsWkt = $map->GetMapSRS();
+                        $mapCs = $factory->Create($mapCsWkt);
+
+                        $mapExtent = $map->GetMapExtent();
+                        $mapExLL = $mapExtent->GetLowerLeftCoordinate();
+                        $mapExUR = $mapExtent->GetUpperRightCoordinate();
+
+                        $metersPerUnit = $mapCs->ConvertCoordinateSystemUnitsToMeters(1.0);
+
+                        //error_log("($requestId) Calc bounds from XYZ");
+                        //XYZ to lat/lon math. From this we can convert to the bounds in the map's CS
+                        //
+                        //Source: http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+                        $n = pow(2, $z);
+                        $lonMin = $x / $n * 360.0 - 180.0;
+                        $latMin = rad2deg(atan(sinh(pi() * (1 - 2 * $y / $n))));
+                        $lonMax = ($x + 1) / $n * 360.0 - 180.0;
+                        $latMax = rad2deg(atan(sinh(pi() * (1 - 2 * ($y + 1) / $n))));
+
+                        $boundsMinX = min($lonMin, $lonMax);
+                        $boundsMinY = min($latMin, $latMax);
+                        $boundsMaxX = max($lonMax, $lonMin);
+                        $boundsMaxY = max($latMax, $latMin);
+
+                        if ($mapCs->GetCsCode() != "LL84") {
+                            $llCs = $factory->CreateFromCode("LL84");
+                            $trans = $factory->GetTransform($llCs, $mapCs);
+
+                            $ul = $trans->Transform($lonMin, $latMin);
+                            $lr = $trans->Transform($lonMax, $latMax);
+
+                            $boundsMinX = min($lr->GetX(), $ul->GetX());
+                            $boundsMinY = min($lr->GetY(), $ul->GetY());
+                            $boundsMaxX = max($lr->GetX(), $ul->GetX());
+                            $boundsMaxY = max($lr->GetY(), $ul->GetY());
+                        }
+
+                        //Set all layers under group to be visible
+                        $layers = $map->GetLayers();
+                        $groups = $map->GetLayerGroups();
+                        $layerCount = $layers->GetCount();
+
+                        if ($groups->IndexOf($groupName) < 0) {
+                            throw new Exception($this->app->localizer->getText("E_GROUP_NOT_FOUND", $groupName));
+                        } else {
+                            $grp = $groups->GetItem($groupName);
+                            $grp->SetVisible(true);
+                        }
+
+                        for ($i = 0; $i < $layerCount; $i++) {
+                            $layer = $layers->GetItem($i);
+                            $group = $layer->GetGroup();
+                            if (null == $group) {
+                                continue;
+                            }
+                            if ($group->GetName() != $groupName) {
+                                $layer->SetVisible(false);
+                                continue;
+                            }
+                            if ($layer->GetLayerType() == MgLayerType::Dynamic)
+                                $layer->SetVisible(true);
+                        }
+
+                        if ($type == "json") {
+                            //error_log("($requestId) Render vector tile");
+                            $this->PutVectorTileXYZ($map, $groupName, $siteConn, $metersPerUnit, $factory, $path, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames);
+                        } else {
+                            $format = strtoupper($type);
+                            //error_log("($requestId) Render image tile");
+                            $this->PutTileImageXYZ($map, $groupName, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames);
+                        }
                     }
                 } catch (MgException $ex) {
                     if ($bLocked) {
