@@ -430,7 +430,13 @@ class MgMappingServiceController extends MgBaseController {
             $param = $req->GetRequestParam();
 
             $param->AddParameter("OPERATION", "CREATERUNTIMEMAP");
-            $param->AddParameter("VERSION", "2.6.0");
+            //Hmmm, this may violate REST API design, but if we're on MGOS 3.0 or newer, we must return linked tile set 
+            //information to the client if applicable. Meaning this API could return 2 different results depending on the
+            //underlying MGOS version.
+            if (intval($version[0]) >= 3)
+                $param->AddParameter("VERSION", "3.0.0");
+            else
+                $param->AddParameter("VERSION", "2.6.0");
             $param->AddParameter("SESSION", $session);
             $param->AddParameter("MAPDEFINITION", $mapDefIdStr);
             $param->AddParameter("TARGETMAPNAME", $mapName);

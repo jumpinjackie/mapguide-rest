@@ -261,6 +261,9 @@ class MgXmlSchemaInfo
         "/RuntimeMap/Extents/LowerLeftCoordinate/Y" => self::XML_DATA_TYPE_NUMBER,
         "/RuntimeMap/Extents/UpperRightCoordinate/X" => self::XML_DATA_TYPE_NUMBER,
         "/RuntimeMap/Extents/UpperRightCoordinate/Y" => self::XML_DATA_TYPE_NUMBER,
+        //RuntimeMap-3.0.0.xsd
+        "/RuntimeMap/TileWidth" => self::XML_DATA_TYPE_NUMBER,
+        "/RuntimeMap/TileHeight" => self::XML_DATA_TYPE_NUMBER,
         //SiteInformation-1.0.0.xsd
         "/SiteInformation/SiteServer/OperatingSystem/AvailablePhysicalMemory" => self::XML_DATA_TYPE_NUMBER,
         "/SiteInformation/SiteServer/OperatingSystem/TotalPhysicalMemory" => self::XML_DATA_TYPE_NUMBER,
