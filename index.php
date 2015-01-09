@@ -17,6 +17,9 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+// Avoid any nasty XXE surprises
+libxml_disable_entity_loader(true);
+
 // See this link for why we are doing this:
 // http://q.nett.gr/wordpress-3-x-on-iis-7-x-with-unicode-permalinks-problem-solved/comment-page-1/
 //

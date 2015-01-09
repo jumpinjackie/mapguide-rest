@@ -516,21 +516,31 @@ class MgUtils
     public static function XslTransformByteReader($app, $byteReader, $xslStylesheet, $xslParams) {
         $locale = $app->config("Locale");
         $xslPath = dirname(__FILE__)."/../res/xsl/$locale/$xslStylesheet";
-        
-        $xsl = new DOMDocument();
-        $xsl->load($xslPath);
 
         $doc = new DOMDocument();
         $doc->loadXML($byteReader->ToString());
 
+        //HACK: We have to re-activate entity loading for XSLT transformation to work
+        //Thanks to Captain Hindsight, XSLT was a bad choice (was it ever good?). It looked good on paper, you know ... we 
+        //had a bunch of existing XSL files already in the schema report we could re-use to easily add HTML representation
+        //support to mapguide-rest for certain XML responses. What could possibly go wrong?
+        //
+        //We'll fix this in v2.0, by using something actually sane
+        libxml_disable_entity_loader(false);
+        $xsl = new DOMDocument();
+        $xsl->load($xslPath);
+
         $xslt = new XSLTProcessor();
         $xslt->importStylesheet($xsl);
+        //Back to normal business
+        libxml_disable_entity_loader(true);
 
         foreach ($xslParams as $key => $value) {
             $xslt->setParameter('', $key, $value);
         }
 
-        return $xslt->transformToXml($doc);
+        $result = $xslt->transformToXml($doc);
+        return $result;
     }
 
     public static function StringToBool($str) {
