@@ -797,10 +797,12 @@ $app->delete("/library/:resourcePath+.FeatureSource/features.:format/:schemaName
  *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
  *          @SWG\parameter(name="filter", paramType="query", required=false, type="string", description="The FDO filter to apply"),
- *          @SWG\parameter(name="properties", paramType="query", required=false, type="string", description="A comma-separated list of proprety names"),
+ *          @SWG\parameter(name="properties", paramType="query", required=false, type="string", description="A comma-separated list of property names"),
  *          @SWG\parameter(name="maxfeatures", paramType="query", required=false, type="integer", description="The maximum number of features to restrict this response to"),
  *          @SWG\parameter(name="transformto", paramType="query", required=false, type="string", description="The CS-Map coordinate system code to transform the resulting features into"),
  *          @SWG\parameter(name="bbox", paramType="query", required=false, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"),
+ *          @SWG\parameter(name="orderby", paramType="query", required=false, type="string", description="A comma-separated list of property names"),
+ *          @SWG\parameter(name="orderoption", paramType="query", required=false, type="string", description="(asc)ending or (desc)ending", enum="['asc','desc']"),
  *          @SWG\parameter(name="pagesize", paramType="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the number of results for the page."),
  *          @SWG\parameter(name="page", paramType="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply.")
  *        ),
@@ -837,6 +839,8 @@ $app->get("/library/:resourcePath+.FeatureSource/features/:schemaName/:className
  *          @SWG\parameter(name="transformto", paramType="query", required=false, type="string", description="The CS-Map coordinate system code to transform the resulting features into"),
  *          @SWG\parameter(name="bbox", paramType="query", required=false, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','geojson']"),
+ *          @SWG\parameter(name="orderby", paramType="query", required=false, type="string", description="A comma-separated list of property names"),
+ *          @SWG\parameter(name="orderoption", paramType="query", required=false, type="string", description="(asc)ending or (desc)ending", enum="['asc','desc']"),
  *          @SWG\parameter(name="pagesize", paramType="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the number of results for the page."),
  *          @SWG\parameter(name="page", paramType="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply.")
  *        ),

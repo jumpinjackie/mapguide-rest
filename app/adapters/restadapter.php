@@ -184,6 +184,23 @@ abstract class MgRestAdapter extends MgResponseHandler
                 }
             }
         }
+
+        $orderby = $this->app->request->get("orderby");
+        $orderOptions = $this->app->request->get("orderoption");
+        if ($orderby != null) {
+            if ($orderOptions == null)
+                $orderOptions = "asc";
+            $orderPropNames = explode(",", $orderby); //If you have a comma in your property names, it's your own fault :)
+            $orderProps = new MgStringCollection();
+            foreach ($orderPropNames as $propName) {
+                $orderProps->Add($propName);
+            }
+            $orderOpt = MgOrderingOption::Ascending;
+            if (strtolower($orderOptions) === "desc")
+                $orderOpt = MgOrderingOption::Descending;
+            $query->SetOrderingFilter($orderProps, $orderOpt);
+        }
+
         return $query;
     }
 

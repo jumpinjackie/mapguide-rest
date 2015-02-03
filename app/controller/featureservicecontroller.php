@@ -963,8 +963,8 @@ class MgFeatureServiceController extends MgBaseController {
 
             $propList = $this->GetRequestParameter("properties", "");
             $filter = $this->GetRequestParameter("filter", "");
-            //$orderby = $this->GetRequestParameter("orderby", "");
-            //$orderOptiosn = $this->GetRequestParameter("orderoption", "");
+            $orderby = $this->GetRequestParameter("orderby", "");
+            $orderOptions = $this->GetRequestParameter("orderoption", "");
             $maxFeatures = $this->GetRequestParameter("maxfeatures", "");
             $transformto = $this->GetRequestParameter("transformto", "");
             $bbox = $this->GetRequestParameter("bbox", "");
@@ -1079,6 +1079,19 @@ class MgFeatureServiceController extends MgBaseController {
                                 $query->AddFeatureProperty($propDef->GetName());
                             }
                         }
+
+                        if ($orderby !== "") {
+                            $orderPropNames = explode(",", $orderby); //If you have a comma in your property names, it's your own fault :)
+                            $orderProps = new MgStringCollection();
+                            foreach ($orderPropNames as $propName) {
+                                $orderProps->Add($propName);
+                            }
+                            $orderOpt = MgOrderingOption::Ascending;
+                            if (strtolower($orderOptions) === "desc")
+                                $orderOpt = MgOrderingOption::Descending;
+                            $query->SetOrderingFilter($orderProps, $orderOpt);
+                        }
+
                         if ($bbox !== "") {
                             $parts = explode(",", $bbox);
                             if (count($parts) == 4) {
@@ -1165,8 +1178,8 @@ class MgFeatureServiceController extends MgBaseController {
 
             $filter = $this->GetRequestParameter("filter", "");
             $propList = $this->GetRequestParameter("properties", "");
-            //$orderby = $this->GetRequestParameter("orderby", "");
-            //$orderOptiosn = $this->GetRequestParameter("orderoption", "");
+            $orderby = $this->GetRequestParameter("orderby", "");
+            $orderOptions = $this->GetRequestParameter("orderoption", "asc");
             $maxFeatures = $this->GetRequestParameter("maxfeatures", "");
             $transformto = $this->GetRequestParameter("transformto", "");
             $bbox = $this->GetRequestParameter("bbox", "");
@@ -1193,6 +1206,17 @@ class MgFeatureServiceController extends MgBaseController {
                 foreach ($propNames as $propName) {
                     $query->AddFeatureProperty($propName);
                 }
+            }
+            if ($orderby !== "") {
+                $orderPropNames = explode(",", $orderby); //If you have a comma in your property names, it's your own fault :)
+                $orderProps = new MgStringCollection();
+                foreach ($orderPropNames as $propName) {
+                    $orderProps->Add($propName);
+                }
+                $orderOpt = MgOrderingOption::Ascending;
+                if (strtolower($orderOptions) === "desc")
+                    $orderOpt = MgOrderingOption::Descending;
+                $query->SetOrderingFilter($orderProps, $orderOpt);
             }
             if ($bbox !== "") {
                 $parts = explode(",", $bbox);
