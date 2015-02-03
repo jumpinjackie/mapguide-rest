@@ -12,7 +12,12 @@
     <description>
       An unexpected error occured. Full error details below:
 
-      {$error->GetDetails()}
+      <p>Code</p>
+      <pre>{$error->code}</pre>
+      <p>Message</p>
+      <pre>{$error->message}</pre>
+      <p>Stack Trace</p>
+      <pre>{$error->stack}</pre>
     </description>
   </item>
 </rss>
