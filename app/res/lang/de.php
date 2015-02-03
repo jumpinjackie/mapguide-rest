@@ -35,6 +35,7 @@ return array(
     "L_REST_POST_BODY_DESC" => "Die XML-Umschlag der Beschreibung der Funktionen eingefügt werden",
     "L_REST_PUT_BODY_DESC" => "Die XML-Umschlag der Beschreibung der Funktionen, die aktualisiert werden",
     "L_REST_DELETE_FILTER_DESC" => "Der FDO Filter String, festzustellen, welche Funktionen gelöscht werden",
+    "E_UNSUPPORTED_PROPERTY_TYPE" => "Nicht unterstützter Objekttyp",
     "E_NOT_SUPPORTED_FOR_SESSION_RESOURCES" => "Dieser Vorgang ist für die Sitzung Ressourcen unterstützt",
     "E_MALFORMED_JSON_BODY" => "Malformed JSON Körper",
     "E_DONT_KNOW_HOW_TO_OUTPUT" => "Konnte nicht ermittelt werden, wie die Ausgabe: %s",

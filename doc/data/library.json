@@ -1185,6 +1185,24 @@
                         },
                         {
                             "paramType": "query",
+                            "name": "orderby",
+                            "type": "string",
+                            "required": false,
+                            "description": "A comma-separated list of property names"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "orderoption",
+                            "type": "string",
+                            "required": false,
+                            "description": "(asc)ending or (desc)ending",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        },
+                        {
+                            "paramType": "query",
                             "name": "pagesize",
                             "type": "integer",
                             "required": false,
@@ -1514,7 +1532,7 @@
                             "name": "properties",
                             "type": "string",
                             "required": false,
-                            "description": "A comma-separated list of proprety names"
+                            "description": "A comma-separated list of property names"
                         },
                         {
                             "paramType": "query",
@@ -1539,6 +1557,24 @@
                         },
                         {
                             "paramType": "query",
+                            "name": "orderby",
+                            "type": "string",
+                            "required": false,
+                            "description": "A comma-separated list of property names"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "orderoption",
+                            "type": "string",
+                            "required": false,
+                            "description": "(asc)ending or (desc)ending",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        },
+                        {
+                            "paramType": "query",
                             "name": "pagesize",
                             "type": "integer",
                             "required": false,
@@ -1550,6 +1586,53 @@
                             "type": "integer",
                             "required": false,
                             "description": "Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply."
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/library/{resourcePath}.FeatureSource/json",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "Creates the given Feature Source",
+                    "nickname": "CreateFeatureSource",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resourcePath",
+                            "type": "string",
+                            "required": true,
+                            "description": "The path of the resource ID"
+                        },
+                        {
+                            "paramType": "body",
+                            "name": "body",
+                            "type": "string",
+                            "required": true,
+                            "description": "The JSON that describes the Feature Source to create"
                         }
                     ],
                     "responseMessages": [
@@ -2087,6 +2170,53 @@
                                 "xml",
                                 "json"
                             ]
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/library/{resourcePath}.FeatureSource/xml",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "Creates the given Feature Source",
+                    "nickname": "CreateFeatureSource",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "resourcePath",
+                            "type": "string",
+                            "required": true,
+                            "description": "The path of the resource ID"
+                        },
+                        {
+                            "paramType": "body",
+                            "name": "body",
+                            "type": "string",
+                            "required": true,
+                            "description": "The XML that describes the Feature Source to create"
                         }
                     ],
                     "responseMessages": [

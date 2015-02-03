@@ -1025,6 +1025,52 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:qualifie
 });
 /**
  * @SWG\Api(
+ *     path="/session/{session}/{resName}.FeatureSource/xml",
+ *     @SWG\Operation(
+ *        method="POST",
+ *        nickname="CreateFeatureSource",
+ *        summary="Creates the given Feature Source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
+ *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The XML that describes the Feature Source to create")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->post("/session/:sessionId/:resName.FeatureSource/xml", function($sessionId, $resName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->CreateFeatureSource($resId, "xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{resName}.FeatureSource/json",
+ *     @SWG\Operation(
+ *        method="POST",
+ *        nickname="CreateFeatureSource",
+ *        summary="Creates the given Feature Source",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
+ *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The JSON that describes the Feature Source to create")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->post("/session/:sessionId/:resName.FeatureSource/json", function($sessionId, $resName) use ($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->CreateFeatureSource($resId, "json");
+});
+/**
+ * @SWG\Api(
  *     path="/session/{session}/{resName}.FeatureSource/features/{schemaName}/{className}",
  *     @SWG\Operation(
  *        method="POST",
