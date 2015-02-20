@@ -29,7 +29,7 @@ require_once dirname(__FILE__)."/../../util/utils.php";
 
 /**
  * @SWG\Resource(
- *      apiVersion="0.5",
+ *      apiVersion="1.0",
  *      swaggerVersion="1.2",
  *      description="Session Repository",
  *      resourcePath="/session"

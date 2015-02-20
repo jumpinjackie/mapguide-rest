@@ -4,6 +4,7 @@
         "smarty/smarty": "3.1.18",
         "zircote/swagger-php": "0.9.4",
         "phing/phing": "2.8.2",
-        "tecnick.com/tcpdf": "6.0.089"
+        "tecnick.com/tcpdf": "6.0.089",
+        "glenscott/url-normalizer": "1.2.0"
     }
 }

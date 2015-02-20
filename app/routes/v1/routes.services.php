@@ -24,7 +24,7 @@ require_once dirname(__FILE__)."/../../controller/restservicecontroller.php";
 
 /**
  * @SWG\Resource(
- *      apiVersion="0.5",
+ *      apiVersion="1.0",
  *      swaggerVersion="1.2",
  *      description="Additional Services",
  *      resourcePath="/services"

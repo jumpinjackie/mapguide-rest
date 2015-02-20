@@ -17,6 +17,7 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+require_once dirname(__FILE__)."/../util/utils.php";
 require_once dirname(__FILE__)."/../version.php";
 require_once "controller.php";
 
@@ -26,9 +27,157 @@ class MgDataController extends MgBaseController {
         parent::__construct($app);
     }
 
-    public function GetDataConfiguration($uriParts) {
-        $uriPath = implode("/", $uriParts);
+    private function rrmdir($dir) { 
+        if (is_dir($dir)) { 
+            $objects = scandir($dir); 
+            foreach ($objects as $object) { 
+                if ($object != "." && $object != "..") { 
+                    if (filetype($dir."/".$object) == "dir") 
+                        $this->rrmdir($dir."/".$object); 
+                    else 
+                        unlink($dir."/".$object); 
+                } 
+            } 
+            reset($objects); 
+            rmdir($dir); 
+        } 
+    }
+
+    //Checks that the given user is an author or higher-privileged group
+    private function ValidateAuthorPrivileges() {
+
+    }
+
+    //Sanitizes the given URI part to strip off all parent navigator parts to prevent attempts
+    //to walk outside of the mapguide-rest installation directory when resolved to a file path
+    private static function SanitizeUriPath($uriPath) {
+        $path = str_replace("/..", "/", $uriPath);
+        $path = str_replace("/.", "/", $path);
+        $path = str_replace("..", "", $path);
+        return $path;
+    }
+
+    private static function SanitizeFileName($fileName) {
+        $name = self::SanitizeUriPath($fileName);
+        $name = str_replace("/", "", $name);
+        return $name;
+    }
+
+    public function EnumerateDataConfigurations($format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $this->EnsureAuthenticationForSite();
+        $this->ValidateAuthorPrivileges();
+        $configRoot = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath"));
+        $configs = glob("$configRoot/*/{restcfg.json}", GLOB_BRACE);
+        $resp = "<DataConfigurationList>";
+        $resp .= "<RootUri>" . $this->app->config("SelfUrl") . "</RootUri>";
+        $resp .= "<MapAgentUrl>".$this->app->config("MapGuide.MapAgentUrl")."</MapAgentUrl>";
+        foreach ($configs as $conf) {
+            $path = realpath($conf);
+            $confRelPath = str_replace("\\", "/", str_replace($configRoot, "", $path));
+            if ($confRelPath[0] == '/' || $confRelPath[0] == '\\') {
+                $confRelPath = substr($confRelPath, 1);
+            }
+            $resp .= "<Configuration>";
+            $resp .= "<ConfigUriPart>data/" . str_replace("restcfg.json", "config", $confRelPath) . "</ConfigUriPart>";
+            $resp .= "<DocUriPart>data/" . str_replace("restcfg.json", "doc/index.html", $confRelPath) . "</DocUriPart>";
+            $resp .= "</Configuration>";
+        }
+        $resp .= "</DataConfigurationList>";
+        if ($fmt == "json") {
+            $this->app->response->header("Content-Type", MgMimeType::Json);
+            $this->app->response->setBody(MgUtils::Xml2Json($resp));
+        } else {
+            $this->app->response->header("Content-Type", MgMimeType::Xml);
+            $this->app->response->setBody($resp);
+        }
+    }
+
+    public function EnumerateDataFiles($uriParts, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
+        $this->EnsureAuthenticationForSite();
+        $this->ValidateAuthorPrivileges();
+
+        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath");
+        if ($path === false) {
+            $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+        } else {
+            $resp = "<DataConfigurationFileList>";
+            $files = scandir($path);
+            foreach ($files as $f) {
+                if ($f === "." || $f === ".." || $f === "restcfg.json")
+                    continue;
+                $resp .= "<File>" . $f . "</File>";
+            }
+            $resp .= "</DataConfigurationFileList>";
+            if ($fmt == "json") {
+                $this->app->response->header("Content-Type", MgMimeType::Json);
+                $this->app->response->setBody(MgUtils::Xml2Json($resp));
+            } else {
+                $this->app->response->header("Content-Type", MgMimeType::Xml);
+                $this->app->response->setBody($resp);
+            }
+        }
+    }
+
+    public function PutDataFile($uriParts) {
+        $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
+        $this->EnsureAuthenticationForSite();
+        $this->ValidateAuthorPrivileges();
+        $fileName = self::SanitizeFileName($this->app->request->params("filename"));
+
+        //Cannot replace restcfg.json
+        if ($fileName == "restcfg.json")
+            $this->BadRequest($this->app->localizer->getText("E_DATA_FILE_NAME_NOT_ALLOWED", $fileName));
+
+        $configPath = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
+        
+        //We must have a restcfg.json in this directory in order to put any other files in it
+        if (!file_exists($configPath))
+            $this->ServerError($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+
+        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath")."/$fileName";
+        
+        $err = $_FILES["data"]["error"];
+        if ($err == 0) {
+            move_uploaded_file($_FILES["data"]["tmp_name"], $path);
+        } else {
+            $this->app->response->setStatus(500);
+            $this->app->response->setBody($this->app->localizer->getText("E_PHP_FILE_UPLOAD_ERROR", $err));
+        }
+    }
+
+    public function DeleteDataFile($uriParts) {
+        $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
+        $this->EnsureAuthenticationForSite();
+        $this->ValidateAuthorPrivileges();
+        $fileName = self::SanitizeFileName($this->app->request->params("filename"));
+
+        //Can't delete restcfg.json
+        if ($fileName == "restcfg.json")
+            $this->BadRequest($this->app->localizer->getText("E_DATA_FILE_NAME_NOT_ALLOWED", $fileName));
+
+        $configPath = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
+        
+        //We must have a restcfg.json in this directory in order to delete any other files in it
+        if ($configPath === false)
+            $this->ServerError($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+
+        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/$fileName");
+        if ($path === false) {
+            $this->NotFound($this->app->localizer->getText("E_DATA_FILE_NOT_FOUND", $fileName));
+        } else {
+            unlink($path);
+        }
+    }
+
+    public function GetDataConfiguration($uriParts) {
+        $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
+        $this->EnsureAuthenticationForSite();
+        $this->ValidateAuthorPrivileges();
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
             $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
@@ -37,8 +186,47 @@ class MgDataController extends MgBaseController {
         }
     }
 
+    public function DeleteConfiguration($uriParts) {
+        $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
+        $this->EnsureAuthenticationForSite();
+        $this->ValidateAuthorPrivileges();
+
+        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath");
+        if ($path === false) {
+            $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+        } else {
+            $this->rrmdir($path);
+        }
+    }
+
+    public function PutDataConfiguration($uriParts) {
+        $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
+        $this->EnsureAuthenticationForSite();
+        $this->ValidateAuthorPrivileges();
+
+        $err = $_FILES["data"]["error"];
+        if ($err == 0) {
+            //Do some basic sanity checks. This file must parse as JSON
+            $obj = json_decode(file_get_contents($_FILES["data"]["tmp_name"]));
+            if ($obj == NULL) {
+                $this->ServerError($this->app->localizer->getText("E_DATA_CONFIGURATION_NOT_JSON"));
+            }
+
+            $dir = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath");
+        if ($dir === FALSE) {
+            mkdir($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath");
+        }
+        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath")."/restcfg.json";
+            
+            move_uploaded_file($_FILES["data"]["tmp_name"], $path);
+        } else {
+            $this->app->response->setStatus(500);
+            $this->app->response->setBody($this->app->localizer->getText("E_PHP_FILE_UPLOAD_ERROR", $err));
+        }
+    }
+
     public function GetApiDocViewer($uriParts) {
-        $uriPath = implode("/", $uriParts);
+        $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
             $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
@@ -60,7 +248,7 @@ class MgDataController extends MgBaseController {
     }
 
     public function GetApiDoc($uriParts) {
-        $uriPath = implode("/", $uriParts);
+        $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
             $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath), MgMimeType::Json);
@@ -311,7 +499,7 @@ class MgDataController extends MgBaseController {
     }
 
     private function HandleMethod($uriParts, $extension, $method) {
-        $uriPath = implode("/", $uriParts);
+        $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
             $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath), MgMimeType::Json);
@@ -361,7 +549,7 @@ class MgDataController extends MgBaseController {
     }
 
     private function HandleMethodSingle($uriParts, $id, $extension, $method) {
-        $uriPath = implode("/", $uriParts);
+        $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
             $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath), MgMimeType::Json);

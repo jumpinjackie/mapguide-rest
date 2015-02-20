@@ -25,6 +25,12 @@ return array(
     "debug" => false,
 
     //
+    //MapGuide.MapAgentUrl
+    //
+    //The mapagent endpoint relative to the root of mapguide-rest
+    "MapGuide.MapAgentUrl" => "../mapagent/mapagent.fcgi",
+
+    //
     //GeoRest.ConfigPath
     //
     //The root path where RESTful data source configuration files are stored

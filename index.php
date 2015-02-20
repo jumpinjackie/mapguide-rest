@@ -84,6 +84,8 @@ $app->localizer = new Localizer($strings);
 $ver = explode(".", SITE_ADMINISTRATOR_VERSION, 4);
 $app->MG_VERSION = array(intval($ver[0]), intval($ver[1]), intval($ver[2]), intval($ver[3]));
 $app->config("SelfUrl", $app->request->getUrl() . $app->request->getRootUri());
+$un = new URL\Normalizer($app->config("SelfUrl") . "/" . $app->config("MapGuide.MapAgentUrl"));
+$app->config("MapGuide.MapAgentUrl", $un->normalize());
 /*
 var_dump($app->localizer->getText("E_METHOD_NOT_SUPPORTED"));
 var_dump($app->localizer->getText("E_METHOD_NOT_SUPPORTED", "test"));
