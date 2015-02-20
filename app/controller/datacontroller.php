@@ -44,8 +44,14 @@ class MgDataController extends MgBaseController {
     }
 
     //Checks that the given user is an author or higher-privileged group
-    private function ValidateAuthorPrivileges() {
-
+    private function ValidateAuthorPrivileges($mimeType) {
+        $siteConn = new MgSiteConnection();
+        $siteConn->Open($this->userInfo);
+        $config = array(
+            "AllowRoles" => array("Author", "Administrator")
+        );
+        if (!$this->ValidateAcl($siteConn, $config))
+            $this->Unauthorized($mimeType);
     }
 
     //Sanitizes the given URI part to strip off all parent navigator parts to prevent attempts
@@ -67,7 +73,7 @@ class MgDataController extends MgBaseController {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $this->EnsureAuthenticationForSite();
-        $this->ValidateAuthorPrivileges();
+        $this->ValidateAuthorPrivileges($fmt == "json" ? MgMimeType::Json : MgMimeType::Xml);
         $configRoot = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath"));
         $configs = glob("$configRoot/*/{restcfg.json}", GLOB_BRACE);
         $resp = "<DataConfigurationList>";
@@ -99,7 +105,7 @@ class MgDataController extends MgBaseController {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
         $this->EnsureAuthenticationForSite();
-        $this->ValidateAuthorPrivileges();
+        $this->ValidateAuthorPrivileges($fmt == "json" ? MgMimeType::Json : MgMimeType::Xml);
 
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath");
         if ($path === false) {
@@ -126,7 +132,7 @@ class MgDataController extends MgBaseController {
     public function PutDataFile($uriParts) {
         $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
         $this->EnsureAuthenticationForSite();
-        $this->ValidateAuthorPrivileges();
+        $this->ValidateAuthorPrivileges(MgMimeType::Xml);
         $fileName = self::SanitizeFileName($this->app->request->params("filename"));
 
         //Cannot replace restcfg.json
@@ -153,7 +159,7 @@ class MgDataController extends MgBaseController {
     public function DeleteDataFile($uriParts) {
         $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
         $this->EnsureAuthenticationForSite();
-        $this->ValidateAuthorPrivileges();
+        $this->ValidateAuthorPrivileges(MgMimeType::Xml);
         $fileName = self::SanitizeFileName($this->app->request->params("filename"));
 
         //Can't delete restcfg.json
@@ -177,7 +183,7 @@ class MgDataController extends MgBaseController {
     public function GetDataConfiguration($uriParts) {
         $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
         $this->EnsureAuthenticationForSite();
-        $this->ValidateAuthorPrivileges();
+        $this->ValidateAuthorPrivileges(MgMimeType::Xml);
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
             $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
@@ -189,7 +195,7 @@ class MgDataController extends MgBaseController {
     public function DeleteConfiguration($uriParts) {
         $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
         $this->EnsureAuthenticationForSite();
-        $this->ValidateAuthorPrivileges();
+        $this->ValidateAuthorPrivileges(MgMimeType::Xml);
 
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath");
         if ($path === false) {
@@ -202,7 +208,7 @@ class MgDataController extends MgBaseController {
     public function PutDataConfiguration($uriParts) {
         $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
         $this->EnsureAuthenticationForSite();
-        $this->ValidateAuthorPrivileges();
+        $this->ValidateAuthorPrivileges(MgMimeType::Xml);
 
         $err = $_FILES["data"]["error"];
         if ($err == 0) {
@@ -217,7 +223,7 @@ class MgDataController extends MgBaseController {
             mkdir($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath");
         }
         $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath")."/restcfg.json";
-            
+
             move_uploaded_file($_FILES["data"]["tmp_name"], $path);
         } else {
             $this->app->response->setStatus(500);
@@ -429,6 +435,16 @@ class MgDataController extends MgBaseController {
             for ($i = 0; $i < $count; $i++) {
                 $group = $config["AllowGroups"][$i];
                 if (array_key_exists($group, $groups))
+                    return true;
+            }
+        }
+        //
+        if (array_key_exists("AllowRoles", $config)) {
+            $roles = $site->EnumerateRoles($this->userName);
+            $count = count($config["AllowRoles"]);
+            for ($i = 0; $i < $count; $i++) {
+                $role = $config["AllowRoles"][$i];
+                if ($roles->IndexOf($role) >= 0)
                     return true;
             }
         }
