@@ -331,6 +331,17 @@ class MgXmlSchemaInfo
         "/WatermarkDefinition/Position/TilePosition/TileHeight" => self::XML_DATA_TYPE_NUMBER,
         "/WatermarkDefinition/Appearance/Transparency" => self::XML_DATA_TYPE_NUMBER,
         "/WatermarkDefinition/Appearance/Rotation" => self::XML_DATA_TYPE_NUMBER,
+        //TileSetDefinition-3.0.0.xsd
+        "/TileSetDefinition/Extents/MinX" => self::XML_DATA_TYPE_NUMBER,
+        "/TileSetDefinition/Extents/MinY" => self::XML_DATA_TYPE_NUMBER,
+        "/TileSetDefinition/Extents/MaxX" => self::XML_DATA_TYPE_NUMBER,
+        "/TileSetDefinition/Extents/MaxY" => self::XML_DATA_TYPE_NUMBER,
+        "/TileSetDefinition/BaseMapLayerGroup/Visible" => self::XML_DATA_TYPE_BOOLEAN,
+        "/TileSetDefinition/BaseMapLayerGroup/ShowInLegend" => self::XML_DATA_TYPE_BOOLEAN,
+        "/TileSetDefinition/BaseMapLayerGroup/ExpandInLegend" => self::XML_DATA_TYPE_BOOLEAN,
+        "/TileSetDefinition/BaseMapLayerGroup/BaseMapLayer/Selectable" => self::XML_DATA_TYPE_BOOLEAN,
+        "/TileSetDefinition/BaseMapLayerGroup/BaseMapLayer/ShowInLegend" => self::XML_DATA_TYPE_BOOLEAN,
+        "/TileSetDefinition/BaseMapLayerGroup/BaseMapLayer/ExpandInLegend" => self::XML_DATA_TYPE_BOOLEAN,
         //Miscellaneous MapGuide response types that don't have a formal schema
         "/SessionTimeout/Value" => self::XML_DATA_TYPE_NUMBER,
         "/FeatureInformation/SelectedFeatures/SelectedLayer/LayerMetadata/Property/Type" => self::XML_DATA_TYPE_NUMBER,
@@ -518,6 +529,10 @@ class MgXmlSchemaInfo
         "/RowSet/Rows/Row/Column" => "abcd1234",
         //StringCollection-1.0.0.xsd
         "/StringCollection/Item" => "abcd1234",
+        //TileSetDefinition-3.0.0.xsd
+        "/TileSetDefinition/TileStoreParameters/Parameter" => "abcd1234",
+        "/TileSetDefinition/BaseMapLayerGroup" => "abcd1234",
+        "/TileSetDefinition/BaseMapLayerGroup/BaseMapLayer" => "abcd1234",
         //UnmanagedDataList-1.0.0.xsd
         "/UnmanagedDataList/UnmanagedDataFolder" => "abcd1234",
         "/UnmanagedDataList/UnmanagedDataFile" => "abcd1234",
