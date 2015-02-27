@@ -1,3 +1,42 @@
+1.0 RC1
+=======
+
+ - #92: MapGuide Open Source 3.0 API and resource support
+    - XYZ tile requests go to the native API if supported
+    - Support TileSetDefinition resources for existing Tile requests
+    - v3.0.0 RuntimeMap resource support
+ - #86: Support "clean" JSON output. This JSON version of any XML response now:
+    - Only array-ifies properties whose cardinality is known to be 1 or more elements
+    - Uses proper data types for the respective XML elements.
+ - #87: Support JSON bodies in APIs that previously accepted XML bodies
+ - #91: Added CRUD support for GeoJSON representation in restcfg.json
+ - #93: Added ordering support for feature query API routes
+ - #95: New APIs for publishing restcfg.json files
+ - #81: Gracefully handle installations where no URL-rewriting module has been installed
+ - #88: APIs that return primitive values now return "boxed" primitive values to provide a consistent client application experience
+ - #90: New simplified JSON structure for APIs that return Feature Schemas and Class Definitions
+ - #83: Added APIs for
+    - Creating Feature Sources
+    - Setting and deleting resource data
+    - Querying long transactions
+    - Querying base CS library
+    - Validating CS WKT
+    - Converting CS WKT to EPSG codes
+    - Testing the connection of a Feature Source
+    - Enumerating unmanaged (aliased) data
+    - Getting site information (GETSITEINFO)
+    - DescribeSchema with class name hint
+    - SetResourceContent that can accept both content and header
+    - Fusion authoring support
+    - Querying the editability of a Feature Source with the REST API
+ - New log configuration file to control logging behaviour in mapguide-rest.
+ - HTML representation changes
+    - Use bootstrap for styling
+    - Use container-fluid for resource list
+    - Layout has been templatized allowing for external customization and localization of content
+ - #85: Fix: Don't lock layers in layered PDFs
+ - #96: Fix: XYZ tile requests for Map Definitions with multiple tiled groups
+
 0.11.2
 ======
 
