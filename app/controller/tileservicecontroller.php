@@ -476,12 +476,20 @@ class MgTileServiceController extends MgBaseController {
                         $layers = $map->GetLayers();
                         $groups = $map->GetLayerGroups();
                         $layerCount = $layers->GetCount();
+                        $groupCount = $groups->GetCount();
 
                         if ($groups->IndexOf($groupName) < 0) {
                             throw new Exception($this->app->localizer->getText("E_GROUP_NOT_FOUND", $groupName));
-                        } else {
-                            $grp = $groups->GetItem($groupName);
-                            $grp->SetVisible(true);
+                        }
+
+                        //Turn all groups that are not the given group to be hidden
+                        for ($i = 0; $i < $groupCount; $i++) {
+                            $group = $groups->GetItem($i);
+                            if ($group->GetName() != $groupName) {
+                                $group->SetVisible(false);
+                            } else {
+                                $group->SetVisible(true);
+                            }
                         }
 
                         for ($i = 0; $i < $layerCount; $i++) {
@@ -490,7 +498,7 @@ class MgTileServiceController extends MgBaseController {
                             if (null == $group) {
                                 continue;
                             }
-                            if ($group->GetName() != $groupName) {
+                            if ($group->GetName() != $groupName && $layer->GetLayerType() == MgLayerType::Dynamic) {
                                 $layer->SetVisible(false);
                                 continue;
                             }
@@ -509,7 +517,7 @@ class MgTileServiceController extends MgBaseController {
                     }
                 } catch (MgException $ex) {
                     if ($bLocked) {
-                        $this->app->log->debug("($requestId) MgException caught ".$ex->GetExceptionMessage().". Releasing lock for $path");
+                        $this->app->log->debug("($requestId) MgException caught ".$ex->GetDetails()."\n".$ex->getTraceAsString()."\n. Releasing lock for $path");
                         $tileError = $ex->GetExceptionMessage();
                         flock($fpLockFile, LOCK_UN);
                         $bLocked = false;
