@@ -130,6 +130,12 @@ class MgMappingServiceController extends MgBaseController {
                 else
                     $scaleVal = (intval($minScale) + intval($maxScale)) / 2.0;
 
+                $minScale = intval($minScale);
+                if (strcmp($maxScale, "infinity") == 0)
+                    $maxScale = 1000000000000;
+                else
+                    $maxScale = intval($maxScale);
+
                 $xml .= "<ScaleRange>\n<MinScale>$minScale</MinScale>\n<MaxScale>$maxScale</MaxScale>\n";
 
                 // 2 passes: First to compile icon count (to determine compression), second to write the actual XML
@@ -415,9 +421,12 @@ class MgMappingServiceController extends MgBaseController {
             $format = strtolower($format);
         }
 
+        /*
         $admin = new MgServerAdmin();
         $admin->Open($this->userInfo);
         $version = explode(".", $admin->GetSiteVersion());
+        */
+        $version = $this->app->MG_VERSION;
         $bCanUseNative = false;
         if (intval($version[0]) > 2) { //3.0 or greater
             $bCanUseNative = true;
