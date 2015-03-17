@@ -1674,7 +1674,9 @@ $app->get("/library/:resourcePath+.TileSetDefinition/xyz/:groupName/:z/:x/:y/til
     //echo "ResId: ".$resId->ToString()."<br/>Group: $groupName<br/>X: $x<br/>Y: $y<br/>Z: $z<br/>Format: $format";
     //die;
     $ctrl = new MgTileServiceController($app);
-    $ctrl->GetTileXYZ($resId, $groupName, $x, $y, $z, "img");
+    //NOTE: Format doesn't matter, because that's defined by the Tile Set itself. We just have to pass something that
+    //passes the valid representation check
+    $ctrl->GetTileXYZ($resId, $groupName, $x, $y, $z, "png");
 });
 
 
