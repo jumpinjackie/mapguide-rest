@@ -25,6 +25,12 @@ return array(
     "debug" => false,
 
     //
+    //Error.OutputStackTrace
+    //
+    //If false, stack trace information will not be outputted in error responses
+    "Error.OutputStackTrace" => false,
+
+    //
     //MapGuide.MapAgentUrl
     //
     //The mapagent endpoint relative to the root of mapguide-rest
@@ -35,6 +41,7 @@ return array(
     //
     //The root path where RESTful data source configuration files are stored
     "GeoRest.ConfigPath" => "./conf/data",
+
     //
     //MapGuide.PhysicalTilePath
     //

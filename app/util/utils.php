@@ -37,28 +37,50 @@ class MgUtils
 
     public static function FormatException($app, $type, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
         $errResponse = "";
-        if ($mimeType === MgMimeType::Xml || $mimeType == MgMimeType::Kml) {
-            $errResponse = sprintf(
-                "<?xml version=\"1.0\"?><Error><Type>%s</Type><Message>%s</Message><Details>%s</Details><StackTrace>%s</StackTrace></Error>",
-                MgUtils::EscapeXmlChars($type),
-                MgUtils::EscapeXmlChars($errorMessage),
-                MgUtils::EscapeXmlChars($details),
-                MgUtils::EscapeXmlChars($phpTrace));
-        } else if ($mimeType === MgMimeType::Json) {
-            $errResponse = sprintf(
-                "{ \"Type\": \"%s\", \"Message\": \"%s\", \"Details\": \"%s\", \"StackTrace\": \"%s\" }",
-                MgUtils::EscapeJsonString($type),
-                MgUtils::EscapeJsonString($errorMessage),
-                MgUtils::EscapeJsonString($details),
-                MgUtils::EscapeJsonString($phpTrace));
+        if ($app->config("Error.OutputStackTrace") === false) {
+            if ($mimeType === MgMimeType::Xml || $mimeType == MgMimeType::Kml) {
+                $errResponse = sprintf(
+                    "<?xml version=\"1.0\"?><Error><Type>%s</Type><Message>%s</Message><Details>%s</Details></Error>",
+                    MgUtils::EscapeXmlChars($type),
+                    MgUtils::EscapeXmlChars($errorMessage),
+                    MgUtils::EscapeXmlChars($details));
+            } else if ($mimeType === MgMimeType::Json) {
+                $errResponse = sprintf(
+                    "{ \"Type\": \"%s\", \"Message\": \"%s\", \"Details\": \"%s\" }",
+                    MgUtils::EscapeJsonString($type),
+                    MgUtils::EscapeJsonString($errorMessage),
+                    MgUtils::EscapeJsonString($details));
+            } else {
+                $errResponse = sprintf(
+                    "<html><head><title>%s</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><style>body{margin:0;padding:30px;font:12px/1.5 Helvetica,Arial,Verdana,sans-serif;}h1{margin:0;font-size:48px;font-weight:normal;line-height:48px;}strong{display:inline-block;width:65px;}</style></head><body><h2>%s</h2>%s</body></html>",
+                    $type,
+                    $errorMessage,
+                    $details);
+            }
         } else {
-            $errResponse = sprintf(
-                "<html><head><title>%s</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><style>body{margin:0;padding:30px;font:12px/1.5 Helvetica,Arial,Verdana,sans-serif;}h1{margin:0;font-size:48px;font-weight:normal;line-height:48px;}strong{display:inline-block;width:65px;}</style></head><body><h2>%s</h2>%s<h2>%s</h2><pre>%s</pre></body></html>",
-                $type,
-                $errorMessage,
-                $details,
-                $app->localizer->getText("L_STACK_TRACE"),
-                $phpTrace);
+            if ($mimeType === MgMimeType::Xml || $mimeType == MgMimeType::Kml) {
+                $errResponse = sprintf(
+                    "<?xml version=\"1.0\"?><Error><Type>%s</Type><Message>%s</Message><Details>%s</Details><StackTrace>%s</StackTrace></Error>",
+                    MgUtils::EscapeXmlChars($type),
+                    MgUtils::EscapeXmlChars($errorMessage),
+                    MgUtils::EscapeXmlChars($details),
+                    MgUtils::EscapeXmlChars($phpTrace));
+            } else if ($mimeType === MgMimeType::Json) {
+                $errResponse = sprintf(
+                    "{ \"Type\": \"%s\", \"Message\": \"%s\", \"Details\": \"%s\", \"StackTrace\": \"%s\" }",
+                    MgUtils::EscapeJsonString($type),
+                    MgUtils::EscapeJsonString($errorMessage),
+                    MgUtils::EscapeJsonString($details),
+                    MgUtils::EscapeJsonString($phpTrace));
+            } else {
+                $errResponse = sprintf(
+                    "<html><head><title>%s</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><style>body{margin:0;padding:30px;font:12px/1.5 Helvetica,Arial,Verdana,sans-serif;}h1{margin:0;font-size:48px;font-weight:normal;line-height:48px;}strong{display:inline-block;width:65px;}</style></head><body><h2>%s</h2>%s<h2>%s</h2><pre>%s</pre></body></html>",
+                    $type,
+                    $errorMessage,
+                    $details,
+                    $app->localizer->getText("L_STACK_TRACE"),
+                    $phpTrace);
+            }
         }
         return $errResponse;
     }
