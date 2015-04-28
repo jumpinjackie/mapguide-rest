@@ -18,7 +18,7 @@
 //
 //
 //  Contains relative to absolute URL conversion code by Aaron Clinger
-//  relased under the BSD license
+//  released under the BSD license
 //
 //  https://github.com/aaronclinger/relative-url-helper
 //

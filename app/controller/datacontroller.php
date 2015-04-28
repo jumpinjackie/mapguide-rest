@@ -219,10 +219,10 @@ class MgDataController extends MgBaseController {
             }
 
             $dir = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath");
-        if ($dir === FALSE) {
-            mkdir($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath");
-        }
-        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath")."/restcfg.json";
+            if ($dir === FALSE) {
+                mkdir($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath");
+            }
+            $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath")."/restcfg.json";
 
             move_uploaded_file($_FILES["data"]["tmp_name"], $path);
         } else {
