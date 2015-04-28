@@ -85,6 +85,50 @@ class MgUtils
         return $errResponse;
     }
 
+    public static function ValidateAcl($userName, $site, $config) {
+        // If the user is in the AllowUsers list, or their group is in the AllowGroups list
+        // let them through, otherwise 403 them
+        //
+        if (array_key_exists("AllowUsers", $config)) {
+            $count = count($config["AllowUsers"]);
+            for ($i = 0; $i < $count; $i++) {
+                $user = $config["AllowUsers"][$i];
+                if ($user == $userName)
+                    return true;
+            }
+        }
+        //
+        if (array_key_exists("AllowGroups", $config)) {
+            $groups = array();
+            $doc = new DOMDocument();
+            $br = $site->EnumerateGroups($userName);
+            $doc->loadXML($br->ToString());
+            $groupNodes = $doc->getElementsByTagName("Name");
+            for ($i = 0; $i < $groupNodes->length; $i++) {
+                $groupName = $groupNodes->item($i)->nodeValue;
+                $groups[$groupName] = $groupName;
+            }
+
+            $count = count($config["AllowGroups"]);
+            for ($i = 0; $i < $count; $i++) {
+                $group = $config["AllowGroups"][$i];
+                if (array_key_exists($group, $groups))
+                    return true;
+            }
+        }
+        //
+        if (array_key_exists("AllowRoles", $config)) {
+            $roles = $site->EnumerateRoles($userName);
+            $count = count($config["AllowRoles"]);
+            for ($i = 0; $i < $count; $i++) {
+                $role = $config["AllowRoles"][$i];
+                if ($roles->IndexOf($role) >= 0)
+                    return true;
+            }
+        }
+        return false;
+    }
+
     public static function GetApiVersionNamespace($app, $prefix) {
         $pi = $app->request->getPathInfo();
         if (strpos($pi, $prefix) > 0) {

@@ -407,48 +407,7 @@ class MgDataController extends MgBaseController {
         if ($this->userName == null && $this->sessionId != null) {
             $this->userName = $site->GetUserForSession();
         }
-        $groups = array();
-        $doc = new DOMDocument();
-        $br = $site->EnumerateGroups($this->userName);
-        $doc->loadXML($br->ToString());
-        $groupNodes = $doc->getElementsByTagName("Name");
-        for ($i = 0; $i < $groupNodes->length; $i++) {
-            $groupName = $groupNodes->item($i)->nodeValue;
-            $groups[$groupName] = $groupName;
-        }
-
-        // If the user is in the AllowUsers list, or their group is in the AllowGroups list
-        // let them through, otherwise 403 them
-
-        //
-        if (array_key_exists("AllowUsers", $config)) {
-            $count = count($config["AllowUsers"]);
-            for ($i = 0; $i < $count; $i++) {
-                $user = $config["AllowUsers"][$i];
-                if ($user == $this->userName)
-                    return true;
-            }
-        }
-        //
-        if (array_key_exists("AllowGroups", $config)) {
-            $count = count($config["AllowGroups"]);
-            for ($i = 0; $i < $count; $i++) {
-                $group = $config["AllowGroups"][$i];
-                if (array_key_exists($group, $groups))
-                    return true;
-            }
-        }
-        //
-        if (array_key_exists("AllowRoles", $config)) {
-            $roles = $site->EnumerateRoles($this->userName);
-            $count = count($config["AllowRoles"]);
-            for ($i = 0; $i < $count; $i++) {
-                $role = $config["AllowRoles"][$i];
-                if ($roles->IndexOf($role) >= 0)
-                    return true;
-            }
-        }
-        return false;
+        return MgUtils::ValidateAcl($this->userName, $site, $config);
     }
 
     static function ApplyFeatureSource($resSvc, $app, $layerDefId) {
