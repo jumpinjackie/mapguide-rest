@@ -346,6 +346,8 @@ class MgXmlSchemaInfo
         "/SessionTimeout/Value" => self::XML_DATA_TYPE_NUMBER,
         "/FeatureInformation/SelectedFeatures/SelectedLayer/LayerMetadata/Property/Type" => self::XML_DATA_TYPE_NUMBER,
         //Response types unique to mapguide-rest
+        "/CoordinateCollection/Coordinate/X" => self::XML_DATA_TYPE_NUMBER,
+        "/CoordinateCollection/Coordinate/Y" => self::XML_DATA_TYPE_NUMBER,
         "/AggregateResult/Total" => self::XML_DATA_TYPE_NUMBER,
         "/AggregateResult/BoundingBox/LowerLeft/X" => self::XML_DATA_TYPE_NUMBER,
         "/AggregateResult/BoundingBox/LowerLeft/Y" => self::XML_DATA_TYPE_NUMBER,
