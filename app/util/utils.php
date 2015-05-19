@@ -90,6 +90,7 @@ class MgUtils
         // let them through, otherwise 403 them
         //
         if (array_key_exists("AllowUsers", $config)) {
+            //print "Checking user ($userName)\n";
             $count = count($config["AllowUsers"]);
             for ($i = 0; $i < $count; $i++) {
                 $user = $config["AllowUsers"][$i];
@@ -99,16 +100,18 @@ class MgUtils
         }
         //
         if (array_key_exists("AllowGroups", $config)) {
+            //print "Checking group membership of ($userName)\n";
             $groups = array();
             $doc = new DOMDocument();
             $br = $site->EnumerateGroups($userName);
-            $doc->loadXML($br->ToString());
+            $xml = $br->ToString();
+            $doc->loadXML($xml);
             $groupNodes = $doc->getElementsByTagName("Name");
             for ($i = 0; $i < $groupNodes->length; $i++) {
                 $groupName = $groupNodes->item($i)->nodeValue;
                 $groups[$groupName] = $groupName;
             }
-
+            
             $count = count($config["AllowGroups"]);
             for ($i = 0; $i < $count; $i++) {
                 $group = $config["AllowGroups"][$i];
@@ -118,11 +121,14 @@ class MgUtils
         }
         //
         if (array_key_exists("AllowRoles", $config)) {
+            //print "Checking roles of ($userName)";
             $roles = $site->EnumerateRoles($userName);
             $count = count($config["AllowRoles"]);
             for ($i = 0; $i < $count; $i++) {
                 $role = $config["AllowRoles"][$i];
-                if ($roles->IndexOf($role) >= 0)
+                $idx = $roles->IndexOf($role);
+                //print "IndexOf($role): $idx\n";
+                if ($idx >= 0)
                     return true;
             }
         }
