@@ -1,47 +1,13 @@
 <?php
 
+require_once dirname(__FILE__)."/TestUtils.php";
 require_once dirname(__FILE__)."/../app/util/utils.php";
-
-class FakeStringCollection
-{
-	private $values;
-	
-	public function __construct($vals) {
-		$this->values = $vals;
-	}
-	
-	public function IndexOf($val) {
-		for ($i = 0; $i < count($this->values); $i++) {
-			if ($val === $this->values[$i])
-				return $i;
-		}
-		return -1;
-	}
-}
 
 class AclTest extends PHPUnit_Framework_TestCase
 {
-	private function mockByteReader($xml) {
-		$stub = $this->getMockBuilder("MgByteReader")->getMock();
-		$stub->method("GetMimeType")
-			->will($this->returnValue("text/xml"));
-		$stub->method("ToString")
-			->will($this->returnValue($xml));
-		return $stub;
-	}
-
-	private function mockSite($groupXml, $rolesArray) {
-		$stub = $this->getMockBuilder("MgSite")->getMock();
-		$stub->method("EnumerateGroups")
-			->will($this->returnValue($this->mockByteReader($groupXml)));
-		$stub->method("EnumerateRoles")
-			->will($this->returnValue(new FakeStringCollection($rolesArray)));
-		return $stub;
-	}
-	
 	public function testEmptyAcl() {
 		$site = $this->getMockBuilder("MgSite")->getMock();
-		$this->assertFalse(MgUtils::ValidateAcl("Anonymous", $site, array()));
+		$this->assertTrue(MgUtils::ValidateAcl("Anonymous", $site, array()));
 	}
 	
 	public function testUserInAcl() {
@@ -62,7 +28,7 @@ class AclTest extends PHPUnit_Framework_TestCase
 		<Description>Built-in group to include all users</Description>
 	</Group>
 </GroupList>';
-		$br = $this->mockByteReader($groupXml);
+		$br = TestUtils::mockByteReader($this, $groupXml);
 		$this->assertEquals("text/xml", $br->GetMimeType());
 		$this->assertEquals($groupXml, $br->ToString());
 		$site = $this->getMockBuilder("MgSite")->getMock();
@@ -88,7 +54,7 @@ class AclTest extends PHPUnit_Framework_TestCase
 		<Description>Built-in group to include all users</Description>
 	</Group>
 </GroupList>';
-		$br = $this->mockByteReader($groupXml);
+		$br = TestUtils::mockByteReader($this, $groupXml);
 		$this->assertEquals("text/xml", $br->GetMimeType());
 		$this->assertEquals($groupXml, $br->ToString());
 		$site = $this->getMockBuilder("MgSite")->getMock();

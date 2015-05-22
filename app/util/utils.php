@@ -86,6 +86,10 @@ class MgUtils
     }
 
     public static function ValidateAcl($userName, $site, $config) {
+        // Empty ACL config = open season
+        if (empty($config))
+            return true;
+        
         // If the user is in the AllowUsers list, or their group is in the AllowGroups list
         // let them through, otherwise 403 them
         //
@@ -132,6 +136,7 @@ class MgUtils
                     return true;
             }
         }
+        
         return false;
     }
 

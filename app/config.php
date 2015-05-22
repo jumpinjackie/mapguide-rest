@@ -43,6 +43,122 @@ return array(
     "GeoRest.ConfigPath" => "./conf/data",
 
     //
+    //MapGuide.FeatureSourceConfiguration
+    //
+    //If this property is defined, access to the given feature source through the REST API will be governed
+    //by the configuration within
+    //
+    //This property also doubles as a whitelist when defined. When active, APIs that operate on feature sources 
+    //will only be allowed if the given feature source id is defined in this list. If this property is omitted 
+    //or the property is an empty array, the whitelist is not active
+    //
+    //Security resolution rules:
+    // - If a Feature Source key is present
+    //    - If it has an empty array value, all actions and representations are allowed for all
+    //    - If it is not empty, action and representation security rules are as follows below
+    // - If an Action is specified
+    //    - If it has an empty array value, it is allowed for all.
+    //    - If it is not empty, only users/groups/roles within the specified ACL are allowed to invoke this operation
+    // - If a Representation is specified
+    //    - If it has an empty array value, it is allowed for all.
+    //    - If it is not empty, only users/groups/roles within the specified ACL are allowed to request the given resource in the specified representation
+    //
+    //See example configurations below for more details
+    //
+    //NOTE: Session-based feature sources are exempt from these whitelisting rules
+    "MapGuide.FeatureSourceConfiguration" => array(
+        //
+        // The "Globals" configuration specifies ACLs for operations that do not 
+        // operate on a specific feature source
+        //
+        "Globals" => array(
+            "Actions" => array(
+                "GETCONNECTIONPROPERTYVALUES" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "ENUMERATEDATASTORES" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "GETPROVIDERCAPABILITIES" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "GETFEATUREPROVIDERS" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "GETSCHEMAMAPPING" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                )
+            )
+        ),
+        //
+        // This Sheboygan Parcels example demonstrates a possible approach to locking down access 
+        // to a given feature source
+        //
+        //  - The following operations are only allowed by authors and administrators:
+        //     - Operations that would expose details about the underlying data store
+        //     - Operations that insert/update/delete data
+        //     - Operations that describe the feature service configuration and capabilities of the MapGuide Server
+        //
+        //  - Anonymous users can only query data and only access a single class definition 
+        //    (and not the ability to walk the entire structure of the data store). An application
+        //    will presumably hand down the necessary schema/class name.
+        //
+        "Library://Samples/Sheboygan/Data/Parcels.FeatureSource" => array(
+            "Actions" => array(
+                "GETCONNECTIONPROPERTYVALUES" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "TESTCONNECTION" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "GETSPATIALCONTEXTS" => array(),
+                "GETLONGTRANSACTIONS" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "GETSCHEMAS" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "CREATEFEATURESOURCE" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "DESCRIBESCHEMA" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "GETCLASSES" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "GETCLASSDEFINITION" => array(),
+                "GETEDITCAPABILITIES" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "SETEDITCAPABILITIES" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "INSERTFEATURES" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "UPDATEFEATURES" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "DELETEFEATURES" => array(
+                    "AllowRoles" => array("Author", "Administrator")
+                ),
+                "SELECTAGGREGATES" => array(),
+                "SELECTFEATURES" => array()
+            ),
+            //
+            // For this configuration, all representations are allowed
+            //
+            "Representations" => array(
+                "xml" => array(),
+                "json" => array(),
+                "geojson" => array(),
+                "html" => array(),
+                "kml" => array()
+            )
+        )
+    ),
+    //
     //MapGuide.PhysicalTilePath
     //
     //The root path where MapGuide-generated tiles are stored. This is to allow for mapguide-rest to

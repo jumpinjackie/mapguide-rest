@@ -23,6 +23,7 @@ require_once dirname(__FILE__)."/../util/paginatedfeaturereader.php";
 require_once dirname(__FILE__)."/../util/readerchunkedresult.php";
 require_once dirname(__FILE__)."/../util/czmlresult.php";
 require_once dirname(__FILE__)."/../util/utils.php";
+require_once dirname(__FILE__)."/../util/whitelist.php";
 
 class MgFeatureServiceController extends MgBaseController {
     const PROP_ALLOW_INSERT = "_MgRestAllowInsert";
@@ -30,8 +31,19 @@ class MgFeatureServiceController extends MgBaseController {
     const PROP_ALLOW_DELETE = "_MgRestAllowDelete";
     const PROP_USE_TRANSACTION = "_MgRestUseTransaction";
 
+    private $whitelistConf;
+    private $whitelist;
+
     public function __construct($app) {
         parent::__construct($app);
+        $this->whitelistConf = $this->app->config("MapGuide.FeatureSourceConfiguration");
+        $this->whitelist = new MgFeatureSourceWhitelist($this->whitelistConf);
+    }
+
+    private function VerifyWhitelist($resIdStr, $mimeType, $requiredAction = null, $requiredRepresentation = null) {
+        $this->whitelist->VerifyWhitelist($resIdStr, $mimeType, function($msg, $mt) {
+            $this->Forbidden($msg, $mt);
+        }, $requiredAction, $requiredRepresentation);
     }
 
     public function GetConnectPropertyValues($providerName, $propName, $format) {
@@ -40,6 +52,8 @@ class MgFeatureServiceController extends MgBaseController {
 
         $partialConnStr = $this->GetRequestParameter("connection", "");
         $sessionId = $this->app->request->params("session");
+
+        //$this->VerifyGlobalWhitelist($this->GetMimeTypeForFormat($fmt), "GETCONNECTIONPROPERTYVALUES", $fmt);
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $providerName, $propName, $partialConnStr) {
@@ -64,6 +78,8 @@ class MgFeatureServiceController extends MgBaseController {
 
         $partialConnStr = $this->GetRequestParameter("connection", "");
         $sessionId = $this->app->request->params("session");
+        
+        //$this->VerifyGlobalWhitelist($this->GetMimeTypeForFormat($fmt), "ENUMERATEDATASTORES", $fmt);
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $providerName, $partialConnStr) {
@@ -88,6 +104,8 @@ class MgFeatureServiceController extends MgBaseController {
         $partialConnStr = $this->GetRequestParameter("connection", "");
         $sessionId = $this->app->request->params("session");
 
+        //$this->VerifyGlobalWhitelist($this->GetMimeTypeForFormat($fmt), "GETPROVIDERCAPABILITIES", $fmt);
+
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $providerName, $partialConnStr) {
             $param->AddParameter("OPERATION", "GETPROVIDERCAPABILITIES");
@@ -108,6 +126,8 @@ class MgFeatureServiceController extends MgBaseController {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
         $sessionId = $this->app->request->params("session");
+        
+        //$this->VerifyGlobalWhitelist($this->GetMimeTypeForFormat($fmt), "GETFEATUREPROVIDERS", $fmt);
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
@@ -132,6 +152,8 @@ class MgFeatureServiceController extends MgBaseController {
         $provider = $this->GetRequestParameter("provider", "");
         $connStr = $this->GetRequestParameter("connection", "");
         $sessionId = $this->app->request->params("session");
+        
+        //$this->VerifyGlobalWhitelist($this->GetMimeTypeForFormat($fmt), "GETSCHEMAMAPPING", $fmt);
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $provider, $connStr) {
@@ -155,6 +177,9 @@ class MgFeatureServiceController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
         }
         $resIdStr = $resId->ToString();
+
+        //$this->VerifyWhitelist($resIdStr, $this->GetMimeTypeForFormat($fmt), "TESTCONNECTION", $fmt);
+
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr) {
             $param->AddParameter("OPERATION", "TESTCONNECTION");
@@ -177,6 +202,9 @@ class MgFeatureServiceController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
         }
         $resIdStr = $resId->ToString();
+
+        //$this->VerifyWhitelist($resIdStr, $this->GetMimeTypeForFormat($fmt), "GETSPATIALCONTEXTS", $fmt);
+
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr) {
             $param->AddParameter("OPERATION", "GETSPATIALCONTEXTS");
@@ -201,6 +229,7 @@ class MgFeatureServiceController extends MgBaseController {
         }
         $resIdStr = $resId->ToString();
 
+        $this->VerifyWhitelist($resIdStr, $this->GetMimeTypeForFormat($fmt), "GETLONGTRANSACTIONS", $fmt);
         $active = $this->GetBooleanRequestParameter("active", false);
 
         $that = $this;
@@ -226,6 +255,9 @@ class MgFeatureServiceController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
         }
         $resIdStr = $resId->ToString();
+
+        //$this->VerifyWhitelist($resIdStr, $this->GetMimeTypeForFormat($fmt), "GETSCHEMANAMES", $fmt);
+
         $resName = $resId->GetName().".".$resId->GetResourceType();
         $pathInfo = $this->app->request->getPathInfo();
         $selfUrl = $this->app->config("SelfUrl");
@@ -260,6 +292,9 @@ class MgFeatureServiceController extends MgBaseController {
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
         }
+        
+        //$this->VerifyWhitelist($resId->ToString(), $this->GetMimeTypeForFormat($fmt), "CREATEFEATURESOURCE", $fmt);
+        
         $this->EnsureAuthenticationForSite($sessionId);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
@@ -399,6 +434,9 @@ class MgFeatureServiceController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
         }
         $resIdStr = $resId->ToString();
+
+        //$this->VerifyWhitelist($resIdStr, $this->GetMimeTypeForFormat($fmt), "DESCRIBESCHEMA", $fmt);
+
         $resName = $resId->GetName().".".$resId->GetResourceType();
         $pathInfo = $this->app->request->getPathInfo();
         $selfUrl = $this->app->config("SelfUrl");
@@ -476,6 +514,9 @@ class MgFeatureServiceController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
         }
         $resIdStr = $resId->ToString();
+
+        //$this->VerifyWhitelist($resIdStr, $this->GetMimeTypeForFormat($fmt), "GETCLASSNAMES", $fmt);
+
         $selfUrl = $this->app->config("SelfUrl");
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $resIdStr, $selfUrl) {
@@ -506,6 +547,9 @@ class MgFeatureServiceController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
         }
         $resIdStr = $resId->ToString();
+
+        //$this->VerifyWhitelist($resIdStr, $this->GetMimeTypeForFormat($fmt), "GETCLASSDEFINITION", $fmt);
+
         if ($fmt == "json") {
             //For JSON, we are defining a completely new response format. No point trying to transform the XML version, which is just a plain
             //XML schema. Do we really want to serve a JSON-ified version of that?
@@ -547,6 +591,8 @@ class MgFeatureServiceController extends MgBaseController {
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
 
+        //$this->VerifyWhitelist($resId->ToString(), $this->GetMimeTypeForFormat($fmt), "GETEDITCAPABILITIES", $fmt);
+
         $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
         $perms = self::CheckPermissions($resSvc, $resId);
 
@@ -577,6 +623,9 @@ class MgFeatureServiceController extends MgBaseController {
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $this->BadRequest($this->app->localizer->getText("E_NOT_SUPPORTED_FOR_SESSION_RESOURCES"), $this->GetMimeTypeForFormat($fmt));
         }
+        
+        //$this->VerifyWhitelist($resIdStr, $this->GetMimeTypeForFormat($fmt), "SETEDITCAPABILITIES", $fmt);
+        
         $this->EnsureAuthenticationForSite($sessionId);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
@@ -763,6 +812,7 @@ class MgFeatureServiceController extends MgBaseController {
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
                 $sessionId = $resId->GetRepositoryName();
             }
+            //$this->VerifyWhitelist($resId->ToString(), $this->GetMimeTypeForFormat($fmt), "INSERTFEATURES", $fmt);
             $this->EnsureAuthenticationForSite($sessionId);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
@@ -829,6 +879,7 @@ class MgFeatureServiceController extends MgBaseController {
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
                 $sessionId = $resId->GetRepositoryName();
             }
+            //$this->VerifyWhitelist($resId->ToString(), $this->GetMimeTypeForFormat($fmt), "UPDATEFEATURES", $fmt);
             $this->EnsureAuthenticationForSite($sessionId);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
@@ -901,6 +952,7 @@ class MgFeatureServiceController extends MgBaseController {
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
                 $sessionId = $resId->GetRepositoryName();
             }
+            //$this->VerifyWhitelist($resId->ToString(), $this->GetMimeTypeForFormat($fmt), "DELETEFEATURES", $fmt);
             $this->EnsureAuthenticationForSite($sessionId);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
@@ -965,6 +1017,7 @@ class MgFeatureServiceController extends MgBaseController {
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
                 $sessionId = $resId->GetRepositoryName();
             }
+            //$this->VerifyWhitelist($resId->ToString(), $this->GetMimeTypeForFormat($fmt), "SELECTAGGREGATES", $fmt);
             $this->EnsureAuthenticationForSite($sessionId);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
@@ -1143,6 +1196,8 @@ class MgFeatureServiceController extends MgBaseController {
                 $elev = $vlNode->getElementsByTagName("ElevationSettings");
                 if ($fsId->length == 1) {
                     $fsId = new MgResourceIdentifier($fsId->item(0)->nodeValue);
+                    //$this->VerifyWhitelist($fsId->ToString(), $this->GetMimeTypeForFormat($fmt), "SELECTFEATURES", $fmt);
+
                     if ($fc->length == 1) {
                         //Add hyperlink, tooltip and elevation as special computed properties
                         if ($hlink->length == 1 && strlen($hlink->item(0)->nodeValue) > 0) {
@@ -1306,6 +1361,7 @@ class MgFeatureServiceController extends MgBaseController {
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
                 $sessionId = $resId->GetRepositoryName();
             }
+            //$this->VerifyWhitelist($resId->ToString(), $this->GetMimeTypeForFormat($fmt), "SELECTFEATURES", $fmt);
             $this->EnsureAuthenticationForSite($sessionId, true);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
