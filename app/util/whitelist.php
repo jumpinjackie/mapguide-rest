@@ -21,12 +21,12 @@ require_once dirname(__FILE__)."/utils.php";
 
 class MgFeatureSourceWhitelist
 {
-	private $conf;
-	
-	public function __construct($conf) {
-		$this->conf = $conf;
-	}
-	
+    private $conf;
+    
+    public function __construct($conf) {
+        $this->conf = $conf;
+    }
+    
     /*
     private static function MakeDict($arr, $makeLower = false) {
         $dict = array();
@@ -106,7 +106,7 @@ class MgFeatureSourceWhitelist
         }
     }
     
-	public function VerifyWhitelist($resIdStr, $mimeType, $forbiddenAction, $requiredAction, $requiredRepresentation, $site, $userName) {
+    public function VerifyWhitelist($resIdStr, $mimeType, $forbiddenAction, $requiredAction, $requiredRepresentation, $site, $userName) {
         if ($this->conf && !empty($this->conf)) {
             $fsConf = null;
             if (!array_key_exists($resIdStr, $this->conf)) {
@@ -119,7 +119,7 @@ class MgFeatureSourceWhitelist
             }
             self::VerifyWhitelistInternal($fsConf, $mimeType, $forbiddenAction, $requiredAction, $requiredRepresentation, $site, $userName);
         }
-	}
+    }
 }
 
 ?>
