@@ -5,6 +5,10 @@ IIS configuration to enable URL rewriting. Requires the Application Request Rout
 <configuration>
     <system.webServer>
         <staticContent>
+            <remove fileExtension=".woff" />
+            <remove fileExtension=".svg" />
+            <remove fileExtension=".czml" />
+            <remove fileExtension=".kml" />
             <mimeMap fileExtension=".woff" mimeType="application/x-woff" />
             <mimeMap fileExtension=".svg" mimeType="image/svg+xml" />
             <mimeMap fileExtension=".czml" mimeType="application/json" />
