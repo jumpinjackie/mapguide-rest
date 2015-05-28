@@ -2,6 +2,7 @@
 /templates_c
 /cache/vectortile
 /cache/templates_c
+/cache/debug.log
 /build
 /dist
 /vendor
