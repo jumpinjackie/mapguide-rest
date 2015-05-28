@@ -66,6 +66,7 @@ return array(
     //See example configurations below for more details
     //
     //NOTE: Session-based feature sources are exempt from these whitelisting rules
+    /*
     "MapGuide.FeatureSourceConfiguration" => array(
         //
         // The "Globals" configuration specifies ACLs for operations that do not 
@@ -154,10 +155,12 @@ return array(
                 "json" => array(),
                 "geojson" => array(),
                 "html" => array(),
-                "kml" => array()
+                "kml" => array(),
+                "czml" => array()
             )
         )
     ),
+    */
     //
     //MapGuide.PhysicalTilePath
     //
