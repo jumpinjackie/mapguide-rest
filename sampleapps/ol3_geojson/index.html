@@ -8,7 +8,7 @@
             #wrap { width: 900; }
             #map { width: 800; height: 600; float: left; border: 1px solid black; }
         </style>
-        <script type="text/javascript" src="../../assets/common/js/ol.js"></script>
+        <script type="text/javascript" src="../../assets/common/js/ol-debug.js"></script>
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
         <script type="text/javascript">
 
@@ -272,35 +272,49 @@
             }
             return styleArray;
         }
-
+        
+        function isValidExtents(extents) {
+            return extents != null &&
+                   extents.length == 4 &&
+                   isFinite(extents[0]) &&
+                   isFinite(extents[1]) &&
+                   isFinite(extents[2]) &&
+                   isFinite(extents[3]);
+        }
+        
         $(document).ready(function() {
             var defaultStyle;
 
-            var buildingsSource = new ol.source.ServerVector({
-                format: new ol.format.GeoJSON(),
+            var geoJsonFormat = new ol.format.GeoJSON();
+
+            var buildingsSource = new ol.source.Vector({
                 loader: function(extent, resolution, projection) {
+                    if (!isValidExtents(extent))
+                        return;
                     var transform = ol.proj.getTransform(projection, 'EPSG:4326');
                     var epsg4326Extent = transform(extent, []);
                     var url = restUrl + '/library/Samples/Sheboygan/Data/BuildingOutlines.FeatureSource/features.geojson/SHP_Schema/BuildingOutlines?&bbox=' + epsg4326Extent.join(',');
                     $.ajax(url).then(function(response) {
-                        var features = districtsSource.readFeatures(response);
+                        var features = geoJsonFormat.readFeatures(response, { featureProjection: projection });
                         for (var i = 0; i < features.length; i++) {
                             features[i].set("_layer", "Buildings");
                         }
                         buildingsSource.addFeatures(features);
                     });
                 },
+                strategy: ol.loadingstrategy.bbox,
                 projection: 'EPSG:3857'
             });
 
-            var parcelsSource = new ol.source.ServerVector({
-                format: new ol.format.GeoJSON(),
+            var parcelsSource = new ol.source.Vector({
                 loader: function(extent, resolution, projection) {
+                    if (!isValidExtents(extent))
+                        return;
                     var transform = ol.proj.getTransform(projection, 'EPSG:4326');
                     var epsg4326Extent = transform(extent, []);
                     var url = restUrl + '/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels?&bbox=' + epsg4326Extent.join(',');
                     $.ajax(url).then(function(response) {
-                        var features = districtsSource.readFeatures(response, { dataProjection: 'EPSG:4326' });
+                        var features = geoJsonFormat.readFeatures(response, { featureProjection: projection });
                         for (var i = 0; i < features.length; i++) {
                             features[i].set("_layer", "Parcels");
                             features[i].set("_selectable", true);
@@ -308,40 +322,45 @@
                         parcelsSource.addFeatures(features);
                     });
                 },
+                strategy: ol.loadingstrategy.bbox,
                 projection: 'EPSG:3857'
             });
 
-            var districtsSource = new ol.source.ServerVector({
-                format: new ol.format.GeoJSON(),
+            var districtsSource = new ol.source.Vector({
                 loader: function(extent, resolution, projection) {
+                    if (!isValidExtents(extent))
+                        return;
                     var transform = ol.proj.getTransform(projection, 'EPSG:4326');
                     var epsg4326Extent = transform(extent, []);
                     var url = restUrl + '/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts?&bbox=' + epsg4326Extent.join(',');
                     $.ajax(url).then(function(response) {
-                        var features = districtsSource.readFeatures(response, { dataProjection: 'EPSG:4326' });
+                        var features = geoJsonFormat.readFeatures(response, { featureProjection: projection });
                         for (var i = 0; i < features.length; i++) {
                             features[i].set("_layer", "Districts");
                         }
                         districtsSource.addFeatures(features);
                     });
                 },
+                strategy: ol.loadingstrategy.bbox,
                 projection: 'EPSG:3857'
             });
 
-            var roadsSource = new ol.source.ServerVector({
-                format: new ol.format.GeoJSON(),
+            var roadsSource = new ol.source.Vector({
                 loader: function(extent, resolution, projection) {
+                    if (!isValidExtents(extent))
+                        return;
                     var transform = ol.proj.getTransform(projection, 'EPSG:4326');
                     var epsg4326Extent = transform(extent, []);
                     var url = restUrl + '/library/Samples/Sheboygan/Data/RoadCenterLines.FeatureSource/features.geojson/Default/RoadCenterLines?&bbox=' + epsg4326Extent.join(',');
                     $.ajax(url).then(function(response) {
-                        var features = roadsSource.readFeatures(response, { dataProjection: 'EPSG:4326' });
+                        var features = geoJsonFormat.readFeatures(response, { featureProjection: projection });
                         for (var i = 0; i < features.length; i++) {
                             features[i].set("_layer", "Roads");
                         }
                         roadsSource.addFeatures(features);
                     });
                 },
+                strategy: ol.loadingstrategy.bbox,
                 projection: 'EPSG:3857'
             });
 
