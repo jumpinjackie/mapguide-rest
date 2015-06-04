@@ -1173,6 +1173,13 @@
                             "description": "A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"
                         },
                         {
+                            "paramType": "query",
+                            "name": "bboxistargetcs",
+                            "type": "boolean",
+                            "required": false,
+                            "description": "Indicates if the bbox should be interpreted in the coordinate system specified in the transformto parameter"
+                        },
+                        {
                             "paramType": "path",
                             "name": "type",
                             "type": "string",
@@ -1554,6 +1561,13 @@
                             "type": "string",
                             "required": false,
                             "description": "A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "bboxistargetcs",
+                            "type": "boolean",
+                            "required": false,
+                            "description": "Indicates if the bbox should be interpreted in the coordinate system specified in the transformto parameter"
                         },
                         {
                             "paramType": "query",
@@ -2295,6 +2309,13 @@
                         },
                         {
                             "paramType": "query",
+                            "name": "bboxistargetcs",
+                            "type": "boolean",
+                            "required": false,
+                            "description": "Indicates if the bbox should be interpreted in the coordinate system specified in the transformto parameter"
+                        },
+                        {
+                            "paramType": "query",
                             "name": "pagesize",
                             "type": "integer",
                             "required": false,
@@ -2381,6 +2402,13 @@
                             "type": "string",
                             "required": false,
                             "description": "A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "bboxistargetcs",
+                            "type": "boolean",
+                            "required": false,
+                            "description": "Indicates if the bbox should be interpreted in the coordinate system specified in the transformto parameter"
                         },
                         {
                             "paramType": "path",

@@ -5632,6 +5632,95 @@
                     assertMimeType(mimeType, MgMimeType.Json);
                 });
             });
+            test("BBOX select (with and without transform)", function() {
+                //With raw credentials
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", { bbox: "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var json = JSON.parse(result);
+                    ok(json.features.length == 1, "Expected 1 result");
+                    ok(json.features[0].id == 6, "Expected feature with id = 6");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", { bbox: "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var json = JSON.parse(result);
+                    ok(json.features.length == 1, "Expected 1 result");
+                    ok(json.features[0].id == 6, "Expected feature with id = 6");
+                });
+                //Raw credentials with WGS84.PseudoMercator bbox. Expect no results
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", { transformto: "WGS84.PseudoMercator", bbox: "-9764214.1845989,5426353.1981194,-9763617.0203154,5426830.9295462" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var json = JSON.parse(result);
+                    ok(json.features.length != 1, "Expected (n != 1) results");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", { transformto: "WGS84.PseudoMercator", bbox: "-9764214.1845989,5426353.1981194,-9763617.0203154,5426830.9295462" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var json = JSON.parse(result);
+                    ok(json.features.length != 1, "Expected (n != 1) results");
+                });
+                //Raw credentials with WGS84.PseudoMercator bbox with the target cs hint flag
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", { transformto: "WGS84.PseudoMercator", bboxistargetcs: 1, bbox: "-9764214.1845989,5426353.1981194,-9763617.0203154,5426830.9295462" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var json = JSON.parse(result);
+                    ok(json.features.length == 1, "Expected 1 result");
+                    ok(json.features[0].id == 6, "Expected feature with id = 6");
+                });
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", { transformto: "WGS84.PseudoMercator", bboxistargetcs: 1, bbox: "-9764214.1845989,5426353.1981194,-9763617.0203154,5426830.9295462" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var json = JSON.parse(result);
+                    ok(json.features.length == 1, "Expected 1 result");
+                    ok(json.features[0].id == 6, "Expected feature with id = 6");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", { session: this.anonymousSessionId, bbox: "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var json = JSON.parse(result);
+                    ok(json.features.length == 1, "Expected 1 result");
+                    ok(json.features[0].id == 6, "Expected feature with id = 6");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", { session: this.adminSessionId, bbox: "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var json = JSON.parse(result);
+                    ok(json.features.length == 1, "Expected 1 result");
+                    ok(json.features[0].id == 6, "Expected feature with id = 6");
+                });
+                //Raw credentials with WGS84.PseudoMercator bbox. Expect no results
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", { session: this.anonymousSessionId, transformto: "WGS84.PseudoMercator", bbox: "-9764214.1845989,5426353.1981194,-9763617.0203154,5426830.9295462" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var json = JSON.parse(result);
+                    ok(json.features.length != 1, "Expected (n != 1) results");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", { session: this.adminSessionId, transformto: "WGS84.PseudoMercator", bbox: "-9764214.1845989,5426353.1981194,-9763617.0203154,5426830.9295462" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var json = JSON.parse(result);
+                    ok(json.features.length != 1, "Expected (n != 1) results");
+                });
+                //Raw credentials with WGS84.PseudoMercator bbox with the target cs hint flag
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", { session: this.anonymousSessionId, transformto: "WGS84.PseudoMercator", bboxistargetcs: 1, bbox: "-9764214.1845989,5426353.1981194,-9763617.0203154,5426830.9295462" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var json = JSON.parse(result);
+                    ok(json.features.length == 1, "Expected 1 result");
+                    ok(json.features[0].id == 6, "Expected feature with id = 6");
+                });
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", { session: this.adminSessionId, transformto: "WGS84.PseudoMercator", bboxistargetcs: 1, bbox: "-9764214.1845989,5426353.1981194,-9763617.0203154,5426830.9295462" }, function(status, result, mimeType) {
+                    ok(status == 200, "(" + status + ") - Response should've been ok");
+                    assertMimeType(mimeType, MgMimeType.Json);
+                    var json = JSON.parse(result);
+                    ok(json.features.length == 1, "Expected 1 result");
+                    ok(json.features[0].id == 6, "Expected feature with id = 6");
+                });
+            });
             test("Insert/Update/Delete Features", function() {
 
                 function createInsertXml(text, geom) {

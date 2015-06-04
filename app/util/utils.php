@@ -833,7 +833,11 @@ class MgUtils
         return MgUtils::ParseSingleFeatureDocument($app, $classDef, $doc, $featureNodeName, $propertyNodeName);
     }
 
-    public static function GetTransform($featSvc, $resId, $schemaName, $className, $transformto) {
+    /**
+     * Builds a coordinate system transform from the class definition's coordinate system to the target
+     * coordinate system indicated by the given coordinate system code
+     */
+    public static function GetTransform($featSvc, $resId, $schemaName, $className, $transformto, $bInvert = false) {
         $transform = null;
         $factory = new MgCoordinateSystemFactory();
         $targetWkt = $factory->ConvertCoordinateSystemCodeToWkt($transformto);
@@ -851,7 +855,10 @@ class MgUtils
                         if ($scReader->GetCoordinateSystemWkt() !== $targetWkt) {
                             $targetCs = $factory->CreateFromCode($transformto);
                             $sourceCs = $factory->Create($scReader->GetCoordinateSystemWkt());
-                            $transform = $factory->GetTransform($sourceCs, $targetCs);
+                            if ($bInvert)
+                                $transform = $factory->GetTransform($targetCs, $sourceCs);
+                            else
+                                $transform = $factory->GetTransform($sourceCs, $targetCs);
                             break;
                         }
                     }

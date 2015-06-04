@@ -1414,8 +1414,11 @@ class MgFeatureServiceController extends MgBaseController {
                                 
                                 //Transform bbox to target cs if flag specified
                                 $bboxIsTargetCs = $this->GetBooleanRequestParameter("bboxistargetcs", false);
-                                if ($transform != null && $bboxIsTargetCs) {
-                                    $geom = $geom->Transform($transform);
+                                if ($bboxIsTargetCs) {
+                                    //Because it has been declared the bbox is in target coordiantes, we have to transform that bbox back to the
+                                    //source, which means we need an inverse transform
+                                    $invTx = MgUtils::GetTransform($featSvc, $fsId, $schemaName, $className, $transformto, true /* invert */);
+                                    $geom = $geom->Transform($invTx);
                                 }
                                 $query->SetSpatialFilter($clsDef->GetDefaultGeometryPropertyName(), $geom, MgFeatureSpatialOperations::EnvelopeIntersects);
                             }
@@ -1544,8 +1547,11 @@ class MgFeatureServiceController extends MgBaseController {
                     
                     //Transform the bbox if we have the flag indicating so
                     $bboxIsTargetCs = $this->GetBooleanRequestParameter("bboxistargetcs", false);
-                    if ($transform != null && $bboxIsTargetCs) {
-                        $geom = $geom->Transform($transform);
+                    if ($bboxIsTargetCs) {
+                        //Because it has been declared the bbox is in target coordiantes, we have to transform that bbox back to the
+                        //source, which means we need an inverse transform
+                        $invTx = MgUtils::GetTransform($featSvc, $resId, $schemaName, $className, $transformto, true /* invert */);
+                        $geom = $geom->Transform($invTx);
                     }
                     
                     $clsDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
