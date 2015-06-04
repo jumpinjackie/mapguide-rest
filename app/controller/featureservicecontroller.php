@@ -1394,17 +1394,6 @@ class MgFeatureServiceController extends MgBaseController {
                             $query->SetOrderingFilter($orderProps, $orderOpt);
                         }
 
-                        if ($bbox !== "") {
-                            $parts = explode(",", $bbox);
-                            if (count($parts) == 4) {
-                                $wktRw = new MgWktReaderWriter();
-                                if ($clsDef == NULL)
-                                    $clsDef = $featSvc->GetClassDefinition($fsId, $schemaName, $className);
-                                $geom = $wktRw->Read(MgUtils::MakeWktPolygon($parts[0], $parts[1], $parts[2], $parts[3]));
-                                $query->SetSpatialFilter($clsDef->GetDefaultGeometryPropertyName(), $geom, MgFeatureSpatialOperations::EnvelopeIntersects);
-                            }
-                        }
-
                         //We must require features as LL84 for CZML output
                         if ($fmt == "czml") {
                             $transformto = "LL84";
@@ -1413,6 +1402,23 @@ class MgFeatureServiceController extends MgBaseController {
                         $transform = null;
                         if ($transformto !== "") {
                             $transform = MgUtils::GetTransform($featSvc, $fsId, $schemaName, $className, $transformto);
+                        }
+
+                        if ($bbox !== "") {
+                            $parts = explode(",", $bbox);
+                            if (count($parts) == 4) {
+                                $wktRw = new MgWktReaderWriter();
+                                if ($clsDef == NULL)
+                                    $clsDef = $featSvc->GetClassDefinition($fsId, $schemaName, $className);
+                                $geom = $wktRw->Read(MgUtils::MakeWktPolygon($parts[0], $parts[1], $parts[2], $parts[3]));
+                                
+                                //Transform bbox to target cs if flag specified
+                                $bboxIsTargetCs = $this->GetBooleanRequestParameter("bboxistargetcs", false);
+                                if ($transform != null && $bboxIsTargetCs) {
+                                    $geom = $geom->Transform($transform);
+                                }
+                                $query->SetSpatialFilter($clsDef->GetDefaultGeometryPropertyName(), $geom, MgFeatureSpatialOperations::EnvelopeIntersects);
+                            }
                         }
 
                         //Ensure valid page number if specified
@@ -1524,19 +1530,27 @@ class MgFeatureServiceController extends MgBaseController {
                     $orderOpt = MgOrderingOption::Descending;
                 $query->SetOrderingFilter($orderProps, $orderOpt);
             }
+            
+            $transform = null;
+            if ($transformto !== "") {
+                $transform = MgUtils::GetTransform($featSvc, $resId, $schemaName, $className, $transformto);
+            }
+            
             if ($bbox !== "") {
                 $parts = explode(",", $bbox);
                 if (count($parts) == 4) {
                     $wktRw = new MgWktReaderWriter();
                     $geom = $wktRw->Read(MgUtils::MakeWktPolygon($parts[0], $parts[1], $parts[2], $parts[3]));
+                    
+                    //Transform the bbox if we have the flag indicating so
+                    $bboxIsTargetCs = $this->GetBooleanRequestParameter("bboxistargetcs", false);
+                    if ($transform != null && $bboxIsTargetCs) {
+                        $geom = $geom->Transform($transform);
+                    }
+                    
                     $clsDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
                     $query->SetSpatialFilter($clsDef->GetDefaultGeometryPropertyName(), $geom, MgFeatureSpatialOperations::EnvelopeIntersects);
                 }
-            }
-
-            $transform = null;
-            if ($transformto !== "") {
-                $transform = MgUtils::GetTransform($featSvc, $resId, $schemaName, $className, $transformto);
             }
 
             $reader = $featSvc->SelectFeatures($resId, "$schemaName:$className", $query);
