@@ -6,4 +6,6 @@ php:
 
 install: composer require
 
-script: vendor/bin/phpunit test
+script:
+    - find app/ -type f -regex '.*\.php\|.*\.php\.j2' -exec php -lf {} \; | grep "Errors parsing ";
+    - vendor/bin/phpunit test
