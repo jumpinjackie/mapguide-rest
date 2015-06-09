@@ -239,9 +239,16 @@ class FeatureReaderModelTest extends PHPUnit_Framework_TestCase
             $this->assertEquals($i, $feat->ID);
             $i++;
         }
+        $j = 0;
+        while ($model->Next()) {
+            $feat = $model->Current();
+            $this->assertEquals($j, $feat->ID);
+            $j++;
+        }
         $model->Done();
         $this->assertTrue($rdr->WasClosed());
         $this->assertEquals(5, $i);
+        $this->assertEquals(5, $j);
     }
     
     public function testModelPeekIterationMixture() {
@@ -251,6 +258,33 @@ class FeatureReaderModelTest extends PHPUnit_Framework_TestCase
         //Peek 1st record
         $this->assertTrue($model->Peek());
         $this->assertEquals(0, $model->Current()->ID);
+        $this->assertTrue($model->Next());
+        $this->assertEquals(0, $model->Current()->ID);
+        $this->assertTrue($model->Next());
+        $this->assertEquals(1, $model->Current()->ID);
+        $this->assertTrue($model->Next());
+        $this->assertEquals(2, $model->Current()->ID);
+        //Peek 4th record
+        $this->assertTrue($model->Peek());
+        $this->assertEquals(3, $model->Current()->ID);
+        $this->assertTrue($model->Next());
+        $this->assertEquals(3, $model->Current()->ID);
+        $this->assertTrue($model->Next());
+        $this->assertEquals(4, $model->Current()->ID);
+        //Peek end of reader
+        $this->assertFalse($model->Peek());
+        $this->assertFalse($model->Next());
+    }
+    
+    public function testModelMultiPeekIterationMixture() {
+        $rdr = new MockReader();
+        $model = new MgFeatureReaderModel(new MockFormatterSet(), $rdr, -1, 0);
+        
+        //Peek 1st and 2nd record
+        $this->assertTrue($model->Peek());
+        $this->assertEquals(0, $model->Current()->ID);
+        $this->assertTrue($model->Peek());
+        $this->assertEquals(1, $model->Current()->ID);
         $this->assertTrue($model->Next());
         $this->assertEquals(0, $model->Current()->ID);
         $this->assertTrue($model->Next());
