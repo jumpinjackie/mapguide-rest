@@ -8,7 +8,11 @@
     <summary type="xhtml">
       <div xmlns="http://www.w3.org/1999/xhtml">
         <div class="alert alert-danger">
-            No property with ID ({$ID}) found
+          {if $single}
+          No property with ID ({$ID}) found
+          {else}
+          No properties found with the given query
+          {/if}
         </div>
       </div>
     </summary>
