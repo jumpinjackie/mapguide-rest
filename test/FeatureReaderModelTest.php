@@ -72,11 +72,17 @@ class MockReader
     }
     
     public function ReadNext() {
+        if ($this->closed)
+            throw new Exception("Reader already closed");
+        
         $this->i += 1;
         return $this->i < count($this->data);
     }
     
     public function GetPropertyType($indexOrProp) {
+        if ($this->closed)
+            throw new Exception("Reader already closed");
+        
         if ($indexOrProp == 0 || $indexOrProp == "ID")
             return MgPropertyType::Int32;
         else
@@ -84,10 +90,27 @@ class MockReader
     }
     
     public function GetPropertyCount() {
+        if ($this->closed)
+            throw new Exception("Reader already closed");
+        
         return 1;
     }
     
+    public function GetPropertyName($index) {
+        if ($this->closed)
+            throw new Exception("Reader already closed");
+        
+        if ($index == 0) {
+            return "ID";
+        }
+        
+        throw new Exception("Invalid property index");
+    }
+    
     public function GetPropertyIndex($name) {
+        if ($this->closed)
+            throw new Exception("Reader already closed");
+        
         if ($name == "ID") {
             return 0;
         }
@@ -95,10 +118,16 @@ class MockReader
     }
     
     public function GetClassDefinition() {
+        if ($this->closed)
+            throw new Exception("Reader already closed");
+        
         return new MockClass();
     }
     
     public function GetInt32($indexOrProp) {
+        if ($this->closed)
+            throw new Exception("Reader already closed");
+        
         if ($indexOrProp == 0 || $indexOrProp == "ID")
             return $this->data[$this->i];
         else
@@ -106,6 +135,9 @@ class MockReader
     }
     
     public function IsNull($indexOrProp) {
+        if ($this->closed)
+            throw new Exception("Reader already closed");
+        
         if ($indexOrProp == 0 || $indexOrProp == "ID")
             return false;
         else
@@ -177,6 +209,25 @@ class FeatureReaderModelTest extends PHPUnit_Framework_TestCase
         $model->Done();
         $this->assertTrue($rdr->WasClosed());
         $this->assertEquals(5, $i);
+    }
+    
+    public function testFeatureModelPrefill() {
+        $rdr = new MockReader();
+        $model = new MgFeatureReaderModel(new MockFormatterSet(), $rdr, -1, 0);
+        $this->assertTrue($model->Next());
+        $feat = $model->Current();
+        $feat->Prefill();
+        $rdr->Close();
+        //These should throw now
+        try {
+            $rdr->ReadNext();
+        } catch (Exception $ex) { }
+        try {
+            $model->Next();
+        } catch (Exception $ex) { }
+        //But our feature's property values should not, as we've cached the underlying values
+        //up-front with prefill
+        $this->assertEquals(0, $feat->ID);
     }
     
     public function testModelPeek() {

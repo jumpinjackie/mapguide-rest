@@ -89,8 +89,18 @@ class MgFeatureModel
         }
         return $this->data[$name][$formatterName];
     }
-
-    public function __get($name) {
+    
+    /**
+     * Reads all feature property values in advance, ensuring all such values are cached up-front
+     */
+    public function Prefill() {
+        for ($i = 0; $i < $this->reader->GetPropertyCount(); $i++) {
+            $name = $this->reader->GetPropertyName($i);
+            $this->GetValue($name);
+        }
+    }
+    
+    private function GetValue($name) {
         if (array_key_exists($name, $this->data)) {
             return $this->data[$name];
         }
@@ -161,6 +171,10 @@ class MgFeatureModel
         } else {
             return "";
         }
+    }
+
+    public function __get($name) {
+        return $this->GetValue($name);
     }
 }
 
