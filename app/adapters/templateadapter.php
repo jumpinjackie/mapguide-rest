@@ -232,8 +232,11 @@ class MgFeatureReaderModel
     private $formatters;
     private $transform;
 
+    private $peeked;
+
     public function __construct($formatters, $reader, $limit, $read, $transform = null) {
         $this->current = null;
+        $this->peeked = null;
         $this->reader = $reader;
         $this->read = $read;
         $this->limit = $limit;
@@ -241,17 +244,48 @@ class MgFeatureReaderModel
         $this->transform = $transform;
     }
 
-    public function Next() {
+    /**
+     * Advances the internal reader and caches the peeked record 
+     */
+    public function Peek() {
         $this->current = null;
+        $this->peeked = null;
         $result = $this->reader->ReadNext();
         $this->read++;
+        if ($result)
+            $this->peeked = new MgFeatureModel($this->formatters, $this->reader, $this->transform);
         $bWithinLimit = !($this->limit > 0 && $this->read > $this->limit);
         if (!$bWithinLimit)
             return false;
         return $result;
     }
 
+    /**
+     * Advances the internal reader to the next record. If a peek operation was made previously
+     * the internal reader is not advanced. Instead the peeked record is set to the current one
+     */
+    public function Next() {
+        $this->current = null;
+        if ($this->peeked == null) { //No peeking, proceed as normal
+            $result = $this->reader->ReadNext();
+            $this->read++;
+            $bWithinLimit = !($this->limit > 0 && $this->read > $this->limit);
+            if (!$bWithinLimit)
+                return false;
+            return $result;
+        } else { //A peek operation was made, set that to the current record and clear the peeked record
+            $this->current = $this->peeked;
+            $this->peeked = null;
+            return true;
+        }
+    }
+
+    /**
+     * Returns the current record. If a peek operation was made, it returns the peeked record
+     */
     public function Current() {
+        if ($this->peeked != null)
+            return $this->peeked;
         if ($this->current == null)
             $this->current = new MgFeatureModel($this->formatters, $this->reader, $this->transform);
         return $this->current;

@@ -43,5 +43,35 @@ if (!class_exists("MgSite")) {
         }
     }
 }
-    
+if (!class_exists("MgPropertyType")) {
+    class MgPropertyType {
+        const Null = 0 ; 
+        const Boolean = 1 ; 
+        const Byte = 2 ; 
+        const DateTime = 3 ; 
+        const Single = 4 ; 
+        const Double = 5 ; 
+        const Int16 = 6 ; 
+        const Int32 = 7 ; 
+        const Int64 = 8 ; 
+        const String = 9 ; 
+        const Blob = 10 ; 
+        const Clob = 11 ; 
+        const Feature = 12 ; 
+        const Geometry = 13 ; 
+        const Raster = 14 ; 
+        const Decimal = 15 ; 
+    }
+}
+if (!class_exists("MgFeaturePropertyType")) {
+    class MgFeaturePropertyType
+    {
+        const DataProperty = 100 ; 
+        const ObjectProperty = 101 ; 
+        const GeometricProperty = 102 ; 
+        const AssociationProperty = 103 ; 
+        const RasterProperty = 104 ; 
+    }
+}
+
 ?>
