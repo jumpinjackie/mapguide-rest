@@ -48,21 +48,147 @@ class MgFormatterSet
 }
 
 /**
+ * Internal use only
+ */
+class MgFeatureModelReaderFacade
+{
+    private $data;
+    private $meta;
+    private $bRead;
+    
+    private $ordNameMap;
+    private $nameOrdMap;
+    
+    public function __construct($data, $meta) {
+        $this->data = $data;
+        $this->meta = $meta;
+        
+        $this->ordNameMap = array();
+        $this->nameOrdMap = array();
+        $bRead = false;
+        if (count($this->data) != count($this->meta)) {
+            throw new Exception("data <-> meta count mismatch");
+        }
+        $i = 0;
+        foreach ($this->meta as $key => $value) {
+            $this->nameOrdMap[$key] = $i;
+            $this->ordNameMap[$i] = $key;
+            $i++;
+        }
+    }
+    
+    public function ReadNext() {
+        if (!$bRead) {
+            $bRead = true;
+        }
+        return $bRead;
+    }
+    
+    public function Close() {}
+    
+    public function IsNull($indexOrName) {
+        return !array_key_exists($indexOrName, $this->data);
+    }
+    
+    public function GetPropertyCount() {
+        return count($this->meta);
+    }
+    
+    public function GetPropertyName($index) {
+        return $ordNameMap[$index];
+    }
+    
+    public function GetPropertyIndex($name) {
+        return $nameOrdMap[$name];
+    }
+    
+    public function GetPropertyType($indexOrName) {
+        return $this->meta[$indexOrName];
+    }
+    
+    public function GetBoolean($indexOrName) {
+        $key = $indexOrName;
+        if (is_int($key))
+            $key = $this->GetPropertyName($key);
+        
+        return MgUtils::StringToBool($this->data[$key]);
+    }
+    
+    public function GetDouble($indexOrName) {
+        $key = $indexOrName;
+        if (is_int($key))
+            $key = $this->GetPropertyName($key);
+        
+        return doubleval($this->data[$key]);
+    }
+    
+    public function GetInt16($indexOrName) {
+        $key = $indexOrName;
+        if (is_int($key))
+            $key = $this->GetPropertyName($key);
+            
+        return intval($this->data[$key]);
+    }
+    
+    public function GetInt32($indexOrName) {
+        $key = $indexOrName;
+        if (is_int($key))
+            $key = $this->GetPropertyName($key);
+            
+        return intval($this->data[$key]);
+    }
+    
+    public function GetInt64($indexOrName) {
+        $key = $indexOrName;
+        if (is_int($key))
+            $key = $this->GetPropertyName($key);
+            
+        return intval($this->data[$key]);
+    }
+    
+    public function GetSingle($indexOrName) {
+        $key = $indexOrName;
+        if (is_int($key))
+            $key = $this->GetPropertyName($key);
+            
+        return floatval($this->data[$key]);
+    }
+    
+    public function GetString($indexOrName) {
+        $key = $indexOrName;
+        if (is_int($key))
+            $key = $this->GetPropertyName($key);
+            
+        return $this->data[$key];
+    }
+}
+
+/**
  * Template model for "single" result templates
  */
 class MgFeatureModel
 {
     private $reader;
     private $data;
+    private $meta;
     private $formatters;
     private $transform;
 
     public function __construct($formatters, $reader, $transform = null) {
         $this->reader = $reader;
         $this->data = array();
+        $this->meta = array();
         $this->formatters = $formatters;
         $this->transform = $transform;
     }
+    
+    /*
+    public function Dump() {
+        $this->Prefill();
+        var_dump($this->data);
+        die;
+    }
+    */
 
     public function DateTimeAsType($name, $formatterName) {
         if (!array_key_exists($name, $this->data)) {
@@ -91,6 +217,14 @@ class MgFeatureModel
     }
     
     /**
+     * Returns a MgFeatureReader-like facade for this feature
+     */
+    public function ReaderFacade() {
+        $this->Prefill();
+        return new MgFeatureModelReaderFacade($this->data, $this->meta);
+    }
+    
+    /**
      * Reads all feature property values in advance, ensuring all such values are cached up-front
      */
     public function Prefill() {
@@ -102,12 +236,32 @@ class MgFeatureModel
     
     private function GetValue($name) {
         if (array_key_exists($name, $this->data)) {
+            if (array_key_exists($name, $this->meta)) {
+                $pt = $this->meta[$name];
+                switch ($pt) {
+                    case MgPropertyType::Geometry:
+                    {
+                        if (array_key_exists("GeomWKT", $this->data[$name]))
+                            return $this->data[$name]["GeomWKT"];
+                        else
+                            return "";
+                    }
+                    case MgPropertyType::DateTime:
+                    {
+                        if (array_key_exists("DateDefault", $this->data[$name]))
+                            return $this->data[$name]["DateDefault"];
+                        else
+                            return "";
+                    }
+                }
+            }
             return $this->data[$name];
         }
 
         $idx = $this->reader->GetPropertyIndex($name);
         if ($idx >= 0) {
             $ptype = $this->reader->GetPropertyType($idx);
+            $this->meta[$name] = $ptype;
             if (!$this->reader->IsNull($idx)) {
                 switch ($ptype) {
                     case MgPropertyType::Boolean:
@@ -257,7 +411,7 @@ class MgFeatureReaderModel
         $this->formatters = $formatters;
         $this->transform = $transform;
     }
-
+    
     /**
      * Advances the internal reader and caches the peeked record 
      */
@@ -451,6 +605,48 @@ class MgTemplateRestAdapter extends MgRestAdapter
         $this->app->response->write($output);
     }
 
+    private function LoadRelatedFeatures($reader, $related) {
+        //Set up queries for any relations that are defined
+        foreach ($this->relations as $relName => $rel) {
+            $relFilterParts = array();
+            $bQuery = false;
+            //At least one source property must have a value before we continue because finding related
+            //records where sourceID is null in target is kind of pointless
+            foreach ($rel->KeyMap as $sourceProp => $targetProp) {
+                if (!$reader->IsNull($sourceProp)) {
+                    $value = self::GetPropertyValue($reader, $sourceProp);
+                    if ($value !== "") {
+                        $bQuery = true;
+                        if ($reader->GetPropertyType($sourceProp) == MgPropertyType::String)
+                            array_push($relFilterParts, "\"$targetProp\" = '$value'");
+                        else
+                            array_push($relFilterParts, "\"$targetProp\" = $value");
+                    } else {
+                        if ($reader->GetPropertyType($sourceProp) == MgPropertyType::String)
+                            array_push($relFilterParts, "\"$targetProp\" = ''");
+                        else
+                            array_push($relFilterParts, "\"$targetProp\" NULL");
+                    }
+                } else {
+                    array_push($relFilterParts, "\"$targetProp\" NULL");
+                }
+            }
+            if ($bQuery === false) {
+                continue;
+            }
+            //Fire off related query and stash in map for template
+            $relQuery = new MgFeatureQueryOptions();
+            $relFilter = implode(" AND ", $relFilterParts);
+            $relQuery->SetFilter($relFilter);
+            try {
+                $relReader = $this->featSvc->SelectFeatures($rel->FeatureSource, $rel->FeatureClass, $relQuery);
+                $related->Add($relName, new MgFeatureReaderModel(new MgFormatterSet($this->app), $relReader, -1, 0, null));
+            } catch (MgException $ex) {
+                throw new Exception($this->app->localizer->getText("E_QUERY_SETUP", $relFilter, $ex->GetDetails()));
+            }
+        }
+    }
+
     /**
      * Handles GET requests for this adapter. Overridable. Does nothing if not overridden.
      */
@@ -467,45 +663,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
             if ($single === true) {
                 //Have to advance the read to initialize the record
                 if ($reader->ReadNext()) {
-                    //Set up queries for any relations that are defined
-                    foreach ($this->relations as $relName => $rel) {
-                        $relFilterParts = array();
-                        $bQuery = false;
-                        //At least one source property must have a value before we continue because finding related
-                        //records where sourceID is null in target is kind of pointless
-                        foreach ($rel->KeyMap as $sourceProp => $targetProp) {
-                            if (!$reader->IsNull($sourceProp)) {
-                                $value = self::GetPropertyValue($reader, $sourceProp);
-                                if ($value !== "") {
-                                    $bQuery = true;
-                                    if ($reader->GetPropertyType($sourceProp) == MgPropertyType::String)
-                                        array_push($relFilterParts, "\"$targetProp\" = '$value'");
-                                    else
-                                        array_push($relFilterParts, "\"$targetProp\" = $value");
-                                } else {
-                                    if ($reader->GetPropertyType($sourceProp) == MgPropertyType::String)
-                                        array_push($relFilterParts, "\"$targetProp\" = ''");
-                                    else
-                                        array_push($relFilterParts, "\"$targetProp\" NULL");
-                                }
-                            } else {
-                                array_push($relFilterParts, "\"$targetProp\" NULL");
-                            }
-                        }
-                        if ($bQuery === false) {
-                            continue;
-                        }
-                        //Fire off related query and stash in map for template
-                        $relQuery = new MgFeatureQueryOptions();
-                        $relFilter = implode(" AND ", $relFilterParts);
-                        $relQuery->SetFilter($relFilter);
-                        try {
-                            $relReader = $this->featSvc->SelectFeatures($rel->FeatureSource, $rel->FeatureClass, $relQuery);
-                            $related->Add($relName, new MgFeatureReaderModel(new MgFormatterSet($this->app), $relReader, -1, 0, null));
-                        } catch (MgException $ex) {
-                            throw new Exception($this->app->localizer->getText("E_QUERY_SETUP", $relFilter, $ex->GetDetails()));
-                        }
-                    }
+                    $this->LoadRelatedFeatures($reader, $related);
                     $smarty->assign("model", new MgFeatureModel(new MgFormatterSet($this->app), $reader, $this->transform));
                     $smarty->assign("related", $related);
                     $smarty->assign("helper", new MgTemplateHelper($this->app));
@@ -529,6 +687,8 @@ class MgTemplateRestAdapter extends MgRestAdapter
                 else
                     $pageNo = intval($pageNo);
 
+                $bNoResults = false;
+                $firstRecord = null;
                 $bEndOfReader = false;
                 if ($this->pageSize > 0) {
                     if ($pageNo > 1) {
@@ -543,40 +703,65 @@ class MgTemplateRestAdapter extends MgRestAdapter
                             }
                             $read++;
                         }
+                        $model = new MgFeatureReaderModel(new MgFormatterSet($this->app), $reader, $limit, $read, $this->transform);
                     } else { //first page, set limit to page size
                         $limit = $this->pageSize;
+                        
+                        $model = new MgFeatureReaderModel(new MgFormatterSet($this->app), $reader, $limit, $read, $this->transform);
+                        //See if this only has one result. If so, then re-route to the single view
+                        if ($pageNo == 1) {
+                            //Peek() lets us advance the reader for previewing purposes without
+                            //compromising the behaviour of Next()
+                            if ($model->Peek()) {
+                                $firstRecord = $model->Current();
+                                //There's actually more, so this isn't a single result
+                                if ($model->Peek()) {
+                                    $firstRecord = null;
+                                }
+                            } else {
+                                $bNoResults = true;
+                            }
+                        }
                     }
                 }
                 
-                if ($read == 0) { //Query produced 0 results
-                    $this->app->response->setStatus(404);
-                    $smarty->assign("single", $single);
+                if ($firstRecord != null) {
+                    $this->LoadRelatedFeatures($firstRecord->ReaderFacade(), $related);
+                    $smarty->assign("model", $firstRecord);
+                    $smarty->assign("related", $related);
                     $smarty->assign("helper", new MgTemplateHelper($this->app));
-                    $output = $smarty->fetch($this->noneViewPath);
+                    $output = $smarty->fetch($this->singleViewPath);
                 } else {
-                    //echo "read: $read, limit: $limit, pageSize: ".$this->pageSize." result limit: ".$this->limit;
-                    //die;
-                    $smarty->assign("model", new MgFeatureReaderModel(new MgFormatterSet($this->app), $reader, $limit, $read, $this->transform));
-                    $smarty->assign("currentPage", $pageNo);
-                    $smarty->assign("endOfReader", $bEndOfReader ? "true" : "false");
-                    if ($this->limit > 0) {
-                        if ($bEndOfReader) {
-                            $smarty->assign("maxPages", $pageNo);
-                        } else {
-                            $smarty->assign("maxPages", ceil($this->limit / $this->pageSize));
-                        }
+                    if ($bNoResults) { //Query produced 0 results
+                        $this->app->response->setStatus(404);
+                        $smarty->assign("single", $single);
+                        $smarty->assign("helper", new MgTemplateHelper($this->app));
+                        $output = $smarty->fetch($this->noneViewPath);
                     } else {
-                        if ($bEndOfReader) {
-                            $smarty->assign("maxPages", $pageNo);
+                        //echo "read: $read, limit: $limit, pageSize: ".$this->pageSize." result limit: ".$this->limit;
+                        //die;
+                        $smarty->assign("model", $model);
+                        $smarty->assign("currentPage", $pageNo);
+                        $smarty->assign("endOfReader", $bEndOfReader ? "true" : "false");
+                        if ($this->limit > 0) {
+                            if ($bEndOfReader) {
+                                $smarty->assign("maxPages", $pageNo);
+                            } else {
+                                $smarty->assign("maxPages", ceil($this->limit / $this->pageSize));
+                            }
                         } else {
-                            if ($this->pageSize > 0)
-                                $smarty->assign("maxPages", -1);
-                            else
-                                $smarty->assign("maxPages", 1);
+                            if ($bEndOfReader) {
+                                $smarty->assign("maxPages", $pageNo);
+                            } else {
+                                if ($this->pageSize > 0)
+                                    $smarty->assign("maxPages", -1);
+                                else
+                                    $smarty->assign("maxPages", 1);
+                            }
                         }
+                        $smarty->assign("helper", new MgTemplateHelper($this->app));
+                        $output = $smarty->fetch($this->manyViewPath);
                     }
-                    $smarty->assign("helper", new MgTemplateHelper($this->app));
-                    $output = $smarty->fetch($this->manyViewPath);
                 }
             }
             $this->WriteOutput($output);
