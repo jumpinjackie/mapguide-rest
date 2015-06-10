@@ -1,7 +1,17 @@
 1.0 RC2
 =======
 
- - #8: Feature Source operation whitelisting support
+ - #98: Fix runtime map XML generation for versions of MapGuide that do not support CREATERUNTIMEMAP
+ - #99: Fix XYZ route for TileSetDefinition
+ - #103: Make stack trace output on error responses configurable
+ - #106: Add support for treating bbox parameter in the coordinate system specified in the 'transformto' parameter
+ - Add missing XML element conversion paths
+ - #8: Feature Source operation whitelisting support, a whitelist configuration example is included in config.php
+ - #105: Data publishing fixes:
+    - If a "many" data query returns no results, show the "None" template view
+    - If a "many" data query returns one results, show the "Single" template view
+ - Fix invalid GETMAPIMAGE operation version for map image adapter
+ - Re-vamped samples landing page
 
 1.0 RC1
 =======
