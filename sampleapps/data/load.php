@@ -1,11 +1,27 @@
 <html>
     <head>
         <title>Load OpenLayers integration Sample Data</title>
+        <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
         <style type="text/css">
+            /* Move down content because we have a fixed navbar that is 50px tall */
+            body {
+                padding-top: 70px;
+                padding-bottom: 20px;
+            }
             .error { color:red; }
         </style>
     </head>
     <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+          <div class="container">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="../index.php">MapGuide REST Samples</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+              
+            </div><!--/.navbar-collapse -->
+          </div>
+        </nav>
 <?php
 
 include(dirname(__FILE__)."/../../../mapadmin/constants.php");
@@ -102,25 +118,37 @@ if (array_key_exists("USERNAME", $_POST) && array_key_exists("PASSWORD", $_POST)
     $br3 = $bs3->GetReader();
     $resSvc->ApplyResourcePackage($br3);
 ?>
-    <p>Sample resources required for OpenLayers integration samples loaded.</p>
-    <p><a href="../index.php">Return to samples</a></p>
+    <div class="container">
+        <p>Sample resources required for OpenLayers integration samples loaded.</p>
+        <p><a class="btn btn-primary" href="../index.php">Return to samples</a></p>
+    </div>
 <? } else { ?>
-    <p>To load the sample resources required for OpenLayers integration samples, login as Administrator</p>
-    <p><strong>NOTE: Make sure you have already downloaded the <a href="http://download.osgeo.org/mapguide/releases/2.0.0/samples/Sheboygan.mgp">Sheboygan Dataset</a> and load this in via the <a href="../../../mapadmin/login.php">MapGuide Site Administrator</a> first before loading these OpenLayers integration sample resources</strong></p>
-    <form action="load.php" method="post">
-        Username: <input type="text" name="USERNAME" id="USERNAME" />
-        <br/>
-        Password: <input type="password" name="PASSWORD" id="PASSWORD" />
-        <br/>
-        <input type="submit" value="Login" />
-    </form>
-    <p><a href="../index.php">Return to samples</a></p>
+    <div class="container">
+        <div class="well">
+            <p>To load the sample resources required for OpenLayers integration samples, login as Administrator</p>
+        </div>
+        <div class="alert alert-info">Make sure you have already downloaded the <a href="http://download.osgeo.org/mapguide/releases/2.0.0/samples/Sheboygan.mgp">Sheboygan Dataset</a> and load this in via the <a href="../../../mapadmin/login.php">MapGuide Site Administrator</a> first before loading these OpenLayers integration sample resources</div>
+        <form action="load.php" method="post">
+            <div class="form-group">
+                <label for="USERNAME">Username:</label>
+                <input type="text" class="form-control" name="USERNAME" id="USERNAME" />
+            </div>
+            <div class="form-group">
+                <label for="PASSWORD">Password:</label>
+                <input type="password" class="form-control" name="PASSWORD" id="PASSWORD" />
+            </div>
+            <input type="submit" class="btn btn-primary" value="Login" />
+            <a class="btn btn-primary" href="../index.php">Return to samples</a>
+        </form>
+    </div>
 <? }
 } catch (MgException $e) {
 ?>
-    <p>An error occured:</p>
-    <div class="error">
+    <div class="alert alert-danger">
+        <p>An error occured:</p>
+        <pre>
     <?= $e->GetDetails() ?>
+        </pre>
     </div>
     <p><a href="javascript:history.go(-1)">Go back</a></p>
     <p><a href="../index.php">Return to samples</a></p>
