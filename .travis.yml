@@ -4,7 +4,7 @@ php:
     - 5.3
     - 5.5
 
-install: composer require
+install: composer install
 
 script:
     - find app/ -type f -regex '.*\.php\|.*\.php\.j2' -exec php -lf {} \;
