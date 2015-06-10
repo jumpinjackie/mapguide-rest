@@ -5,7 +5,6 @@ function is_installed($feature)
     return file_exists(dirname(__FILE__)."/".$feature);
 }
 
-$hasOL2Samples = true;
 ?>
 <!DOCTYPE html>
 <html>
@@ -26,7 +25,7 @@ $hasOL2Samples = true;
         <nav class="navbar navbar-inverse navbar-fixed-top">
           <div class="container">
             <div class="navbar-header">
-              <a class="navbar-brand" href="#">MapGuide REST Samples</a>
+              <a class="navbar-brand" href="index.php">MapGuide REST Samples</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
               
@@ -115,7 +114,6 @@ $hasOL2Samples = true;
                         </div>
                     </div>
                 </div>
-                <? if ($hasOL2Samples) { ?>
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <a data-toggle="collapse" data-parent="#accordion" href="#samplesOpenLayers"><strong>MapGuide REST API with OpenLayers</strong></a>
@@ -139,7 +137,6 @@ $hasOL2Samples = true;
                         </div>
                     </div>
                 </div>
-                <? } ?>
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <a data-toggle="collapse" data-parent="#accordion" href="#samplesLeaflet"><strong>MapGuide REST API with Leaflet</strong></a>
