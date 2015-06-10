@@ -36,7 +36,7 @@
 
         viewer.dataSources.add(buildingSource);
         //Cap by bbox to avoid intensive query responses
-        buildingSource.loadUrl("../../library/Samples/Melbourne/Layers/BuildingFootprints.LayerDefinition/features.czml?bbox=319751.2190843,5811830.620593,321466.7976002,5813460.3978747");
+        buildingSource.process("../../library/Samples/Melbourne/Layers/BuildingFootprints.LayerDefinition/features.czml?bbox=319751.2190843,5811830.620593,321466.7976002,5813460.3978747");
 
         viewer.scene.camera.flyTo({
           destination: Cesium.Cartesian3.fromDegrees(144.962162, -37.814644, 2000.0)

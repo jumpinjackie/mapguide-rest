@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <MapDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="2.4.0" xsi:noNamespaceSchemaLocation="MapDefinition-2.4.0.xsd">
   <Name>Sheboygan Tiled Map</Name>
-  <CoordinateSystem>GEOGCS["WGS84 Lat/Long's, Degrees, -180 ==&gt; +180",DATUM["D_WGS_1984",SPHEROID["World_Geodetic_System_of_1984",6378137,298.257222932867]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]</CoordinateSystem>
+  <CoordinateSystem>PROJCS["WGS84.PseudoMercator",GEOGCS["LL84",DATUM["WGS84",SPHEROID["WGS84",6378137.000,298.25722293]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Popular Visualisation Pseudo Mercator"],PARAMETER["false_easting",0.000],PARAMETER["false_northing",0.000],PARAMETER["central_meridian",0.00000000000000],UNIT["Meter",1.00000000000000]]</CoordinateSystem>
   <Extents>
-    <MinX>-87.764986990962839</MinX>
-    <MaxX>-87.695521510899724</MaxX>
-    <MinY>43.691398128787782</MinY>
-    <MaxY>43.797520000480347</MaxY>
+    <MinX>-9769953.6613122653</MinX>
+    <MaxX>-9762220.7994439267</MaxX>
+    <MinY>5417808.8801717851</MinY>
+    <MaxY>5434161.2241863841</MaxY>
   </Extents>
   <BackgroundColor>ffcdbd9c</BackgroundColor>
   <BaseMapDefinition>

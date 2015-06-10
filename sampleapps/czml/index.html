@@ -41,9 +41,9 @@
         viewer.dataSources.add(parcelsSource);
 
         //Trees and Parcels are capped by bbox to avoid intensive query responses
-        parcelsSource.loadUrl("../../library/Samples/Sheboygan/Layers/ParcelsREST.LayerDefinition/features.czml?bbox=-87.731383,43.746562,-87.712058,43.760503");
-        treesSource.loadUrl("../../library/Samples/Sheboygan/Layers/Trees.LayerDefinition/features.czml?bbox=-87.731383,43.746562,-87.712058,43.760503");
-        roadsSource.loadUrl("../../library/Samples/Sheboygan/Layers/Roads.LayerDefinition/features.czml?bbox=-87.731383,43.746562,-87.712058,43.760503");
+        parcelsSource.process("../../library/Samples/Sheboygan/Layers/ParcelsREST.LayerDefinition/features.czml?bbox=-87.731383,43.746562,-87.712058,43.760503");
+        treesSource.process("../../library/Samples/Sheboygan/Layers/Trees.LayerDefinition/features.czml?bbox=-87.731383,43.746562,-87.712058,43.760503");
+        roadsSource.process("../../library/Samples/Sheboygan/Layers/Roads.LayerDefinition/features.czml?bbox=-87.731383,43.746562,-87.712058,43.760503");
 
         viewer.scene.camera.flyTo({
           destination: Cesium.Cartesian3.fromDegrees(-87.724283, 43.752034, 2000.0)
