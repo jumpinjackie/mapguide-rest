@@ -242,7 +242,7 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             $param = $req->GetRequestParam();
 
             $param->AddParameter("OPERATION", "GETMAPIMAGE");
-            $param->AddParameter("VERSION", "2.0.0");
+            $param->AddParameter("VERSION", "1.0.0");
             $param->AddParameter("SESSION", $this->sessionId);
             $param->AddParameter("LOCALE", $this->app->config("Locale"));
             $param->AddParameter("CLIENTAGENT", "MapGuide REST Extension");
