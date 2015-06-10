@@ -1481,7 +1481,7 @@ class MgFeatureServiceController extends MgBaseController {
                 $sessionId = $resId->GetRepositoryName();
             }
             
-            $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
+            $this->EnsureAuthenticationForSite($sessionId, true, $mimeType);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
             $site = $siteConn->GetSite();
