@@ -285,10 +285,10 @@
                   defaultProjection: 'EPSG:4326'
                 }),
                 projection: 'EPSG:3857',
-                tileGrid: new ol.tilegrid.XYZ({
+                tileGrid: ol.tilegrid.createXYZ({
                   maxZoom: 19
                 }),
-                url: restUrl + '/library/Samples/Sheboygan/MapsTiled/SheboyganNoWatermark.MapDefinition/xyz/Base Layer Group/{z}/{x}/{y}/tile.json'
+                url: restUrl + '/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/xyz/Base Layer Group/{z}/{x}/{y}/tile.json'
               }),
               style: styleFunc
             });
