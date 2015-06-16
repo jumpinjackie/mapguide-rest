@@ -1,24 +1,9 @@
 <?php
 
 include dirname(__FILE__)."/../../mapadmin/constants.php";
+include(dirname(__FILE__)."/bootstrap.php");
 
 $prolog = "<?xml";
-
-//If you changed this, change it here too
-$adminUser = "Administrator";
-$adminPass = "admin";
-$authorUser = "Author";
-$authorPass = "author";
-$wfsUser = "WfsUser";
-$wfsPass = "wfs";
-$wmsUser = "WmsUser";
-$wmsPass = "wms";
-
-$user1User = "User1";
-$user1Pass = "user1";
-$user2User = "User2";
-$user2Pass = "user2";
-$userGroup = "RestUsers";
 
 $selfUrl = "/mapguide/rest";
 $dump = false;
@@ -34,94 +19,13 @@ if (array_key_exists("no_url_rewrite", $_GET) && $_GET["no_url_rewrite"] == "1")
     $selfUrl = "/mapguide/rest/index.php";
 }
 
-try {
-    
-    if (!$dump) {
-        
-        $webConfigPath = dirname(__FILE__)."/../../webconfig.ini";
-        MgInitializeWebTier($webConfigPath);
-    
-        $mgp = dirname(__FILE__)."/data/Sheboygan.mgp";
-        if (!file_exists($mgp)) {
-            echo "Please put Sheboygan.mgp into the /data directory before running this test suite";
-            die;
-        }
-    
-        if (!is_dir(dirname(__FILE__)."/../conf/data/test_anonymous/"))
-            mkdir(dirname(__FILE__)."/../conf/data/test_anonymous/");
-        copy(dirname(__FILE__)."/data/restcfg_anonymous.json", dirname(__FILE__)."/../conf/data/test_anonymous/restcfg.json");
-        if (!is_dir(dirname(__FILE__)."/../conf/data/test_author/"))
-            mkdir(dirname(__FILE__)."/../conf/data/test_author/");
-        copy(dirname(__FILE__)."/data/restcfg_author.json", dirname(__FILE__)."/../conf/data/test_author/restcfg.json");
-        if (!is_dir(dirname(__FILE__)."/../conf/data/test_administrator/"))
-            mkdir(dirname(__FILE__)."/../conf/data/test_administrator/");
-        copy(dirname(__FILE__)."/data/restcfg_administrator.json", dirname(__FILE__)."/../conf/data/test_administrator/restcfg.json");
-        if (!is_dir(dirname(__FILE__)."/../conf/data/test_wfsuser/"))
-            mkdir(dirname(__FILE__)."/../conf/data/test_wfsuser/");
-        copy(dirname(__FILE__)."/data/restcfg_wfsuser.json", dirname(__FILE__)."/../conf/data/test_wfsuser/restcfg.json");
-        if (!is_dir(dirname(__FILE__)."/../conf/data/test_wmsuser/"))
-            mkdir(dirname(__FILE__)."/../conf/data/test_wmsuser/");
-        copy(dirname(__FILE__)."/data/restcfg_wmsuser.json", dirname(__FILE__)."/../conf/data/test_wmsuser/restcfg.json");
-        if (!is_dir(dirname(__FILE__)."/../conf/data/test_group/"))
-            mkdir(dirname(__FILE__)."/../conf/data/test_group/");
-        copy(dirname(__FILE__)."/data/restcfg_group.json", dirname(__FILE__)."/../conf/data/test_group/restcfg.json");
-        if (!is_dir(dirname(__FILE__)."/../conf/data/test_mixed/"))
-            mkdir(dirname(__FILE__)."/../conf/data/test_mixed/");
-        copy(dirname(__FILE__)."/data/restcfg_mixed.json", dirname(__FILE__)."/../conf/data/test_mixed/restcfg.json");
-    
-        $source = new MgByteSource($mgp);
-        $br = $source->GetReader();
-    
-        $siteConn = new MgSiteConnection();
-        $userInfo = new MgUserInformation($adminUser, $adminPass);
-        $siteConn->Open($userInfo);
-    
-        $site = new MgSite();
-        $site->Open($userInfo);
-        //Set up any required users
-        try {
-            $site->AddGroup($userGroup, "Group for mapguide-rest test suite users");
-        } catch (MgException $ex) { }
-        try {
-            $site->AddUser($user1User, $user1User, $user1Pass, "Test user for mapguide-rest test suite");
-        } catch (MgException $ex) { }
-        try {
-            $site->AddUser($user2User, $user2User, $user2Pass, "Test user for mapguide-rest test suite");
-        } catch (MgException $ex) { }
-        try {
-            $groups = new MgStringCollection();
-            $users = new MgStringCollection();
-            $groups->Add($userGroup);
-            $users->Add($user1User);
-            $users->Add($user2User);
-            $site->GrantGroupMembershipsToUsers($groups, $users);
-        } catch (MgException $ex) { }
-    
-        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-        $resSvc->ApplyResourcePackage($br);
-    
-        $srcId = new MgResourceIdentifier("Library://Samples/Sheboygan/Data/Parcels.FeatureSource");
-        $dstId = new MgResourceIdentifier("Library://RestUnitTests/Parcels.FeatureSource");
-        $resSvc->CopyResource($srcId, $dstId, true);
-    
-        $bsWriteable = new MgByteSource(dirname(__FILE__)."/data/Parcels_Writeable.FeatureSource.xml");
-        $brWriteable = $bsWriteable->GetReader();
-        $resSvc->SetResource($dstId, $brWriteable, null);
-    
-        $rdsdfsource = new MgByteSource(dirname(__FILE__)."/data/RedlineLayer.sdf");
-        $rdsdfrdr = $rdsdfsource->GetReader();
-        $resId = new MgResourceIdentifier("Library://RestUnitTests/RedlineLayer.FeatureSource");
-    
-        $rdXml = '<?xml version="1.0"?><FeatureSource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="FeatureSource-1.0.0.xsd"><Provider>OSGeo.SDF</Provider><Parameter><Name>File</Name><Value>%MG_DATA_FILE_PATH%RedlineLayer.sdf</Value></Parameter></FeatureSource>';
-        $rdXmlSource = new MgByteSource($rdXml, strlen($rdXml));
-        $rdXmlRdr = $rdXmlSource->GetReader();
-    
-        $resSvc->SetResource($resId, $rdXmlRdr, null);
-        $resSvc->SetResourceData($resId, "RedlineLayer.sdf", MgResourceDataType::File, $rdsdfrdr);
+if (!$dump) {
+    try {    
+        SetupTestData();
+    } catch (MgException $ex) {
+        echo "Failed to bootstrap the test suite. Exception was: ".$ex->GetDetails();
+        die;
     }
-} catch (MgException $ex) {
-    echo "Failed to bootstrap the test suite. Exception was: ".$ex->GetDetails();
-    die;
 }
 
 $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FeatureSource-1.0.0.xsd"><Provider>OSGeo.SDF</Provider><Parameter><Name>File</Name><Value>%MG_DATA_FILE_PATH%Empty.sdf</Value></Parameter></FeatureSource>';
@@ -156,6 +60,190 @@ if ($dump) {
                 Binary: '<?= MgMimeType::Binary ?>',
                 Pdf: 'application/pdf'
             };
+            
+            function makeXmlBlob(xml) {
+                return new Blob([xml], { type: "text/xml" });
+            }
+            
+            /* Blob.js
+             * A Blob implementation.
+             * 2013-06-20
+             * 
+             * By Eli Grey, http://eligrey.com
+             * By Devin Samarin, https://github.com/eboyjr
+             * License: X11/MIT
+             *   See LICENSE.md
+             */
+            
+            /*global unescape */
+            /*jslint bitwise: true, regexp: true, confusion: true, es5: true, vars: true, white: true,
+              plusplus: true */
+            
+            /*! @source http://purl.eligrey.com/github/Blob.js/blob/master/Blob.js */
+            
+            if ((typeof Blob !== "function" && typeof Blob !== "object") || (Blob && Blob.toString() === '[object BlobConstructor]'))
+            this.Blob = (function(view) {
+                "use strict";
+            
+                var BlobBuilder = view.BlobBuilder || view.WebKitBlobBuilder || view.MozBlobBuilder || view.MSBlobBuilder || (function(view) {
+                    var
+                          get_class = function(object) {
+                            return Object.prototype.toString.call(object).match(/^\[object\s(.*)\]$/)[1];
+                        }
+                        , FakeBlobBuilder = function BlobBuilder() {
+                            this.data = [];
+                        }
+                        , FakeBlob = function Blob(data, type, encoding) {
+                            this.data = data;
+                            this.size = data.length;
+                            this.type = type;
+                            this.encoding = encoding;
+                        }
+                        , FBB_proto = FakeBlobBuilder.prototype
+                        , FB_proto = FakeBlob.prototype
+                        , FileReaderSync = view.FileReaderSync
+                        , FileException = function(type) {
+                            this.code = this[this.name = type];
+                        }
+                        , file_ex_codes = (
+                              "NOT_FOUND_ERR SECURITY_ERR ABORT_ERR NOT_READABLE_ERR ENCODING_ERR "
+                            + "NO_MODIFICATION_ALLOWED_ERR INVALID_STATE_ERR SYNTAX_ERR"
+                        ).split(" ")
+                        , file_ex_code = file_ex_codes.length
+                        , real_URL = view.URL || view.webkitURL || view
+                        , real_create_object_URL = real_URL.createObjectURL
+                        , real_revoke_object_URL = real_URL.revokeObjectURL
+                        , URL = real_URL
+                        , btoa = view.btoa
+                        , atob = view.atob
+                        
+                        , ArrayBuffer = view.ArrayBuffer
+                        , Uint8Array = view.Uint8Array
+                    ;
+                    FakeBlob.fake = FB_proto.fake = true;
+                    while (file_ex_code--) {
+                        FileException.prototype[file_ex_codes[file_ex_code]] = file_ex_code + 1;
+                    }
+                    if (!real_URL.createObjectURL) {
+                        URL = view.URL = {};
+                    }
+                    URL.createObjectURL = function(blob) {
+                        var
+                              type = blob.type
+                            , data_URI_header
+                        ;
+                        if (type === null) {
+                            type = "application/octet-stream";
+                        }
+                        if (blob instanceof FakeBlob) {
+                            data_URI_header = "data:" + type;
+                            if (blob.encoding === "base64") {
+                                return data_URI_header + ";base64," + blob.data;
+                            } else if (blob.encoding === "URI") {
+                                return data_URI_header + "," + decodeURIComponent(blob.data);
+                            } if (btoa) {
+                                return data_URI_header + ";base64," + btoa(blob.data);
+                            } else {
+                                return data_URI_header + "," + encodeURIComponent(blob.data);
+                            }
+                        } else if (real_create_object_URL) {
+                            return real_create_object_URL.call(real_URL, blob);
+                        }
+                    };
+                    URL.revokeObjectURL = function(object_URL) {
+                        if (object_URL.substring(0, 5) !== "data:" && real_revoke_object_URL) {
+                            real_revoke_object_URL.call(real_URL, object_URL);
+                        }
+                    };
+                    FBB_proto.append = function(data/*, endings*/) {
+                        var bb = this.data;
+                        // decode data to a binary string
+                        if (Uint8Array && (data instanceof ArrayBuffer || data instanceof Uint8Array)) {
+                            var
+                                  str = ""
+                                , buf = new Uint8Array(data)
+                                , i = 0
+                                , buf_len = buf.length
+                            ;
+                            for (; i < buf_len; i++) {
+                                str += String.fromCharCode(buf[i]);
+                            }
+                            bb.push(str);
+                        } else if (get_class(data) === "Blob" || get_class(data) === "File") {
+                            if (FileReaderSync) {
+                                var fr = new FileReaderSync;
+                                bb.push(fr.readAsBinaryString(data));
+                            } else {
+                                // async FileReader won't work as BlobBuilder is sync
+                                throw new FileException("NOT_READABLE_ERR");
+                            }
+                        } else if (data instanceof FakeBlob) {
+                            if (data.encoding === "base64" && atob) {
+                                bb.push(atob(data.data));
+                            } else if (data.encoding === "URI") {
+                                bb.push(decodeURIComponent(data.data));
+                            } else if (data.encoding === "raw") {
+                                bb.push(data.data);
+                            }
+                        } else {
+                            if (typeof data !== "string") {
+                                data += ""; // convert unsupported types to strings
+                            }
+                            // decode UTF-16 to binary string
+                            bb.push(unescape(encodeURIComponent(data)));
+                        }
+                    };
+                    FBB_proto.getBlob = function(type) {
+                        if (!arguments.length) {
+                            type = null;
+                        }
+                        return new FakeBlob(this.data.join(""), type, "raw");
+                    };
+                    FBB_proto.toString = function() {
+                        return "[object BlobBuilder]";
+                    };
+                    FB_proto.slice = function(start, end, type) {
+                        var args = arguments.length;
+                        if (args < 3) {
+                            type = null;
+                        }
+                        return new FakeBlob(
+                              this.data.slice(start, args > 1 ? end : this.data.length)
+                            , type
+                            , this.encoding
+                        );
+                    };
+                    FB_proto.toString = function() {
+                        return "[object Blob]";
+                    };
+                    return FakeBlobBuilder;
+                }(view));
+            
+                var Blob = function(blobParts, options) {
+                    var type = options ? (options.type || "") : "";
+                    var builder = new BlobBuilder();
+                    if (blobParts) {
+                        for (var i = 0, len = blobParts.length; i < len; i++) {
+                            if (Uint8Array && blobParts[i] instanceof Uint8Array) {
+                                builder.append(blobParts[i].buffer);
+                            }
+                            else {
+                                builder.append(blobParts[i]);
+                            }
+                        }
+                    }
+                    var blob = builder.getBlob(type);
+                    if (!blob.slice && blob.webkitSlice) {
+                        blob.slice = blob.webkitSlice;
+                    }
+                    return blob;
+                };
+                var getPrototypeOf = Object.getPrototypeOf || function(object) {
+                    return object.__proto__;
+                };
+                Blob.prototype = getPrototypeOf(new Blob());
+                return Blob;
+            }(this));
 
             /**
              * jQuery plugin to convert a given $.ajax response xml object to json.
@@ -194,7 +282,7 @@ if ($dump) {
                     }
                     return xml;
                 }
-
+                
                 function normalize(value, options){
                     if (!!options.normalize){
                         return (value || '').trim();
@@ -353,6 +441,15 @@ if ($dump) {
                 }
                 return values.join("&");
             }
+            
+            function prepareEnvironment(context) {
+                context.ok = function(assertion, message) {
+                    ok(assertion, message);
+                };
+                context.assertMimeType = function(expected, actual) {
+                    context.ok(actual == expected, "(" + actual + ") Expected mime type of: " + expected);
+                };
+            }
 
             function api_test(url, type, data, callback) {
                 var origType = type;
@@ -387,6 +484,7 @@ if ($dump) {
                         xhr.setRequestHeader("Authorization", "Basic "); //Hmm, this is being set if we don't set it ourselves for some reason. So might as well plug and invalid one in to trigger 401
                     },
                     complete: function(result) {
+                        //console.log(type + " - " + result.status + " - " + url);
                         if(result.status == 0) {
                             callback(result.status, null, result.getResponseHeader("Content-Type"));
                         } else if(result.status == 404) {
@@ -431,6 +529,7 @@ if ($dump) {
                     },
                     async: false,
                     complete: function(result) {
+                        //console.log(type + " - " + result.status + " - " + url);
                         if(result.status == 0) {
                             callback(result.status, null, result.getResponseHeader("Content-Type"));
                         } else if(result.status == 404) {
