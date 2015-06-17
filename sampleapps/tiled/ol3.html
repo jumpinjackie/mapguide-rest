@@ -81,8 +81,9 @@
             //If a tile set definition is defined it takes precedence over the map definition, this enables
             //this example to work with older releases of MapGuide where no such resource type exists.
             var resourceId = rtMapInfo.RuntimeMap.TileSetDefinition || rtMapInfo.RuntimeMap.MapDefinition;
-            var tileWidth = rtMapInfo.RuntimeMap.TileWidth;
-            var tileHeight = rtMapInfo.RuntimeMap.TileHeight;
+            //On MGOS 2.6 or older, tile width/height is never returned, so default to 300x300
+            var tileWidth = rtMapInfo.RuntimeMap.TileWidth || 300;
+            var tileHeight = rtMapInfo.RuntimeMap.TileHeight || 300;
             var metersPerUnit = rtMapInfo.RuntimeMap.CoordinateSystem.MetersPerUnit;
             var dpi = rtMapInfo.RuntimeMap.DisplayDpi;
             var projection = null;
