@@ -1,0 +1,197 @@
+<html>
+    <head>
+        <title>Basic Sheboygan tiled map example</title>
+        <link rel="stylesheet" href="../../assets/common/js/theme/default/style.css" />
+        <style type="text/css">
+            body { font-family: Verdana; font-size: 0.9em; }
+            #error { color: red; }
+            #wrap { width: 900; }
+            #map { width: 650; height: 500; float: right; }
+            #layers { background: #6699FF; color: white; width: 250; height: 500; overflow: auto; display: block-inline; float: left; }
+            #rootList { list-style-type: none; margin-left: -20px; }
+            #rootList li { list-style-type: none; }
+            .olControlMousePosition { background: #ffff66; font-size: 0.6em !important; padding: 2px; }
+        </style>
+        <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="../../assets/common/js/ol.js"></script>
+        <script type="text/javascript">
+        
+        //This sample is assumed to be hosted at http://servername/mapguide/rest/sampleapps/tiled/index.html
+        var restUrl = "../../../rest";
+        
+        //Various features you can include in the CREATERUNTIMEMAP response.
+        var REQ_NONE = 0;                   //Nothing. This the default.
+        var REQ_LAYER_STRUCTURE = 1;        //Information about layers and groups (required for the mask values below to have any effect)
+        var REQ_LAYER_ICONS = 2;            //Icons for each layer (has no effect if REQ_LAYER_STRUCTURE is not in the bitmask)
+        var REQ_LAYER_FEATURE_SOURCE = 4;   //Feature Source information for each layer (has no effect if REQ_LAYER_STRUCTURE is not in the bitmask)
+        
+        var gMimeType = null;
+        var map = null;
+        
+        $(document).ready(function() {
+            //Have a play with the bitmask values to see the differences in JSON payload size
+            //and to see how our legend control gracefully handles such situations
+            //createMap(REQ_NONE);
+            //createMap(REQ_LAYER_STRUCTURE);
+            createMap(REQ_LAYER_STRUCTURE | REQ_LAYER_FEATURE_SOURCE | REQ_LAYER_ICONS);
+        });
+        
+        function createMap(reqFeatures) {
+            $.ajax({
+                url: restUrl + "/services/createmap.json",
+                method: "post",
+                data: {
+                    "mapdefinition": "Library://Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition",
+                    "requestedfeatures": reqFeatures,
+                    //Optional parameters you can specify and/or experiment with
+                    //"iconformat": "GIF",    //Uncomment to override desired image format (default: PNG)
+                    //"iconwidth": 32,         //Uncomment to override desired icon width (default: 16)
+                    //"iconheight": 32,        //Uncomment to override desired icon height (default: 16)
+                    //"iconsperscalerange": 3, //Uncomment to observe theme compression for themes exceeding this number of rules (default: 25)
+                    //"targetmapname": "MyRuntimeMapForOpenLayers", //Uncomment if you require a specific map name be given (default: inferred from Map Definition)
+                    "format": "json"
+                },
+                success: function(data, textStatus, jqXHR) {
+                    $("#jsonSize").html(jqXHR.responseText.length);
+                    loadMap(data);
+                }
+            }).error(function(jqXHR, textStatus, errorThrown) {
+                $("#error").html(jqXHR.responseText);
+            });
+        }
+        
+        function loadMap(rtMapInfo) {
+            if (rtMapInfo.RuntimeMap.IconMimeType) {
+                gMimeType = rtMapInfo.RuntimeMap.IconMimeType;
+                $("#iconFormat").html(gMimeType);
+            }
+            var extent = [
+                rtMapInfo.RuntimeMap.Extents.LowerLeftCoordinate.X,
+                rtMapInfo.RuntimeMap.Extents.LowerLeftCoordinate.Y,
+                rtMapInfo.RuntimeMap.Extents.UpperRightCoordinate.X,
+                rtMapInfo.RuntimeMap.Extents.UpperRightCoordinate.Y
+            ];
+            var finiteScales = [];
+            if (rtMapInfo.RuntimeMap.FiniteDisplayScale) {
+                for (var i = rtMapInfo.RuntimeMap.FiniteDisplayScale.length - 1; i >= 0; i--) {
+                    finiteScales.push(rtMapInfo.RuntimeMap.FiniteDisplayScale[i]);
+                }
+            }
+            
+            //If a tile set definition is defined it takes precedence over the map definition, this enables
+            //this example to work with older releases of MapGuide where no such resource type exists.
+            var resourceId = rtMapInfo.RuntimeMap.TileSetDefinition || rtMapInfo.RuntimeMap.MapDefinition;
+            var tileWidth = rtMapInfo.RuntimeMap.TileWidth;
+            var tileHeight = rtMapInfo.RuntimeMap.TileHeight;
+            var metersPerUnit = rtMapInfo.RuntimeMap.CoordinateSystem.MetersPerUnit;
+            var dpi = rtMapInfo.RuntimeMap.DisplayDpi;
+            var projection = null;
+            var zOrigin = finiteScales.length - 1;
+            var inPerUnit = 39.37 * metersPerUnit;
+            var resolutions = new Array(finiteScales.length);
+            for (var i = 0; i < finiteScales.length; ++i) {
+                resolutions[i] = finiteScales[i] / inPerUnit / dpi;
+            }
+            
+            if (rtMapInfo.RuntimeMap.CoordinateSystem.EpsgCode.length > 0) {
+                projection = "EPSG:" + rtMapInfo.RuntimeMap.CoordinateSystem.EpsgCode;
+            }
+            
+            var tileGrid = new ol.tilegrid.TileGrid({
+                origin: ol.extent.getTopLeft(extent),
+                resolutions: resolutions,
+                tileSize: [tileWidth, tileHeight]
+            });
+            
+            var groupLayers = [];
+            for (var i = 0; i < rtMapInfo.RuntimeMap.Group.length; i++) {
+                var group = rtMapInfo.RuntimeMap.Group[i];
+                if (group.Type != 2 && group.Type != 3) { //BaseMap or LinkedTileSet
+                    continue;
+                }
+                var urlTemplate = restUrl 
+                    + resourceId.replace("Library:/", "/library")
+                    + "/tile.img/" + group.Name + "/{z}/{y}/{x}";
+                
+                groupLayers.push(
+                    new ol.layer.Tile({
+                        source: new ol.source.TileImage({
+                            tileGrid: tileGrid,
+                            projection: projection,
+                            tileUrlFunction: function(tileCoord) {
+                                return urlTemplate.replace('{z}', (zOrigin - tileCoord[0]).toString())
+                                    .replace('{x}', tileCoord[1].toString())
+                                    .replace('{y}', (-tileCoord[2] - 1).toString());
+                            },
+                            wrapX: false
+                        })
+                    })
+                );
+            }
+            
+            /*
+            if (groupLayers.length > 0) {
+                groupLayers.push( 
+                    new ol.layer.Tile({
+                        source: new ol.source.TileDebug({
+                            tileGrid: tileGrid,
+                            projection: projection,
+                            tileUrlFunction: function(tileCoord) {
+                                return urlTemplate.replace('{z}', (zOrigin - tileCoord[0]).toString())
+                                    .replace('{x}', tileCoord[1].toString())
+                                    .replace('{y}', (-tileCoord[2] - 1).toString());
+                            },
+                            wrapX: false
+                        })
+                    })
+                );
+            }
+            */
+            
+            var map = new ol.Map({
+                target: "map",
+                layers: groupLayers,
+                view: new ol.View({
+                    projection: projection,
+                    resolutions: tileGrid.getResolutions()
+                })
+            });
+            map.getView().fitExtent(extent, map.getSize());
+            
+            //Render togglers
+            for (var i = 0; i < rtMapInfo.RuntimeMap.Group.length; i++) {
+                var group = rtMapInfo.RuntimeMap.Group[i];
+                if (group.Type != 2 && group.Type != 3) { //BaseMap or LinkedTileSet
+                    continue;
+                }
+                $("#rootList").append("<li><input type='checkbox' class='toggle-group' data-group-index='" + i + "' data-group='" + group.Name + "' " + (groupLayers[i].getVisible() ? "checked='checked'" : "") + " />" + group.Name + "</li>");
+            }
+            $(".toggle-group").on("change", function(e) {
+                var idx = $(e.currentTarget).attr("data-group-index");
+                groupLayers[idx].setVisible(!groupLayers[idx].getVisible());
+            })
+        }
+        </script>
+    </head>
+    <body;
+        <p>This map was created from the JSON response of the MapGuide REST API</p>
+        <div id="error">
+        </div>
+        <div id="wrap">
+            <div id="layers">
+                <div id="legend">
+                    <strong>Base Layer Groups</strong>
+                    <ul id="rootList">
+                    </ul>
+                </div>
+            </div>
+            <div id="map">
+            </div>
+        </div>
+        <div style="clear:both"></div>
+        <p>JSON payload for CREATERUNTIMEMAP is: <span id="jsonSize"></span> characters</p>
+        <p>Icon format is: <span id="iconFormat"></span></p>
+        <p id="mapName"></p>
+        <p id="mgSession"></p>
+    </body>
+</html>

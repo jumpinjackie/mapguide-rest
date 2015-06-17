@@ -122,7 +122,8 @@ function is_installed($feature)
                         <div class="panel-body">
                             <ul class="list-group">
                                 <li class="list-group-item"><a href="untiled/index.html">Basic Sheboygan un-tiled map example with basic legend</a></li>
-                                <li class="list-group-item"><a href="tiled/index.html">Basic Sheboygan tiled map example</a></li>
+                                <li class="list-group-item"><a href="tiled/index.html">Basic Sheboygan tiled map example (OpenLayers 2)</a></li>
+                                <li class="list-group-item"><a href="tiled/ol3.html">Basic Sheboygan tiled map example (OpenLayers 3)</a></li>
                                 <li class="list-group-item"><a href="selection/index.html">Basic Sheboygan un-tiled map example with selection</a></li>
                                 <li class="list-group-item"><a href="selection2/index.html">Basic Sheboygan un-tiled map example with selection property palette</a></li>
                                 <li class="list-group-item"><a href="mixed/index.html">Basic Sheboygan mixed map (tiled and untiled) example</a></li>
