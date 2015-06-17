@@ -16,7 +16,7 @@
             #baseLayerSwitcher .baseLayersDiv { font-size: 0.7em; }
         </style>
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
-        <script type="text/javascript" src="../../assets/common/js/OpenLayers.js"></script>
+        <script type="text/javascript" src="../../assets/common/js/OpenLayers.debug.js"></script>
         <script type="text/javascript" src="../../assets/common/js/legend.js"></script>
         <script type="text/javascript" src="../libs/OpenLayers.Layer.MapGuideREST.js"></script>
         <script type="text/javascript">
@@ -142,17 +142,28 @@
             };
 
             map = new OpenLayers.Map('map', mapOptions );
+            var resourceId = rtMapInfo.RuntimeMap.TileSetDefinition || rtMapInfo.RuntimeMap.MapDefinition;
             var tiledLayers = {};
             //Iterate in reverse order so any base layer groups are added in correct draw order
             for (var i = rtMapInfo.RuntimeMap.Group.length - 1; i >= 0; i--) {
                 var group = rtMapInfo.RuntimeMap.Group[i];
-                if (group.Type == "2") { //MgLayerGroupType.BaseMap
-                    var layer = new OpenLayers.Layer.MapGuideREST("MapGuide Base Layer Group (via REST): " + group.Name, restUrl, {
-                        mapdefinition: rtMapInfo.RuntimeMap.MapDefinition,
-                        basemaplayergroupname: group.Name,
-                        singleTile: false
-                    });
-                    map.addLayer(layer);
+                if (group.Type == "2" || group.Type == "3") { //MgLayerGroupType.BaseMap
+                    if (resourceId.indexOf(".TileSetDefinition") >= 0) {
+                        var layer = new OpenLayers.Layer.MapGuideREST("MapGuide Base Layer Group (via REST): " + group.Name, restUrl, {
+                            mapdefinition: resourceId,
+                            basemaplayergroupname: group.Name,
+                            singleTile: false,
+                            defaultSize: new OpenLayers.Size(rtMapInfo.RuntimeMap.TileWidth, rtMapInfo.RuntimeMap.TileHeight)
+                        });
+                        map.addLayer(layer);
+                    } else {
+                        var layer = new OpenLayers.Layer.MapGuideREST("MapGuide Base Layer Group (via REST): " + group.Name, restUrl, {
+                            mapdefinition: resourceId,
+                            basemaplayergroupname: group.Name,
+                            singleTile: false
+                        });
+                        map.addLayer(layer);
+                    }
                     tiledLayers[group.Name] = layer;
                 }
             }

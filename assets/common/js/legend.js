@@ -149,7 +149,7 @@ Legend.prototype.update = function() {
 };
 
 Legend.prototype.createGroupElement = function(group) {
-    return $("<li><input type='checkbox' class='group-checkbox' data-is-tiled='" + (group.Type == 2) + "' data-group-name='" + group.Name + "' value='" + group.ObjectId + "' " + ((group.Visible) ? "checked='checked'" : "") + " /><img src='" + this.stdIconRoot + "/lc_group.gif' /> " + group.LegendLabel + "<ul class='groupChildren'></ul></li>");
+    return $("<li><input type='checkbox' class='group-checkbox' data-is-tiled='" + (group.Type == 2 || group.Type == 3) + "' data-group-name='" + group.Name + "' value='" + group.ObjectId + "' " + ((group.Visible) ? "checked='checked'" : "") + " /><img src='" + this.stdIconRoot + "/lc_group.gif' /> " + group.LegendLabel + "<ul class='groupChildren'></ul></li>");
 };
 
 Legend.prototype.getIconUri = function(iconBase64) {
