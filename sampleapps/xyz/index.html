@@ -1,9 +1,10 @@
 <html>
     <head>
         <title>Sheboygan map as XYZ layer</title>
+        <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
         <link rel="stylesheet" href="../../assets/common/js/theme/default/style.css" />
         <style type="text/css">
-            body { font-family: Verdana; font-size: 0.9em; }
+            #main { margin-top: 50px; padding-top: 20px; }
             #error { color: red; }
             #wrap { width: 900; }
             #map { width: 400; height: 300; float: left; }
@@ -41,13 +42,28 @@
         </script>
     </head>
     <body>
-        <p>This example demonstrates a Map Definition being consumed as an XYZ layer via the MapGuide REST API.</p>
-        <p>The Map Definition is in WGS84.PseudoMercator</p>
-        <p>Sample not loading? <a href="../data/load.php">Check that the required resources have been loaded</a></p>
-        <div id="error">
-        </div>
-        <div id="wrap">
-            <div id="map">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="../index.php">MapGuide REST Samples</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse"></div>
+                <!--/.navbar-collapse -->
+            </div>
+        </nav>
+        <div id="main">
+            <div class="container">
+                <div class="alert alert-info">
+                    <p>This example demonstrates a Map Definition being consumed as an XYZ layer via the MapGuide REST API.</p>
+                    <p>The Map Definition is in WGS84.PseudoMercator</p>
+                    <p>Sample not loading? <a href="../data/load.php">Check that the required resources have been loaded</a></p>
+                </div>
+                <div id="error">
+                </div>
+                <div id="wrap">
+                    <div id="map">
+                    </div>
+                </div>
             </div>
         </div>
     </body>

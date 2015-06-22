@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
     <head>Consuming published data example</head>
+    <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
     <link rel="stylesheet" href="../../assets/common/js/theme/default/style.css" />
     <style type="text/css">
-        body { font-family: Verdana; font-size: 0.9em; }
         #error { color: red; }
         #wrap { width: 900; }
         #map1 { width: 650px; height: 500px; }
@@ -11,6 +11,7 @@
         #rootList { list-style-type: none; margin-left: -20px; }
         #rootList li { list-style-type: none; }
         .olControlMousePosition { background: #ffff66; font-size: 0.6em !important; padding: 2px; }
+        #main { margin-top: 50px; padding-top: 20px; }
     </style>
     <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="../../assets/common/js/OpenLayers.js"></script>
@@ -34,12 +35,27 @@
 
     </script>
     <body>
-        <p>This map consumes GeoJSON and GeoRSS feeds published by the RESTful data publishing framework</p>
-        <p>You can find the GeoJSON feed being used <a href="../../data/districts/.geojson">here</a></p>
-        <p>You can find the GeoRSS feed being used <a href="../../data/property/.georss">here</a></p>
-        <div id="error">
-        </div>
-        <div id="map1">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="../index.php">MapGuide REST Samples</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse"></div>
+                <!--/.navbar-collapse -->
+            </div>
+        </nav>
+        <div id="main">
+            <div class="container">
+                <div class="alert alert-info">
+                    <p>This map consumes GeoJSON and GeoRSS feeds published by the RESTful data publishing framework</p>
+                    <p>You can find the GeoJSON feed being used <a href="../../data/districts/.geojson">here</a></p>
+                    <p>You can find the GeoRSS feed being used <a href="../../data/property/.georss">here</a></p>
+                </div>
+                <div id="error">
+                </div>
+                <div id="map1">
+                </div>
+            </div>
         </div>
     </body>
 </html>

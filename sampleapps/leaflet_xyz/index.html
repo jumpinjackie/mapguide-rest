@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html>
+    
     <head>
         <title>Sheboygan map as XYZ layer</title>
+        <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
         <link rel="stylesheet" href="../../assets/common/css/leaflet.css" />
         <style type="text/css">
-            body { font-family: Verdana; font-size: 0.9em; }
             #error { color: red; }
             #map { width: 400px; height: 300px; }
             .olControlMousePosition { background: #ffff66; font-size: 0.6em !important; padding: 2px; }
+            #main { margin-top: 50px; padding-top: 20px; }
         </style>
         <script src="../../assets/common/js/leaflet-src.js"></script>
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
         <script type="text/javascript">
-
             $(document).ready(function() {
                 var map = L.map('map').setView([43.744459064634, -87.7302542509315], 13);
                 L.tileLayer('../../library/Samples/Sheboygan/MapsTiled/SheboyganNoWatermark.MapDefinition/xyz/Base Layer Group/{z}/{x}/{y}/tile.png', {
@@ -20,14 +21,29 @@
                     maxZoom: 18
                 }).addTo(map);
             });
-
         </script>
     </head>
+    
     <body>
-        <p>This example demonstrates a Map Definition being consumed as an XYZ layer from leaflet via the MapGuide REST API.</p>
-        <strong>For maximum visual fidelity, your Map Definition should be in WGS84.PseudoMercator</strong>
-        <p>Sample not loading? <a href="../data/load.php">Check that the required resources have been loaded</a></p>
-        <div id="map">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="../index.php">MapGuide REST Samples</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse"></div>
+                <!--/.navbar-collapse -->
+            </div>
+        </nav>
+        <div id="main">
+            <div class="container">
+                <p>This example demonstrates a Map Definition being consumed as an XYZ layer from leaflet via the MapGuide REST API.</p>
+                <strong>For maximum visual fidelity, your Map Definition should be in WGS84.PseudoMercator</strong>
+                <p>Sample not loading?
+                    <a href="../data/load.php">Check that the required resources have been loaded</a>
+                </p>
+                <div id="map"></div>
+            </div>
         </div>
     </body>
+
 </html>

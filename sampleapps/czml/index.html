@@ -7,18 +7,17 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <title>CZML Example </title>
+    <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
     <script src="../../assets/cesium/Cesium.js"></script>
     <style>
       @import url(../../assets/cesium/Widgets/widgets.css);
       #cesiumContainer {
         position: absolute;
-        top: 0;
+        top: 50px;
         left: 0;
-        height: 100%;
-        width: 100%;
-        margin: 0;
+        bottom: 0;
+        right: 0;
         overflow: hidden;
-        padding: 0;
         font-family: sans-serif;
       }
 
@@ -52,6 +51,16 @@
     </script>
   </head>
 <body>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="../index.php">MapGuide REST Samples</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        
+      </div><!--/.navbar-collapse -->
+    </div>
+  </nav>
   <div id="cesiumContainer"></div>
 </body>
 </html>

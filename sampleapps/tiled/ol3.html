@@ -1,9 +1,10 @@
 <html>
     <head>
         <title>Basic Sheboygan tiled map example</title>
+        <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
         <link rel="stylesheet" href="../../assets/common/css/ol.css" />
         <style type="text/css">
-            body { font-family: Verdana; font-size: 0.9em; }
+            #main { margin-top: 50px; padding-top: 20px; }
             #error { color: red; }
             #wrap { width: 900; }
             #map { width: 650; height: 500; float: right; }
@@ -221,25 +222,42 @@
         </script>
     </head>
     <body>
-        <p>This map was created from the JSON response of the MapGuide REST API</p>
-        <div id="error">
-        </div>
-        <div id="wrap">
-            <div id="layers">
-                <div id="legend">
-                    <strong>Base Layer Groups</strong>
-                    <ul id="rootList">
-                    </ul>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="../index.php">MapGuide REST Samples</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse"></div>
+                <!--/.navbar-collapse -->
+            </div>
+        </nav>
+        <div id="main">
+            <div class="container">
+                <div class="alert alert-info">
+                    <p>This map was created from the JSON response of the MapGuide REST API</p>
+                </div>
+                <div id="error">
+                </div>
+                <div id="wrap">
+                    <div id="layers">
+                        <div id="legend">
+                            <strong>Base Layer Groups</strong>
+                            <ul id="rootList">
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="map">
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="alert alert-info">
+                    <p>Scale: 1:<span id="scale"></span></p>
+                    <p>JSON payload for CREATERUNTIMEMAP is: <span id="jsonSize"></span> characters</p>
+                    <p>Icon format is: <span id="iconFormat"></span></p>
+                    <p id="mapName"></p>
+                    <p id="mgSession"></p>
                 </div>
             </div>
-            <div id="map">
-            </div>
         </div>
-        <div style="clear:both"></div>
-        <p>Scale: 1:<span id="scale"></span></p>
-        <p>JSON payload for CREATERUNTIMEMAP is: <span id="jsonSize"></span> characters</p>
-        <p>Icon format is: <span id="iconFormat"></span></p>
-        <p id="mapName"></p>
-        <p id="mgSession"></p>
     </body>
 </html>

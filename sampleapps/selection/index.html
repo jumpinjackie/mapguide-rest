@@ -1,9 +1,9 @@
 <html>
     <head>
         <title>Basic Sheboygan un-tiled map example with selection</title>
+        <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
         <link rel="stylesheet" href="../../assets/common/js/theme/default/style.css" />
         <style type="text/css">
-            body { font-family: Verdana; font-size: 0.9em; }
             #error { color: red; }
             #wrap { width: 1150; }
             #map { width: 650; height: 500; float: right; }
@@ -15,6 +15,7 @@
             #selInfoTree li { list-style-type: none; margin-left: -20px; }
             #selMessage { color: red; font-weight: bolder; }
             .olControlMousePosition { background: #ffff66; font-size: 0.6em !important; padding: 2px; }
+            #main { margin-top: 50px; padding-top: 20px; }
         </style>
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
         <script type="text/javascript" src="../../assets/common/js/OpenLayers.js"></script>
@@ -350,26 +351,41 @@
         </script>
     </head>
     <body>
-        <p>This example demonstrates selection via the MapGuide REST API. This map was created from the JSON response of the MapGuide REST API</p>
-        <div id="error">
-        </div>
-        <button onclick="doSelectPointOrRect()">Select Point/Rectangle</button>
-        <button onclick="doSelectPolygon()">Select By Polygon</button>
-        <span id="selMessage"></span>
-        <div id="wrap">
-            <div id="details">
-                <strong>Layer and Groups</strong>
-                <ul id="rootList">
-                </ul>
-            </div>
-            <div id="selInfo">
-                <strong>Selection Info</strong>
-                <div id="selInfoTree">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="../index.php">MapGuide REST Samples</a>
                 </div>
+                <div id="navbar" class="navbar-collapse collapse"></div>
+                <!--/.navbar-collapse -->
             </div>
-            <div id="map">
+        </nav>
+        <div id="main">
+            <div class="container">
+                <div class="alert alert-info">
+                    <p>This example demonstrates selection via the MapGuide REST API. This map was created from the JSON response of the MapGuide REST API</p>
+                </div>
+                <div id="error">
+                </div>
+                <button onclick="doSelectPointOrRect()">Select Point/Rectangle</button>
+                <button onclick="doSelectPolygon()">Select By Polygon</button>
+                <span id="selMessage"></span>
+                <div id="wrap">
+                    <div id="details">
+                        <strong>Layer and Groups</strong>
+                        <ul id="rootList">
+                        </ul>
+                    </div>
+                    <div id="selInfo">
+                        <strong>Selection Info</strong>
+                        <div id="selInfoTree">
+                        </div>
+                    </div>
+                    <div id="map">
+                    </div>
+                </div>
+                <p><span id="selCount">0</span> features selected</p>
             </div>
         </div>
-        <p><span id="selCount">0</span> features selected</p>
     </body>
 </html>

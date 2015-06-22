@@ -1,9 +1,10 @@
 <html>
     <head>
         <title>Basic Sheboygan tiled map example</title>
+        <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
         <link rel="stylesheet" href="../../assets/common/js/theme/default/style.css" />
         <style type="text/css">
-            body { font-family: Verdana; font-size: 0.9em; }
+            #main { margin-top: 50px; padding-top: 20px; }
             #error { color: red; }
             #wrap { width: 900; }
             #map { width: 650; height: 500; float: right; }
@@ -14,6 +15,7 @@
             
             #baseLayerSwitcher { background: #6699FF; color: white; padding: 5px; }
             #baseLayerSwitcher .baseLayersDiv { font-size: 0.7em; }
+            #baseLayerSwitcher label { display: inline; }
         </style>
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
         <script type="text/javascript" src="../../assets/common/js/OpenLayers.debug.js"></script>
@@ -181,26 +183,43 @@
         </script>
     </head>
     <body>
-        <p>This map was created from the JSON response of the MapGuide REST API</p>
-        <div id="error">
-        </div>
-        <div id="wrap">
-            <div id="layers">
-                <div id="baseLayerSwitcher">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="../index.php">MapGuide REST Samples</a>
                 </div>
-                <div id="legend">
-                    <strong>Layer and Groups</strong>
-                    <ul id="rootList">
-                    </ul>
+                <div id="navbar" class="navbar-collapse collapse"></div>
+                <!--/.navbar-collapse -->
+            </div>
+        </nav>
+        <div id="main">
+            <div class="container">
+                <div class="alert alert-info">
+                    <p>This map was created from the JSON response of the MapGuide REST API</p>
+                </div>
+                <div id="error">
+                </div>
+                <div id="wrap">
+                    <div id="layers">
+                        <div id="baseLayerSwitcher">
+                        </div>
+                        <div id="legend">
+                            <strong>Layer and Groups</strong>
+                            <ul id="rootList">
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="map">
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="alert alert-info">
+                    <p>JSON payload for CREATERUNTIMEMAP is: <span id="jsonSize"></span> characters</p>
+                    <p>Icon format is: <span id="iconFormat"></span></p>
+                    <p id="mapName"></p>
+                    <p id="mgSession"></p>
                 </div>
             </div>
-            <div id="map">
-            </div>
         </div>
-        <div style="clear:both"></div>
-        <p>JSON payload for CREATERUNTIMEMAP is: <span id="jsonSize"></span> characters</p>
-        <p>Icon format is: <span id="iconFormat"></span></p>
-        <p id="mapName"></p>
-        <p id="mgSession"></p>
     </body>
 </html>

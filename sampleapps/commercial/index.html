@@ -1,12 +1,14 @@
 <html>
+    
     <head>
         <title>Sheboygan map with Google/OSM layers</title>
+        <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
         <link rel="stylesheet" href="../../assets/common/js/theme/default/style.css" />
         <style type="text/css">
-            body { font-family: Verdana; font-size: 0.9em; }
             #error { color: red; }
             #wrap { width: 900; }
             #map { width: 650; height: 500; float: right; }
+            #main { margin-top: 50px; padding-top: 20px; }
             #layers { width: 250; height: 500; overflow: auto; display: block-inline; float: left; }
             #rootList { list-style-type: none; margin-left: -20px; }
             #rootList li { list-style-type: none; }
@@ -14,6 +16,7 @@
             
             #baseLayerSwitcher { background: #6699FF; color: white; padding: 5px; }
             #baseLayerSwitcher .baseLayersDiv { font-size: 0.7em; }
+            #baseLayerSwitcher label { display: inline; }
         </style>
         <script src="http://maps.google.com/maps/api/js?v=3&sensor=false"></script>
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
@@ -21,218 +24,234 @@
         <script type="text/javascript" src="../../assets/common/js/legend.js"></script>
         <script type="text/javascript" src="../libs/OpenLayers.Layer.MapGuideREST.js"></script>
         <script type="text/javascript">
-        
-        //This sample is assumed to be hosted at http://servername/mapguide/rest/sampleapps/tiled/index.html
-        var restUrl = "../../../rest";
-        
-        //Various features you can include in the CREATERUNTIMEMAP response.
-        var REQ_NONE = 0;                   //Nothing. This the default.
-        var REQ_LAYER_STRUCTURE = 1;        //Information about layers and groups (required for the mask values below to have any effect)
-        var REQ_LAYER_ICONS = 2;            //Icons for each layer (has no effect if REQ_LAYER_STRUCTURE is not in the bitmask)
-        var REQ_LAYER_FEATURE_SOURCE = 4;   //Feature Source information for each layer (has no effect if REQ_LAYER_STRUCTURE is not in the bitmask)
-        
-        var gMimeType = null;
-        var map = null;
-        var mgLayer = null;
-        var sessionId = null;
-        
-        $(document).ready(function() {
-            OpenLayers.Control.DragPan.prototype.enableKinetic = false;
-            //Have a play with the bitmask values to see the differences in JSON payload size
-            //and to see how our legend control gracefully handles such situations
-            //createMap(REQ_NONE);
-            //createMap(REQ_LAYER_STRUCTURE);
-            createMap(REQ_LAYER_STRUCTURE | REQ_LAYER_FEATURE_SOURCE | REQ_LAYER_ICONS);
-        });
-        
-        function createMap(reqFeatures) {
-            $.ajax({
-                url: restUrl + "/services/createmap.json",
-                method: "post",
-                data: {
-                    "mapdefinition": "Library://Samples/Sheboygan/Maps/SheboyganCommercial.MapDefinition",
-                    "requestedfeatures": reqFeatures,
-                    //Optional parameters you can specify and/or experiment with
-                    //"iconformat": "GIF",    //Uncomment to override desired image format (default: PNG)
-                    //"iconwidth": 32,         //Uncomment to override desired icon width (default: 16)
-                    //"iconheight": 32,        //Uncomment to override desired icon height (default: 16)
-                    //"iconsperscalerange": 3, //Uncomment to observe theme compression for themes exceeding this number of rules (default: 25)
-                    //"targetmapname": "MyRuntimeMapForOpenLayers", //Uncomment if you require a specific map name be given (default: inferred from Map Definition)
-                    "format": "json"
-                },
-                success: function(data, textStatus, jqXHR) {
-                    $("#jsonSize").html(jqXHR.responseText.length);
-                    loadMap(data);
-                }
-            }).error(function(jqXHR, textStatus, errorThrown) {
-                $("#error").html(jqXHR.responseText);
+            //This sample is assumed to be hosted at http://servername/mapguide/rest/sampleapps/tiled/index.html
+            var restUrl = "../../../rest";
+            
+            //Various features you can include in the CREATERUNTIMEMAP response.
+            var REQ_NONE = 0;                   //Nothing. This the default.
+            var REQ_LAYER_STRUCTURE = 1;        //Information about layers and groups (required for the mask values below to have any effect)
+            var REQ_LAYER_ICONS = 2;            //Icons for each layer (has no effect if REQ_LAYER_STRUCTURE is not in the bitmask)
+            var REQ_LAYER_FEATURE_SOURCE = 4;   //Feature Source information for each layer (has no effect if REQ_LAYER_STRUCTURE is not in the bitmask)
+            
+            var gMimeType = null;
+            var map = null;
+            var mgLayer = null;
+            var sessionId = null;
+            
+            $(document).ready(function() {
+                OpenLayers.Control.DragPan.prototype.enableKinetic = false;
+                //Have a play with the bitmask values to see the differences in JSON payload size
+                //and to see how our legend control gracefully handles such situations
+                //createMap(REQ_NONE);
+                //createMap(REQ_LAYER_STRUCTURE);
+                createMap(REQ_LAYER_STRUCTURE | REQ_LAYER_FEATURE_SOURCE | REQ_LAYER_ICONS);
             });
-        }
-        
-        function loadMap(rtMapInfo) {
-            if (rtMapInfo.RuntimeMap.IconMimeType) {
-                gMimeType = rtMapInfo.RuntimeMap.IconMimeType;
-                $("#iconFormat").html(gMimeType);
-            }
-            var extent = new OpenLayers.Bounds(
-                rtMapInfo.RuntimeMap.Extents.LowerLeftCoordinate.X,
-                rtMapInfo.RuntimeMap.Extents.LowerLeftCoordinate.Y,
-                rtMapInfo.RuntimeMap.Extents.UpperRightCoordinate.X,
-                rtMapInfo.RuntimeMap.Extents.UpperRightCoordinate.Y);
             
-            OpenLayers.Control.CustomNavToolbar = OpenLayers.Class(OpenLayers.Control.Panel, {
-                /**
-                 * Constructor: OpenLayers.Control.NavToolbar 
-                 * Add our two mousedefaults controls.
-                 *
-                 * Parameters:
-                 * options - {Object} An optional object whose properties will be used
-                 *     to extend the control.
-                 */
-                initialize: function(options) {
-                    OpenLayers.Control.Panel.prototype.initialize.apply(this, [options]);
-                    this.addControls([
-                      new OpenLayers.Control.Navigation(),
-                      //Here it come
-                      new OpenLayers.Control.ZoomBox({alwaysZoom:true})
-                    ]);
-                    // To make the custom navtoolbar use the regular navtoolbar style
-                    this.displayClass = 'olControlNavToolbar'
-                },            
-                /**
-                 * Method: draw 
-                 * calls the default draw, and then activates mouse defaults.
-                 */
-                draw: function() {
-                    var div = OpenLayers.Control.Panel.prototype.draw.apply(this, arguments);
-                    this.defaultControl = this.controls[0];
-                    return div;
-                }
-            });
-            var mapOptions = {
-                theme: null,
-                projection: 'EPSG:900913',
-                maxExtent: extent,
-                maxResolution: 'auto',
-                controls: [
-                    new OpenLayers.Control.Navigation(),
-                    new OpenLayers.Control.Attribution(),
-                    new OpenLayers.Control.Zoom(),
-                    new OpenLayers.Control.ScaleLine(),
-                    new OpenLayers.Control.MousePosition(),
-                    new OpenLayers.Control.LayerSwitcher({ div: $("#baseLayerSwitcher")[0] }),
-                    new OpenLayers.Control.CustomNavToolbar({alwaysZoom:true})
-                ]
-            };
-            
-            if (rtMapInfo.RuntimeMap.CoordinateSystem.EpsgCode.length > 0) {
-                mapOptions.projection = "EPSG:" + rtMapInfo.RuntimeMap.CoordinateSystem.EpsgCode;
-            }
-            
-            var options = {
-                isBaseLayer: false,
-                transitionEffect: "resize",
-                buffer: 1,
-                useOverlay: true,
-                useAsyncOverlay: true,
-                singleTile: true,
-                mapname: rtMapInfo.RuntimeMap.Name,
-                session: rtMapInfo.RuntimeMap.SessionId,
-                selectioncolor: '0xFF000000',
-                behavior: 2
-            };
-            
-            sessionId = rtMapInfo.RuntimeMap.SessionId;
-            
-            //Adjust the scale assumptions for MapGuide layers
-            //Tiled layers MUST use a DPI value of 96, untiled layers can use a 
-            //different DPI value which will be passed to the server as a parameter.
-            //Tiled and untiled layers must adjust the OL INCHES_PER_UNIT values
-            //for any degree-based projections.
-            
-            //You'll still need to do these adjustments manually, but CREATERUNTIMEMAP
-            //now provides the necessary meters-per-unit value for you to do this.
-            var metersPerUnit = rtMapInfo.RuntimeMap.CoordinateSystem.MetersPerUnit;
-            var inPerUnit = OpenLayers.INCHES_PER_UNIT.m * metersPerUnit;
-            OpenLayers.INCHES_PER_UNIT["dd"] = inPerUnit;
-            OpenLayers.INCHES_PER_UNIT["degrees"] = inPerUnit;
-            OpenLayers.DOTS_PER_INCH = 96;
-            
-            map = new OpenLayers.Map('map', mapOptions );
-            
-            map.addLayers([
-                new OpenLayers.Layer.Google(
-                    "Google Physical",
-                    {type: google.maps.MapTypeId.TERRAIN}
-                ),
-                new OpenLayers.Layer.Google(
-                    "Google Streets", // the default
-                    {numZoomLevels: 20}
-                ),
-                new OpenLayers.Layer.Google(
-                    "Google Hybrid",
-                    {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20}
-                ),
-                new OpenLayers.Layer.Google(
-                    "Google Satellite",
-                    {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
-                ),
-                new OpenLayers.Layer.OSM("OpenStreetMap")
-            ]);
-            
-            mgLayer = new OpenLayers.Layer.MapGuideREST( "MapGuide (from CREATERUNTIMEMAP)", restUrl, options );
-            map.addLayer(mgLayer);
-            map.zoomToExtent(extent);
-            
-            var legend = new Legend({
-                legendSelector: "#rootList",
-                stdIconRoot: "../../../stdicons",
-                runtimeMap: rtMapInfo,
-                map: map,
-                mgLayerOL: mgLayer
-            });
-            legend.update();
-            
-            $("#mapName").html("MapGuide mapname: " + rtMapInfo.RuntimeMap.Name);
-            $("#mgSession").html("MapGuide session ID: " + sessionId);
-            $("div.olMap").css("background-color", "#" + rtMapInfo.RuntimeMap.BackgroundColor.substring(2));
-            startKeepAlive();
-        }
-        
-        function startKeepAlive() {
-            var keepAlive = function() {
-                $.getJSON(restUrl + "/session/" + sessionId + "/timeout.json", function(data, textStatus, jxXHR) {
-                    $("#mgSession").html("MapGuide session ID: " + sessionId + " (last checked at: " + (new Date()) + ")");
-                    setTimeout(keepAlive, data.PrimitiveValue.Value * 1000);
+            function createMap(reqFeatures) {
+                $.ajax({
+                    url: restUrl + "/services/createmap.json",
+                    method: "post",
+                    data: {
+                        "mapdefinition": "Library://Samples/Sheboygan/Maps/SheboyganCommercial.MapDefinition",
+                        "requestedfeatures": reqFeatures,
+                        //Optional parameters you can specify and/or experiment with
+                        //"iconformat": "GIF",    //Uncomment to override desired image format (default: PNG)
+                        //"iconwidth": 32,         //Uncomment to override desired icon width (default: 16)
+                        //"iconheight": 32,        //Uncomment to override desired icon height (default: 16)
+                        //"iconsperscalerange": 3, //Uncomment to observe theme compression for themes exceeding this number of rules (default: 25)
+                        //"targetmapname": "MyRuntimeMapForOpenLayers", //Uncomment if you require a specific map name be given (default: inferred from Map Definition)
+                        "format": "json"
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        $("#jsonSize").html(jqXHR.responseText.length);
+                        loadMap(data);
+                    }
+                }).error(function(jqXHR, textStatus, errorThrown) {
+                    $("#error").html(jqXHR.responseText).addClass("alert").addClass("alert-error");
                 });
-            };
-            keepAlive();
-        }
-        
+            }
+            
+            function loadMap(rtMapInfo) {
+                if (rtMapInfo.RuntimeMap.IconMimeType) {
+                    gMimeType = rtMapInfo.RuntimeMap.IconMimeType;
+                    $("#iconFormat").html(gMimeType);
+                }
+                var extent = new OpenLayers.Bounds(
+                    rtMapInfo.RuntimeMap.Extents.LowerLeftCoordinate.X,
+                    rtMapInfo.RuntimeMap.Extents.LowerLeftCoordinate.Y,
+                    rtMapInfo.RuntimeMap.Extents.UpperRightCoordinate.X,
+                    rtMapInfo.RuntimeMap.Extents.UpperRightCoordinate.Y);
+                
+                OpenLayers.Control.CustomNavToolbar = OpenLayers.Class(OpenLayers.Control.Panel, {
+                    /**
+                     * Constructor: OpenLayers.Control.NavToolbar 
+                     * Add our two mousedefaults controls.
+                     *
+                     * Parameters:
+                     * options - {Object} An optional object whose properties will be used
+                     *     to extend the control.
+                     */
+                    initialize: function(options) {
+                        OpenLayers.Control.Panel.prototype.initialize.apply(this, [options]);
+                        this.addControls([
+                          new OpenLayers.Control.Navigation(),
+                          //Here it come
+                          new OpenLayers.Control.ZoomBox({alwaysZoom:true})
+                        ]);
+                        // To make the custom navtoolbar use the regular navtoolbar style
+                        this.displayClass = 'olControlNavToolbar'
+                    },            
+                    /**
+                     * Method: draw 
+                     * calls the default draw, and then activates mouse defaults.
+                     */
+                    draw: function() {
+                        var div = OpenLayers.Control.Panel.prototype.draw.apply(this, arguments);
+                        this.defaultControl = this.controls[0];
+                        return div;
+                    }
+                });
+                var mapOptions = {
+                    theme: null,
+                    projection: 'EPSG:900913',
+                    maxExtent: extent,
+                    maxResolution: 'auto',
+                    controls: [
+                        new OpenLayers.Control.Navigation(),
+                        new OpenLayers.Control.Attribution(),
+                        new OpenLayers.Control.Zoom(),
+                        new OpenLayers.Control.ScaleLine(),
+                        new OpenLayers.Control.MousePosition(),
+                        new OpenLayers.Control.LayerSwitcher({ div: $("#baseLayerSwitcher")[0] }),
+                        new OpenLayers.Control.CustomNavToolbar({alwaysZoom:true})
+                    ]
+                };
+                
+                if (rtMapInfo.RuntimeMap.CoordinateSystem.EpsgCode.length > 0) {
+                    mapOptions.projection = "EPSG:" + rtMapInfo.RuntimeMap.CoordinateSystem.EpsgCode;
+                }
+                
+                var options = {
+                    isBaseLayer: false,
+                    transitionEffect: "resize",
+                    buffer: 1,
+                    useOverlay: true,
+                    useAsyncOverlay: true,
+                    singleTile: true,
+                    mapname: rtMapInfo.RuntimeMap.Name,
+                    session: rtMapInfo.RuntimeMap.SessionId,
+                    selectioncolor: '0xFF000000',
+                    behavior: 2
+                };
+                
+                sessionId = rtMapInfo.RuntimeMap.SessionId;
+                
+                //Adjust the scale assumptions for MapGuide layers
+                //Tiled layers MUST use a DPI value of 96, untiled layers can use a 
+                //different DPI value which will be passed to the server as a parameter.
+                //Tiled and untiled layers must adjust the OL INCHES_PER_UNIT values
+                //for any degree-based projections.
+                
+                //You'll still need to do these adjustments manually, but CREATERUNTIMEMAP
+                //now provides the necessary meters-per-unit value for you to do this.
+                var metersPerUnit = rtMapInfo.RuntimeMap.CoordinateSystem.MetersPerUnit;
+                var inPerUnit = OpenLayers.INCHES_PER_UNIT.m * metersPerUnit;
+                OpenLayers.INCHES_PER_UNIT["dd"] = inPerUnit;
+                OpenLayers.INCHES_PER_UNIT["degrees"] = inPerUnit;
+                OpenLayers.DOTS_PER_INCH = 96;
+                
+                map = new OpenLayers.Map('map', mapOptions );
+                
+                map.addLayers([
+                    new OpenLayers.Layer.Google(
+                        "Google Physical",
+                        {type: google.maps.MapTypeId.TERRAIN}
+                    ),
+                    new OpenLayers.Layer.Google(
+                        "Google Streets", // the default
+                        {numZoomLevels: 20}
+                    ),
+                    new OpenLayers.Layer.Google(
+                        "Google Hybrid",
+                        {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20}
+                    ),
+                    new OpenLayers.Layer.Google(
+                        "Google Satellite",
+                        {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
+                    ),
+                    new OpenLayers.Layer.OSM("OpenStreetMap")
+                ]);
+                
+                mgLayer = new OpenLayers.Layer.MapGuideREST( "MapGuide (from CREATERUNTIMEMAP)", restUrl, options );
+                map.addLayer(mgLayer);
+                map.zoomToExtent(extent);
+                
+                var legend = new Legend({
+                    legendSelector: "#rootList",
+                    stdIconRoot: "../../../stdicons",
+                    runtimeMap: rtMapInfo,
+                    map: map,
+                    mgLayerOL: mgLayer
+                });
+                legend.update();
+                
+                $("#mapName").html("MapGuide mapname: " + rtMapInfo.RuntimeMap.Name);
+                $("#mgSession").html("MapGuide session ID: " + sessionId);
+                $("div.olMap").css("background-color", "#" + rtMapInfo.RuntimeMap.BackgroundColor.substring(2));
+                startKeepAlive();
+            }
+            
+            function startKeepAlive() {
+                var keepAlive = function() {
+                    $.getJSON(restUrl + "/session/" + sessionId + "/timeout.json", function(data, textStatus, jxXHR) {
+                        $("#mgSession").html("MapGuide session ID: " + sessionId + " (last checked at: " + (new Date()) + ")");
+                        setTimeout(keepAlive, data.PrimitiveValue.Value * 1000);
+                    });
+                };
+                keepAlive();
+            }
         </script>
     </head>
+    
     <body>
-        <p>This example demonstrates MapGuide layer integration with Google/OSM. The map is created with the MapGuide REST API.</p>
-        <p>The Map Definition is in WGS84.PseudoMercator which allows for the MapGuide map to line up with any Google/OSM layer</p>
-        <p>Sample not loading? <a href="../data/load.php">Check that the required resources have been loaded</a></p>
-        <div id="error">
-        </div>
-        <div id="wrap">
-            <div id="layers">
-                <div id="baseLayerSwitcher">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="../index.php">MapGuide REST Samples</a>
                 </div>
-                <div id="legend">
-                    <strong>Layer and Groups</strong>
-                    <ul id="rootList">
-                    </ul>
+                <div id="navbar" class="navbar-collapse collapse"></div>
+                <!--/.navbar-collapse -->
+            </div>
+        </nav>
+        <div id="main">
+            <div class="container">
+                <div class="alert alert-info">
+                    <p>This example demonstrates MapGuide layer integration with Google/OSM. The map is created with the MapGuide REST API.</p>
+                    <p>The Map Definition is in WGS84.PseudoMercator which allows for the MapGuide map to line up with any Google/OSM layer</p>
+                    <p>Sample not loading?
+                        <a href="../data/load.php">Check that the required resources have been loaded</a>
+                    </p>
+                </div>
+                <div id="error"></div>
+                <div id="wrap">
+                    <div id="layers">
+                        <div id="baseLayerSwitcher"></div>
+                        <div id="legend">
+                            <strong>Layer and Groups</strong>
+                            <ul id="rootList"></ul>
+                        </div>
+                    </div>
+                    <div id="map"></div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="alert alert-info">
+                    <p>JSON payload for CREATERUNTIMEMAP is: <span id="jsonSize"></span> characters</p>
+                    <p>Icon format is: <span id="iconFormat"></span></p>
+                    <p id="mapName"></p>
+                    <p id="mgSession"></p>
                 </div>
             </div>
-            <div id="map">
-            </div>
         </div>
-        <p>JSON payload for CREATERUNTIMEMAP is: <span id="jsonSize"></span> characters</p>
-        <p>Icon format is: <span id="iconFormat"></span></p>
-        <p id="mapName"></p>
-        <p id="mgSession"></p>
     </body>
+
 </html>
