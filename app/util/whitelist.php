@@ -19,7 +19,7 @@
 
 require_once dirname(__FILE__)."/utils.php";
 
-class MgFeatureSourceWhitelist
+class MgWhitelist
 {
     private $conf;
     

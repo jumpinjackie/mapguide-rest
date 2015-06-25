@@ -19,7 +19,7 @@
 
 require_once dirname(__FILE__)."/../app/util/whitelist.php";
 
-class FSWhiteListTest extends PHPUnit_Framework_TestCase
+class RSWhiteListTest extends PHPUnit_Framework_TestCase
 {
     private $actions;
     private $representations;
@@ -27,26 +27,22 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
     
     public function __construct() {
         $this->actions = array(
-            "GETCONNECTIONPROPERTYVALUES",
-            "ENUMERATEDATASTORES",
-            "GETPROVIDERCAPABILITIES",
-            "GETFEATUREPROVIDERS",
-            "GETSCHEMAMAPPING",
-            "TESTCONNECTION",
-            "GETSPATIALCONTEXTS",
-            "GETLONGTRANSACTIONS",
-            "GETSCHEMAS",
-            "CREATEFEATURESOURCE",
-            "DESCRIBESCHEMA",
-            "GETCLASSES",
-            "GETCLASSDEFINITION",
-            "GETEDITCAPABILITIES",
-            "SETEDITCAPABILITIES",
-            "INSERTFEATURES",
-            "UPDATEFEATURES",
-            "DELETEFEATURES",
-            "SELECTAGGREGATES",
-            "SELECTFEATURES"
+            "ENUMERATERESOURCES",
+            "ENUMERATERESOURCEDATA",
+            "ENUMERATERESOURCEREFERENCES",
+            "ENUMERATEUNMANAGEDDATA",
+            "GETRESOURCE",
+            "GETRESOURCEDATA",
+            "GETRESOURCEHEADER",
+            "SETRESOUCE",
+            "SETRESOURCEDATA",
+            "SETRESOURCEHEADER",
+            "APPLYRESOURCEPACKAGE",
+            "DELETERESOURCE",
+            "DELETERESOURCEDATA",
+            "COPYRESOURCE",
+            "MOVERESOURCE",
+            "GETRESOURCEINFO" // specific to mapguide-rest
         );
         $this->representations = array("xml", "json", "geojson", "html", "kml");
         $this->testIds = array(
@@ -61,6 +57,11 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
             "Library://Samples/Sheboygan/Data/Soils.FeatureSource",
             "Library://Samples/Sheboygan/Data/Trees.FeatureSource",
             "Library://Samples/Sheboygan/Data/VotingDistricts.FeatureSource"
+        );
+        $this->testFolders = array(
+            "Library://Samples/Sheboygan/",
+            "Library://Samples/Sheboygan/Data/",
+            "Library://Samples/Sheboygan/Layers/"
         );
     }
     
@@ -171,8 +172,8 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
         $conf = array(
             "Library://Samples/Sheboygan/Data/Parcels.FeatureSource" => array(
                 "Actions" => array(
-                    "TESTCONNECTION" => array(),
-                    "SELECTFEATURES" => array()
+                    "GETRESOURCE" => array(),
+                    "GETRESOURCEDATA" => array()
                 ),
                 "Representations" => array()
             )
@@ -199,7 +200,7 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
         $resIdStr = "Library://Samples/Sheboygan/Data/Parcels.FeatureSource";
         foreach ($this->actions as $action) {
             foreach ($this->representations as $repr) {
-                $bExpect = !in_array($action, array("TESTCONNECTION", "SELECTFEATURES"));
+                $bExpect = !in_array($action, array("GETRESOURCE", "GETRESOURCEDATA"));
                 $bForbidden = false;
                 $wl->VerifyWhitelist($resIdStr, $mimeType, function () use (&$bForbidden) {
                     $bForbidden = true;
@@ -216,8 +217,8 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
         $conf = array(
             "Library://Samples/Sheboygan/Data/Parcels.FeatureSource" => array(
                 "Actions" => array(
-                    "TESTCONNECTION" => array(),
-                    "SELECTFEATURES" => array()
+                    "GETRESOURCE" => array(),
+                    "GETRESOURCEDATA" => array()
                 ),
                 "Representations" => array(
                     "xml" => array(),
@@ -248,7 +249,7 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
         foreach ($this->actions as $action) {
             foreach ($this->representations as $repr) {
                 $bExpect = true; 
-                if (in_array($action, array("TESTCONNECTION", "SELECTFEATURES"))) {
+                if (in_array($action, array("GETRESOURCE", "GETRESOURCEDATA"))) {
                     if (in_array($repr, array("xml", "json"))) {
                         $bExpect = false;
                     }
@@ -293,8 +294,8 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
         $conf = array(
             "Library://Samples/Sheboygan/Data/Parcels.FeatureSource" => array(
                 "Actions" => array(
-                    "TESTCONNECTION" => array(),
-                    "SELECTFEATURES" => array()
+                    "GETRESOURCE" => array(),
+                    "GETRESOURCEDATA" => array()
                 ),
                 "Representations" => array(
                     "xml" => array(
@@ -335,7 +336,7 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
             foreach ($this->actions as $action) {
                 foreach ($this->representations as $repr) {
                     $bExpect = true; 
-                    if (in_array($action, array("TESTCONNECTION", "SELECTFEATURES"))) {
+                    if (in_array($action, array("GETRESOURCE", "GETRESOURCEDATA"))) {
                         if (in_array($repr, array("xml", "json"))) {
                             switch ($userName) {
                                 case "Author":
@@ -391,12 +392,12 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
         $conf = array(
             "Library://Samples/Sheboygan/Data/Parcels.FeatureSource" => array(
                 "Actions" => array(
-                    "TESTCONNECTION" => array(
+                    "GETRESOURCE" => array(
                         "AllowUsers" => array("Author"),
                         "AllowGroups" => array("Foo"),
                         "AllowRoles" => array("Users")
                     ),
-                    "SELECTFEATURES" => array(
+                    "GETRESOURCEDATA" => array(
                         "AllowUsers" => array("Administrator"),
                         "AllowGroups" => array("Foo"),
                         "AllowRoles" => array("Authors")
@@ -441,7 +442,7 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
             foreach ($this->actions as $action) {
                 foreach ($this->representations as $repr) {
                     $bExpect = true; 
-                    if (in_array($action, array("TESTCONNECTION", "SELECTFEATURES"))) {
+                    if (in_array($action, array("GETRESOURCE", "GETRESOURCEDATA"))) {
                         if (in_array($repr, array("xml", "json"))) {
                             switch ($userName) {
                                 case "Author":
@@ -449,12 +450,12 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
                                     break;
                                 case "Anonymous":
                                     $bExpect = 
-                                        ($action == "SELECTFEATURES") ||
-                                        ($action == "TESTCONNECTION" && $repr == "xml");
+                                        ($action == "GETRESOURCEDATA") ||
+                                        ($action == "GETRESOURCE" && $repr == "xml");
                                     break;
                                 case "Administrator":
-                                    $bExpect = !($action == "SELECTFEATURES" && $repr == "xml");
-                                    break;	
+                                    $bExpect = !($action == "GETRESOURCEDATA" && $repr == "xml");
+                                    break;
                             }
                         }
                     }
@@ -469,11 +470,8 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
     }
     
     private static function isGlobalOperation($op) {
-        return $op === "GETCONNECTIONPROPERTYVALUES" ||
-               $op === "ENUMERATEDATASTORES" ||
-               $op === "GETPROVIDERCAPABILITIES" ||
-               $op === "GETFEATUREPROVIDERS" ||
-               $op === "GETSCHEMAMAPPING";
+        return $op === "APPLYRESOURCEPACKAGE" ||
+               $op === "ENUMERATEUNMANAGEDDATA";
     }
     
     public function testWhitelistGlobalsWithAcls()
@@ -507,19 +505,10 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
         $conf = array(
             "Globals" => array(
                 "Actions" => array(
-                    "GETCONNECTIONPROPERTYVALUES" => array(
+                    "APPLYRESOURCEPACKAGE" => array(
                         "AllowRoles" => array("Author", "Administrator")
                     ),
-                    "ENUMERATEDATASTORES" => array(
-                        "AllowRoles" => array("Author", "Administrator")
-                    ),
-                    "GETPROVIDERCAPABILITIES" => array(
-                        "AllowRoles" => array("Author", "Administrator")
-                    ),
-                    "GETFEATUREPROVIDERS" => array(
-                        "AllowRoles" => array("Author", "Administrator")
-                    ),
-                    "GETSCHEMAMAPPING" => array(
+                    "ENUMERATEUNMANAGEDDATA" => array(
                         "AllowRoles" => array("Author", "Administrator")
                     )
                 )

@@ -37,7 +37,7 @@ class MgFeatureServiceController extends MgBaseController {
     public function __construct($app) {
         parent::__construct($app);
         $this->whitelistConf = $this->app->config("MapGuide.FeatureSourceConfiguration");
-        $this->whitelist = new MgFeatureSourceWhitelist($this->whitelistConf);
+        $this->whitelist = new MgWhitelist($this->whitelistConf);
     }
 
     private function VerifyWhitelist($resIdStr, $mimeType, $requiredAction, $requiredRepresentation, $site, $userName) {
