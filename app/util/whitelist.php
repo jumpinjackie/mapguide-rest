@@ -109,11 +109,15 @@ class MgWhitelist
     public function VerifyWhitelist($resIdStr, $mimeType, $forbiddenAction, $requiredAction, $requiredRepresentation, $site, $userName) {
         if ($this->conf && !empty($this->conf)) {
             $fsConf = null;
+            //If resource configuration does not exist, then fall back to the global one
             if (!array_key_exists($resIdStr, $this->conf)) {
-                if ($forbiddenAction != null && is_callable($forbiddenAction)) {
-                    call_user_func_array($forbiddenAction, array("This resource is not whitelisted for this operation", $mimeType));
-                    return;
+                if (!array_key_exists("Globals", $this->conf)) {
+                    if ($forbiddenAction != null && is_callable($forbiddenAction)) {
+                        call_user_func_array($forbiddenAction, array("This resource is not whitelisted for this operation", $mimeType));
+                        return;
+                    }
                 }
+                $fsConf = $this->conf["Globals"];
             } else {
                 $fsConf = $this->conf[$resIdStr];
             }

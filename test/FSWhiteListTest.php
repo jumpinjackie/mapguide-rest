@@ -540,6 +540,165 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
             }
         }
     }
+    
+    public function testWhitelistAclGlobalInheritance() {
+        $everyoneGroupXml = '<?xml version="1.0" encoding="UTF-8"?>
+<GroupList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="GroupList-1.0.0.xsd">
+    <Group>
+        <Name>Everyone</Name>
+        <Description>Built-in group to include all users</Description>
+    </Group>
+</GroupList>';
+        $everyoneGroupBr = TestUtils::mockByteReader($this, $everyoneGroupXml);
+        
+        $this->assertEquals("text/xml", $everyoneGroupBr->GetMimeType());
+        $this->assertEquals($everyoneGroupXml, $everyoneGroupBr->ToString());
+        $site = $this->getMockBuilder("MgSite")->getMock();
+        
+        $site->method("EnumerateGroups")
+            ->will($this->returnValue($everyoneGroupBr));
+        
+        $roleMethodMap = array(
+            array("Author", new FakeStringCollection(array("Author"))),
+            array("Anonymous", new FakeStringCollection(array("Users"))),
+            array("Administrator", new FakeStringCollection(array("Administrator")))
+        );
+        $site->method("EnumerateRoles")
+            ->will($this->returnValueMap($roleMethodMap));
+        
+        //Everything not parcels is subject to the global rules
+        //Any parcel action in the list with any representation is allowed if the calling user is part of any of the users/groups/roles specified
+        $conf = array(
+            "Globals" => array(
+                "Actions" => array(
+                    "SELECTFEATURES" => array(
+                        "AllowRoles" => array("Author", "Administrator")
+                    )
+                )
+            ),
+            "Library://Samples/Sheboygan/Data/Parcels.FeatureSource" => array(
+                "Actions" => array(
+                    "SELECTFEATURES" => array(
+                        "AllowUsers" => array("Author"),
+                        "AllowGroups" => array("Foo"),
+                        "AllowRoles" => array("Users")
+                    )
+                ),
+                "Representations" => array(
+                    "xml" => array(
+                        "AllowUsers" => array("Administrator"),
+                        "AllowGroups" => array("Foo"),
+                        "AllowRoles" => array("Authors")
+                    ),
+                    "json" => array(
+                        "AllowUsers" => array("Author"),
+                        "AllowGroups" => array("Foo"),
+                        "AllowRoles" => array("Users")
+                    )
+                )
+            )
+        );
+        
+        $mimeType = "text/xml";
+        $resp = "json";
+        $wl = new MgWhitelist($conf);
+        
+        //Anonymous can't use SELECTFEATURES globally
+        $action = "SELECTFEATURES";
+        $userName = "Anonymous";
+        $bExpect = true;
+        $bForbidden = false;
+        $wl->VerifyGlobalWhitelist($mimeType, function($msg, $mt) use (&$bForbidden) {
+            $bForbidden = true;
+        }, $action, $resp, $site, $userName);
+        $this->assertEquals($bExpect, $bForbidden, "Expected (".($bExpect?"true":"false").") on ($action, $resp) for $userName. Got: ".($bForbidden?"true":"false"));
+        
+        //Author can use GETRESSELECTFEATURESOURCE globally
+        $action = "SELECTFEATURES";
+        $userName = "Author";
+        $bExpect = false;
+        $bForbidden = false;
+        $wl->VerifyGlobalWhitelist($mimeType, function($msg, $mt) use (&$bForbidden) {
+            $bForbidden = true;
+        }, $action, $resp, $site, $userName);
+        $this->assertEquals($bExpect, $bForbidden, "Expected (".($bExpect?"true":"false").") on ($action, $resp) for $userName. Got: ".($bForbidden?"true":"false"));
+        
+        //Administrator can use SELECTFEATURES globally
+        $action = "SELECTFEATURES";
+        $userName = "Administrator";
+        $bExpect = false;
+        $bForbidden = false;
+        $wl->VerifyGlobalWhitelist($mimeType, function($msg, $mt) use (&$bForbidden) {
+            $bForbidden = true;
+        }, $action, $resp, $site, $userName);
+        $this->assertEquals($bExpect, $bForbidden, "Expected (".($bExpect?"true":"false").") on ($action, $resp) for $userName. Got: ".($bForbidden?"true":"false"));
+        
+        //Test on trees. As the configuration has no entry for this, it should default to global configuration
+        
+        $resIdStr = "Library://Samples/Sheboygan/Data/Trees.FeatureSource";
+        //Anonymous can't use SELECTFEATURES on trees
+        $action = "SELECTFEATURES";
+        $userName = "Anonymous";
+        $bExpect = true;
+        $bForbidden = false;
+        $wl->VerifyWhitelist($resIdStr, $mimeType, function($msg, $mt) use (&$bForbidden) {
+            $bForbidden = true;
+        }, $action, $resp, $site, $userName);
+        $this->assertEquals($bExpect, $bForbidden, "Expected (".($bExpect?"true":"false").") on ($action, $resp) for $userName. Got: ".($bForbidden?"true":"false"));
+        
+        //Author can use SELECTFEATURES on trees
+        $action = "SELECTFEATURES";
+        $userName = "Author";
+        $bExpect = false;
+        $bForbidden = false;
+        $wl->VerifyWhitelist($resIdStr, $mimeType, function($msg, $mt) use (&$bForbidden) {
+            $bForbidden = true;
+        }, $action, $resp, $site, $userName);
+        $this->assertEquals($bExpect, $bForbidden, "Expected (".($bExpect?"true":"false").") on ($action, $resp) for $userName. Got: ".($bForbidden?"true":"false"));
+        
+        //Administrator can use SELECTFEATURES on trees
+        $action = "SELECTFEATURES";
+        $userName = "Administrator";
+        $bExpect = false;
+        $bForbidden = false;
+        $wl->VerifyWhitelist($resIdStr, $mimeType, function($msg, $mt) use (&$bForbidden) {
+            $bForbidden = true;
+        }, $action, $resp, $site, $userName);
+        $this->assertEquals($bExpect, $bForbidden, "Expected (".($bExpect?"true":"false").") on ($action, $resp) for $userName. Got: ".($bForbidden?"true":"false"));
+        
+        //Test on parcels
+        
+        $resIdStr = "Library://Samples/Sheboygan/Data/Parcels.FeatureSource";
+        //Anonymous can use SELECTFEATURES on trees
+        $action = "SELECTFEATURES";
+        $userName = "Anonymous";
+        $bExpect = false;
+        $bForbidden = false;
+        $wl->VerifyWhitelist($resIdStr, $mimeType, function($msg, $mt) use (&$bForbidden) {
+            $bForbidden = true;
+        }, $action, $resp, $site, $userName);
+        $this->assertEquals($bExpect, $bForbidden, "Expected (".($bExpect?"true":"false").") on ($action, $resp) for $userName. Got: ".($bForbidden?"true":"false"));
+        
+        //Author can use SELECTFEATURES on trees
+        $action = "SELECTFEATURES";
+        $userName = "Author";
+        $bExpect = false;
+        $bForbidden = false;
+        $wl->VerifyWhitelist($resIdStr, $mimeType, function($msg, $mt) use (&$bForbidden) {
+            $bForbidden = true;
+        }, $action, $resp, $site, $userName);
+        $this->assertEquals($bExpect, $bForbidden, "Expected (".($bExpect?"true":"false").") on ($action, $resp) for $userName. Got: ".($bForbidden?"true":"false"));
+        
+        //Administrator can't use SELECTFEATURES on trees
+        $action = "SELECTFEATURES";
+        $userName = "Administrator";
+        $bExpect = true;
+        $bForbidden = false;
+        $wl->VerifyWhitelist($resIdStr, $mimeType, function($msg, $mt) use (&$bForbidden) {
+            $bForbidden = true;
+        }, $action, $resp, $site, $userName);
+        $this->assertEquals($bExpect, $bForbidden, "Expected (".($bExpect?"true":"false").") on ($action, $resp) for $userName. Got: ".($bForbidden?"true":"false"));
+    }
 }
 
 ?>
