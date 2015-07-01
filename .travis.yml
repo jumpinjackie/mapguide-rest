@@ -7,5 +7,5 @@ php:
 install: composer install
 
 script:
-    - find app/ -type f -regex '.*\.php\|.*\.php\.j2' -exec php -lf {} \;
+    - vendor/bin/parallel-lint -s -e php,phpt --exclude vendor .
     - vendor/bin/phpunit test
