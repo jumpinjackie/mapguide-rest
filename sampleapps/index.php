@@ -159,6 +159,7 @@ function is_installed($feature)
                     <div id="samplesCesium" class="panel-collapse collapse">
                         <div class="panel-body">
                             <ul class="list-group">
+                                <li class="list-group-item"><a href="cesium/xyz.html">Sheboygan XYZ tiles (via UrlTemplateImageryProvider)</a></li>
                                 <li class="list-group-item"><a href="cesium/index.html">Sheboygan Districts</a></li>
                                 <li class="list-group-item"><a href="czml/index.html">Cesium viewer with CZML sources</a></li>
                                 <li class="list-group-item"><a href="czml/building.html">Melbourne building footprints</a></li>
