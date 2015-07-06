@@ -189,10 +189,17 @@
                 console.log(" " + layers[i].get("name"));
             }
             */
-            var view = new ol.View({
-                projection: projection,
-                resolutions: tileGrid.getResolutions()
-            });
+            var view = null;
+            if (resolutions.length == 0) {
+                view = new ol.View({
+                    projection: projection
+                });
+            } else {
+                view = new ol.View({
+                    projection: projection,
+                    resolutions: resolutions
+                });
+            }
             map = new ol.Map({
                 target: "map",
                 layers: layers,

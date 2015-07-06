@@ -52,6 +52,7 @@ function Legend(options)
                 //Do we have a parent?
                 if (typeof(groupElMap[group.ParentId]) != 'undefined') {
                     var el = this.createGroupElement(group);
+                    groupElMap[group.ObjectId] = el;
                     groupElMap[group.ParentId].find("ul.groupChildren").append(el);
                     removeIds.push(group.ObjectId);
                 }
