@@ -75,12 +75,18 @@ class MgDataController extends MgBaseController {
         $this->EnsureAuthenticationForSite();
         $this->ValidateAuthorPrivileges($fmt == "json" ? MgMimeType::Json : MgMimeType::Xml);
         $configRoot = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath"));
-        $configs = glob("$configRoot/*/{restcfg.json}", GLOB_BRACE);
+        
+        $configDir = new RecursiveDirectoryIterator("$configRoot");
+        $iterator = new RecursiveIteratorIterator($configDir);
+        
         $resp = "<DataConfigurationList>";
         $resp .= "<RootUri>" . $this->app->config("SelfUrl") . "</RootUri>";
         $resp .= "<MapAgentUrl>".$this->app->config("MapGuide.MapAgentUrl")."</MapAgentUrl>";
-        foreach ($configs as $conf) {
-            $path = realpath($conf);
+        foreach ($iterator as $conf) {
+            if ($conf->getFilename() != "restcfg.json")
+                continue;
+            $path = $conf->getRealpath();
+            
             $confRelPath = str_replace("\\", "/", str_replace($configRoot, "", $path));
             if ($confRelPath[0] == '/' || $confRelPath[0] == '\\') {
                 $confRelPath = substr($confRelPath, 1);
