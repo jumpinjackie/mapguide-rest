@@ -2,6 +2,7 @@ mapguide-rest
 =============
 
 [![Build Status](https://travis-ci.org/jumpinjackie/mapguide-rest.svg)](https://travis-ci.org/jumpinjackie/mapguide-rest)
+[![Windows Build Status](https://ci.appveyor.com/api/projects/status/trt32l1n4p20uwvp/branch/master?svg=true)](https://ci.appveyor.com/project/jumpinjackie/mapguide-rest)
 
 mapguide-rest is a RESTful web extension for [MapGuide Open Source](http://mapguide.osgeo.org) that continues the ideas explored in [mapguide4j](https://github.com/jumpinjackie/mapguide4j) and [GeoREST](https://code.google.com/p/georest/) projects
 
