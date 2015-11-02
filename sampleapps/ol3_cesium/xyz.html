@@ -1,20 +1,27 @@
 <html>
     <head>
-        <title>Sheboygan map as XYZ</title>
+        <title>ol3-cesium Example</title>
         <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
         <link rel="stylesheet" href="../../assets/ol3-cesium/ol3/css/ol.css" />
         <style type="text/css">
             #error { color: red; }
             #wrap { width: 900; }
-            #map { width: 400; height: 300; float: left; border: 1px solid black; }
+            #map { width: 640; height: 480; float: left; border: 1px solid black; }
             #main { margin-top: 50px; padding-top: 20px; }
         </style>
         <script type="text/javascript" src="../../assets/ol3-cesium/ol3/ol.js"></script>
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="../../assets/ol3-cesium/cesium/Cesium.js"></script>
+        <script type="text/javascript" src="../../assets/ol3-cesium/ol3cesium.js"></script>
         <script type="text/javascript">
 
         //This sample is assumed to be hosted at http://servername/mapguide/rest/sampleapps/tiled/index.html
         var restUrl = "../..";
+        var ol3d = null;
+        
+        function toggle3D() {
+            ol3d.setEnabled(!ol3d.getEnabled());
+        } 
 
         $(document).ready(function() {
             //NOTE: Your map definition can be in any coordinate system as long as it it transformable to LL84
@@ -55,6 +62,13 @@
                 zoom: 12
               })
             });
+            
+            ol3d = new olcs.OLCesium({ map: map });
+            var scene = ol3d.getCesiumScene();
+            var terrainProvider = new Cesium.CesiumTerrainProvider({
+                url : '//assets.agi.com/stk-terrain/world'
+            });
+            scene.terrainProvider = terrainProvider;
         });
 
         </script>
@@ -72,10 +86,10 @@
         <div id="main">
             <div class="container">
                 <div class="alert alert-info">
-                    <p>This example demonstrates a Map Definition being consumed as a <strong>XYZ layer</strong> via the MapGuide REST API with <a href="http://openlayers.org/">OpenLayers 3</a>.</p>
-                    <p>An OpenStreetMap layer is included as a backdrop for context</p>
-                    <strong>For maximum visual fidelity, your Map Definition should be in WGS84.PseudoMercator</strong>
+                    <p>This example demonstrates a Map Definition being consumed as a <strong>XYZ layer</strong> via the MapGuide REST API with <a href="http://openlayers.org/">OpenLayers 3</a> with seamless transition to Cesium 3D mode via the <a href="http://openlayers.org/ol3-cesium/">ol3-cesium library</a>.</p>
+                    <strong>For seamless transition, your Map Definition should be in WGS84.PseudoMercator</strong>
                     <p>Sample not loading? <a href="../data/load.php">Check that the required resources have been loaded</a></p>
+                    <button onclick="toggle3D()">Toggle 3D</button>
                 </div>
                 <div id="error">
                 </div>

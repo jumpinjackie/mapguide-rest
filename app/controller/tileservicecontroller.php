@@ -431,8 +431,8 @@ class MgTileServiceController extends MgBaseController {
 
                         $renderSvc = $siteConn->CreateService(MgServiceType::RenderingService);
 
-                        $layerGroups = $map->GetLayerGroups();
-                        $baseGroup = $layerGroups->GetItem($groupName);
+                        $groups = $map->GetLayerGroups();
+                        $baseGroup = $groups->GetItem($groupName); //Will throw MgObjectNotFoundException -> 404 if no such group exists
 
                         $factory = new MgCoordinateSystemFactory();
                         $mapCsWkt = $map->GetMapSRS();
@@ -474,13 +474,9 @@ class MgTileServiceController extends MgBaseController {
 
                         //Set all layers under group to be visible
                         $layers = $map->GetLayers();
-                        $groups = $map->GetLayerGroups();
+                        
                         $layerCount = $layers->GetCount();
                         $groupCount = $groups->GetCount();
-
-                        if ($groups->IndexOf($groupName) < 0) {
-                            throw new Exception($this->app->localizer->getText("E_GROUP_NOT_FOUND", $groupName));
-                        }
 
                         //Turn all groups that are not the given group to be hidden
                         for ($i = 0; $i < $groupCount; $i++) {
@@ -522,7 +518,7 @@ class MgTileServiceController extends MgBaseController {
                         flock($fpLockFile, LOCK_UN);
                         $bLocked = false;
                     }
-                    if ($ex instanceof MgResourceNotFoundException) {
+                    if ($ex instanceof MgResourceNotFoundException || $ex instanceof MgObjectNotFoundException) {
                         $this->NotFound($ex->GetExceptionMessage(), $this->GetMimeTypeForFormat($fmt));
                     }
                     else if ($ex instanceof MgConnectionFailedException) {
@@ -530,7 +526,7 @@ class MgTileServiceController extends MgBaseController {
                     }
                 } catch (Exception $ex) {
                     if ($bLocked) {
-                        $tileError = $ex->getMessage();
+                        $tileError = get_class($ex)." - ".$ex->getMessage();
                         $this->app->log->debug("($requestId) Exception caught ($tileError). Releasing lock for $path");
                         flock($fpLockFile, LOCK_UN);
                         $bLocked = false;

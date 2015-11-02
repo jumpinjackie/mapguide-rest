@@ -167,6 +167,18 @@ function is_installed($feature)
                         </div>
                     </div>
                 </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#samplesOl3Cesium"><strong>MapGuide REST API with ol3-Cesium</strong></a>
+                    </div>
+                    <div id="samplesOl3Cesium" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <ul class="list-group">
+                                <li class="list-group-item"><a href="ol3_cesium/xyz.html">Sheboygan XYZ tiles</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </body>
