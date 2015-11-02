@@ -3,9 +3,9 @@
   <head>
     <title>mapguide-rest XYZ integration example</title>
     <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
-    <script src="../../assets/cesium/Cesium.js"></script>
+    <script src="../../assets/ol3-cesium/cesium/Cesium.js"></script>
     <style>
-      @import url(../../assets/cesium/Widgets/widgets.css);
+      @import url(../../assets/ol3-cesium/cesium/Widgets/widgets.css);
       #cesiumContainer {
         position: absolute;
         top: 50px;
@@ -29,6 +29,7 @@
                 new Cesium.ProviderViewModel({
                     name: "mapguide-rest XYZ layer",
                     tooltip: "XYZ tileset served from mapguide-rest",
+                    iconUrl: "../../assets/ol3-cesium/cesium/Widgets/Images/ImageryProviders/openStreetMap.png",
                     creationFunction: function() {
                         return new Cesium.UrlTemplateImageryProvider({
                             url: '../../library/Samples/Sheboygan/MapsTiled/SheboyganNoWatermark.MapDefinition/xyz/Base Layer Group/{z}/{x}/{y}/tile.png',
@@ -41,7 +42,7 @@
                 new Cesium.ProviderViewModel({
                     name: "OpenStreetMap",
                     tooltip: "OpenStreetMap",
-                    iconUrl: "../../assets/cesium/Widgets/Images/ImageryProviders/openStreetMap.png",
+                    iconUrl: "../../assets/ol3-cesium/cesium/Widgets/Images/ImageryProviders/openStreetMap.png",
                     creationFunction: function() {
                         return new Cesium.OpenStreetMapImageryProvider();
                     }
@@ -49,7 +50,7 @@
                 new Cesium.ProviderViewModel({
                     name: "Stamen Toner",
                     tooltip: "Stamen Toner",
-                    iconUrl: "../../assets/cesium/Widgets/Images/ImageryProviders/stamenToner.png",
+                    iconUrl: "../../assets/ol3-cesium/cesium/Widgets/Images/ImageryProviders/stamenToner.png",
                     creationFunction: function() {
                         return new Cesium.OpenStreetMapImageryProvider({
                             url: "//stamen-tiles.a.ssl.fastly.net/toner/",

@@ -2,7 +2,7 @@
     <head>
         <title>Basic Sheboygan tiled map example</title>
         <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="../../assets/common/css/ol.css" />
+        <link rel="stylesheet" href="../../assets/ol3-cesium/ol3/css/ol.css" />
         <style type="text/css">
             #error { color: red; }
             #wrap { width: 900; }
@@ -13,7 +13,7 @@
             #main { margin-top: 50px; padding-top: 20px; }
         </style>
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
-        <script type="text/javascript" src="../../assets/common/js/ol-debug.js"></script>
+        <script type="text/javascript" src="../../assets/ol3-cesium/ol3/ol.js"></script>
         <script type="text/javascript" src="../../assets/common/js/legend_ol3.js"></script>
         <script type="text/javascript">
         
@@ -205,7 +205,7 @@
                 layers: layers,
                 view: view
             });
-            view.fitExtent(extent, map.getSize());
+            view.fit(extent, map.getSize());
             view.on("change:resolution", function(e) {
                 updateScale(view.getResolution() * dpi * inPerUnit);
             });

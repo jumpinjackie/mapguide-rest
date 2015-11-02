@@ -2,14 +2,14 @@
     <head>
         <title>Sheboygan map as dynamic vector layers</title>
         <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="../../assets/common/css/ol.css" />
+        <link rel="stylesheet" href="../../assets/ol3-cesium/ol3/css/ol.css" />
         <style type="text/css">
             #error { color: red; }
             #wrap { width: 900; }
             #map { width: 800; height: 600; float: left; border: 1px solid black; }
             #main { margin-top: 50px; padding-top: 20px; }
         </style>
-        <script type="text/javascript" src="../../assets/common/js/ol-debug.js"></script>
+        <script type="text/javascript" src="../../assets/ol3-cesium/ol3/ol.js"></script>
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
         <script type="text/javascript">
 
@@ -410,8 +410,15 @@
             });
 
             var highlightStyleCache = {};
-            var featureOverlay = new ol.FeatureOverlay({
+            var collection = new ol.Collection();
+            var featureOverlay = new ol.layer.Vector({
               map: map,
+              source: new ol.source.Vector({
+                  features: collection,
+                  useSpatialIndex: false
+              }),
+              updateWhileAnimating: true,
+              updateWhileInteracting: true,
               style: function(feature, resolution) {
                 var text = resolution < 5000 ? feature.get('_name') : '';
                 if (!highlightStyleCache[text]) {
@@ -460,10 +467,10 @@
 
               if (feature !== highlight) {
                 if (highlight) {
-                  featureOverlay.removeFeature(highlight);
+                  featureOverlay.getSource().removeFeature(highlight);
                 }
                 if (feature) {
-                  featureOverlay.addFeature(feature);
+                  featureOverlay.getSource().addFeature(feature);
                 }
                 highlight = feature;
               }
