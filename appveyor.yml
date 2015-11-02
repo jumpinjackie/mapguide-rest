@@ -1,0 +1,22 @@
+build: false
+shallow_clone: true
+platform:
+    - x86
+    - x64
+clone_folder: c:\projects\mapguide-rest
+branches:
+    only:
+      - master
+install:
+    - cinst -y php -version 5.5.16
+    - cd c:\php
+    - copy php.ini-production php.ini
+    - echo extension_dir=ext >> php.ini
+    - echo extension=php_openssl.dll >> php.ini
+    - SET PATH=C:\php;%PATH%
+    - cd c:\projects\mapguide-rest
+    - php -r "readfile('http://getcomposer.org/installer');" | php
+    - php composer.phar install --no-interaction
+test_script:
+    - vendor\bin\parallel-lint.bat -s -e php,phpt --exclude vendor .
+    - vendor\bin\phpunit test
