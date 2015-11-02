@@ -4,6 +4,9 @@ platform:
     - x86
     - x64
 clone_folder: c:\projects\mapguide-rest
+cache:
+  - '%LOCALAPPDATA%\Composer\files'
+  
 branches:
     only:
       - master
