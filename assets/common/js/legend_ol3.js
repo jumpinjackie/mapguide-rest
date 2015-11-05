@@ -211,9 +211,19 @@ Legend.prototype.createLayerElements = function(layer) {
                 var chkBoxHtml = "";
                 if (layer.Type == 1) //Dynamic
                     chkBoxHtml = "<input type='checkbox' class='layer-checkbox' value='" + layer.ObjectId + "' " + ((layer.Visible == true) ? "checked='checked'" : "") + " />";
-                els.push($("<li class='layer-node' data-layer-min-scale='" + scaleRange.MinScale + "' data-layer-max-scale='" + scaleRange.MaxScale + "'>" + chkBoxHtml + "<img src='" + icon + "' /> " + text + childHtml + "</li>"));
+                els.push($("<li class='layer-node' data-layer-name='" + layer.Name + "' data-layer-selectable='" + layer.Selectable + "' data-layer-min-scale='" + scaleRange.MinScale + "' data-layer-max-scale='" + scaleRange.MaxScale + "'>" + chkBoxHtml + "<img src='" + icon + "' /> " + text + childHtml + "</li>"));
             }
         }
     }
     return els;
+};
+
+Legend.prototype.getSelectedLayerNames = function() {
+    var names = [];
+    $("li.layer-node:visible").each(function(i, e) {
+        var el = $(e);
+        if (el.data("layer-selectable") == true)
+            names.push(el.data("layer-name"));
+    });
+    return names;
 };
