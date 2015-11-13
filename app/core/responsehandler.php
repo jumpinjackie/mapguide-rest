@@ -198,6 +198,8 @@ abstract class MgResponseHandler
             $status = 500;
             if ($statusMessage === "MgResourceNotFoundException" || $statusMessage === "MgResourceDataNotFoundException") {
                 $status = 404;
+            } else if ($statusMessage === "MgConnectionFailedException") {
+                $status = 503;
             }
             $this->OutputException($statusMessage, $result->GetErrorMessage(), $result->GetDetailedErrorMessage(), $e->getTraceAsString(), $status, $mimeType);
         }
