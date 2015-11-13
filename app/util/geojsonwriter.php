@@ -120,27 +120,67 @@ class MgGeoJsonWriter
         return $output;
     }
 
-    public static function ToGeoJson($geom) {
+    public static function ToGeoJson($geom, $bIncludePropertyName = true) {
         $geomType = $geom->GetGeometryType();
-        //TODO: Convert all the geometry types. Right now, we're converting the same subset as GeoREST
+        $prefix = "";
+        if ($bIncludePropertyName)
+            $prefix = '"geometry": ';
+        
         switch ($geomType) {
             case MgGeometryType::Point:
                 {
                     $coord = $geom->GetCoordinate();
-                    return '"geometry": { "type": "Point", "coordinates": '.MgGeoJsonWriter::CoordToGeoJson($coord)." }";
+                    return $prefix.'{ "type": "Point", "coordinates": '.self::CoordToGeoJson($coord)." }";
                 }
             case MgGeometryType::LineString:
                 {
                     $coords = $geom->GetCoordinates();
-                    return '"geometry": { "type": "LineString", "coordinates": '.MgGeoJsonWriter::CoordsToGeoJson($coords)." }";
+                    return $prefix.'{ "type": "LineString", "coordinates": '.self::CoordsToGeoJson($coords)." }";
                 }
             case MgGeometryType::Polygon:
                 {
-                    return '"geometry": { "type": "Polygon", "coordinates": '.MgGeoJsonWriter::PolygonToGeoJson($geom)." }";
+                    return $prefix.'{ "type": "Polygon", "coordinates": '.self::PolygonToGeoJson($geom)." }";
+                }
+            case MgGeometryType::MultiPoint:
+                {
+                    $coords = $geom->GetCoordinates();
+                    return $prefix.'{ "type": "MultiPoint", "coordinates": '.self::CoordsToGeoJson($coords)." }";
                 }
             case MgGeometryType::MultiLineString:
                 {
-                    return '"geometry": { "type": "MultiLineString", "coordinates": '.MgGeoJsonWriter::MultiLineStringToGeoJson($geom)." }";
+                    return $prefix.'{ "type": "MultiLineString", "coordinates": '.self::MultiLineStringToGeoJson($geom)." }";
+                }
+            case MgGeometryType::MultiPolygon:
+                {
+                    $str = $prefix.'{ "type": "MultiPolygon", "coordinates": [';
+                    $count = $geom->GetCount();
+                    $bFirst = true;
+                    for ($i = 0; $i < $count; $i++) {
+                        if (!$bFirst)
+                            $str .= ",";
+                        $poly = $geom->GetPolygon($i);
+                        $str .= self::PolygonToGeoJson($poly);
+                        $bFirst = false;
+                    }
+                    $str .= ']';
+                    $str .= '}';
+                    return $str;
+                }
+            case MgGeometryType::MultiGeometry:
+                {
+                    $str = $prefix.'{ "type": "GeometryCollection", "geometries": [';
+                    $count = $geom->GetCount();
+                    $bFirst = true;
+                    for ($i = 0; $i < $count; $i++) {
+                        if (!$bFirst)
+                            $str .= ",";
+                        $g = $geom->GetGeometry($i);
+                        $str .= self::ToGeoJson($g, false);
+                        $bFirst = false;
+                    }
+                    $str .= ']';
+                    $str .= '}';
+                    return $str;
                 }
             default:
                 return '"geometry": null';
