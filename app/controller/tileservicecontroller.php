@@ -286,9 +286,19 @@ class MgTileServiceController extends MgBaseController {
         return $path;
     }
 
-    private function PutTileImageXYZ($map, $groupName, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames) {
+    private function PutTileImageXYZ($map, $groupName, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames, $requestId) {
         //We don't use RenderTile (as it uses key parameters that are locked to serverconfig.ini), we use RenderMap instead
-        $env = new MgEnvelope($boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY);
+        $bufferPx = $this->app->config("MapGuide.XYZTileBuffer");
+        $ratio = $bufferPx / self::XYZ_TILE_WIDTH;
+        $dx = $boundsMaxX - $boundsMinX;
+        $dy = $boundsMaxY - $boundsMinY;
+        //If we have a buffer, we have to inflate the bounds by the given ratio
+        $minx = $boundsMinX - ($dx * $ratio);
+        $miny = $boundsMinY - ($dy * $ratio);
+        $maxx = $boundsMaxX + ($dx * $ratio);
+        $maxy = $boundsMaxY + ($dx * $ratio);
+        $env = new MgEnvelope($minx, $miny, $maxx, $maxy);
+        
         $strColor = $map->GetBackgroundColor();
         //Make sure the alpha component is transparent
         if (strlen($strColor) == 8) {
@@ -308,9 +318,76 @@ class MgTileServiceController extends MgBaseController {
             }
         }
         $bgColor = new MgColor($strColor);
-        $tileImg = $renderSvc->RenderMap($map, null, $env, self::XYZ_TILE_WIDTH, self::XYZ_TILE_HEIGHT, $bgColor, $format, false);
+        $tileImg = $renderSvc->RenderMap($map, null, $env, self::XYZ_TILE_WIDTH + (2 * $bufferPx), self::XYZ_TILE_HEIGHT + (2 * $bufferPx), $bgColor, $format, false);
         $sink = new MgByteSink($tileImg);
-        $sink->ToFile($path);
+        
+        if ($bufferPx > 0)
+        {
+            $tmpPath = tempnam(sys_get_temp_dir(), 'TempTile');
+            $sink->ToFile($tmpPath);
+            
+            $this->app->log->debug("($requestId): Saved image to $tmpPath for cropping");
+            
+            $im = null;
+            switch ($format)
+            {
+                case MgImageFormats::Png:
+                    $im = imagecreatefrompng($tmpPath);
+                    break;
+                case MgImageFormats::Jpeg:
+                    $im = imagecreatefromjpeg($tmpPath);
+                    break;
+                case MgImageFormats::Gif:
+                    $im = imagecreatefromgif($tmpPath);
+                    break;
+            }
+            
+            if ($im == null)
+                throw new Exception("Image format not supported for cropping: $format");
+
+            $tile = imagecreatetruecolor(self::XYZ_TILE_WIDTH, self::XYZ_TILE_HEIGHT);
+            imagesavealpha($tile, true);
+            
+            $trans_color = imagecolorallocatealpha($tile, 0, 0, 0, 127);
+            imagefill($tile, 0, 0, $trans_color);
+            
+            $error = null;
+            try {
+                //Crop by using imagecopy(). imagecrop() exists in PHP 5.5 and if you're using PHP 5.5, chances
+                //are you're using MGOS 3.0 that has native XYZ tile support in which case: Why are you even
+                //here?
+                imagecopy($tile, $im, 0, 0, $bufferPx, $bufferPx, self::XYZ_TILE_WIDTH, self::XYZ_TILE_HEIGHT);
+                $this->app->log->debug("($requestId): Cropped image. Saving to $path");
+                
+                switch ($format)
+                {
+                    case MgImageFormats::Png:
+                        imagepng($tile, $path);
+                        break;
+                    case MgImageFormats::Jpeg:
+                        imagejpeg($tile, $path);
+                        break;
+                    case MgImageFormats::Gif:
+                        imagegif($tile, $path);
+                        break;
+                }
+            } catch (Exception $ex) {
+                //Don't rethrow yet as we have some cleanup to do
+                $error = $ex;
+            }
+            
+            @imagedestroy($tile);
+            @imagedestroy($im);
+            @unlink($tmpPath);
+            
+            //We can rethrow now if something was caught
+            if ($error != null)
+                throw $error;
+        }
+        else
+        {
+            $sink->ToFile($path);
+        }
     }
 
     public function GetTile($resId, $groupName, $scaleIndex, $row, $col, $format) {
@@ -508,7 +585,7 @@ class MgTileServiceController extends MgBaseController {
                         } else {
                             $format = strtoupper($type);
                             //error_log("($requestId) Render image tile");
-                            $this->PutTileImageXYZ($map, $groupName, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames);
+                            $this->PutTileImageXYZ($map, $groupName, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames, $requestId);
                         }
                     }
                 } catch (MgException $ex) {

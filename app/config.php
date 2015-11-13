@@ -319,6 +319,18 @@ return array(
     //in order to determine and/or apply 304 http caching
     "MapGuide.TileImageFormat" => "png",
     //
+    //MapGuide.XYZTileBuffer
+    //
+    //On installations of MapGuide before 3.0, XYZ tile support is done through the RenderMap API. Unfortunately, this
+    //produces an undesirable cropping effect on labels and symbology if they lie on the boundaries of the rendered tile
+    //
+    //To workaround that, you can specify a buffer value here that will render the tile as a (256 * n) x (256 * n) image
+    //where n = 2 x [this value]
+    //
+    //The buffered tile is then cropped back to the original size
+    //
+    "MapGuide.XYZTileBuffer" => 90,
+    //
     //Cache.RootDir
     //
     //The root path of where all cache-able items produced by mapguide-rest will reside. You must ensure that the
