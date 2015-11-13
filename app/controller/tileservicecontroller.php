@@ -167,7 +167,11 @@ class MgTileServiceController extends MgBaseController {
         } else {
             $relPath = "/".$resId->GetPath()."/".$resId->GetName()."/$groupName/$z/$x/$y.$ext";
         }
-        $path = $app->config("AppRootDir")."/".$app->config("Cache.RootDir")."/tile.$type".$relPath;
+        $customRoot = $app->config("Cache.XYZTileRoot");
+        if ($customRoot != null)
+            $path = "$customRoot/tile.$type".$relPath;
+        else
+            $path = $app->config("AppRootDir")."/".$app->config("Cache.RootDir")."/tile.$type".$relPath;
         return $path;
     }
 

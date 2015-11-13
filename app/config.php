@@ -342,6 +342,16 @@ return array(
     // - XYZ vector tiles
     "Cache.RootDir" => "./cache",
     //
+    //Cache.XYZTileRoot
+    //
+    //If specfied, defines the absolute root path of where all cached XYZ tiles produced by mapguide-rest will reside. You must
+    //ensure that the web server has appropriate permissions to write files and create directories in this directory.
+    //
+    //If specified, will override the value of Cache.RootDir for the purpose of tile storage. Other cache-able items will still
+    //be stored in the path defined by Cache.RootDir
+    //
+    //"Cache.XYZTileRoot" => "C:/tilecache",
+    //
     //Locale
     //
     //The locale to use for error messages returned by mapguide-rest. Exceptions thrown by MapGuide will still use the locale configured in serverconfig.ini
