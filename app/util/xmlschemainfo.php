@@ -557,7 +557,8 @@ class MgXmlSchemaInfo
         "/SelectedLayerCollection/SelectedLayer" => "abcd1234",
         "/LayerCollection/Layer" => "abcd1234",
         "/FeatureSourceParams/FeatureSchema/ClassDefinition" => "abcd1234",
-        "/DataConfigurationList/Configuration" => "abcd1234"
+        "/DataConfigurationList/Configuration" => "abcd1234",
+        "/UpdateMap/Operation" => "abcd1234"
     );
 
     private static function GetXmlPath($domElement, $suffix = "") {

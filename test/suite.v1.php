@@ -9907,7 +9907,109 @@
                     self.ok(result.indexOf("mapagent/mapagent.fcgi") < 0, "Expected no mapagent callback urls in response");
                 });
             });
+            module("Runtime Map", {
+                setup: function() {
+                    var self = this;
+                    prepareEnvironment(self);
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                        self.ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                        self.anonymousSessionId = JSON.parse(result).PrimitiveValue.Value;
+                    });
+                    api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                        self.ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                        self.adminSessionId = JSON.parse(result).PrimitiveValue.Value;
+                    });
+                },
+                teardown: function() {
+                    api_test(rest_root_url + "/session/" + this.anonymousSessionId, "DELETE", null, function(status, result, mimeType) {
+                        self.ok(status == 200, "(" + status + ") - Expected anonymous session to be destroyed");
+                        delete this.anonymousSessionId;
+                    });
 
+                    api_test(rest_root_url + "/session/" + this.adminSessionId, "DELETE", null, function(status, result, mimeType) {
+                        self.ok(status == 200, "(" + status + ") - Expected admin session to be destroyed");
+                        delete this.adminSessionId;
+                    });
+                }
+            });
+            test("Layer/Group Modification", function() {
+                var reqFeatures = (1|2|4);
+                var anonMapName = null;
+                var adminMapName = null;
+                
+                function createModificationXml() {
+                    var xml = "<UpdateMap>";
+                    xml += "<Operation>";
+                    xml += "<Type>RemoveLayer</Type>";
+                    xml += "<Name>Trees</Name>";
+                    xml += "</Operation>";
+                    xml += "<Operation>";
+                    xml += "<Type>RemoveGroup</Type>";
+                    xml += "<Name>Base Map</Name>";
+                    xml += "</Operation>";
+                    xml += "</UpdateMap>";
+                    return xml;
+                }
+
+                api_test(rest_root_url + "/services/createmap.json", "POST", { session: this.anonymousSessionId, requestedfeatures: reqFeatures, mapdefinition: "Library://Samples/Sheboygan/Maps/Sheboygan.MapDefinition" }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    var map = JSON.parse(result);
+                    anonMapName = map.RuntimeMap.Name;
+                });
+                api_test(rest_root_url + "/services/createmap.json", "POST", { session: this.adminSessionId, requestedfeatures: reqFeatures, mapdefinition: "Library://Samples/Sheboygan/Maps/Sheboygan.MapDefinition" }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    var map = JSON.parse(result);
+                    adminMapName = map.RuntimeMap.Name;
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/" + anonMapName + ".Map/layersandgroups.xml", "PUT", createModificationXml(), function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/" + adminMapName + ".Map/layersandgroups.xml", "PUT", createModificationXml(), function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/" + anonMapName + ".Map/description.json", "GET", { requestedfeatures: reqFeatures }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    var map = JSON.parse(result).RuntimeMap;
+                    var bGroupRemoved = true;
+                    var bLayerRemoved = true;
+                    for (var i = 0; i < map.Group.length; i++) {
+                        if (map.Group[i].Name == "Base Map") {
+                            bGroupRemoved = false;
+                        }
+                    }
+                    for (var i = 0; i < map.Layer.length; i++) {
+                        if (map.Layer[i].Name == "Trees") {
+                            bLayerRemoved = false;
+                        }
+                    }
+                    self.ok(bGroupRemoved, "Expected 'Base Map' group to be removed");
+                    self.ok(bLayerRemoved, "Expected 'Trees' layer to be removed");
+                });
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/" + adminMapName + ".Map/description.json", "GET", { requestedfeatures: reqFeatures }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    var map = JSON.parse(result).RuntimeMap;
+                    var bGroupRemoved = true;
+                    var bLayerRemoved = true;
+                    for (var i = 0; i < map.Group.length; i++) {
+                        if (map.Group[i].Name == "Base Map") {
+                            bGroupRemoved = false;
+                        }
+                    }
+                    for (var i = 0; i < map.Layer.length; i++) {
+                        if (map.Layer[i].Name == "Trees") {
+                            bLayerRemoved = false;
+                        }
+                    }
+                    self.ok(bGroupRemoved, "Expected 'Base Map' group to be removed");
+                    self.ok(bLayerRemoved, "Expected 'Trees' layer to be removed");
+                });
+            });
             module("Plotting - Library", {
                 setup: function() {
                     var self = this;

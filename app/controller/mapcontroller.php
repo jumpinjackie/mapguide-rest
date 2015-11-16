@@ -804,122 +804,175 @@ class MgMapController extends MgBaseController {
     public function UpdateMapLayersAndGroups($sessionId, $mapName, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
-        
-        $this->EnsureAuthenticationForSite($sessionId);
-        $siteConn = new MgSiteConnection();
-        $siteConn->Open($this->userInfo);
-
-        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-
-        $map = new MgMap($siteConn);
-        $map->Open($mapName);
-        
-        if ($fmt == "json") {
-            $body = $this->app->request->getBody();
-            $json = json_decode($body);
-            if ($json == NULL)
-                throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
-        } else {
-            $body = $this->app->request->getBody();
-            $jsonStr = MgUtils::Xml2Json($body);
-            $json = json_decode($jsonStr);
-        }
-        
-        if (!isset($json->UpdateMap)) {
-            throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
-        }
-        
-        /*
-        Expected structure
-        
-        /UpdateMap
-            /Operation [1...n]
-                /[AddLayer|UpdateLayer|RemoveLayer|AddGroup|UpdateGroup|RemoveGroup]
-         */
-        
-        $layers = $map->GetLayers();
-        $groups = $map->GetLayerGroups();
-        
-        $um = $json->UpdateMap;
-        $updateStats = new stdClass();
-        $updateStats->AddedLayers = 0;
-        $updateStats->UpdatedLayers = 0;
-        $updateStats->RemovedLayers = 0;
-        $updateStats->AddedGroups = 0;
-        $updateStats->UpdatedGroups = 0;
-        $updateStats->RemovedGroups = 0;
-        
-        for ($i = 0; $i < count($um->Operations); $i++) {
-            $op = $um->Operations[$i];
-            if (isset($op->AddLayer)) {
-                $resId = new MgResourceIdentifier($op->AddLayer->ResourceId);
-                $layer = new MgLayer($resId, $resSvc);
-                $layer->SetName($op->AddLayer->Name);
-                ApplyCommonLayerProperties($layer, $op->AddLayer, $groups);
-                if (isset($op->AddLayer->InsertAt)) {
-                    $layers->Insert(intval($op->AddLayer->InsertAt), $layer);
-                } else {
-                    $layers->Add($layer);
-                }
-                
-                $updateStats->AddedLayers++;
-            } else if (isset($op->UpdateLayer)) {
-                $layer = $layers->GetItem($op->UpdateLayer->Name);
-                
-                if (ApplyCommonLayerProperties($layer, $op->UpdateLayer, $groups))
-                    $updateStats->UpdatedLayers++;
-            } else if (isset($op->RemoveLayer)) {
-                $layer = $layers->GetItem($op->RemoveLayer->Name);
-                
-                if ($layers->Remove($layer))
-                    $updateStats->RemovedLayers++;
-            } else if (isset($op->AddGroup)) {
-                $group = new MgLayerGroup();
-                $group->SetName($op->AddGroup->Name);
-                ApplyCommonGroupProperties($group, $op->AddGroup, $groups);
-                
-                $updateStats->AddedGroups++;
-            } else if (isset($op->UpdateGroup)) {
-                $group = $groups->GetItem($op->UpdateGroup->Name);
-                
-                if (ApplyCommonGroupProperties($group, $op->UpdateGroup, $groups))
-                    $updateStats->UpdatedGroups++;
-            } else if (isset($op->RemoveGroup)) {
-                $group = $groups->GetItem($op->UpdateGroup->Name);
-                
-                if ($groups->Remove($group))
-                    $updateStats->RemovedGroups++;
+        try {
+            $this->EnsureAuthenticationForSite($sessionId);
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+    
+            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+    
+            $map = new MgMap($siteConn);
+            $map->Open($mapName);
+            
+            if ($fmt == "json") {
+                $body = $this->app->request->getBody();
+                $json = json_decode($body);
+                if ($json == NULL)
+                    throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+            } else {
+                $body = $this->app->request->getBody();
+                $jsonStr = MgUtils::Xml2Json($body);
+                $json = json_decode($jsonStr);
             }
-        }
-        
-        $response = "<UpdateMapResult>";
-        $response .= "<AddedLayers>";
-        $response .= $updateStats->AddedLayers;
-        $response .= "</AddedLayers>";
-        $response .= "<UpdatedLayers>";
-        $response .= $updateStats->UpdatedLayers;
-        $response .= "</UpdatedLayers>";
-        $response .= "<RemovedLayers>";
-        $response .= $updateStats->RemovedLayers;
-        $response .= "</RemovedLayers>";
-        $response .= "<AddedGroups>";
-        $response .= $updateStats->AddedGroups;
-        $response .= "</AddedGroups>";
-        $response .= "<UpdatedGroups>";
-        $response .= $updateStats->UpdatedGroups;
-        $response .= "</UpdatedGroups>";
-        $response .= "<RemovedGroups>";
-        $response .= $updateStats->RemovedGroups;
-        $response .= "</RemovedGroups>";
-        $response .= "</UpdateMapResult>";
-        
-        $bs = new MgByteSource($response, strlen($response));
-        $bs->SetMimeType(MgMimeType::Xml);
-        $br = $bs->GetReader();
-        if ($format == "json") {
-            $this->OutputXmlByteReaderAsJson($br);
-        } else {
-            $this->OutputByteReader($br);
+            
+            if (!isset($json->UpdateMap)) {
+                throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+            }
+            
+            /*
+            Expected structure
+            
+            /UpdateMap
+                /Operation [1...n]
+                    /Type - [AddLayer|UpdateLayer|RemoveLayer|AddGroup|UpdateGroup|RemoveGroup]
+                    /Name
+                    /ResourceId
+                    /SetLegendLabel
+                    /SetDisplayInLegend
+                    /SetExpandInLegend
+                    /SetVisible
+                    /SetSelectable
+                    /InsertAt
+            */
+            
+            $layers = $map->GetLayers();
+            $groups = $map->GetLayerGroups();
+            
+            $um = $json->UpdateMap;
+            $updateStats = new stdClass();
+            $updateStats->AddedLayers = 0;
+            $updateStats->UpdatedLayers = 0;
+            $updateStats->RemovedLayers = 0;
+            $updateStats->AddedGroups = 0;
+            $updateStats->UpdatedGroups = 0;
+            $updateStats->RemovedGroups = 0;
+            
+            $this->app->log->debug("Operations found: ".count($um->Operation));
+            
+            for ($i = 0; $i < count($um->Operation); $i++) {
+                $op = $um->Operation[$i];
+                switch ($op->Type) {
+                    case "AddLayer": 
+                    {
+                        $resId = new MgResourceIdentifier($op->ResourceId);
+                        $layer = new MgLayer($resId, $resSvc);
+                        $layer->SetName($op->Name);
+                        ApplyCommonLayerProperties($layer, $op, $groups);
+                        if (isset($op->InsertAt)) {
+                            $layers->Insert(intval($op->InsertAt), $layer);
+                        } else {
+                            $layers->Add($layer);
+                        }
+                        $this->app->log->debug("Add Layer: ".$op->Name);
+                        $updateStats->AddedLayers++;
+                    } 
+                    break;
+                    case "UpdateLayer":
+                    {
+                        $layer = $layers->GetItem($op->Name);
+                        
+                        if (ApplyCommonLayerProperties($layer, $op, $groups)) {
+                            $this->app->log->debug("Updated Layer: ".$op->Name);
+                            $updateStats->UpdatedLayers++;
+                        }
+                    } 
+                    break;
+                    case "RemoveLayer": {
+                        $layer = $layers->GetItem($op->Name);
+                        
+                        if ($layers->Remove($layer)) {
+                            $this->app->log->debug("Removed Layer: ".$op->Name);
+                            $updateStats->RemovedLayers++;
+                        }
+                    } 
+                    break;
+                    case "AddGroup": 
+                    {
+                        $group = new MgLayerGroup();
+                        $group->SetName($op->Name);
+                        ApplyCommonGroupProperties($group, $op, $groups);
+                        if (isset($op->InsertAt)) {
+                            $groups->Insert(intval($op->InsertAt), $group);
+                        } else {
+                            $groups->Add($group);
+                        }
+                        $this->app->log->debug("Add Group: ".$op->Name);
+                        $updateStats->AddedGroups++;
+                    }
+                    break;
+                    case "UpdateGroup": 
+                    {
+                        $group = $groups->GetItem($op->Name);
+                        
+                        if (ApplyCommonGroupProperties($group, $op, $groups)) {
+                            $this->app->log->debug("Updated Group: ".$op->Name);
+                            $updateStats->UpdatedGroups++;
+                        }
+                    }
+                    break;
+                    case "RemoveGroup": 
+                    {
+                        $group = $groups->GetItem($op->Name);
+                        
+                        if ($groups->Remove($group)) {
+                            $this->app->log->debug("Removed Group: ".$op->Name);
+                            $updateStats->RemovedGroups++;
+                        }
+                    }
+                    break;
+                }
+            }
+            
+            if ($updateStats->AddedLayers > 0 ||
+                $updateStats->UpdatedLayers > 0 ||
+                $updateStats->RemovedLayers > 0 ||
+                $updateStats->AddedGroups > 0 ||
+                $updateStats->UpdatedGroups > 0 ||
+                $updateStats->RemovedGroups > 0) {
+                $map->Save();
+            }
+            
+            $response = "<UpdateMapResult>";
+            $response .= "<AddedLayers>";
+            $response .= $updateStats->AddedLayers;
+            $response .= "</AddedLayers>";
+            $response .= "<UpdatedLayers>";
+            $response .= $updateStats->UpdatedLayers;
+            $response .= "</UpdatedLayers>";
+            $response .= "<RemovedLayers>";
+            $response .= $updateStats->RemovedLayers;
+            $response .= "</RemovedLayers>";
+            $response .= "<AddedGroups>";
+            $response .= $updateStats->AddedGroups;
+            $response .= "</AddedGroups>";
+            $response .= "<UpdatedGroups>";
+            $response .= $updateStats->UpdatedGroups;
+            $response .= "</UpdatedGroups>";
+            $response .= "<RemovedGroups>";
+            $response .= $updateStats->RemovedGroups;
+            $response .= "</RemovedGroups>";
+            $response .= "</UpdateMapResult>";
+            
+            $bs = new MgByteSource($response, strlen($response));
+            $bs->SetMimeType(MgMimeType::Xml);
+            $br = $bs->GetReader();
+            if ($format == "json") {
+                $this->OutputXmlByteReaderAsJson($br);
+            } else {
+                $this->OutputByteReader($br);
+            }
+        } catch (MgException $ex) {
+            $this->OnException($ex, $this->GetMimeTypeForFormat($format));
         }
     }
     
