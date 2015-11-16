@@ -1,0 +1,316 @@
+{
+    "basePath": "http://localhost/mapguide/rest",
+    "swaggerVersion": "1.2",
+    "apiVersion": "1.0",
+    "resourcePath": "/data",
+    "apis": [
+        {
+            "path": "/data/configs.{type}",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Enumerates all data configurations",
+                    "nickname": "GetDataConfigurations",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/data/{uriPart}/config",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Gets the data configuration for the given URI part",
+                    "nickname": "GetDataConfiguration",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "uriPart",
+                            "type": "string",
+                            "required": true,
+                            "description": "The URI part"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                },
+                {
+                    "method": "POST",
+                    "summary": "Set the given data configuration",
+                    "nickname": "SetDataConfigurations",
+                    "parameters": [
+                        {
+                            "paramType": "form",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "uriPart",
+                            "type": "string",
+                            "required": true,
+                            "description": "The URI part"
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "data",
+                            "type": "file",
+                            "required": true,
+                            "description": "The data configuration file to load"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                },
+                {
+                    "method": "DELETE",
+                    "summary": "Delete the given data configuration",
+                    "nickname": "DeleteDataConfigurations",
+                    "parameters": [
+                        {
+                            "paramType": "form",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "uriPart",
+                            "type": "string",
+                            "required": true,
+                            "description": "The URI part"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/data/{uriPart}/file",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "Upload a file for a given data configuration",
+                    "nickname": "SetDataFile",
+                    "parameters": [
+                        {
+                            "paramType": "form",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "uriPart",
+                            "type": "string",
+                            "required": true,
+                            "description": "The URI part"
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "filename",
+                            "type": "string",
+                            "required": true,
+                            "description": "The file name to upload to"
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "data",
+                            "type": "file",
+                            "required": true,
+                            "description": "The file to load"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                },
+                {
+                    "method": "DELETE",
+                    "summary": "Deletes a file for a given data configuration",
+                    "nickname": "DeleteDataFile",
+                    "parameters": [
+                        {
+                            "paramType": "form",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "uriPart",
+                            "type": "string",
+                            "required": true,
+                            "description": "The URI part"
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "filename",
+                            "type": "string",
+                            "required": true,
+                            "description": "The file name to upload to"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/data/{uriPart}/files.{type}",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Gets the list of files for the given data configuration",
+                    "nickname": "GetDataConfigurationFiles",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "session",
+                            "type": "string",
+                            "required": false,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "uriPart",
+                            "type": "string",
+                            "required": true,
+                            "description": "The URI part"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
