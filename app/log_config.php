@@ -25,7 +25,7 @@ class LogWriter extends \Slim\LogWriter
 }
 
 return array(
-    "log.enabled" => false,
+    "log.enabled" => true,
     "log.level" => \Slim\Log::DEBUG,
     "log.writer" => new LogWriter(dirname(__FILE__)."/../cache/debug.log")
 );

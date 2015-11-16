@@ -1257,7 +1257,7 @@
             "operations": [
                 {
                     "method": "PUT",
-                    "summary": "Updates the map selection according to some spatial critieria",
+                    "summary": "Updates the map selection according to some spatial criteria",
                     "nickname": "QueryMapFeatures",
                     "parameters": [
                         {
@@ -1285,7 +1285,7 @@
                             "paramType": "form",
                             "name": "geometry",
                             "type": "string",
-                            "required": true,
+                            "required": false,
                             "description": "The WKT of the intersecting geometry"
                         },
                         {
@@ -1355,6 +1355,20 @@
                             "type": "string",
                             "required": false,
                             "description": "Bitmask value determining which layers will be queried. 1=Visible, 2=Selectable, 4=HasTooltips"
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "selectionxml",
+                            "type": "boolean",
+                            "required": false,
+                            "description": "Indicates if the 'featurefilter' parameter is to be treated as selection XML"
+                        },
+                        {
+                            "paramType": "form",
+                            "name": "append",
+                            "type": "boolean",
+                            "required": false,
+                            "description": "Indicates if the this query selection should append to the current selection"
                         },
                         {
                             "paramType": "form",

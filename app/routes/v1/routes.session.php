@@ -581,12 +581,12 @@ $app->post("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $m
  *     @SWG\Operation(
  *        method="PUT",
  *        nickname="QueryMapFeatures",
- *        summary="Updates the map selection according to some spatial critieria",
+ *        summary="Updates the map selection according to some spatial criteria",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map"),
  *          @SWG\parameter(name="layernames", paramType="form", required=false, type="string", description="A comma-separated list of layer names"),
- *          @SWG\parameter(name="geometry", paramType="form", required=true, type="string", description="The WKT of the intersecting geometry"),
+ *          @SWG\parameter(name="geometry", paramType="form", required=false, type="string", description="The WKT of the intersecting geometry"),
  *          @SWG\parameter(name="maxfeatures", paramType="form", required=false, type="integer", description="The maximum number features to select as a result of this operation"),
  *          @SWG\parameter(name="selectionvariant", paramType="form", required=true, type="string", description="The geometry operator to apply", enum="['TOUCHES','INTERSECTS','WITHIN','ENVELOPEINTERSECTS']"),
  *          @SWG\parameter(name="selectioncolor", paramType="form", required=false, type="string", description="The selection color"),
@@ -595,6 +595,8 @@ $app->post("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $m
  *          @SWG\parameter(name="requestdata", paramType="form", required=true, type="string", description="A bitmask specifying the information to return in the response. 1=Attributes, 2=Inline Selection, 4=Tooltip, 8=Hyperlink"),
  *          @SWG\parameter(name="featurefilter", paramType="form", required=false, type="string", description="An XML selection string containing the required feature IDs"),
  *          @SWG\parameter(name="layerattributefilter", paramType="form", required=false, type="string", description="Bitmask value determining which layers will be queried. 1=Visible, 2=Selectable, 4=HasTooltips"),
+ *          @SWG\parameter(name="selectionxml", paramType="form", required=false, type="boolean", description="Indicates if the 'featurefilter' parameter is to be treated as selection XML"),
+ *          @SWG\parameter(name="append", paramType="form", required=false, type="boolean", description="Indicates if the this query selection indicated by the 'featurefilter' parameter should append to the current selection"),
  *          @SWG\parameter(name="format", paramType="form", required=false, type="string", description="The format of the response", enum="['xml','json']")
  *        ),
  *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),

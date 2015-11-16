@@ -103,7 +103,10 @@ return array(
     "E_MISSING_REQUIRED_ADAPTER_PROPERTY" => "Missing required adapter property '%s'",
     "E_LAYER_NOT_FOUND_IN_MAP" => "No layer named (%s) found in map",
     "E_LAYER_NOT_POINTING_TO_EXPECTED_FEATURE_SOURCE" => "Layer (%s) does not point to the expected feature source of (%s). It instead points to: %s",
-    "E_UNKNOWN_PAPER_SIZE" => "Unknown paper size: %s"
+    "E_UNKNOWN_PAPER_SIZE" => "Unknown paper size: %s",
+    "E_INVALID_DOCUMENT" => "Invalid document",
+    "E_PROPERTY_NOT_FOUND_IN_CLASS" => "Property (%s) not found in class: %s",
+    "E_MULTIPLE_IDENTITY_PROPS_NOT_SUPPORTED" => "Multiple identity properties not supported"
 );
 
 ?>

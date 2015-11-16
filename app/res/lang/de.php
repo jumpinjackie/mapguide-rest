@@ -103,7 +103,10 @@ return array(
     "E_MISSING_REQUIRED_ADAPTER_PROPERTY" => "Fehlende erforderliche Adapter-Eigenschaft '%s'",
     "E_LAYER_NOT_FOUND_IN_MAP" => "Keine Ebene namens (%s) in der Karte gefunden",
     "E_LAYER_NOT_POINTING_TO_EXPECTED_FEATURE_SOURCE" => "Schicht (%s) nicht zu der erwarteten Funktion Quelle (%s) zeigen. Er verweist stattdessen auf: %s",
-    "E_UNKNOWN_PAPER_SIZE" => "Unbekannt Papierformat: %s"
+    "E_UNKNOWN_PAPER_SIZE" => "Unbekannt Papierformat: %s",
+    "E_INVALID_DOCUMENT" => "ungültigen Dokument",
+    "E_PROPERTY_NOT_FOUND_IN_CLASS" => "Immobilien (%s) nicht in der Klasse gefunden: %s",
+    "E_MULTIPLE_IDENTITY_PROPS_NOT_SUPPORTED" => "Multiple Identität Eigenschaften nicht unterstützt"
 );
 
 ?>

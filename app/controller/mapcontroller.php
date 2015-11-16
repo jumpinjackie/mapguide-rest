@@ -36,6 +36,148 @@ class MgMapController extends MgBaseController {
     const KeepSelection     = 4;
     const RenderBaseLayers  = 8;
 
+    private function TranslateToSelectionXml($siteConn, $mapName, $featFilter, $bAppend) {
+        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+        $map = new MgMap($siteConn);
+        $map->Open($mapName);
+        $sel = new MgSelection($map);
+        $layers = $map->GetLayers();
+        
+        //If appending, load the current selection first
+        if ($bAppend) {
+            $sel->Open($resSvc, $mapName);
+        }
+        
+        $doc = new DOMDocument();
+        $doc->loadXML($featFilter);
+        
+        /*
+        Document structure
+        
+        /SelectionUpdate
+            /Layer
+                /Name
+                /Feature
+                    /ID
+                        /Name
+                        /Value
+         */
+        $root = $doc->documentElement;
+        if ($root->tagName != "SelectionUpdate") {
+            $this->BadRequest($this->app->localizer->getText("E_INVALID_DOCUMENT"), MgMimeType::Xml);
+        }
+        $layerNodes = $root->childNodes;
+        for ($i = 0; $i < $layerNodes->length; $i++) {
+            $layerNode = $layerNodes->item($i);
+            if ($layerNode->tagName == "Layer") {
+                //$this->app->log->debug("Found //SelectionUpdate/Layer");
+                $featureNodes = $layerNode->childNodes;
+                for ($j = 0; $j < $featureNodes->length; $j++) {
+                    $featureNode = $featureNodes->item($j);
+                    if ($featureNode->tagName == "Name") {
+                        //$this->app->log->debug("Found //SelectionUpdate/Layer/Name");
+                        $layerName = $featureNode->nodeValue;
+                        $lidx = $layers->IndexOf($layerName);
+                        if ($lidx < 0)
+                            $this->BadRequest($this->app->localizer->getText("E_LAYER_NOT_FOUND_IN_MAP", $layerName), MgMimeType::Xml);
+
+                        $layer = $layers->GetItem($lidx);
+                        $clsDef = $layer->GetClassDefinition();
+                        $clsIdProps = $clsDef->GetIdentityProperties();
+                    } else if ($featureNode->tagName == "Feature") {
+                        //$this->app->log->debug("Found //SelectionUpdate/Layer/Feature");
+                        $idNodes = $featureNode->childNodes;
+                        if ($idNodes->length == 1) {
+                            $idNode = $idNodes->item(0);
+                            if ($idNode->tagName == "ID") {
+                                //$this->app->log->debug("Found //SelectionUpdate/Layer/Feature/ID");
+                                $nameNode = null;
+                                $valueNode = null;
+                                for ($nv = 0; $nv < $idNode->childNodes->length; $nv++) {
+                                    $children = $idNode->childNodes;
+                                    $child = $children->item($nv);
+                                    if ($child->tagName == "Name") {
+                                        //$this->app->log->debug("Found //SelectionUpdate/Layer/Feature/ID/Name");
+                                        $nameNode = $child;
+                                    } else if ($child->tagName == "Value") {
+                                        //$this->app->log->debug("Found //SelectionUpdate/Layer/Feature/ID/Value");
+                                        $valueNode = $child;
+                                    }
+                                }
+                                
+                                //Name/Value nodes must be specified
+                                if ($nameNode == null || $valueNode == null)
+                                    $this->BadRequest($this->app->localizer->getText("E_INVALID_DOCUMENT"), MgMimeType::Xml);
+
+                                //Property must exist
+                                $pidx = $clsIdProps->IndexOf($nameNode->nodeValue);
+                                if ($pidx < 0)
+                                    $this->BadRequest($this->app->localizer->getText("E_PROPERTY_NOT_FOUND_IN_CLASS", $nameNode->nodeValue, $clsDef->GetName()), MgMimeType::Xml);
+                                
+                                $propDef = $clsIdProps->GetItem($pidx);
+                                $value = $valueNode->nodeValue;
+                                $propType = $propDef->GetDataType();
+                                //$this->app->log->debug("Value is: $value");
+                                //$this->app->log->debug("Property type: $propType");
+                                switch ($propType) {
+                                    case MgPropertyType::Int16:
+                                        //$this->app->log->debug("=== ADD INT16: $value ===");
+                                        $sel->AddFeatureIdInt16($layer, $layer->GetFeatureClassName(), intval($value));
+                                        break;
+                                    case MgPropertyType::Int32:
+                                        //$this->app->log->debug("=== ADD INT32: $value ===");
+                                        $sel->AddFeatureIdInt32($layer, $layer->GetFeatureClassName(), intval($value));
+                                        break;
+                                    case MgPropertyType::Int64:
+                                        //$this->app->log->debug("=== ADD INT64: $value ===");
+                                        $sel->AddFeatureIdInt64($layer, $layer->GetFeatureClassName(), intval($value));
+                                        break;
+                                    case MgPropertyType::String:
+                                        //$this->app->log->debug("=== ADD STRING: $value ===");
+                                        $sel->AddFeatureIdString($layer, $layer->GetFeatureClassName(), $value);
+                                        break;
+                                    case MgPropertyType::Single:
+                                    case MgPropertyType::Double:
+                                        //$this->app->log->debug("=== ADD DOUBLE: $value ===");
+                                        $sel->AddFeatureIdInt64($layer, $layer->GetFeatureClassName(), floatval($value));
+                                        break;
+                                    //case MgPropertyType::DateTime:
+                                    //    break;
+                                }
+                            }
+                        } else if ($idNodes->length > 1) {
+                            throw new Exception($this->app->localizer->getText("E_MULTIPLE_IDENTITY_PROPS_NOT_SUPPORTED"));
+                        }
+                    }
+                }
+            }
+        }
+        return $sel->ToXml();
+    }
+    
+    private function AppendSelectionXml($siteConn, $mapName, $featFilter) {
+        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+        $map = new MgMap($siteConn);
+        $map->Open($mapName);
+        $sel = new MgSelection($map);
+        $sel->Open($resSvc, $mapName);
+        
+        $sel2 = new MgSelection($map, $featFilter);
+        $layers = $sel2->GetLayers();
+        if ($layers != NULL) {
+            $count = $layers->GetCount();
+            for ($i = 0; $i < $count; $i++) {
+                $layer = $layers->GetItem($i);
+                //Funnel selected features into original selection
+                $clsDef = $layer->GetClassDefinition();
+                $fr = $sel2->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), false);
+                $sel->AddFeatures($layer, $fr, 0);
+                $fr->Close();
+            }
+        }
+        return $sel->ToXml();
+    }
+
     public function QueryMapFeatures($sessionId, $mapName) {
         $layerNames = $this->app->request->params("layernames");
         $geometry = $this->app->request->params("geometry");
@@ -46,6 +188,10 @@ class MgMapController extends MgBaseController {
         $persist = $this->app->request->params("persist");
         $reqData = $this->app->request->params("requestdata");
         $featFilter = $this->app->request->params("featurefilter");
+        
+        $bSelectionXml = $this->app->request->params("selectionxml");
+        $bAppend = $this->app->request->params("append");
+        
         $layerAttFilter = $this->app->request->params("layerattributefilter");
         $format = $this->app->request->params("format");
 
@@ -74,6 +220,16 @@ class MgMapController extends MgBaseController {
             $persist = true;
         else
             $persist = ($persist == "1" || $persist == "true");
+            
+        if ($bSelectionXml == null)
+            $bSelectionXml = true;
+        else
+            $bSelectionXml = ($bSelectionXml == "1" || $bSelectionXml == "true");
+            
+        if ($bAppend == null)
+            $bAppend = true;
+        else
+            $bAppend = ($bAppend == "1" || $bAppend == "true");
 
         if ($reqData == null)
             $reqData = 0;
@@ -96,6 +252,24 @@ class MgMapController extends MgBaseController {
         } else if (intval($version[0]) == 2 && intval($version[1]) >= 6) { //2.6 or greater
             $bCanUseNative = true;
         }
+        
+        //$this->app->log->debug("APPEND: $bAppend");
+        //$this->app->log->debug("FILTER (Before): $featFilter");
+        
+        if (!$bSelectionXml) {
+            //Append only works in the absence of geometry
+            if ($geometry == null && $featFilter != null)
+                $featFilter = $this->TranslateToSelectionXml($siteConn, $mapName, $featFilter, $bAppend);
+        } else {
+            //Append only works in the absence of geometry
+            if ($geometry == null && $bAppend) {
+                $featFilter = $this->AppendSelectionXml($siteConn, $mapName, $featFilter);
+            }
+        }
+        
+        //$this->app->log->debug("GEOMETRY: $geometry");
+        //$this->app->log->debug("FILTER: $featFilter");
+        //$this->app->log->debug("Can use native: $bCanUseNative");
         if ($bCanUseNative) {
             $req = new MgHttpRequest("");
             $param = $req->GetRequestParam();
@@ -111,7 +285,7 @@ class MgMapController extends MgBaseController {
             $param->AddParameter("LAYERNAMES", $layerNames);
             $param->AddParameter("PERSIST", $persist ? "1" : "0");
             $param->AddParameter("LAYERATTRIBUTEFILTER", $layerAttFilter);
-            if ($featFilter == null)
+            if ($featFilter != null)
                 $param->AddParameter("FEATUREFILTER", $featFilter);
 
             $param->AddParameter("REQUESTDATA", $reqData);
