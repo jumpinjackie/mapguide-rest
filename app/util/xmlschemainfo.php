@@ -364,7 +364,13 @@ class MgXmlSchemaInfo
         "/GroupCollection/Group/DisplayInLegend" => self::XML_DATA_TYPE_BOOLEAN,
         "/GroupCollection/Group/ExpandInLegend" => self::XML_DATA_TYPE_BOOLEAN,
         "/GroupCollection/Group/Visible" => self::XML_DATA_TYPE_BOOLEAN,
-        "/GroupCollection/Group/ActuallyVisible" => self::XML_DATA_TYPE_BOOLEAN
+        "/GroupCollection/Group/ActuallyVisible" => self::XML_DATA_TYPE_BOOLEAN,
+        "/UpdateMapResult/AddedLayers" => self::XML_DATA_TYPE_NUMBER,
+        "/UpdateMapResult/UpdatedLayers" => self::XML_DATA_TYPE_NUMBER,
+        "/UpdateMapResult/RemovedLayers" => self::XML_DATA_TYPE_NUMBER,
+        "/UpdateMapResult/AddedGroups" => self::XML_DATA_TYPE_NUMBER,
+        "/UpdateMapResult/UpdatedGroups" => self::XML_DATA_TYPE_NUMBER,
+        "/UpdateMapResult/RemovedGroups" => self::XML_DATA_TYPE_NUMBER,
     );
 
     //This is the definitive list of XML element paths where the leaf element can exist in multiples (according to its respective)

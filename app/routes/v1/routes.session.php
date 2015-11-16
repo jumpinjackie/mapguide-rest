@@ -439,6 +439,49 @@ $app->get("/session/:sessionId/:mapName.Map/description.:format", function($sess
 });
 /**
  * @SWG\Api(
+ *     path="/session/{session}/{mapName}.Selection/layersandgroups",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="UpdateMapLayersAndGroups",
+ *        summary="Update the layers and groups of the runtime map",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->put("/session/:sessionId/:mapName.Map/layersandgroups", function($sessionId, $mapName) use ($app) {
+    $ctrl = new MgMapController($app);
+    $ctrl->UpdateMapLayersAndGroups($sessionId, $mapName, "xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{mapName}.Selection/layersandgroups.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="UpdateMapLayersAndGroups",
+ *        summary="Update the layers and groups of the runtime map",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->put("/session/:sessionId/:mapName.Map/layersandgroups.:format", function($sessionId, $mapName, $format) use ($app) {
+    $ctrl = new MgMapController($app);
+    $ctrl->UpdateMapLayersAndGroups($sessionId, $mapName, $format);
+});
+/**
+ * @SWG\Api(
  *     path="/session/{session}/{mapName}.Selection/xml",
  *     @SWG\Operation(
  *        method="GET",
@@ -595,7 +638,7 @@ $app->post("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $m
  *          @SWG\parameter(name="requestdata", paramType="form", required=true, type="string", description="A bitmask specifying the information to return in the response. 1=Attributes, 2=Inline Selection, 4=Tooltip, 8=Hyperlink"),
  *          @SWG\parameter(name="featurefilter", paramType="form", required=false, type="string", description="An XML selection string containing the required feature IDs"),
  *          @SWG\parameter(name="layerattributefilter", paramType="form", required=false, type="string", description="Bitmask value determining which layers will be queried. 1=Visible, 2=Selectable, 4=HasTooltips"),
- *          @SWG\parameter(name="selectionxml", paramType="form", required=false, type="boolean", description="Indicates if the 'featurefilter' parameter is to be treated as selection XML"),
+ *          @SWG\parameter(name="selectionxml", paramType="form", required=false, type="boolean", description="Indicates if the 'featurefilter' parameter is to be treated as selection XML. Otherwise the input is treated as a SelectionUpdate XML document"),
  *          @SWG\parameter(name="append", paramType="form", required=false, type="boolean", description="Indicates if the this query selection indicated by the 'featurefilter' parameter should append to the current selection"),
  *          @SWG\parameter(name="format", paramType="form", required=false, type="string", description="The format of the response", enum="['xml','json']")
  *        ),

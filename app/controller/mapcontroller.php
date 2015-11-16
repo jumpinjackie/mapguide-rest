@@ -179,6 +179,7 @@ class MgMapController extends MgBaseController {
     }
 
     public function QueryMapFeatures($sessionId, $mapName) {
+        //TODO: Append only works in featurefilter mode. Add append support for geometry-based selections
         $layerNames = $this->app->request->params("layernames");
         $geometry = $this->app->request->params("geometry");
         $maxFeatures = $this->app->request->params("maxfeatures");
@@ -798,6 +799,196 @@ class MgMapController extends MgBaseController {
         $selection->FromXml($xml);
 
         $selection->Save($resSvc, $mapName);
+    }
+    
+    public function UpdateMapLayersAndGroups($sessionId, $mapName, $format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        
+        $this->EnsureAuthenticationForSite($sessionId);
+        $siteConn = new MgSiteConnection();
+        $siteConn->Open($this->userInfo);
+
+        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+
+        $map = new MgMap($siteConn);
+        $map->Open($mapName);
+        
+        if ($fmt == "json") {
+            $body = $this->app->request->getBody();
+            $json = json_decode($body);
+            if ($json == NULL)
+                throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+        } else {
+            $body = $this->app->request->getBody();
+            $jsonStr = MgUtils::Xml2Json($body);
+            $json = json_decode($jsonStr);
+        }
+        
+        if (!isset($json->UpdateMap)) {
+            throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+        }
+        
+        /*
+        Expected structure
+        
+        /UpdateMap
+            /Operation [1...n]
+                /[AddLayer|UpdateLayer|RemoveLayer|AddGroup|UpdateGroup|RemoveGroup]
+         */
+        
+        $layers = $map->GetLayers();
+        $groups = $map->GetLayerGroups();
+        
+        $um = $json->UpdateMap;
+        $updateStats = new stdClass();
+        $updateStats->AddedLayers = 0;
+        $updateStats->UpdatedLayers = 0;
+        $updateStats->RemovedLayers = 0;
+        $updateStats->AddedGroups = 0;
+        $updateStats->UpdatedGroups = 0;
+        $updateStats->RemovedGroups = 0;
+        
+        for ($i = 0; $i < count($um->Operations); $i++) {
+            $op = $um->Operations[$i];
+            if (isset($op->AddLayer)) {
+                $resId = new MgResourceIdentifier($op->AddLayer->ResourceId);
+                $layer = new MgLayer($resId, $resSvc);
+                $layer->SetName($op->AddLayer->Name);
+                ApplyCommonLayerProperties($layer, $op->AddLayer, $groups);
+                if (isset($op->AddLayer->InsertAt)) {
+                    $layers->Insert(intval($op->AddLayer->InsertAt), $layer);
+                } else {
+                    $layers->Add($layer);
+                }
+                
+                $updateStats->AddedLayers++;
+            } else if (isset($op->UpdateLayer)) {
+                $layer = $layers->GetItem($op->UpdateLayer->Name);
+                
+                if (ApplyCommonLayerProperties($layer, $op->UpdateLayer, $groups))
+                    $updateStats->UpdatedLayers++;
+            } else if (isset($op->RemoveLayer)) {
+                $layer = $layers->GetItem($op->RemoveLayer->Name);
+                
+                if ($layers->Remove($layer))
+                    $updateStats->RemovedLayers++;
+            } else if (isset($op->AddGroup)) {
+                $group = new MgLayerGroup();
+                $group->SetName($op->AddGroup->Name);
+                ApplyCommonGroupProperties($group, $op->AddGroup, $groups);
+                
+                $updateStats->AddedGroups++;
+            } else if (isset($op->UpdateGroup)) {
+                $group = $groups->GetItem($op->UpdateGroup->Name);
+                
+                if (ApplyCommonGroupProperties($group, $op->UpdateGroup, $groups))
+                    $updateStats->UpdatedGroups++;
+            } else if (isset($op->RemoveGroup)) {
+                $group = $groups->GetItem($op->UpdateGroup->Name);
+                
+                if ($groups->Remove($group))
+                    $updateStats->RemovedGroups++;
+            }
+        }
+        
+        $response = "<UpdateMapResult>";
+        $response .= "<AddedLayers>";
+        $response .= $updateStats->AddedLayers;
+        $response .= "</AddedLayers>";
+        $response .= "<UpdatedLayers>";
+        $response .= $updateStats->UpdatedLayers;
+        $response .= "</UpdatedLayers>";
+        $response .= "<RemovedLayers>";
+        $response .= $updateStats->RemovedLayers;
+        $response .= "</RemovedLayers>";
+        $response .= "<AddedGroups>";
+        $response .= $updateStats->AddedGroups;
+        $response .= "</AddedGroups>";
+        $response .= "<UpdatedGroups>";
+        $response .= $updateStats->UpdatedGroups;
+        $response .= "</UpdatedGroups>";
+        $response .= "<RemovedGroups>";
+        $response .= $updateStats->RemovedGroups;
+        $response .= "</RemovedGroups>";
+        $response .= "</UpdateMapResult>";
+        
+        $bs = new MgByteSource($response, strlen($response));
+        $bs->SetMimeType(MgMimeType::Xml);
+        $br = $bs->GetReader();
+        if ($format == "json") {
+            $this->OutputXmlByteReaderAsJson($br);
+        } else {
+            $this->OutputByteReader($br);
+        }
+    }
+    
+    static function ApplyCommonProperties($obj, $op, $groups) {
+        $bChanged = false;
+        if (isset($op->SetDisplayInLegend)) {
+            $ov = $obj->GetDisplayInLegend();
+            $nv = MgUtils::StringToBoolean($op->SetDisplayInLegend);
+            if ($ov != $nv) {
+                $obj->SetDisplayInLegend($nv);
+                $bChanged = true;
+            }
+        }
+        if (isset($op->SetGroup)) {
+            $oGroup = $obj->GetGroup();
+            if ($oGroup == null) {
+                $parent = $groups->GetItem($op->SetGroup);
+                $obj->SetGroup($parent);
+                $bChanged = true;
+            } else {
+                $parent = $groups->GetItem($op->SetGroup);
+                if ($parent->GetObjectId() != $oGroup->GetObjectId()) {
+                    $obj->SetGroup($parent);
+                    $bChanged = true;
+                }
+            }
+        }
+        if (isset($op->SetLegendLabel)) {
+            $ov = $obj->GetLegendLabel();
+            if ($ov != $op->SetLegendLabel) {
+                $obj->SetLegendLabel($op->SetLegendLabel);
+                $bChanged = true;
+            }
+        }
+        if (isset($op->SetVisible)) {
+            $ov = $obj->GetVisible();
+            $nv = MgUtils::StringToBoolean($op->SetVisible);
+            if ($ov != $nv) {
+                $obj->SetVisible($nv);
+                $bChanged = true;
+            }
+        }
+        return $bChanged;
+    }
+    
+    static function ApplyCommonGroupProperties($group, $op, $groups) {
+        $bChanged = ApplyCommonProperties($layer, $op, $groups);
+        if (isset($op->SetExpandInLegend)) {
+            $ov = $group->GetExpandInLegend();
+            $nv = MgUtils::StringToBoolean($op->SetExpandInLegend);
+            if ($ov != $nv) {
+                $obj->SetExpandInLegend($nv);
+                $bChanged = true;
+            }
+        }
+        return $bChanged;
+    }
+    
+    static function ApplyCommonLayerProperties($layer, $op, $groups) {
+        $bChanged = ApplyCommonProperties($layer, $op, $groups);
+        if (isset($op->SetSelectable)) {
+            $ov = $layer>GetSelectable();
+            $nv = MgUtils::StringToBoolean($op->SetSelectable);
+            if ($ov != $nv) {
+                $obj->SetSelectable($nv);
+                $bChanged = true;
+            }
+        }
+        return $bChanged;
     }
 }
 
