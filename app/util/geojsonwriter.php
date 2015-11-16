@@ -143,8 +143,18 @@ class MgGeoJsonWriter
                 }
             case MgGeometryType::MultiPoint:
                 {
-                    $coords = $geom->GetCoordinates();
-                    return $prefix.'{ "type": "MultiPoint", "coordinates": '.self::CoordsToGeoJson($coords)." }";
+                    $strCoords = "";
+                    $count = $geom->GetCount();
+                    $bFirst = true;
+                    for ($i = 0; $i < $count; $i++) {
+                        if (!$bFirst)
+                            $strCoords .= ",";
+                        $pt = $geom->GetPoint($i);
+                        $coord = $pt->GetCoordinate();
+                        $strCoords .= self::CoordToGeoJson($coord);
+                        $bFirst = false;
+                    }
+                    return $prefix.'{ "type": "MultiPoint", "coordinates": ['.$strCoords.'] }';
                 }
             case MgGeometryType::MultiLineString:
                 {
