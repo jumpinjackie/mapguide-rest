@@ -9932,7 +9932,7 @@
                     });
                 }
             });
-            test("Layer/Group Modification", function() {
+            test("Layer/Group Modification (XML)", function() {
                 var reqFeatures = (1|2|4);
                 var anonMapName = null;
                 var adminMapName = null;
@@ -10109,10 +10109,10 @@
                 var cls = "SHP_Schema:Trees";
                 var geom = "SHPGEOM";
                 //Insert a session-based layer
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Trees.LayerDefinition", "POST", createLayerXml(fsId, cls, geom), function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Trees.LayerDefinition/content.xml", "POST", createLayerXml(fsId, cls, geom), function(status, result, mimeType) {
                     self.ok(status == 201, "(" + status + ") - Expected created status");
                 });
-                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Trees.LayerDefinition", "POST", createLayerXml(fsId, cls, geom), function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Trees.LayerDefinition/content.xml", "POST", createLayerXml(fsId, cls, geom), function(status, result, mimeType) {
                     self.ok(status == 201, "(" + status + ") - Expected created status");
                 });
                 var anonTreesXml = createInsertLayerXml("Trees", "Session:" + this.anonymousSessionId + "//Trees.LayerDefinition", "Trees (Session-based)", true, false, true);
@@ -10124,6 +10124,275 @@
                 api_test(rest_root_url + "/session/" + this.adminSessionId + "/" + adminMapName + ".Map/layersandgroups.xml", "PUT", adminTreesXml, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Expected OK status");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                //Verify by re-querying layer structure
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/" + anonMapName + ".Map/description.json", "GET", { requestedfeatures: reqFeatures }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    var map = JSON.parse(result).RuntimeMap;
+                    var bFoundTrees = false;
+                    var bFoundGroup = false;
+                    for (var i = 0; i < map.Group.length; i++) {
+                        if (map.Group[i].Name == "Session-based Layers") {
+                            bFoundGroup = true;
+                            self.ok(map.Group[i].Visible == true, "Expected group Visible = true");
+                            self.ok(map.Group[i].ExpandInLegend == true, "Expected group ExpandInLegend = true");
+                            self.ok(map.Group[i].DisplayInLegend == true, "Expected group DisplayInLegend = true");
+                            self.ok(map.Group[i].LegendLabel == "Session Layers", "Expected group label: Session Layers");
+                        }
+                    }
+                    for (var i = 0; i < map.Layer.length; i++) {
+                        if (map.Layer[i].Name == "Trees") {
+                            bFoundTrees = true;
+                            self.ok(map.Layer[i].Visible == true, "Expected layer Visible = true");
+                            self.ok(map.Layer[i].Selectable == false, "Expected layer Selectable = false");
+                            self.ok(map.Layer[i].DisplayInLegend == true, "Expected layer DisplayInLegend = true");
+                            self.ok(map.Layer[i].LegendLabel == "Trees (Session-based)", "Expected layer label: Trees (Session-based)");
+                        }
+                    }
+                    self.ok(bFoundGroup, "Expected 'Session-based Layers' group to be added");
+                    self.ok(bFoundTrees, "Expected 'Trees' layer to be re-added");
+                });
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/" + adminMapName + ".Map/description.json", "GET", { requestedfeatures: reqFeatures }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    var map = JSON.parse(result).RuntimeMap;
+                    var bFoundTrees = false;
+                    var bFoundGroup = false;
+                    for (var i = 0; i < map.Group.length; i++) {
+                        if (map.Group[i].Name == "Session-based Layers") {
+                            bFoundGroup = true;
+                            self.ok(map.Group[i].Visible == true, "Expected group Visible = true");
+                            self.ok(map.Group[i].ExpandInLegend == true, "Expected group ExpandInLegend = true");
+                            self.ok(map.Group[i].DisplayInLegend == true, "Expected group DisplayInLegend = true");
+                            self.ok(map.Group[i].LegendLabel == "Session Layers", "Expected group label: Session Layers");
+                        }
+                    }
+                    for (var i = 0; i < map.Layer.length; i++) {
+                        if (map.Layer[i].Name == "Trees") {
+                            bFoundTrees = true;
+                            self.ok(map.Layer[i].Visible == false, "Expected layer Visible = false");
+                            self.ok(map.Layer[i].Selectable == true, "Expected layer Selectable = true");
+                            self.ok(map.Layer[i].DisplayInLegend == false, "Expected layer DisplayInLegend = false");
+                            self.ok(map.Layer[i].LegendLabel == "Trees (Session-based)", "Expected layer label: Trees (Session-based)");
+                        }
+                    }
+                    self.ok(bFoundGroup, "Expected 'Session-based Layers' group to be added");
+                    self.ok(bFoundTrees, "Expected 'Trees' layer to be re-added");
+                });
+            });
+            test("Layer/Group Modification (JSON)", function() {
+                var reqFeatures = (1|2|4);
+                var anonMapName = null;
+                var adminMapName = null;
+                
+                function createLayerJson(fsId, className, geom) {
+                    return {
+                        "LayerDefinition": {
+                            "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                            "@version": "1.0.0",
+                            "@xsi:noNamespaceSchemaLocation": "LayerDefinition-1.0.0.xsd",
+                            "VectorLayerDefinition": {
+                                "ResourceId": fsId,
+                                "FeatureName": className,
+                                "FeatureNameType": "FeatureClass",
+                                "Geometry": geom,
+                                "VectorScaleRange": [
+                                    {
+                                        "PointTypeStyle": {
+                                            "DisplayAsText": false,
+                                            "AllowOverpost": false,
+                                            "PointRule": [
+                                                {
+                                                    "LegendLabel": null,
+                                                    "PointSymbolization2D": {
+                                                        "Mark": {
+                                                            "Unit": "Points",
+                                                            "SizeContext": "DeviceUnits",
+                                                            "SizeX": "10",
+                                                            "SizeY": "10",
+                                                            "Rotation": "0",
+                                                            "Shape": "Square",
+                                                            "Fill": {
+                                                                "FillPattern": "Solid",
+                                                                "ForegroundColor": "ffffffff",
+                                                                "BackgroundColor": "ffffffff"
+                                                            },
+                                                            "Edge": {
+                                                                "LineStyle": "Solid",
+                                                                "Thickness": "1",
+                                                                "Color": "ff000000",
+                                                                "Unit": "Points"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "LineTypeStyle": {
+                                            "LineRule": [
+                                                {
+                                                    "LegendLabel": null,
+                                                    "LineSymbolization2D": [
+                                                        {
+                                                            "LineStyle": "Solid",
+                                                            "Thickness": "1",
+                                                            "Color": "ff000000",
+                                                            "Unit": "Points"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "AreaTypeStyle": {
+                                            "AreaRule": [
+                                                {
+                                                    "LegendLabel": null,
+                                                    "AreaSymbolization2D": {
+                                                        "Fill": {
+                                                            "FillPattern": "Solid",
+                                                            "ForegroundColor": "ffffffff",
+                                                            "BackgroundColor": "ffffffff"
+                                                        },
+                                                        "Stroke": {
+                                                            "LineStyle": "Solid",
+                                                            "Thickness": "1",
+                                                            "Color": "ff000000",
+                                                            "Unit": "Points"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    };
+                }
+                
+                function createModificationJson() {
+                    return {
+                        "UpdateMap": {
+                            "Operation": [
+                                {
+                                    "Type": "RemoveLayer",
+                                    "Name": "Trees"
+                                },
+                                {
+                                    "Type": "RemoveGroup",
+                                    "Name": "Base Map"
+                                }
+                            ]
+                        }
+                    };
+                }
+                
+                function createInsertLayerJson(name, ldfId, label, bVisible, bSelectable, bShowInLegend) {
+                    return {
+                        "UpdateMap": {
+                            "Operation": [
+                                {
+                                    "Type": "AddGroup",
+                                    "Name": "Session-based Layers",
+                                    "SetExpandInLegend": true,
+                                    "SetDisplayInLegend": true,
+                                    "SetVisible": true,
+                                    "SetLegendLabel": "Session Layers"
+                                },
+                                {
+                                    "Type": "AddLayer",
+                                    "Name": name,
+                                    "ResourceId": ldfId,
+                                    "SetLegendLabel": label,
+                                    "SetSelectable": bSelectable,
+                                    "SetVisible": bVisible,
+                                    "SetDisplayInLegend": bShowInLegend,
+                                    "SetGroup": "Session-based Layers"
+                                }
+                            ]
+                        }
+                    };
+                }
+
+                api_test(rest_root_url + "/services/createmap.json", "POST", { session: this.anonymousSessionId, requestedfeatures: reqFeatures, mapdefinition: "Library://Samples/Sheboygan/Maps/Sheboygan.MapDefinition" }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    var map = JSON.parse(result);
+                    anonMapName = map.RuntimeMap.Name;
+                });
+                api_test(rest_root_url + "/services/createmap.json", "POST", { session: this.adminSessionId, requestedfeatures: reqFeatures, mapdefinition: "Library://Samples/Sheboygan/Maps/Sheboygan.MapDefinition" }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    var map = JSON.parse(result);
+                    adminMapName = map.RuntimeMap.Name;
+                });
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/" + anonMapName + ".Map/layersandgroups.json", "PUT", JSON.stringify(createModificationJson()), function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/" + adminMapName + ".Map/layersandgroups.json", "PUT", JSON.stringify(createModificationJson()), function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+                //Verify by re-querying layer structure
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/" + anonMapName + ".Map/description.json", "GET", { requestedfeatures: reqFeatures }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    var map = JSON.parse(result).RuntimeMap;
+                    var bGroupRemoved = true;
+                    var bLayerRemoved = true;
+                    for (var i = 0; i < map.Group.length; i++) {
+                        if (map.Group[i].Name == "Base Map") {
+                            bGroupRemoved = false;
+                        }
+                    }
+                    for (var i = 0; i < map.Layer.length; i++) {
+                        if (map.Layer[i].Name == "Trees") {
+                            bLayerRemoved = false;
+                        }
+                    }
+                    self.ok(bGroupRemoved, "Expected 'Base Map' group to be removed");
+                    self.ok(bLayerRemoved, "Expected 'Trees' layer to be removed");
+                });
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/" + adminMapName + ".Map/description.json", "GET", { requestedfeatures: reqFeatures }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    var map = JSON.parse(result).RuntimeMap;
+                    var bGroupRemoved = true;
+                    var bLayerRemoved = true;
+                    for (var i = 0; i < map.Group.length; i++) {
+                        if (map.Group[i].Name == "Base Map") {
+                            bGroupRemoved = false;
+                        }
+                    }
+                    for (var i = 0; i < map.Layer.length; i++) {
+                        if (map.Layer[i].Name == "Trees") {
+                            bLayerRemoved = false;
+                        }
+                    }
+                    self.ok(bGroupRemoved, "Expected 'Base Map' group to be removed");
+                    self.ok(bLayerRemoved, "Expected 'Trees' layer to be removed");
+                });
+                var fsId = "Library://Samples/Sheboygan/Data/Trees.FeatureSource";
+                var cls = "SHP_Schema:Trees";
+                var geom = "SHPGEOM";
+                //Insert a session-based layer
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Trees.LayerDefinition/content.json", "POST", JSON.stringify(createLayerJson(fsId, cls, geom)), function(status, result, mimeType) {
+                    self.ok(status == 201, "(" + status + ") - Expected created status");
+                });
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Trees.LayerDefinition/content.json", "POST", JSON.stringify(createLayerJson(fsId, cls, geom)), function(status, result, mimeType) {
+                    self.ok(status == 201, "(" + status + ") - Expected created status");
+                });
+                var anonTreesJson = createInsertLayerJson("Trees", "Session:" + this.anonymousSessionId + "//Trees.LayerDefinition", "Trees (Session-based)", true, false, true);
+                var adminTreesJson = createInsertLayerJson("Trees", "Session:" + this.adminSessionId + "//Trees.LayerDefinition", "Trees (Session-based)", false, true, false);
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/" + anonMapName + ".Map/layersandgroups.json", "PUT", JSON.stringify(anonTreesJson), function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/" + adminMapName + ".Map/layersandgroups.json", "PUT", JSON.stringify(adminTreesJson), function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
                 });
                 //Verify by re-querying layer structure
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/" + anonMapName + ".Map/description.json", "GET", { requestedfeatures: reqFeatures }, function(status, result, mimeType) {

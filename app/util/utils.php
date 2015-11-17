@@ -456,7 +456,13 @@ class MgUtils
             } else {
                 //$xml .= "<!--- START VALUE -->" . self::DEBUG_NEWLINE();
                 $xml .= "<$nodeName>" . self::DEBUG_NEWLINE();
-                $xml .= self::EscapeXmlChars(strval($value));
+                if ($value === true) {
+                    $xml .= "true";
+                } else if ($value === false) {
+                    $xml .= "false";
+                } else {
+                    $xml .= self::EscapeXmlChars(strval($value));
+                }
                 //$xml .= "<!--- END VALUE -->" . self::DEBUG_NEWLINE();
                 $xml .= "</$nodeName>" . self::DEBUG_NEWLINE();
             }

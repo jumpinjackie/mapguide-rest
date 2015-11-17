@@ -654,16 +654,15 @@ $app->put("/session/:sessionId/:mapName.Selection", function($sessionId, $mapNam
 });
 /**
  * @SWG\Api(
- *     path="/session/{session}/{resName}",
+ *     path="/session/{session}/{mapName}.Map",
  *     @SWG\Operation(
  *        method="POST",
- *        nickname="SetResource",
- *        summary="Sets the resource XML for a session-based resource",
+ *        nickname="CreateMap",
+ *        summary="Creates the runtime map",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The name of the session resource (including extension)"),
- *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The new selection XML")
+ *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The Map Definition XML")
  *        ),
  *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
@@ -671,17 +670,11 @@ $app->put("/session/:sessionId/:mapName.Selection", function($sessionId, $mapNam
  *     )
  *   )
  */
-$app->post("/session/:sessionId/:resName", function($sessionId, $resName) use($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    if ($resId->GetResourceType() == MgResourceType::Map) {
-        $ctrl = new MgMapController($app);
-        $ctrl->CreateMap($resId);
-    } else {
-        $ctrl = new MgResourceServiceController($app);
-        $ctrl->SetResource($resId);
-    }
+$app->post("/session/:sessionId/:resName.Map", function($sessionId, $resName) use($app) {
+    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.Map");
+    $ctrl = new MgMapController($app);
+    $ctrl->CreateMap($resId);
 })->name("session_resource_id");
-
 //
 // NOTE:
 // Although the session repository allows for resources of multiple depth, for the sake of simplicity the REST API only
@@ -1644,7 +1637,7 @@ $app->post("/session/:sessionId/:resName/content", function($sessionId, $resName
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The resource name (including extension)"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The resource XML content")
  *        ),
  *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),

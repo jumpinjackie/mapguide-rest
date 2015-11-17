@@ -867,7 +867,7 @@ class MgMapController extends MgBaseController {
                         $resId = new MgResourceIdentifier($op->ResourceId);
                         $layer = new MgLayer($resId, $resSvc);
                         $layer->SetName($op->Name);
-                        ApplyCommonLayerProperties($layer, $op, $groups);
+                        self::ApplyCommonLayerProperties($layer, $op, $groups);
                         if (isset($op->InsertAt)) {
                             $layers->Insert(intval($op->InsertAt), $layer);
                         } else {
@@ -881,7 +881,7 @@ class MgMapController extends MgBaseController {
                     {
                         $layer = $layers->GetItem($op->Name);
                         
-                        if (ApplyCommonLayerProperties($layer, $op, $groups)) {
+                        if (self::ApplyCommonLayerProperties($layer, $op, $groups)) {
                             $this->app->log->debug("Updated Layer: ".$op->Name);
                             $updateStats->UpdatedLayers++;
                         }
@@ -898,9 +898,8 @@ class MgMapController extends MgBaseController {
                     break;
                     case "AddGroup": 
                     {
-                        $group = new MgLayerGroup();
-                        $group->SetName($op->Name);
-                        ApplyCommonGroupProperties($group, $op, $groups);
+                        $group = new MgLayerGroup($op->Name);
+                        self::ApplyCommonGroupProperties($group, $op, $groups);
                         if (isset($op->InsertAt)) {
                             $groups->Insert(intval($op->InsertAt), $group);
                         } else {
@@ -914,7 +913,7 @@ class MgMapController extends MgBaseController {
                     {
                         $group = $groups->GetItem($op->Name);
                         
-                        if (ApplyCommonGroupProperties($group, $op, $groups)) {
+                        if (self::ApplyCommonGroupProperties($group, $op, $groups)) {
                             $this->app->log->debug("Updated Group: ".$op->Name);
                             $updateStats->UpdatedGroups++;
                         }
@@ -980,7 +979,7 @@ class MgMapController extends MgBaseController {
         $bChanged = false;
         if (isset($op->SetDisplayInLegend)) {
             $ov = $obj->GetDisplayInLegend();
-            $nv = MgUtils::StringToBoolean($op->SetDisplayInLegend);
+            $nv = MgUtils::StringToBool($op->SetDisplayInLegend);
             if ($ov != $nv) {
                 $obj->SetDisplayInLegend($nv);
                 $bChanged = true;
@@ -1009,7 +1008,7 @@ class MgMapController extends MgBaseController {
         }
         if (isset($op->SetVisible)) {
             $ov = $obj->GetVisible();
-            $nv = MgUtils::StringToBoolean($op->SetVisible);
+            $nv = MgUtils::StringToBool($op->SetVisible);
             if ($ov != $nv) {
                 $obj->SetVisible($nv);
                 $bChanged = true;
@@ -1019,12 +1018,12 @@ class MgMapController extends MgBaseController {
     }
     
     static function ApplyCommonGroupProperties($group, $op, $groups) {
-        $bChanged = ApplyCommonProperties($layer, $op, $groups);
+        $bChanged = self::ApplyCommonProperties($group, $op, $groups);
         if (isset($op->SetExpandInLegend)) {
             $ov = $group->GetExpandInLegend();
-            $nv = MgUtils::StringToBoolean($op->SetExpandInLegend);
+            $nv = MgUtils::StringToBool($op->SetExpandInLegend);
             if ($ov != $nv) {
-                $obj->SetExpandInLegend($nv);
+                $group->SetExpandInLegend($nv);
                 $bChanged = true;
             }
         }
@@ -1032,12 +1031,12 @@ class MgMapController extends MgBaseController {
     }
     
     static function ApplyCommonLayerProperties($layer, $op, $groups) {
-        $bChanged = ApplyCommonProperties($layer, $op, $groups);
+        $bChanged = self::ApplyCommonProperties($layer, $op, $groups);
         if (isset($op->SetSelectable)) {
-            $ov = $layer>GetSelectable();
-            $nv = MgUtils::StringToBoolean($op->SetSelectable);
+            $ov = $layer->GetSelectable();
+            $nv = MgUtils::StringToBool($op->SetSelectable);
             if ($ov != $nv) {
-                $obj->SetSelectable($nv);
+                $layer->SetSelectable($nv);
                 $bChanged = true;
             }
         }
