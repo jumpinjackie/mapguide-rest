@@ -911,11 +911,27 @@ class MgMapController extends MgBaseController {
                     break;
                     case "UpdateGroup": 
                     {
-                        $group = $groups->GetItem($op->Name);
-                        
-                        if (self::ApplyCommonGroupProperties($group, $op, $groups)) {
-                            $this->app->log->debug("Updated Group: ".$op->Name);
-                            $updateStats->UpdatedGroups++;
+                        $gidx = $groups->IndexOf($op->Name);
+                        if ($gidx < 0) {
+                            if ($op->AddIfNotExists) {
+                                $group = new MgLayerGroup($op->Name);
+                                self::ApplyCommonGroupProperties($group, $op, $groups);
+                                if (isset($op->InsertAt)) {
+                                    $groups->Insert(intval($op->InsertAt), $group);
+                                } else {
+                                    $groups->Add($group);
+                                }
+                                $this->app->log->debug("Add Group: ".$op->Name);
+                                $updateStats->AddedGroups++;
+                            } else {
+                                throw new Exception($this->app->localizer->getText("E_GROUP_NOT_FOUND",$op->Name));
+                            }
+                        } else {
+                            $group = $groups->GetItem($gidx);
+                            if (self::ApplyCommonGroupProperties($group, $op, $groups)) {
+                                $this->app->log->debug("Updated Group: ".$op->Name);
+                                $updateStats->UpdatedGroups++;
+                            }
                         }
                     }
                     break;

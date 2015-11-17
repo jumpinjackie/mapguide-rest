@@ -6,13 +6,13 @@
 
 function Legend(options)
 {
-    var rtMapInfo = options.runtimeMap;
     var legendSelector = options.legendSelector;
     this.map = options.map;
     this.mgLayer = options.mgLayerOL;
     this.mgTiledLayers = options.mgTiledLayers || {};
     this.debug = false;
 
+    var rtMapInfo = options.runtimeMap;
     this.dpi = rtMapInfo.RuntimeMap.DisplayDpi;
     this.inPerUnit = rtMapInfo.RuntimeMap.CoordinateSystem.MetersPerUnit * 39.37;
 
@@ -25,7 +25,43 @@ function Legend(options)
     
     this.map.getView().on("change:resolution", this.update, this);
     
+    this.updateLayersAndGroups(rtMapInfo);
+    
+    //$("input.group-checkbox", this.rootEl).change(function() {
+    this.rootEl.on("change", "input.group-checkbox", function() {
+        var el = $(this);
+        var bShow = el.is(":checked");
+        if (el.attr("data-is-tiled") == "true") {
+            var name = el.attr("data-group-name");
+            if (typeof(_self.mgTiledLayers[name]) != 'undefined') {
+                _self.mgTiledLayers[name].setVisible(bShow);
+            }
+        } else {
+            var objId = el.val();
+            _self.showGroup(objId, bShow);
+        }
+    });
+    
+    //$("input.layer-checkbox", this.rootEl).change(function() {
+    this.rootEl.on("change", "input.layer-checkbox", function() {
+        var el = $(this);
+        var bShow = el.is(":checked");
+        var objId = el.val();
+        _self.showLayer(objId, bShow);
+    });
+    
+    this.req = {
+        showgroups: null,
+        showlayers: null,
+        hidegroups: null,
+        hidelayers: null
+    };
+}
+
+Legend.prototype.updateLayersAndGroups = function(rtMapInfo) {
+    this.mapInfo = rtMapInfo;
     var groupElMap = {};
+    this.rootEl.empty();
     if (rtMapInfo.RuntimeMap.Group) {
         var remainingGroups = {};
         //1st pass, un-parented groups
@@ -80,41 +116,17 @@ function Legend(options)
             }
         }
     }
-    
-    $("input.group-checkbox", this.rootEl).change(function() {
-        var el = $(this);
-        var bShow = el.is(":checked");
-        if (el.attr("data-is-tiled") == "true") {
-            var name = el.attr("data-group-name");
-            if (typeof(_self.mgTiledLayers[name]) != 'undefined') {
-                _self.mgTiledLayers[name].setVisible(bShow);
-            }
-        } else {
-            var objId = el.val();
-            _self.showGroup(objId, bShow);
-        }
-    });
-    
-    $("input.layer-checkbox", this.rootEl).change(function() {
-        var el = $(this);
-        var bShow = el.is(":checked");
-        var objId = el.val();
-        _self.showLayer(objId, bShow);
-    });
-    
-    this.req = {
-        showgroups: null,
-        showlayers: null,
-        hidegroups: null,
-        hidelayers: null
-    };
-}
+};
 
 Legend.prototype.resetRequest = function() {
     this.req.showgroups = null;
     this.req.showlayers = null;
     this.req.hidegroups = null;
     this.req.hidelayers = null;
+};
+
+Legend.prototype.refreshLayer = function() {
+    this.mgLayer.getSource().updateParams({ seq: (new Date()).getTime() });
 };
 
 Legend.prototype.updateMgLayer_ = function() {

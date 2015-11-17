@@ -265,7 +265,7 @@
             legend.update();
             
             //Setup click handler
-            map.on("singleclick", onMapClick);
+            map.on("click", onMapClick);
         }
         
         function onMapClick(e) {
@@ -379,6 +379,248 @@
             });
         }
         
+        function createLayerDefJson(fsId, className, geom, color) {
+            return {
+                "LayerDefinition": {
+                    "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                    "@version": "1.0.0",
+                    "@xsi:noNamespaceSchemaLocation": "LayerDefinition-1.0.0.xsd",
+                    "VectorLayerDefinition": {
+                        "ResourceId": fsId,
+                        "FeatureName": className,
+                        "FeatureNameType": "FeatureClass",
+                        "Geometry": geom,
+                        "VectorScaleRange": [
+                            {
+                                "PointTypeStyle": {
+                                    "DisplayAsText": false,
+                                    "AllowOverpost": false,
+                                    "PointRule": [
+                                        {
+                                            "LegendLabel": null,
+                                            "PointSymbolization2D": {
+                                                "Mark": {
+                                                    "Unit": "Points",
+                                                    "SizeContext": "DeviceUnits",
+                                                    "SizeX": "10",
+                                                    "SizeY": "10",
+                                                    "Rotation": "0",
+                                                    "Shape": "Square",
+                                                    "Fill": {
+                                                        "FillPattern": "Solid",
+                                                        "ForegroundColor": "ffffffff",
+                                                        "BackgroundColor": "ffffffff"
+                                                    },
+                                                    "Edge": {
+                                                        "LineStyle": "Solid",
+                                                        "Thickness": "1",
+                                                        "Color": "ff" + color,
+                                                        "Unit": "Points"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "LineTypeStyle": {
+                                    "LineRule": [
+                                        {
+                                            "LegendLabel": null,
+                                            "LineSymbolization2D": [
+                                                {
+                                                    "LineStyle": "Solid",
+                                                    "Thickness": "1",
+                                                    "Color": "ff" + color,
+                                                    "Unit": "Points"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "AreaTypeStyle": {
+                                    "AreaRule": [
+                                        {
+                                            "LegendLabel": null,
+                                            "AreaSymbolization2D": {
+                                                "Fill": {
+                                                    "FillPattern": "Solid",
+                                                    "ForegroundColor": "ffffffff",
+                                                    "BackgroundColor": "ffffffff"
+                                                },
+                                                "Stroke": {
+                                                    "LineStyle": "Solid",
+                                                    "Thickness": "1",
+                                                    "Color": "ff" + color,
+                                                    "Unit": "Points"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            };
+        }
+        
+        function createFeatureSourceJson() {
+            return {
+                FeatureSourceParams: {
+                    File: {
+                        Provider: "OSGeo.SDF",
+                        FileName: "TurfResults.sdf"
+                    },
+                    SpatialContext: {
+                        Name: "Default",
+                        Description: "Default Spatial Context",
+                        CoordinateSystem: "GEOGCS[\"LL84\",DATUM[\"WGS84\",SPHEROID[\"WGS84\",6378137.000,298.25722293]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.01745329251994]]",
+                        XYTolerance: 0.00001,
+                        ZTolerance: 0.00001
+                    },
+                    FeatureSchema: {
+                        Name: "Default",
+                        Description: "Default Schema",
+                        ClassDefinition: [
+                            {
+                                Name: "TurfResults",
+                                Description: "Turf.js geometry results",
+                                PropertyDefinition: [
+                                    {
+                                        IsIdentity: true,
+                                        Name: "ID",
+                                        PropertyType: 100, //MgFeaturePropertyType.DataProperty
+                                        DataType: 7, //MgPropertyType.Int32
+                                        Nullable: false,
+                                        IsAutoGenerated: true
+                                    },
+                                    {
+                                        Name: "Geometry",
+                                        PropertyType: 102, //MgFeaturePropertyType.GeometricProperty
+                                        GeometryTypes: (1 | 2 | 4), //MgFeatureGeometricType.Point|Curve|Surface
+                                        SpatialContextAssociation: "Default"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        
+        function addLayerJson(layerDefId, name) {
+            return {
+                UpdateMap: {
+                    Operation: [
+                        { 
+                            Type: "UpdateGroup",
+                            Name: "Turf Results",
+                            SetLegendLabel: "Turf.js results",
+                            AddIfNotExists: true,
+                            InsertAt: 0,
+                            SetVisible: true,
+                            SetDisplayInLegend: true
+                        },
+                        {
+                            Type: "AddLayer",
+                            ResourceId: layerDefId,
+                            Name: name,
+                            SetLegendLabel: name,
+                            SetDisplayInLegend: true,
+                            SetVisible: true,
+                            SetSelectable: false,
+                            SetGroup: "Turf Results",
+                            InsertAt: 0
+                        }
+                    ]
+                }
+            }
+        }
+        
+        function createInsertJson(geoms) {
+            var features = [];
+            for (var i = 0; i < geoms.length; i++) {
+                features.push({ 
+                    Property: [
+                        { Name: "Geometry", Value: geoms[i] }
+                    ] 
+                });
+            }
+            var json = {
+                FeatureSet: {
+                    Features: {
+                        Feature: features
+                    }
+                }
+            };
+            return json;
+        }
+        
+        var counter = 0;
+        
+        function saveToLayer() {
+            counter++;
+            
+            //Collect WKTs of turf result layer
+            var geoms = [];
+            var features = resultsLayer.getSource().getFeatures();
+            for (var i = 0; i < features.length; i++) {
+                var feat = features[i];
+                geoms.push(wktFormat.writeFeature(feat));
+            }
+            
+            var layerName = "TurfResult" + counter;
+            var url = restUrl + "/session/" + sessionId + "/" + mapName + ".Map/layersandgroups.json";
+            
+            var makeFeatureSource = function() {
+                return $.ajax({
+                    url: restUrl + "/session/" + sessionId + "/" + layerName + ".FeatureSource/json",
+                    type: "POST",
+                    data: JSON.stringify(createFeatureSourceJson())
+                })
+            };
+            var createLayerDef = function(data, textStatus, jqXHR) {
+                return $.ajax({
+                    url: restUrl + "/session/" + sessionId + "/" + layerName + ".LayerDefinition/content.json",
+                    type: "POST",
+                    data: JSON.stringify(createLayerDefJson("Session:" + sessionId + "//" + layerName + ".FeatureSource", "Default:TurfResults", "Geometry", "FF00000"))
+                });
+            };
+            var insertTurfResult = function(data, textStatus, jqXHR) {
+                return $.ajax({
+                    url: restUrl + "/session/" + sessionId + "/" + layerName + ".FeatureSource/features.json/Default/TurfResults",
+                    type: "POST",
+                    processData: false,
+                    data: JSON.stringify(createInsertJson(geoms))
+                })
+            };
+            var addLayerToMap = function(data, textStatus, jqXHR) {
+                return $.ajax({
+                    url: restUrl + "/session/" + sessionId + "/" + mapName + ".Map/layersandgroups.json",
+                    type: "POST",
+                    data: JSON.stringify(addLayerJson("Session:" + sessionId + "//" + layerName + ".LayerDefinition", layerName)),
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader("X-HTTP-Method-Override", "PUT");
+                    }
+                });
+            };
+            
+            makeFeatureSource()
+                .then(createLayerDef)
+                .then(insertTurfResult)
+                .then(addLayerToMap)
+                .then(function() {
+                    alert("Layer saved");
+                    clearResults();
+                    var reqFeatures = (1|2|4);
+                    //Re-query layer structure from server
+                    $.getJSON(restUrl + "/session/" + sessionId + "/" + mapName + ".Map/description.json?requestedfeatures=" + reqFeatures).then(function(res) {
+                        legend.updateLayersAndGroups(res);
+                        legend.refreshLayer();
+                    });
+                });
+        }
+        
         </script>
     </head>
     <body>
@@ -411,15 +653,14 @@
                         <div class="alert alert-info">
                             <p>Select a parcel and run any of the operations below</p>
                         </div>
-                        <button onclick="clearResults()">Clear</button>
-                        <br />
-                        <button onclick="buffer()">Buffer</button>
-                        <br />
-                        <button onclick="envelope()">BBOX</button>
-                        <br />
-                        <button onclick="centroid()">Centroid</button>
-                        <br />
-                        <button onclick="explode()">Explode</button>
+                        <div class="btn-group-vertical">
+                            <button class="btn btn-danger" onclick="clearResults()">Clear</button>
+                            <button class="btn btn-default" onclick="buffer()">Buffer</button>
+                            <button class="btn btn-default" onclick="envelope()">BBOX</button>
+                            <button class="btn btn-default" onclick="centroid()">Centroid</button>
+                            <button class="btn btn-default" onclick="explode()">Explode</button>
+                            <button class="btn btn-primary" onclick="saveToLayer()">Save to Layer</button>
+                        </div>
                     </div>
                     <div id="map">
                     </div>

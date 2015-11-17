@@ -422,6 +422,8 @@ class MgFeatureServiceController extends MgBaseController {
                 $cls->SetName($mkClass->Name);
             if (isset($mkClass->Description))
                 $cls->SetDescription($mkClass->Description);
+            if (isset($mkClass->DefaultGeometryPropertyName))
+                $cls->SetDefaultGeometryPropertyName($mkClass->DefaultGeometryPropertyName);
 
             $clsProps = $cls->GetProperties();
             $idProps = $cls->GetIdentityProperties();

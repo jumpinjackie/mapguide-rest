@@ -335,7 +335,7 @@ if ($dump) {
                     return result;
                 }
 
-                /**w
+                /**
                  * Converts an xml document or string to a JSON object.
                  *
                  * @param xml
