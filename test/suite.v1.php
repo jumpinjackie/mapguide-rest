@@ -9937,6 +9937,77 @@
                 var anonMapName = null;
                 var adminMapName = null;
                 
+                function createLayerXml(fsId, className, geom) {
+                    var xml = '<LayerDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="1.0.0" xsi:noNamespaceSchemaLocation="LayerDefinition-1.0.0.xsd">';
+                    xml += "<VectorLayerDefinition>";
+                        xml += "<ResourceId>" + fsId + "</ResourceId>";
+                        xml += "<FeatureName>" + className + "</FeatureName>";
+                        xml += "<FeatureNameType>FeatureClass</FeatureNameType>";
+                        xml += "<Geometry>" + geom + "</Geometry>";
+                        xml += "<VectorScaleRange>";
+                        xml += "<PointTypeStyle>";
+                            xml += "<DisplayAsText>false</DisplayAsText>";
+                            xml += "<AllowOverpost>false</AllowOverpost>";
+                            xml += "<PointRule>";
+                            xml += "<LegendLabel />";
+                            xml += "<PointSymbolization2D>";
+                                xml += "<Mark>";
+                                xml += "<Unit>Points</Unit>";
+                                xml += "<SizeContext>DeviceUnits</SizeContext>";
+                                xml += "<SizeX>10</SizeX>";
+                                xml += "<SizeY>10</SizeY>";
+                                xml += "<Rotation>0</Rotation>";
+                                xml += "<Shape>Square</Shape>";
+                                xml += "<Fill>";
+                                    xml += "<FillPattern>Solid</FillPattern>";
+                                    xml += "<ForegroundColor>ffffffff</ForegroundColor>";
+                                    xml += "<BackgroundColor>ffffffff</BackgroundColor>";
+                                xml += "</Fill>";
+                                xml += "<Edge>"
+                                    xml += "<LineStyle>Solid</LineStyle>";
+                                    xml += "<Thickness>1</Thickness>";
+                                    xml += "<Color>ff000000</Color>";
+                                    xml += "<Unit>Points</Unit>";
+                                xml += "</Edge>";
+                                xml += "</Mark>";
+                            xml += "</PointSymbolization2D>";
+                            xml += "</PointRule>";
+                        xml += "</PointTypeStyle>";
+                        xml += "<LineTypeStyle>";
+                            xml += "<LineRule>";
+                            xml += "<LegendLabel />";
+                            xml += "<LineSymbolization2D>";
+                                xml += "<LineStyle>Solid</LineStyle>";
+                                xml += "<Thickness>1</Thickness>";
+                                xml += "<Color>ff000000</Color>";
+                                xml += "<Unit>Points</Unit>";
+                            xml += "</LineSymbolization2D>";
+                            xml += "</LineRule>";
+                        xml += "</LineTypeStyle>";
+                        xml += "<AreaTypeStyle>";
+                            xml += "<AreaRule>";
+                            xml += "<LegendLabel />";
+                            xml += "<AreaSymbolization2D>";
+                                xml += "<Fill>";
+                                xml += "<FillPattern>Solid</FillPattern>";
+                                xml += "<ForegroundColor>ffffffff</ForegroundColor>";
+                                xml += "<BackgroundColor>ffffffff</BackgroundColor>";
+                                xml += "</Fill>";
+                                xml += "<Stroke>";
+                                xml += "<LineStyle>Solid</LineStyle>";
+                                xml += "<Thickness>1</Thickness>";
+                                xml += "<Color>ff000000</Color>";
+                                xml += "<Unit>Points</Unit>";
+                                xml += "</Stroke>";
+                            xml += "</AreaSymbolization2D>";
+                            xml += "</AreaRule>";
+                        xml += "</AreaTypeStyle>";
+                        xml += "</VectorScaleRange>";
+                    xml += "</VectorLayerDefinition>";
+                    xml += "</LayerDefinition>";
+                    return xml;
+                }
+                
                 function createModificationXml() {
                     var xml = "<UpdateMap>";
                     xml += "<Operation>";
@@ -9946,6 +10017,30 @@
                     xml += "<Operation>";
                     xml += "<Type>RemoveGroup</Type>";
                     xml += "<Name>Base Map</Name>";
+                    xml += "</Operation>";
+                    xml += "</UpdateMap>";
+                    return xml;
+                }
+                
+                function createInsertLayerXml(name, ldfId, label, bVisible, bSelectable, bShowInLegend) {
+                    var xml = "<UpdateMap>";
+                    xml += "<Operation>";
+                    xml += "<Type>AddGroup</Type>";
+                    xml += "<Name>Session-based Layers</Name>";
+                    xml += "<SetExpandInLegend>true</SetExpandInLegend>";
+                    xml += "<SetDisplayInLegend>true</SetDisplayInLegend>";
+                    xml += "<SetVisible>true</SetVisible>";
+                    xml += "<SetLegendLabel>Session Layers</SetLegendLabel>";
+                    xml += "</Operation>";
+                    xml += "<Operation>";
+                    xml += "<Type>AddLayer</Type>";
+                    xml += "<Name>" + name + "</Name>";
+                    xml += "<ResourceId>" + ldfId + "</ResourceId>";
+                    xml += "<SetLegendLabel>" + label + "</SetLegendLabel>";
+                    xml += "<SetSelectable>" + bSelectable + "</SetSelectable>";
+                    xml += "<SetVisible>" + bVisible + "</SetVisible>";
+                    xml += "<SetDisplayInLegend>" + bShowInLegend + "</SetDisplayInLegend>";
+                    xml += "<SetGroup>Session-based Layers</SetGroup>";
                     xml += "</Operation>";
                     xml += "</UpdateMap>";
                     return xml;
@@ -9971,6 +10066,7 @@
                     self.ok(status == 200, "(" + status + ") - Expected OK status");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
+                //Verify by re-querying layer structure
                 api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/" + anonMapName + ".Map/description.json", "GET", { requestedfeatures: reqFeatures }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Expected OK status");
                     self.assertMimeType(mimeType, MgMimeType.Json);
@@ -10008,6 +10104,81 @@
                     }
                     self.ok(bGroupRemoved, "Expected 'Base Map' group to be removed");
                     self.ok(bLayerRemoved, "Expected 'Trees' layer to be removed");
+                });
+                var fsId = "Library://Samples/Sheboygan/Data/Trees.FeatureSource";
+                var cls = "SHP_Schema:Trees";
+                var geom = "SHPGEOM";
+                //Insert a session-based layer
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Trees.LayerDefinition", "POST", createLayerXml(fsId, cls, geom), function(status, result, mimeType) {
+                    self.ok(status == 201, "(" + status + ") - Expected created status");
+                });
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Trees.LayerDefinition", "POST", createLayerXml(fsId, cls, geom), function(status, result, mimeType) {
+                    self.ok(status == 201, "(" + status + ") - Expected created status");
+                });
+                var anonTreesXml = createInsertLayerXml("Trees", "Session:" + this.anonymousSessionId + "//Trees.LayerDefinition", "Trees (Session-based)", true, false, true);
+                var adminTreesXml = createInsertLayerXml("Trees", "Session:" + this.adminSessionId + "//Trees.LayerDefinition", "Trees (Session-based)", false, true, false);
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/" + anonMapName + ".Map/layersandgroups.xml", "PUT", anonTreesXml, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/" + adminMapName + ".Map/layersandgroups.xml", "PUT", adminTreesXml, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                //Verify by re-querying layer structure
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/" + anonMapName + ".Map/description.json", "GET", { requestedfeatures: reqFeatures }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    var map = JSON.parse(result).RuntimeMap;
+                    var bFoundTrees = false;
+                    var bFoundGroup = false;
+                    for (var i = 0; i < map.Group.length; i++) {
+                        if (map.Group[i].Name == "Session-based Layers") {
+                            bFoundGroup = true;
+                            self.ok(map.Group[i].Visible == true, "Expected group Visible = true");
+                            self.ok(map.Group[i].ExpandInLegend == true, "Expected group ExpandInLegend = true");
+                            self.ok(map.Group[i].DisplayInLegend == true, "Expected group DisplayInLegend = true");
+                            self.ok(map.Group[i].LegendLabel == "Session Layers", "Expected group label: Session Layers");
+                        }
+                    }
+                    for (var i = 0; i < map.Layer.length; i++) {
+                        if (map.Layer[i].Name == "Trees") {
+                            bFoundTrees = true;
+                            self.ok(map.Layer[i].Visible == true, "Expected layer Visible = true");
+                            self.ok(map.Layer[i].Selectable == false, "Expected layer Selectable = false");
+                            self.ok(map.Layer[i].DisplayInLegend == true, "Expected layer DisplayInLegend = true");
+                            self.ok(map.Layer[i].LegendLabel == "Trees (Session-based)", "Expected layer label: Trees (Session-based)");
+                        }
+                    }
+                    self.ok(bFoundGroup, "Expected 'Session-based Layers' group to be added");
+                    self.ok(bFoundTrees, "Expected 'Trees' layer to be re-added");
+                });
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/" + adminMapName + ".Map/description.json", "GET", { requestedfeatures: reqFeatures }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Expected OK status");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    var map = JSON.parse(result).RuntimeMap;
+                    var bFoundTrees = false;
+                    var bFoundGroup = false;
+                    for (var i = 0; i < map.Group.length; i++) {
+                        if (map.Group[i].Name == "Session-based Layers") {
+                            bFoundGroup = true;
+                            self.ok(map.Group[i].Visible == true, "Expected group Visible = true");
+                            self.ok(map.Group[i].ExpandInLegend == true, "Expected group ExpandInLegend = true");
+                            self.ok(map.Group[i].DisplayInLegend == true, "Expected group DisplayInLegend = true");
+                            self.ok(map.Group[i].LegendLabel == "Session Layers", "Expected group label: Session Layers");
+                        }
+                    }
+                    for (var i = 0; i < map.Layer.length; i++) {
+                        if (map.Layer[i].Name == "Trees") {
+                            bFoundTrees = true;
+                            self.ok(map.Layer[i].Visible == false, "Expected layer Visible = false");
+                            self.ok(map.Layer[i].Selectable == true, "Expected layer Selectable = true");
+                            self.ok(map.Layer[i].DisplayInLegend == false, "Expected layer DisplayInLegend = false");
+                            self.ok(map.Layer[i].LegendLabel == "Trees (Session-based)", "Expected layer label: Trees (Session-based)");
+                        }
+                    }
+                    self.ok(bFoundGroup, "Expected 'Session-based Layers' group to be added");
+                    self.ok(bFoundTrees, "Expected 'Trees' layer to be re-added");
                 });
             });
             module("Plotting - Library", {
