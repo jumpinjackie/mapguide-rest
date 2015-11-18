@@ -163,6 +163,11 @@ class MgMapController extends MgBaseController {
         $sel->Open($resSvc, $mapName);
         
         $sel2 = new MgSelection($map, $featFilter);
+        self::MergeSelections($sel, $sel2);
+        return $sel->ToXml();
+    }
+    
+    private static function MergeSelections($sel, $sel2) {
         $layers = $sel2->GetLayers();
         if ($layers != NULL) {
             $count = $layers->GetCount();
@@ -175,7 +180,6 @@ class MgMapController extends MgBaseController {
                 $fr->Close();
             }
         }
-        return $sel->ToXml();
     }
 
     public function QueryMapFeatures($sessionId, $mapName) {
@@ -240,126 +244,147 @@ class MgMapController extends MgBaseController {
         if ($selColor == null)
             $selColor = "0x0000FFFF";
 
-        $this->EnsureAuthenticationForSite($sessionId);
-        $siteConn = new MgSiteConnection();
-        $siteConn->Open($this->userInfo);
-
-        $admin = new MgServerAdmin();
-        $admin->Open($this->userInfo);
-        $version = explode(".", $admin->GetSiteVersion());
-        $bCanUseNative = false;
-        if (intval($version[0]) > 2) { //3.0 or greater
-            $bCanUseNative = true;
-        } else if (intval($version[0]) == 2 && intval($version[1]) >= 6) { //2.6 or greater
-            $bCanUseNative = true;
-        }
-        
-        //$this->app->log->debug("APPEND: $bAppend");
-        //$this->app->log->debug("FILTER (Before): $featFilter");
-        
-        if (!$bSelectionXml) {
-            //Append only works in the absence of geometry
-            if ($geometry == null && $featFilter != null)
-                $featFilter = $this->TranslateToSelectionXml($siteConn, $mapName, $featFilter, $bAppend);
-        } else {
-            //Append only works in the absence of geometry
-            if ($geometry == null && $bAppend) {
-                $featFilter = $this->AppendSelectionXml($siteConn, $mapName, $featFilter);
+        try {
+            $this->EnsureAuthenticationForSite($sessionId);
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+    
+            $admin = new MgServerAdmin();
+            $admin->Open($this->userInfo);
+            $version = explode(".", $admin->GetSiteVersion());
+            $bCanUseNative = false;
+            //If appending, we can't use the native operation as that operation does not support appending
+            if (intval($version[0]) > 2) { //3.0 or greater
+                $bCanUseNative = !$bAppend;
+            } else if (intval($version[0]) == 2 && intval($version[1]) >= 6) { //2.6 or greater
+                $bCanUseNative = !$bAppend;
             }
-        }
-        
-        //$this->app->log->debug("GEOMETRY: $geometry");
-        //$this->app->log->debug("FILTER: $featFilter");
-        //$this->app->log->debug("Can use native: $bCanUseNative");
-        if ($bCanUseNative) {
-            $req = new MgHttpRequest("");
-            $param = $req->GetRequestParam();
-
-            $param->AddParameter("OPERATION", "QUERYMAPFEATURES");
-            $param->AddParameter("VERSION", "2.6.0");
-            $param->AddParameter("SESSION", $sessionId);
-            $param->AddParameter("MAPNAME", $mapName);
-
-            $param->AddParameter("GEOMETRY", $geometry);
-            $param->AddParameter("SELECTIONVARIANT", $selVariant);
-            $param->AddParameter("MAXFEATURES", $maxFeatures);
-            $param->AddParameter("LAYERNAMES", $layerNames);
-            $param->AddParameter("PERSIST", $persist ? "1" : "0");
-            $param->AddParameter("LAYERATTRIBUTEFILTER", $layerAttFilter);
-            if ($featFilter != null)
-                $param->AddParameter("FEATUREFILTER", $featFilter);
-
-            $param->AddParameter("REQUESTDATA", $reqData);
-            $param->AddParameter("SELECTIONCOLOR", $selColor);
-            $param->AddParameter("SELECTIONFORMAT", $selFormat);
-
-            if ($format === "json")
-                $param->AddParameter("FORMAT", MgMimeType::Json);
-            else
-                $param->AddParameter("FORMAT", MgMimeType::Xml);
-            $this->ExecuteHttpRequest($req);
-        } else { //Shim the response
-            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-            $renderSvc = $siteConn->CreateService(MgServiceType::RenderingService);
-
-            $layersToQuery = null;
-            if ($layerNames != null) {
-                $layersToQuery = new MgStringCollection();
-                $names = explode(",", $layerNames);
-                foreach ($names as $name) {
-                    $layersToQuery->Add($name);
+            
+            //$this->app->log->debug("APPEND: $bAppend");
+            //$this->app->log->debug("FILTER (Before): $featFilter");
+            
+            if (!$bSelectionXml) {
+                //Append only works in the absence of geometry
+                if ($geometry == null && $featFilter != null) {
+                    $featFilter = $this->TranslateToSelectionXml($siteConn, $mapName, $featFilter, $bAppend);
+                    //$this->app->log->debug("FeatFilter: $featFilter");
                 }
-            }
-
-            $variant = 0;
-            if ($selVariant === "TOUCHES")
-                $variant = MgFeatureSpatialOperations::Touches;
-            else if ($selVariant === "INTERSECTS")
-                $variant = MgFeatureSpatialOperations::Intersects;
-            else if ($selVariant === "WITHIN")
-                $variant = MgFeatureSpatialOperations::Within;
-            else if ($selVariant === "ENVELOPEINTERSECTS")
-                $variant = MgFeatureSpatialOperations::EnvelopeIntersects;
-
-            $map = new MgMap($siteConn);
-            $map->Open($mapName);
-            $selection = new MgSelection($map);
-
-            $wktRw = new MgWktReaderWriter();
-            $selectGeom = $wktRw->Read($geometry);
-
-            $featInfo = $renderSvc->QueryFeatures($map, $layersToQuery, $selectGeom, $variant, $featFilter, $maxFeatures, $layerAttFilter);
-            $bHasNewSelection = false;
-            if ($persist) {
-                $sel = $featInfo->GetSelection();
-                if ($sel != null) {
-                    $selection->FromXml($sel->ToXml());
-                    $bHasNewSelection = true;
-                }
-                $selection->Save($resSvc, $mapName);
-            }
-
-            // Render an image of this selection if requested
-            $inlineSelectionImg = null;
-            if ((($reqData & self::REQUEST_INLINE_SELECTION) == self::REQUEST_INLINE_SELECTION) && $bHasNewSelection) {
-                $color = new MgColor($selColor);
-                $renderOpts = new MgRenderingOptions($selFormat, self::RenderSelection | self::KeepSelection, $color);
-                $inlineSelectionImg = $renderSvc->RenderDynamicOverlay($map, $selection, $renderOpts);
-            }
-
-            // Collect any attributes of selected features
-            $bRequestAttributes = (($reqData & self::REQUEST_ATTRIBUTES) == self::REQUEST_ATTRIBUTES);
-
-            $xml = $this->CollectQueryMapFeaturesResult($resSvc, $reqData, $featInfo, $selection, $bRequestAttributes, $inlineSelectionImg);
-
-            $bs = new MgByteSource($xml, strlen($xml));
-            $bs->SetMimeType(MgMimeType::Xml);
-            $br = $bs->GetReader();
-            if ($format == "json") {
-                $this->OutputXmlByteReaderAsJson($br);
             } else {
-                $this->OutputByteReader($br);
+                //Append only works in the absence of geometry
+                if ($geometry == null && $bAppend) {
+                    $featFilter = $this->AppendSelectionXml($siteConn, $mapName, $featFilter);
+                }
             }
+            
+            //$this->app->log->debug("GEOMETRY: $geometry");
+            //$this->app->log->debug("FILTER: $featFilter");
+            //$this->app->log->debug("Can use native: $bCanUseNative");
+            if ($bCanUseNative) {
+                $req = new MgHttpRequest("");
+                $param = $req->GetRequestParam();
+    
+                $param->AddParameter("OPERATION", "QUERYMAPFEATURES");
+                $param->AddParameter("VERSION", "2.6.0");
+                $param->AddParameter("SESSION", $sessionId);
+                $param->AddParameter("MAPNAME", $mapName);
+    
+                $param->AddParameter("GEOMETRY", $geometry);
+                $param->AddParameter("SELECTIONVARIANT", $selVariant);
+                $param->AddParameter("MAXFEATURES", $maxFeatures);
+                $param->AddParameter("LAYERNAMES", $layerNames);
+                $param->AddParameter("PERSIST", $persist ? "1" : "0");
+                $param->AddParameter("LAYERATTRIBUTEFILTER", $layerAttFilter);
+                if ($featFilter != null)
+                    $param->AddParameter("FEATUREFILTER", $featFilter);
+    
+                $param->AddParameter("REQUESTDATA", $reqData);
+                $param->AddParameter("SELECTIONCOLOR", $selColor);
+                $param->AddParameter("SELECTIONFORMAT", $selFormat);
+    
+                if ($format === "json")
+                    $param->AddParameter("FORMAT", MgMimeType::Json);
+                else
+                    $param->AddParameter("FORMAT", MgMimeType::Xml);
+                $this->ExecuteHttpRequest($req);
+            } else { //Shim the response
+                $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+                $renderSvc = $siteConn->CreateService(MgServiceType::RenderingService);
+    
+                $layersToQuery = null;
+                if ($layerNames != null) {
+                    $layersToQuery = new MgStringCollection();
+                    $names = explode(",", $layerNames);
+                    foreach ($names as $name) {
+                        $layersToQuery->Add($name);
+                    }
+                }
+    
+                $variant = 0;
+                if ($selVariant === "TOUCHES")
+                    $variant = MgFeatureSpatialOperations::Touches;
+                else if ($selVariant === "INTERSECTS")
+                    $variant = MgFeatureSpatialOperations::Intersects;
+                else if ($selVariant === "WITHIN")
+                    $variant = MgFeatureSpatialOperations::Within;
+                else if ($selVariant === "ENVELOPEINTERSECTS")
+                    $variant = MgFeatureSpatialOperations::EnvelopeIntersects;
+    
+                $map = new MgMap($siteConn);
+                $map->Open($mapName);
+                $selection = new MgSelection($map);
+    
+                $wktRw = new MgWktReaderWriter();
+                $selectGeom = null;
+                if ($geometry != null)
+                    $selectGeom = $wktRw->Read($geometry);
+    
+                $featInfo = $renderSvc->QueryFeatures($map, $layersToQuery, $selectGeom, $variant, $featFilter, $maxFeatures, $layerAttFilter);
+                $bHasNewSelection = false;
+                if ($persist) {
+                    $sel = $featInfo->GetSelection();
+                    if ($sel != null) {
+                        $selXml = $sel->ToXml();
+                        //$this->app->log->debug("Query selection:\n$selXml");
+                        if ($bAppend) {
+                            $selOrig = new MgSelection($map);
+                            $selOrig->Open($resSvc, $mapName);
+                            $selAppend = new MgSelection($map, $selXml);
+                            self::MergeSelections($selOrig, $selAppend);
+                            $selNewXml = $selOrig->ToXml();
+                            //$this->app->log->debug("Appended selection:\n$selNewXml");
+                            $selection->FromXml($selNewXml);
+                        } else {
+                            $selection->FromXml($selXml);
+                        }
+                        $bHasNewSelection = true;
+                    }
+                    $selection->Save($resSvc, $mapName);
+                }
+    
+                // Render an image of this selection if requested
+                $inlineSelectionImg = null;
+                if ((($reqData & self::REQUEST_INLINE_SELECTION) == self::REQUEST_INLINE_SELECTION) && $bHasNewSelection) {
+                    $color = new MgColor($selColor);
+                    $renderOpts = new MgRenderingOptions($selFormat, self::RenderSelection | self::KeepSelection, $color);
+                    $inlineSelectionImg = $renderSvc->RenderDynamicOverlay($map, $selection, $renderOpts);
+                }
+    
+                // Collect any attributes of selected features
+                $bRequestAttributes = (($reqData & self::REQUEST_ATTRIBUTES) == self::REQUEST_ATTRIBUTES);
+    
+                $xml = $this->CollectQueryMapFeaturesResult($resSvc, $reqData, $featInfo, $selection, $bRequestAttributes, $inlineSelectionImg);
+    
+                $bs = new MgByteSource($xml, strlen($xml));
+                $bs->SetMimeType(MgMimeType::Xml);
+                $br = $bs->GetReader();
+                if ($format == "json") {
+                    $this->OutputXmlByteReaderAsJson($br);
+                } else {
+                    $this->OutputByteReader($br);
+                }
+            }
+        } catch (MgException $ex) {
+            $this->OnException($ex, $this->GetMimeTypeForFormat($format));
         }
     }
 
