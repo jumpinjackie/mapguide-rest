@@ -680,7 +680,7 @@ class MgMapController extends MgBaseController {
         $map->Open($mapName);
         $selection = new MgSelection($map);
         $selection->Open($resSvc, $mapName);
-
+        
         $this->app->response->header("Content-Type", MgMimeType::Xml);
         $this->app->response->write($selection->ToXml());
     }
@@ -731,6 +731,7 @@ class MgMapController extends MgBaseController {
     public function GetSelectedFeatures($sessionId, $mapName, $layerName, $format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "geojson", "html"));
 
+        $propList = $this->GetRequestParameter("properties", "");
         $pageSize = $this->GetRequestParameter("pagesize", -1);
         $pageNo = $this->GetRequestParameter("page", -1);
         $orientation = $this->GetRequestParameter("orientation", "h");
@@ -738,75 +739,88 @@ class MgMapController extends MgBaseController {
         //Internal debugging flag
         $chunk = $this->GetBooleanRequestParameter("chunk", true);
 
-        $this->EnsureAuthenticationForSite($sessionId);
-        $siteConn = new MgSiteConnection();
-        $siteConn->Open($this->userInfo);
-
-        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-        $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
-
-        $map = new MgMap($siteConn);
-        $map->Open($mapName);
-        $selection = new MgSelection($map);
-        $selection->Open($resSvc, $mapName);
-
-        $layers = $selection->GetLayers();
-        if ($layers != null) {
-            $lidx = -1;
-            $layerCount = $layers->GetCount();
-            for ($i = 0; $i < $layerCount; $i++) {
-                $currentlayer = $layers->GetItem($i);
-                if ($currentlayer->GetName() == $layerName) {
-                    $lidx = $i;
-                    break;
+        try {
+            $this->EnsureAuthenticationForSite($sessionId);
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+    
+            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+            $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
+    
+            $map = new MgMap($siteConn);
+            $map->Open($mapName);
+            $selection = new MgSelection($map);
+            $selection->Open($resSvc, $mapName);
+    
+            $layers = $selection->GetLayers();
+            if ($layers != null) {
+                $lidx = -1;
+                $layerCount = $layers->GetCount();
+                for ($i = 0; $i < $layerCount; $i++) {
+                    $currentlayer = $layers->GetItem($i);
+                    if ($currentlayer->GetName() == $layerName) {
+                        $lidx = $i;
+                        break;
+                    }
                 }
-            }
-            if ($lidx < 0) {
-                $this->NotFound($this->app->localizer->getText("E_LAYER_NOT_IN_SELECTION", $layerName), $this->GetMimeTypeForFormat($fmt));
-            } else {
-                $layer = $layers->GetItem($lidx);
-                $bMapped = ($this->GetBooleanRequestParameter("mappedonly", "0") == "1");
-                $transformto = $this->GetRequestParameter("transformto", "");
-                $transform = null;
-                if ($transformto !== "") {
-                    $resId = new MgResourceIdentifier($layer->GetFeatureSourceId());
-                    $tokens = explode(":", $layer->GetFeatureClassName());
-                    $transform = MgUtils::GetTransform($featSvc, $resId, $tokens[0], $tokens[1], $transformto);
-                }
-
-                $owriter = null;
-                if ($chunk === "0")
-                    $owriter = new MgSlimChunkWriter($this->app);
-                else
-                    $owriter = new MgHttpChunkWriter();
-
-                //NOTE: This does not do a query to ascertain a total, this is already a pre-computed property of the selection set.
-                $total = $selection->GetSelectedFeaturesCount($layer, $layer->GetFeatureClassName());
-                $reader = $selection->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), $bMapped);
-                if ($pageSize > 0) {
-                    $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo, $total);
-                    $result = new MgReaderChunkedResult($featSvc, $pageReader, -1, $owriter, $this->app->localizer);
+                if ($lidx < 0) {
+                    $this->NotFound($this->app->localizer->getText("E_LAYER_NOT_IN_SELECTION", $layerName), $this->GetMimeTypeForFormat($fmt));
                 } else {
-                    $result = new MgReaderChunkedResult($featSvc, $reader, -1, $owriter, $this->app->localizer);
+                    $layer = $layers->GetItem($lidx);
+                    $bMapped = ($this->GetBooleanRequestParameter("mappedonly", "0") == "1");
+                    $transformto = $this->GetRequestParameter("transformto", "");
+                    $transform = null;
+                    if ($transformto !== "") {
+                        $resId = new MgResourceIdentifier($layer->GetFeatureSourceId());
+                        $tokens = explode(":", $layer->GetFeatureClassName());
+                        $transform = MgUtils::GetTransform($featSvc, $resId, $tokens[0], $tokens[1], $transformto);
+                    }
+    
+                    $owriter = null;
+                    if ($chunk === "0")
+                        $owriter = new MgSlimChunkWriter($this->app);
+                    else
+                        $owriter = new MgHttpChunkWriter();
+    
+                    //NOTE: This does not do a query to ascertain a total, this is already a pre-computed property of the selection set.
+                    $total = $selection->GetSelectedFeaturesCount($layer, $layer->GetFeatureClassName());
+                    if (strlen($propList) > 0) {
+                        $tokens = explode(",", $propList);
+                        $propNames = new MgStringCollection();
+                        foreach ($tokens as $propName) {
+                            $propNames->Add($propName);
+                        }
+                        $reader = $selection->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), $propNames);
+                    } else {
+                        $reader = $selection->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), $bMapped);
+                    }
+                    if ($pageSize > 0) {
+                        $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo, $total);
+                        $result = new MgReaderChunkedResult($featSvc, $pageReader, -1, $owriter, $this->app->localizer);
+                    } else {
+                        $result = new MgReaderChunkedResult($featSvc, $reader, -1, $owriter, $this->app->localizer);
+                    }
+                    $result->CheckAndSetDownloadHeaders($this->app, $format);
+                    if ($transform != null)
+                        $result->SetTransform($transform);
+                    if ($fmt === "html") {
+                        $result->SetAttributeDisplayOrientation($orientation);
+                        $result->SetHtmlParams($this->app);
+                    }
+                    $result->Output($format);
                 }
-                $result->CheckAndSetDownloadHeaders($this->app, $format);
-                if ($transform != null)
-                    $result->SetTransform($transform);
+            } else {
+                $owriter = new MgHttpChunkWriter();
+                $reader = new MgNullFeatureReader();
+                $result = new MgReaderChunkedResult($featSvc, $reader, -1, $owriter, $this->app->localizer);
                 if ($fmt === "html") {
                     $result->SetAttributeDisplayOrientation($orientation);
                     $result->SetHtmlParams($this->app);
                 }
                 $result->Output($format);
             }
-        } else {
-            $owriter = new MgHttpChunkWriter();
-            $reader = new MgNullFeatureReader();
-            $result = new MgReaderChunkedResult($featSvc, $reader, -1, $owriter, $this->app->localizer);
-            if ($fmt === "html") {
-                $result->SetAttributeDisplayOrientation($orientation);
-                $result->SetHtmlParams($this->app);
-            }
-            $result->Output($format);
+        } catch (MgException $ex) {
+            $this->OnException($ex, $this->GetMimeTypeForFormat($format));
         }
     }
 
