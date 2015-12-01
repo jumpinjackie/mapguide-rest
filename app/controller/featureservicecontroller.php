@@ -1316,8 +1316,6 @@ class MgFeatureServiceController extends MgBaseController {
                             $query->AddComputedProperty(MgRestConstants::PROP_HYPERLINK, $hlink->item(0)->nodeValue);
                         }
                         if ($tt->length == 1 && strlen($tt->item(0)->nodeValue) > 0) {
-                            var_dump($tt->item(0)->nodeValue);
-                            die;
                             $query->AddComputedProperty(MgRestConstants::PROP_TOOLTIP, $tt->item(0)->nodeValue);
                         }
                         if ($elev->length == 1) {
