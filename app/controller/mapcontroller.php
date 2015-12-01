@@ -57,10 +57,11 @@ class MgMapController extends MgBaseController {
         /SelectionUpdate
             /Layer
                 /Name
-                /Feature
+                /Feature [0...n]
                     /ID
                         /Name
                         /Value
+                /SelectionFilter [0...n]
          */
         $root = $doc->documentElement;
         if ($root->tagName != "SelectionUpdate") {
@@ -84,6 +85,11 @@ class MgMapController extends MgBaseController {
                         $layer = $layers->GetItem($lidx);
                         $clsDef = $layer->GetClassDefinition();
                         $clsIdProps = $clsDef->GetIdentityProperties();
+                    } else if ($featureNode->tagName == "SelectionFilter") {
+                        $query = new MgFeatureQueryOptions();
+                        $query->SetFilter($featureNode->nodeValue);
+                        $fr = $layer->SelectFeatures($query);
+                        $sel->AddFeatures($layer, $fr, 0);
                     } else if ($featureNode->tagName == "Feature") {
                         //$this->app->log->debug("Found //SelectionUpdate/Layer/Feature");
                         $idNodes = $featureNode->childNodes;
