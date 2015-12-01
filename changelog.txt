@@ -1,3 +1,22 @@
+1.0 RC3
+=======
+ - #111: Whitelisting expanded to cover Resource Service operations
+   - Defined ACLs can now be inherited
+ - #112: Use RecursiveDirectoryIterator instead of glob() to walk all data publishing configuration files
+ - #114: Allow anon access to feature aggregates
+ - #113: Clasify MgConnectionFailedException as http 503
+ - #100: Allow custom root directory for XYZ tiles
+ - #101: When rendering XYZ tiles, render a "buffered" version of the tile and crop it back to original size to eliminate cropping of labels/symbology at tile boundaries
+ - Completed GeoJSON support for all geometry types (MultiPoint, MultiPolygon, GeometryCollection)
+ - #115: New Layer/Group/Selection mutation APIs
+ - #117: Selected features route now supports explicit list of property names
+ - New/updated sample applications
+   - Tiled and mixed examples using OpenLayers 3
+   - Cesium example using XYZ image tiles
+   - Turf.js client-geometry example demonstrating client-side feature source / layer def setup and demonstrating layer/group mutation APIs
+   - Kitchen sink example updated to demonstrate selection mutation APIs
+   - Cesium and OpenLayers replaced with integrated ol3-cesium package
+
 1.0 RC2
 =======
 

@@ -168,6 +168,53 @@
             ]
         },
         {
+            "path": "/session/{session}/{mapName}.Map",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "Creates the runtime map",
+                    "nickname": "CreateMap",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "mapName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The name of the runtime map"
+                        },
+                        {
+                            "paramType": "body",
+                            "name": "body",
+                            "type": "string",
+                            "required": true,
+                            "description": "The Map Definition XML"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "path": "/session/{session}/{mapName}.Map/description",
             "operations": [
                 {
@@ -1361,14 +1408,14 @@
                             "name": "selectionxml",
                             "type": "boolean",
                             "required": false,
-                            "description": "Indicates if the 'featurefilter' parameter is to be treated as selection XML"
+                            "description": "Indicates if the 'featurefilter' parameter is to be treated as selection XML. Otherwise the input is treated as a SelectionUpdate XML document"
                         },
                         {
                             "paramType": "form",
                             "name": "append",
                             "type": "boolean",
                             "required": false,
-                            "description": "Indicates if the this query selection should append to the current selection"
+                            "description": "Indicates if the this query selection indicated by the 'featurefilter' parameter should append to the current selection"
                         },
                         {
                             "paramType": "form",
@@ -1650,6 +1697,97 @@
             ]
         },
         {
+            "path": "/session/{session}/{mapName}.Selection/layersandgroups",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Update the layers and groups of the runtime map",
+                    "nickname": "UpdateMapLayersAndGroups",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "mapName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The name of the runtime map"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/session/{session}/{mapName}.Selection/layersandgroups.{type}",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Update the layers and groups of the runtime map",
+                    "nickname": "UpdateMapLayersAndGroups",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "mapName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The name of the runtime map"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "path": "/session/{session}/{mapName}.Selection/xml",
             "operations": [
                 {
@@ -1734,55 +1872,6 @@
         {
             "path": "/session/{session}/{resName}",
             "operations": [
-                {
-                    "method": "POST",
-                    "summary": "Sets the resource XML for a session-based resource",
-                    "nickname": "SetResource",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "mapName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The name of the runtime map"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The name of the session resource (including extension)"
-                        },
-                        {
-                            "paramType": "body",
-                            "name": "body",
-                            "type": "string",
-                            "required": true,
-                            "description": "The new selection XML"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                },
                 {
                     "method": "DELETE",
                     "summary": "Deletes the given resource",
@@ -4319,59 +4408,6 @@
         {
             "path": "/session/{session}/{resName}/content.{type}",
             "operations": [
-                {
-                    "method": "POST",
-                    "summary": "Sets the resource content for the given resource",
-                    "nickname": "SetResourceContent",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The resource name (including extension)"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "type",
-                            "type": "string",
-                            "required": true,
-                            "description": "xml or json",
-                            "enum": [
-                                "xml",
-                                "json"
-                            ]
-                        },
-                        {
-                            "paramType": "body",
-                            "name": "body",
-                            "type": "string",
-                            "required": true,
-                            "description": "The resource XML content"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                },
                 {
                     "method": "GET",
                     "summary": "Gets the specified resource content for the given resource ID",
