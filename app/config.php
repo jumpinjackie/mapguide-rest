@@ -28,7 +28,7 @@ return array(
     //Error.OutputStackTrace
     //
     //If false, stack trace information will not be outputted in error responses
-    "Error.OutputStackTrace" => true,
+    "Error.OutputStackTrace" => false,
 
     //
     //MapGuide.MapAgentUrl
