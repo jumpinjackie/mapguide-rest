@@ -503,6 +503,28 @@ $app->get("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $ma
 });
 /**
  * @SWG\Api(
+ *     path="/session/{session}/{mapName}.Selection/layers.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetSelectionLayerNames",
+ *        summary="Gets the layers of the current selection set",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:mapName.Selection/layers.:format", function($sessionId, $mapName, $format) use ($app) {
+    $ctrl = new MgMapController($app);
+    $ctrl->GetSelectionLayerNames($sessionId, $mapName, $format);
+});
+/**
+ * @SWG\Api(
  *     path="/session/{session}/{mapName}.Selection/layers",
  *     @SWG\Operation(
  *        method="GET",
@@ -524,10 +546,10 @@ $app->get("/session/:sessionId/:mapName.Selection/layers", function($sessionId, 
 });
 /**
  * @SWG\Api(
- *     path="/session/{session}/{mapName}.Selection/layers.{type}",
+ *     path="/session/{session}/{mapName}.Selection/overview",
  *     @SWG\Operation(
  *        method="GET",
- *        nickname="GetSelectionLayerNames",
+ *        nickname="GetSelectionOverview",
  *        summary="Gets the layers of the current selection set",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
@@ -540,9 +562,31 @@ $app->get("/session/:sessionId/:mapName.Selection/layers", function($sessionId, 
  *     )
  *   )
  */
-$app->get("/session/:sessionId/:mapName.Selection/layers.:format", function($sessionId, $mapName, $format) use ($app) {
+$app->get("/session/:sessionId/:mapName.Selection/overview", function($sessionId, $mapName) use ($app) {
     $ctrl = new MgMapController($app);
-    $ctrl->GetSelectionLayerNames($sessionId, $mapName, $format);
+    $ctrl->GetSelectionOverview($sessionId, $mapName, "xml");
+});
+/**
+ * @SWG\Api(
+ *     path="/session/{session}/{mapName}.Selection/overview.{type}",
+ *     @SWG\Operation(
+ *        method="GET",
+ *        nickname="GetSelectionOverview",
+ *        summary="Gets the layers of the current selection set",
+ *        @SWG\parameters(
+ *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map"),
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *        ),
+ *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
+ *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *     )
+ *   )
+ */
+$app->get("/session/:sessionId/:mapName.Selection/overview.:format", function($sessionId, $mapName, $format) use ($app) {
+    $ctrl = new MgMapController($app);
+    $ctrl->GetSelectionOverview($sessionId, $mapName, $format);
 });
 /**
  * @SWG\Api(

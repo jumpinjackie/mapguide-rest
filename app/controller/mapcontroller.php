@@ -189,6 +189,7 @@ class MgMapController extends MgBaseController {
     }
 
     public function QueryMapFeatures($sessionId, $mapName) {
+        //TODO: Append only works in featurefilter mode. Add append support for geometry-based selections
         $layerNames = $this->app->request->params("layernames");
         $geometry = $this->app->request->params("geometry");
         $maxFeatures = $this->app->request->params("maxfeatures");
@@ -688,6 +689,88 @@ class MgMapController extends MgBaseController {
         
         $this->app->response->header("Content-Type", MgMimeType::Xml);
         $this->app->response->write($selection->ToXml());
+    }
+    
+    public function GetSelectionOverview($sessionId, $mapName, $format) {
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $bIncludeBounds = $this->GetBooleanRequestParameter("bounds", false);
+        
+        $this->EnsureAuthenticationForSite($sessionId);
+        $siteConn = new MgSiteConnection();
+        $siteConn->Open($this->userInfo);
+
+        $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+        $featSvc = null;
+        if ($bIncludeBounds) {
+            $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
+        }
+
+        $map = new MgMap($siteConn);
+        $map->Open($mapName);
+        $selection = new MgSelection($map);
+        $selection->Open($resSvc, $mapName);
+        
+        $output = "<SelectionOverview>";
+        
+        if ($bIncludeBounds) {
+            $env = $selection->GetExtents($featSvc);
+            if ($env != null && !$env->IsNull()) {
+                $ll = $env->GetLowerLeftCoordinate();
+                $ur = $env->GetUpperRightCoordinate();
+                $output .= "<Bounds>";
+                
+                $output .= "<MinX>";
+                $output .= $ll->GetX();
+                $output .= "</MinX>";
+                
+                $output .= "<MinY>";
+                $output .= $ll->GetY();
+                $output .= "</MinY>";
+                
+                $output .= "<MaxX>";
+                $output .= $ur->GetX();
+                $output .= "</MaxX>";
+                
+                $output .= "<MaxY>";
+                $output .= $ur->GetY();
+                $output .= "</MaxY>";
+                
+                $output .= "</Bounds>";
+            }
+        }
+        
+        $layers = $selection->GetLayers();
+        if ($layers != NULL) {
+            for ($i = 0; $i < $layers->GetCount(); $i++) {
+                $layer = $layers->GetItem($i);
+                $layerName = $layer->GetName();
+                
+                $output .= "<Layer>";
+                
+                $output .= "<Name>";
+                $output .= $layerName;
+                $output .= "</Name>";
+                $output .= "<SelectionCount>";
+                $output .= $selection->GetSelectedFeaturesCount($layer, $layer->GetFeatureClassName());
+                $output .= "</SelectionCount>";
+                //$output .= "<FeaturesUrl>";
+                //$output .= $this->app->urlFor("get_selected_features", array("sessionId" => $sessionId, "mapName" => $mapName, "layerName" => $layerName, "format" => $format));
+                //$output .= "</FaeturesUrl>";
+                
+                $output .= "</Layer>";
+            }
+        }
+        
+        $output .= "</SelectionOverview>";
+        
+        $bs = new MgByteSource($output, strlen($output));
+        $bs->SetMimeType(MgMimeType::Xml);
+        $br = $bs->GetReader();
+        if ($format == "json") {
+            $this->OutputXmlByteReaderAsJson($br);
+        } else {
+            $this->OutputByteReader($br);
+        }
     }
 
     public function GetSelectionLayerNames($sessionId, $mapName, $format) {

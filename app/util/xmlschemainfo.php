@@ -371,6 +371,11 @@ class MgXmlSchemaInfo
         "/UpdateMapResult/AddedGroups" => self::XML_DATA_TYPE_NUMBER,
         "/UpdateMapResult/UpdatedGroups" => self::XML_DATA_TYPE_NUMBER,
         "/UpdateMapResult/RemovedGroups" => self::XML_DATA_TYPE_NUMBER,
+        "/SelectionOverview/Bounds/MinX" => self::XML_DATA_TYPE_NUMBER,
+        "/SelectionOverview/Bounds/MinY" => self::XML_DATA_TYPE_NUMBER,
+        "/SelectionOverview/Bounds/MaxX" => self::XML_DATA_TYPE_NUMBER,
+        "/SelectionOverview/Bounds/MaxY" => self::XML_DATA_TYPE_NUMBER,
+        "/SelectionOverview/Layer/SelectionCount" => self::XML_DATA_TYPE_NUMBER
     );
 
     //This is the definitive list of XML element paths where the leaf element can exist in multiples (according to its respective)
@@ -558,7 +563,8 @@ class MgXmlSchemaInfo
         "/LayerCollection/Layer" => "abcd1234",
         "/FeatureSourceParams/FeatureSchema/ClassDefinition" => "abcd1234",
         "/DataConfigurationList/Configuration" => "abcd1234",
-        "/UpdateMap/Operation" => "abcd1234"
+        "/UpdateMap/Operation" => "abcd1234",
+        "/SelectionOverview/Layer" => "abcd1234",
     );
 
     private static function GetXmlPath($domElement, $suffix = "") {
