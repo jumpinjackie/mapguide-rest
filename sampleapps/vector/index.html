@@ -9,7 +9,7 @@
             #wrap { width: 900; }
             #map { width: 800; height: 600; float: left; border: 1px solid black; }
         </style>
-        <script type="text/javascript" src="../../assets/ol3-cesium/ol3/ol.js"></script>
+        <script type="text/javascript" src="../../assets/ol3-cesium/ol3cesium.js"></script>
         <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
         <script type="text/javascript">
 
@@ -279,16 +279,17 @@
             //NOTE: Your map definition can be in any coordinate system as long as it it transformable to LL84
             //
             //But the ol3 tile layer must remain as EPSG:3857
-
+            var tileGrid = ol.tilegrid.createXYZ({
+                minZoom: 5,
+                maxZoom: 19
+            });
             var tileLayer = new ol.layer.Vector({
-              source: new ol.source.TileVector({
+              source: new ol.source.Vector({
                 format: new ol.format.GeoJSON({
                   defaultProjection: 'EPSG:4326'
                 }),
                 projection: 'EPSG:3857',
-                tileGrid: ol.tilegrid.createXYZ({
-                  maxZoom: 19
-                }),
+                strategy: ol.loadingstrategy.tile(tileGrid),
                 url: restUrl + '/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/xyz/Base Layer Group/{z}/{x}/{y}/tile.json'
               }),
               style: styleFunc

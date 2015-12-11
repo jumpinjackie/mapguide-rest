@@ -189,7 +189,6 @@ class MgMapController extends MgBaseController {
     }
 
     public function QueryMapFeatures($sessionId, $mapName) {
-        //TODO: Append only works in featurefilter mode. Add append support for geometry-based selections
         $layerNames = $this->app->request->params("layernames");
         $geometry = $this->app->request->params("geometry");
         $maxFeatures = $this->app->request->params("maxfeatures");

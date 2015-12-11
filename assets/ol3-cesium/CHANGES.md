@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.10 - 2015-11-30
+
+* Breaking changes
+  * OL3-Cesium is now compiled together with OL3. A custom closure compiler
+    build is no more required.
+
 ## v1.9 - 2015-10-22
 
 * Breaking changes
@@ -13,6 +19,9 @@
     `olcs.RasterSynchronizer.prototype.convertLayerToCesiumImageries`.
 
 * Changes
+  * Add `olcs.OLCesium.setResolutionScale` to allow improving performance at
+    the cost of quality.
+  * Automatically use device pixel ratio to configure the Webgl 3D globe.
   * Add the experimental method `olcs.OLCesium.enableAutoRenderLoop` to stop
     rendering the globe when idle. This is based on work from Kevin Ring.
   * Port to Cesium 1.14.
