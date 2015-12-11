@@ -1056,7 +1056,7 @@ $app->post("/session/:sessionId/:resName/contentorheader.:format", function($ses
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The resource name (including extension)"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']"),
  *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The resource XML content")
  *        ),
  *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
