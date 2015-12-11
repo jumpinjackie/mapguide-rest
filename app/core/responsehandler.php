@@ -146,7 +146,7 @@ abstract class MgResponseHandler
                         }
                     }
                 } else {
-                    $format = $param->GetParameterValue("FORMAT");
+                    $format = $origMimeType;
                     if ($param->ContainsParameter("XSLSTYLESHEET"))
                         $format = MgMimeType::Html;
                     else
