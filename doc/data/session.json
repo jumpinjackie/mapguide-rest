@@ -1282,7 +1282,7 @@
             "operations": [
                 {
                     "method": "GET",
-                    "summary": "Gets the layers of the current selection set",
+                    "summary": "Gets an overview of the current selection set with optional extent",
                     "nickname": "GetSelectionOverview",
                     "parameters": [
                         {
@@ -1309,6 +1309,13 @@
                                 "xml",
                                 "json"
                             ]
+                        },
+                        {
+                            "paramType": "query",
+                            "name": "bounds",
+                            "type": "boolean",
+                            "required": false,
+                            "description": "If true, includes the bounds of the whole selection"
                         }
                     ],
                     "responseMessages": [

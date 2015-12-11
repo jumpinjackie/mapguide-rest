@@ -450,6 +450,8 @@
                 html = "";
                 var selectionUrls = [
                     { label: "View Selection XML", url: root + ".Selection/xml" },
+                    { label: "View Selection Overview (XML)", url: root + ".Selection/overview.xml" },
+                    { label: "View Selection Overview (JSON)", url: root + ".Selection/overview.json" },
                     { label: "View Selection Layer Names (XML)", url: root + ".Selection/layers.xml" },
                     { label: "View Selection Layer Names (json)", url: root + ".Selection/layers.json" },
                     { label: "View Selected Features (Parcels - HTML)", url: root + ".Selection/features.html/Parcels?pagesize=10&page=1" },
@@ -512,7 +514,6 @@
                 <label>
                     <input id="chkAppend" type="checkbox" /> Append
                 </label>
-                <span id="selMessage"></span>
                 <div id="wrap">
                     <div id="details">
                         <strong>Layer and Groups</strong>
@@ -528,7 +529,7 @@
                     </div>
                     <div id="map"></div>
                 </div>
-                <p><span id="selCount">0</span> features selected</p>
+                <p><span id="selCount">0</span> features selected <span id="selMessage"></span></p>
             </div>
         </div>
     </body>

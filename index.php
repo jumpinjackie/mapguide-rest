@@ -110,6 +110,10 @@ include dirname(__FILE__)."/app/formatters/registration.php";
 //Set the root dir of this file for code that needs to know about it
 $app->config("AppRootDir", dirname(__FILE__));
 include "app/config.php";
+
+//$namespace is used to uniquely suffix named routes. Otherwise the slim router can throw
+//an error about duplicate routes
+$namespace = "default";
 //Register these routes in the default namespace
 include "app/routes/v1/routes.data.php";
 include "app/routes/v1/routes.library.php";
@@ -123,6 +127,7 @@ include "app/routes/v1/routes.doc.php";
 //Now scope the same routes under the v1 namespace. While the above includes may change, the includes
 //here cannot. We have effectively set these routes "in stone". Once set, this cannot be changed
 $app->group("/v1", function() use ($app) {
+    $namespace = "v1";
     include "app/routes/v1/routes.data.php";
     include "app/routes/v1/routes.library.php";
     include "app/routes/v1/routes.session.php";

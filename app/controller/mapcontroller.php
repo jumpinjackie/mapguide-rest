@@ -535,7 +535,7 @@ class MgMapController extends MgBaseController {
                 $map->Save($resSvc, $resId);
 
                 $this->app->response->setStatus(201);
-                $this->app->response->setBody($this->app->urlFor("session_resource_id", array("sessionId" => $resId->GetRepositoryName(), "resName" => $resId->GetName().".".$resId->GetResourceType())));
+                $this->app->response->setBody(MgUtils::GetNamedRoute($this->app, "/session", "session_resource_id", array("sessionId" => $resId->GetRepositoryName(), "resName" => $resId->GetName().".".$resId->GetResourceType())));
             }
         }
     }
@@ -753,9 +753,10 @@ class MgMapController extends MgBaseController {
                 $output .= "<SelectionCount>";
                 $output .= $selection->GetSelectedFeaturesCount($layer, $layer->GetFeatureClassName());
                 $output .= "</SelectionCount>";
-                //$output .= "<FeaturesUrl>";
-                //$output .= $this->app->urlFor("get_selected_features", array("sessionId" => $sessionId, "mapName" => $mapName, "layerName" => $layerName, "format" => $format));
-                //$output .= "</FaeturesUrl>";
+                $output .= "<FeaturesUrl>";
+                $innerFormat = ($format == "json" ? "geojson" : $format);
+                $output .= MgUtils::GetNamedRoute($this->app, "/session", "get_selected_features", array("sessionId" => $sessionId, "mapName" => $mapName, "layerName" => $layerName, "format" => $innerFormat));
+                $output .= "</FeaturesUrl>";
                 
                 $output .= "</Layer>";
             }

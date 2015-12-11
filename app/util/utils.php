@@ -139,6 +139,15 @@ class MgUtils
         
         return false;
     }
+    
+    public static function GetNamedRoute($app, $servicePrefix, $routeName, $params = array()) {
+        $apiNamespace = self::GetApiVersionNamespace($app, $servicePrefix);
+        if ($apiNamespace == "") {
+            $apiNamespace = "default";
+        }
+        $routeName .= "_$apiNamespace";
+        return $app->urlFor($routeName, $params);
+    }
 
     public static function GetApiVersionNamespace($app, $prefix) {
         $pi = $app->request->getPathInfo();

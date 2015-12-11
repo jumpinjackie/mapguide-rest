@@ -369,11 +369,12 @@ $app->get("/session/:sessionId/:mapName.Selection/layers.:format", function($ses
  *     @SWG\Operation(
  *        method="GET",
  *        nickname="GetSelectionOverview",
- *        summary="Gets the layers of the current selection set",
+ *        summary="Gets an overview of the current selection set with optional extent",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
+ *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']"),
+ *          @SWG\parameter(name="bounds", paramType="query", required=false, type="boolean", description="If true, includes the bounds of the whole selection")
  *        ),
  *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
@@ -412,7 +413,7 @@ $app->get("/session/:sessionId/:mapName.Selection/overview.:format", function($s
 $app->get("/session/:sessionId/:mapName.Selection/features.:format/:layerName", function($sessionId, $mapName, $format, $layerName) use ($app) {
     $ctrl = new MgMapController($app);
     $ctrl->GetSelectedFeatures($sessionId, $mapName, $layerName, $format);
-});
+})->name("get_selected_features_$namespace");
 /**
  * @SWG\Api(
  *     path="/session/{session}/{mapName}.Selection/xml",
@@ -491,7 +492,7 @@ $app->post("/session/:sessionId/:resName.Map", function($sessionId, $resName) us
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.Map");
     $ctrl = new MgMapController($app);
     $ctrl->CreateMap($resId);
-})->name("session_resource_id");
+})->name("session_resource_id_$namespace");
 //
 // NOTE:
 // Although the session repository allows for resources of multiple depth, for the sake of simplicity the REST API only
