@@ -2821,8 +2821,15 @@
                     self.ok(result == null, "Non-null result");
                     self.ok(status == 404, "(" + status+ ") - Route should not be legal");
                 });
-                api_test_with_credentials(rest_root_url + "/session", "POST", {}, "Foo", "Bar", function(status, result, mimeType) {
-                    self.ok(status == 401, "(" + status+ ") - Request should've required authentication");
+                api_test_with_credentials(rest_root_url + "/session.xml", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
+                    self.ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                    self.ok(status == 201, "(" + status+ ") - Expected created response");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test_with_credentials(rest_root_url + "/session.xml", "POST", {}, "<?= $adminUser ?>", "<?= $adminPass ?>", function(status, result, mimeType) {
+                    self.ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                    self.ok(status == 201, "(" + status+ ") - Expected created response");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 api_test_with_credentials(rest_root_url + "/session.json", "POST", {}, "Anonymous", "", function(status, result, mimeType) {
                     self.ok(status != 401, "(" + status+ ") - Request should've been authenticated");
@@ -2881,11 +2888,11 @@
                 api_test(rest_root_url + "/library/Samples/list", "POST", { depth: -1, type: "FeatureSource" }, function(status, result, mimeType) {
                     self.ok(status == 404, "(" + status + ") - Route should not be legal");
                 });
-                api_test_with_credentials(rest_root_url + "/library/Samples/list", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/list.xml", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_with_credentials(rest_root_url + "/library/Samples/list", "GET", { depth: -1, type: "FeatureSource" }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/list.xml", "GET", { depth: -1, type: "FeatureSource" }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -2905,50 +2912,6 @@
                 api_test_admin(rest_root_url + "/library/Samples/list.foo", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/list", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got a list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_anon(rest_root_url + "/library/Samples/list", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got a list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/list", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got a list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/list", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got a list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/list", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got a list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/list", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got a list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/list", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got a list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/list", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got a list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -3069,11 +3032,11 @@
             });
             test("Get Resource Content", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.xml", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", { depth: -1, type: "FeatureSource" }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.xml", "GET", { depth: -1, type: "FeatureSource" }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -3092,50 +3055,6 @@
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.bar", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected a bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -3220,11 +3139,11 @@
             });
             test("Get Resource Header", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header.xml", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header", "GET", "depth=-1&type=FeatureSource", "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header.xml", "GET", "depth=-1&type=FeatureSource", "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -3244,46 +3163,6 @@
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header.sdfjkdsg", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected a bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header", "GET", null, function(status, result, mimeType) {
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header", "GET", null, function(status, result, mimeType) {
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/header", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -3386,11 +3265,11 @@
                 api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "PUT", null, function(status, result, mimeType) {
                     self.ok(status == 404, "(" + status + ") - Route should not be legal");
                 });
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", { depth: -1, type: "LayerDefinition" }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.xml", "GET", { depth: -1, type: "LayerDefinition" }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -3410,50 +3289,6 @@
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.jsdhf", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected a bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -3765,11 +3600,11 @@
             });
             test("Enumerate Resource References", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", { depth: -1, type: "FeatureSource" }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", { depth: -1, type: "FeatureSource" }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -3789,50 +3624,6 @@
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.sdjf", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -3954,13 +3745,13 @@
             test("Set/Get/Delete resource", function() {
                 var self = this;
                 var xml = '<?= $emptyFeatureSourceXml ?>';
-                api_test_with_credentials(rest_root_url + "/library/RestUnitTests/Empty.FeatureSource/content", "POST", {}, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/RestUnitTests/Empty.FeatureSource/content.xml", "POST", {}, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                 });
-                api_test_anon(rest_root_url + "/library/RestUnitTests/Empty.FeatureSource/content", "POST", xml, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/Empty.FeatureSource/content.xml", "POST", xml, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Anonymous shouldn't be able to save to library repo");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty.FeatureSource/content", "POST", xml, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty.FeatureSource/content.xml", "POST", xml, function(status, result, mimeType) {
                     self.ok(status == 201, "(" + status + ") - Should've saved resource");
                 });
                 api_test_anon(rest_root_url + "/library/RestUnitTests/Empty.FeatureSource", "DELETE", null, function(status, result, mimeType) {
@@ -3982,25 +3773,25 @@
                     return xml;
                 }
                 var xml = '<?= $emptyFeatureSourceXml ?>';
-                api_test_with_credentials(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/contentorheader", "POST", {}, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/contentorheader.xml", "POST", {}, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                 });
-                api_test_anon(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/contentorheader", "POST", { content: makeXmlBlob(xml) }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/contentorheader.xml", "POST", { content: makeXmlBlob(xml) }, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Anonymous shouldn't be able to save to library repo");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/contentorheader", "POST", { content: makeXmlBlob(xml) }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/contentorheader.xml", "POST", { content: makeXmlBlob(xml) }, function(status, result, mimeType) {
                     self.ok(status == 201, "(" + status + ") - Should've saved resource");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/header", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/header.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Expect success");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                     var header = result || "";
                     self.ok(header.indexOf("<Name>HelloWorld</Name>") < 0, "Expected no header");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/contentorheader", "POST", { content: makeXmlBlob(xml), header: makeXmlBlob(createHeaderXml()) }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/contentorheader.xml", "POST", { content: makeXmlBlob(xml), header: makeXmlBlob(createHeaderXml()) }, function(status, result, mimeType) {
                     self.ok(status == 201, "(" + status + ") - Should've saved resource content and header");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/header", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/Empty2.FeatureSource/header.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Expect success");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                     var header = result || "";
@@ -4040,7 +3831,7 @@
             });
             test("Get Spatial Contexts", function() {
                 var self = this;
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -4052,30 +3843,6 @@
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts.sdigud", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/spatialcontexts", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -4124,7 +3891,7 @@
             });
             test("Get Schemas", function() {
                 var self = this;
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -4136,30 +3903,6 @@
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas.ksjdg", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schemas", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -4228,7 +3971,7 @@
             });
             test("DescribeSchema - SHP_Schema", function() {
                 var self = this;
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema/SHP_Schema", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.xml/SHP_Schema", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -4243,24 +3986,24 @@
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema/SHP_Schema", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.xml/SHP_Schema", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema/SHP_Schema", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.xml/SHP_Schema", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.xml/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/schema.xml/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -4332,7 +4075,7 @@
             });
             test("Get Classes - SHP_Schema", function() {
                 var self = this;
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes/SHP_Schema", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -4344,30 +4087,6 @@
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes.sdgudkf/SHP_Schema", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes/SHP_Schema", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes/SHP_Schema", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classes/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -4436,7 +4155,7 @@
             });
             test("Get Class Definition - SHP_Schema:Parcels", function() {
                 var self = this;
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef.xml/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -4448,54 +4167,6 @@
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef.jsdfjkdf/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -4564,7 +4235,7 @@
             });
             test("Get Class Definition - SHP_Schema:Parcels alternate route", function() {
                 var self = this;
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef.xml/SHP_Schema:Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -4576,54 +4247,6 @@
                 api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef.jsdfjkdf/SHP_Schema:Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -4692,7 +4315,7 @@
             });
             test("Get FDO Providers", function() {
                 var self = this;
-                api_test(rest_root_url + "/providers", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/providers.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -4704,30 +4327,6 @@
                 api_test_admin(rest_root_url + "/providers.sdgfdsf", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/providers", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/providers", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/providers", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/providers", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -4796,7 +4395,7 @@
             });
             test("SDF Provider Capabilities", function() {
                 var self = this;
-                api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -4808,30 +4407,6 @@
                 api_test_admin(rest_root_url + "/providers/OSGeo.SDF/capabilities.ksdjgdf", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -4881,7 +4456,7 @@
             //List Data Stores test case excluded as that requires a SQL Server feature source set up. Can always manually verify
             test("SDF Provider - Connection Property Values for ReadOnly", function() {
                 var self = this;
-                api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues.xml/ReadOnly", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -4893,30 +4468,6 @@
                 api_test_admin(rest_root_url + "/providers/OSGeo.SDF/connectvalues.skdjfkd/ReadOnly", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -4965,37 +4516,13 @@
             });
             test("Aggregates - count", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.xml/count/SHP_Schema/Parcels", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/count/SHP_Schema/Parcels", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Json);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -5020,37 +4547,13 @@
             });
             test("Aggregates - bbox", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.xml/bbox/SHP_Schema/Parcels", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Json);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -5075,37 +4578,13 @@
             });
             test("Aggregates - bbox (with xform)", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator" }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.xml/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator" }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator" }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Json);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator", session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transform: "WGS84.PseudoMercator", session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -5130,33 +4609,13 @@
             });
             test("Aggregates - distinctvalues", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.xml/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.json/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Json);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -5180,24 +4639,24 @@
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.xml/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.xml/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, property: "RTYPE" }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.xml/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, property: "RTYPE" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, property: "RTYPE" }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/aggregates.xml/distinctvalues/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, property: "RTYPE" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -5225,30 +4684,30 @@
             });
             test("Select 100 Parcels", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -5283,30 +4742,30 @@
             });
             test("Select 100 Parcels by Layer", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100 }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { maxfeatures: 100 }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -5341,30 +4800,30 @@
             });
             test("Parcels owned by SCHMITT", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -5399,30 +4858,30 @@
             });
             test("Parcels owned by SCHMITT by Layer", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -5457,30 +4916,30 @@
             });
             test("Select 100 Parcels with projected property list", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -5515,30 +4974,30 @@
             });
             test("Select 100 Parcels by layer with projected property list", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -5573,30 +5032,30 @@
             });
             test("Select 100 Parcels (xformed to WGS84.PseudoMercator)", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -5631,30 +5090,30 @@
             });
             test("Select 100 Parcels by layer (xformed to WGS84.PseudoMercator)", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -5827,43 +5286,43 @@
                 }
 
                 //Disable everything
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(false, false, false, false), function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header.xml", "POST", createHeaderXml(false, false, false, false), function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Expect anon setresourceheader denial");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(false, false, false, false), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header.xml", "POST", createHeaderXml(false, false, false, false), function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Expect admin setresourceheader success");
                 });
 
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("anon credential insert", "POINT (0 0)"), function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "POST", createInsertXml("anon credential insert", "POINT (0 0)"), function(status, result, mimeType) {
                     self.ok(status == 403, "(" + status + ") - Expect anon insert denial");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("admin credential insert", "POINT (1 1)"), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "POST", createInsertXml("admin credential insert", "POINT (1 1)"), function(status, result, mimeType) {
                     self.ok(status == 403, "(" + status + ") - Expect admin insert denial");
                 });
 
                 //Enable insert
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, false, false, false), function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header.xml", "POST", createHeaderXml(true, false, false, false), function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Expect anon setresourceheader denial");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, false, false, true), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header.xml", "POST", createHeaderXml(true, false, false, true), function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Expect admin setresourceheader success. Enable insert/transactions");
                 });
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("anon credential insert", "POINT (0 0)"), function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "POST", createInsertXml("anon credential insert", "POINT (0 0)"), function(status, result, mimeType) {
                     self.ok(status == 500, "(" + status + ") - Expect anon insert failure. Transactions not supported");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("admin credential insert", "POINT (1 1)"), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "POST", createInsertXml("admin credential insert", "POINT (1 1)"), function(status, result, mimeType) {
                     self.ok(status == 500, "(" + status + ") - Expect admin insert failure. Transactions not supported");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, false, false, false), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header.xml", "POST", createHeaderXml(true, false, false, false), function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Expect admin setresourceheader success. Enable insert. Disable transactions");
                 });
 
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("anon credential insert", "POINT (0 0)"), function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "POST", createInsertXml("anon credential insert", "POINT (0 0)"), function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Expect anon insert success");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("admin credential insert", "POINT (1 1)"), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "POST", createInsertXml("admin credential insert", "POINT (1 1)"), function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Expect admin insert success");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -5882,40 +5341,40 @@
                     }
                 });
 
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result, mimeType) {
                     self.ok(status == 403, "(" + status + ") - Expect anon update denial");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result, mimeType) {
                     self.ok(status == 403, "(" + status + ") - Expect admin update denial");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //Enable update
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, false, false), function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header.xml", "POST", createHeaderXml(true, true, false, false), function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Expect anon setresourceheader denial");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, false, true), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header.xml", "POST", createHeaderXml(true, true, false, true), function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Expect admin setresourceheader success - Enable insert/update/transactions");
                 });
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result, mimeType) {
                     self.ok(status == 500, "(" + status + ") - Expect anon update failure - Transactions not supported");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result, mimeType) {
                     self.ok(status == 500, "(" + status + ") - Expect admin update failure - Transactions not supported");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, false, false), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header.xml", "POST", createHeaderXml(true, true, false, false), function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Expect admin setresourceheader success - Enable insert/update. Disable transactions");
                 });
 
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Expect anon update success");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Expect admin update success");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -5934,33 +5393,33 @@
                     }
                 });
 
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result, mimeType) {
                     self.ok(status == 403, "(" + status + ") - Expect admin delete denial");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result, mimeType) {
                     self.ok(status == 403, "(" + status + ") - Expect admin delete denial");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //Enable everything
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, true, false), function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header.xml", "POST", createHeaderXml(true, true, true, false), function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Expect anon setresourceheader denial");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, true, true), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header.xml", "POST", createHeaderXml(true, true, true, true), function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Expect admin setresourceheader success. Enable everything");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result, mimeType) {
                     self.ok(status == 500, "(" + status + ") - Expect admin delete failure. Transactions not supported");
                 });
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result, mimeType) {
                     self.ok(status == 500, "(" + status + ") - Expect anon delete failure. Transactions not supported");
                 });
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header", "POST", createHeaderXml(true, true, true, false), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/header.xml", "POST", createHeaderXml(true, true, true, false), function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Expect admin setresourceheader success. Enable everything except transactions");
                 });
 
-                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Expect admin delete success");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -5972,7 +5431,7 @@
                     self.ok(gj.features.length == 1, "Expected 1 inserted features. Got " + gj.features.length);
                     self.ok(gj.features[0].id == 1, "expected feature ID 2 to be deleted");
                 });
-                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/RestUnitTests/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Expect anon delete success");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -6210,110 +5669,163 @@
             });
             test("Get Status", function() {
                 var self = this;
-                api_test(rest_root_url + "/site/status", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/status.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/site/status", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/site/status.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/site/status", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/site/status.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/site/status", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/status.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/site/status", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/status.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                
+                //With raw credentials
+                api_test_anon(rest_root_url + "/site/status.json", "GET", null, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/site/status.json", "GET", null, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+
+                //With session id
+                api_test(rest_root_url + "/site/status.json", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/site/status.json", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
                 });
             });
             test("Get Version", function() {
                 var self = this;
-                api_test(rest_root_url + "/site/version", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/version.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/site/version", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/site/version.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
-                api_test_admin(rest_root_url + "/site/version", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/site/version.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
 
                 //With session id
-                api_test(rest_root_url + "/site/version", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/version.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
-                api_test(rest_root_url + "/site/version", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/version.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                
+                //With raw credentials
+                api_test_anon(rest_root_url + "/site/version.json", "GET", null, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test_admin(rest_root_url + "/site/version.json", "GET", null, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/site/version.json", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                });
+                api_test(rest_root_url + "/site/version.json", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                 });
             });
             test("List Groups", function() {
                 var self = this;
-                api_test(rest_root_url + "/site/groups", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/groups.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_anon(rest_root_url + "/site/groups", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/site/groups.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Anonymous access denied");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_admin(rest_root_url + "/site/groups", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/site/groups.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/site/groups", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/groups.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
-                api_test(rest_root_url + "/site/groups", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/groups.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Anonymous session id should've been denied");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                
+                //With raw credentials
+                api_test_admin(rest_root_url + "/site/groups.json", "GET", null, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+
+                //With session id
+                api_test(rest_root_url + "/site/groups.json", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+
+                api_test(rest_root_url + "/site/groups.json", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 401, "(" + status + ") - Anonymous session id should've been denied");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
                 });
             });
             test("List Roles - Anonymous", function() {
                 var self = this;
-                api_test(rest_root_url + "/site/user/Anonymous/roles", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/user/Anonymous/roles.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_anon(rest_root_url + "/site/user/Anonymous/roles", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/site/user/Anonymous/roles.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_admin(rest_root_url + "/site/user/Anonymous/roles", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/site/user/Anonymous/roles.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/site/user/Anonymous/roles", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/user/Anonymous/roles.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 //TODO: Review. Should anonymous be allowed to snoop its own groups and roles?
-                api_test(rest_root_url + "/site/user/Anonymous/roles", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/user/Anonymous/roles.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -6321,60 +5833,60 @@
             });
             test("List Roles - Administrator", function() {
                 var self = this;
-                api_test(rest_root_url + "/site/user/Administrator/roles", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/user/Administrator/roles.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_anon(rest_root_url + "/site/user/Administrator/roles", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/site/user/Administrator/roles.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Anonymous access denied");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_admin(rest_root_url + "/site/user/Administrator/roles", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/site/user/Administrator/roles.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/site/user/Administrator/roles", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/user/Administrator/roles.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/site/user/Administrator/roles", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/user/Administrator/roles.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Anonymous session id should've been denied");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
             });
             test("List Groups - Anonymous", function() {
                 var self = this;
-                api_test(rest_root_url + "/site/user/Anonymous/groups", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/user/Anonymous/groups.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_anon(rest_root_url + "/site/user/Anonymous/groups", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/site/user/Anonymous/groups.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_admin(rest_root_url + "/site/user/Anonymous/groups", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/site/user/Anonymous/groups.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/site/user/Anonymous/groups", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/user/Anonymous/groups.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                      self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
                 //TODO: Review. Should anonymous be allowed to snoop its own groups and roles?
-                api_test(rest_root_url + "/site/user/Anonymous/groups", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/user/Anonymous/groups.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -6382,58 +5894,58 @@
             });
             test("List Groups - Administrator", function() {
                 var self = this;
-                api_test(rest_root_url + "/site/user/Administrator/groups", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/user/Administrator/groups.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_anon(rest_root_url + "/site/user/Administrator/groups", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/site/user/Administrator/groups.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Anonymous access denied");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_admin(rest_root_url + "/site/user/Administrator/groups", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/site/user/Administrator/groups.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/site/user/Administrator/groups", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/user/Administrator/groups.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/site/user/Administrator/groups", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/user/Administrator/groups.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Anonymous session id should've been denied");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
             });
             test("List users under everyone", function() {
                 var self = this;
-                api_test(rest_root_url + "/site/groups/Everyone/users", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/groups/Everyone/users.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_anon(rest_root_url + "/site/groups/Everyone/users", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/site/groups/Everyone/users.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Anonymous access denied");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
-                api_test_admin(rest_root_url + "/site/groups/Everyone/users", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/site/groups/Everyone/users.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/site/groups/Everyone/users", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/groups/Everyone/users.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/site/groups/Everyone/users", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/site/groups/Everyone/users.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Anonymous session id should've been denied");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -6482,7 +5994,7 @@
                 }, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") copy operation should've been denied");
                 });
-                api_test(rest_root_url + "/library/RestUnitTests/Parcels.LayerDefinition/content", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/RestUnitTests/Parcels.LayerDefinition/content.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - the parcels layerdef should exist");
                 });
             });
@@ -6504,11 +6016,11 @@
                 }, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") copy operation should've been denied");
                 });
-                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Parcels.LayerDefinition/content", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Parcels.LayerDefinition/content.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - the parcels layerdef should exist");
                 });
-                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Parcels2.LayerDefinition/content", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Parcels2.LayerDefinition/content.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(status == 404, "(" + status + ") - the parcels2 layerdef should not exist");
                 });
             });
@@ -6530,11 +6042,11 @@
                 }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") copy operation should've succeeded");
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/content", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/content.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - the parcels layerdef should exist");
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels2.LayerDefinition/content", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels2.LayerDefinition/content.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - the parcels2 layerdef should exist");
                 });
@@ -6557,11 +6069,11 @@
                 }, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") move operation should've been denied");
                 });
-                api_test(rest_root_url + "/library/RestUnitTests/Parcels2.LayerDefinition/content", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/RestUnitTests/Parcels2.LayerDefinition/content.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - the parcels2 layerdef should exist");
                 });
-                api_test(rest_root_url + "/library/RestUnitTests/Parcels.LayerDefinition/content", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/RestUnitTests/Parcels.LayerDefinition/content.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(status == 404, "(" + status + ") - the parcels layerdef shouldn't exist");
                 });
             });
@@ -6616,50 +6128,6 @@
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content.bar", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected a bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/content", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource content back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -6746,11 +6214,11 @@
             //Need to confirm if like EnumerateResources, this is not permitted on session repos
             test("Get Resource Header - anon session", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.xml", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_with_credentials(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", "depth=-1&type=FeatureSource", "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.xml", "GET", "depth=-1&type=FeatureSource", "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -6770,42 +6238,6 @@
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header.sdfjkdsg", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected a bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", null, function(status, result, mimeType) {
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", null, function(status, result, mimeType) {
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/header", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(status == 200, "(" + status + ") - Should've got resource header back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -6883,10 +6315,10 @@
             */
             test("Enumerate Resource Data - anon session", function() {
                 var self = this;
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "POST", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "POST", null, function(status, result, mimeType) {
                     self.ok(status == 404, "(" + status + ") - Route should not be legal");
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "PUT", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.xml", "PUT", null, function(status, result, mimeType) {
                     self.ok(status == 404, "(" + status + ") - Route should not be legal");
                 });
 
@@ -6905,50 +6337,6 @@
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist.jsdhf", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected a bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/datalist", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -7069,11 +6457,11 @@
             });
             test("Enumerate Resource References - anon session", function() {
                 var self = this;
-                api_test_with_credentials(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", null, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_with_credentials(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { depth: -1, type: "FeatureSource" }, "Foo", "Bar", function(status, result, mimeType) {
+                api_test_with_credentials(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.xml", "GET", { depth: -1, type: "FeatureSource" }, "Foo", "Bar", function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -7093,50 +6481,6 @@
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references.sdjf", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { session: this.anonymousSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/references", "GET", { session: this.adminSessionId, depth: -1, type: "LayerDefinition" }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Should've got resource data list back");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -7258,18 +6602,18 @@
             test("Set/Get/Delete resource - anon session", function() {
                 var self = this;
                 var xml = '<?= $emptyFeatureSourceXml ?>';
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource/content", "POST", xml, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource/content.xml", "POST", xml, function(status, result, mimeType) {
                     self.ok(status == 201, "(" + status + ") - Should've saved resource by anon");
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource/content", "POST", xml, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource/content.xml", "POST", xml, function(status, result, mimeType) {
                     self.ok(status == 201, "(" + status + ") - Should've saved resource by admin");
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource/content", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource/content.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                     self.ok(status == 200, "(" + status + ") - Empty fs should exist");
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource/content", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource/content.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                     self.ok(status == 200, "(" + status + ") - Empty2 fs should exist");
@@ -7294,18 +6638,18 @@
                     return xml;
                 }
                 var xml = '<?= $emptyFeatureSourceXml ?>';
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource/contentorheader", "POST", { content: makeXmlBlob(xml) }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource/contentorheader.xml", "POST", { content: makeXmlBlob(xml) }, function(status, result, mimeType) {
                     self.ok(status == 201, "(" + status + ") - Should've saved resource by anon");
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource/contentorheader", "POST", { content: makeXmlBlob(xml) }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource/contentorheader.xml", "POST", { content: makeXmlBlob(xml) }, function(status, result, mimeType) {
                     self.ok(status == 201, "(" + status + ") - Should've saved resource by admin");
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource/content", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty.FeatureSource/content.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                     self.ok(status == 200, "(" + status + ") - Empty fs should exist");
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource/content", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Empty2.FeatureSource/content.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                     self.ok(status == 200, "(" + status + ") - Empty2 fs should exist");
@@ -7325,7 +6669,7 @@
                     data: makeXmlBlob("<Test></Test>")
                 };
                 var xml = '<?= $emptyFeatureSourceXml ?>';
-                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/content", "POST", xml, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.adminSessionId + "/Empty.FeatureSource/content.xml", "POST", xml, function(status, result, mimeType) {
                     self.ok(status == 201, "(" + status + ") - Should've saved resource by anon");
                 });
                 //Various bad requests
@@ -7533,31 +6877,7 @@
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
                 });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
+                
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/spatialcontexts.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
@@ -7611,30 +6931,6 @@
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas.ksjdg", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schemas", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -7713,24 +7009,24 @@
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema/SHP_Schema", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema.xml/SHP_Schema", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema/SHP_Schema", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema.xml/SHP_Schema", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema.xml/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/schema.xml/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -7810,31 +7106,7 @@
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
                 });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes/SHP_Schema", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes/SHP_Schema", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes/SHP_Schema", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes/SHP_Schema", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
+                
                 //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classes.xml/SHP_Schema", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
@@ -7906,54 +7178,6 @@
                 api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.jsdfjkdf/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema/Parcels", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -8032,54 +7256,6 @@
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef/SHP_Schema:Parcels", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With raw credentials
                 api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/classdef.xml/SHP_Schema:Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
@@ -8152,30 +7328,6 @@
                 api_test_admin(rest_root_url + "/providers.sdgfdsf", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/providers", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/providers", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/providers", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/providers", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -8254,30 +7406,6 @@
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/providers/OSGeo.SDF/capabilities", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With raw credentials
                 api_test_anon(rest_root_url + "/providers/OSGeo.SDF/capabilities.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
@@ -8331,30 +7459,6 @@
                 api_test_admin(rest_root_url + "/providers/OSGeo.SDF/connectvalues.skdjfkd/ReadOnly", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/providers/OSGeo.SDF/connectvalues/ReadOnly", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -8414,24 +7518,24 @@
             test("Aggregates - count", function() {
                 var self = this;
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/count/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/count/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/count/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/count/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/count/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -8460,24 +7564,24 @@
             test("Aggregates - bbox", function() {
                 var self = this;
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/bbox/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/bbox/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/bbox/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/bbox/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -8506,24 +7610,24 @@
             test("Aggregates - bbox (with xform)", function() {
                 var self = this;
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/bbox/SHP_Schema/Parcels", "GET", { transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -8552,21 +7656,21 @@
             test("Aggregates - distinctvalues", function() {
                 var self = this;
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/distinctvalues/SHP_Schema/Parcels", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected error. Missing required parameter.");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -8592,24 +7696,24 @@
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/aggregates.xml/distinctvalues/SHP_Schema/Parcels", "GET", { property: "RTYPE" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -8638,24 +7742,24 @@
             test("Select 100 Parcels", function() {
                 var self = this;
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -8686,24 +7790,24 @@
             test("Select 100 Parcels by layer", function() {
                 var self = this;
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { session: this.anonymousSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { session: this.adminSessionId, maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -8734,24 +7838,24 @@
             test("Parcels owned by SCHMITT", function() {
                 var self = this;
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -8782,24 +7886,24 @@
             test("Parcels owned by SCHMITT by layer", function() {
                 var self = this;
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { session: this.anonymousSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { session: this.adminSessionId, filter: encodeURIComponent("RNAME LIKE 'SCHMITT%'") }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -8830,24 +7934,24 @@
             test("Select 100 Parcels with projected property list", function() {
                 var self = this;
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -8878,24 +7982,24 @@
             test("Select 100 Parcels with projected property list by layer", function() {
                 var self = this;
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { session: this.anonymousSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { session: this.adminSessionId, properties: "Autogenerated_SDF_ID,RNAME,SHPGEOM", maxfeatures: 100 }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -8926,24 +8030,24 @@
             test("Select 100 Parcels (xformed to WGS84.PseudoMercator)", function() {
                 var self = this;
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -8974,24 +8078,24 @@
             test("Select 100 Parcels by layer (xformed to WGS84.PseudoMercator)", function() {
                 var self = this;
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With session id
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { session: this.anonymousSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Parcels.LayerDefinition/features.xml", "GET", { session: this.adminSessionId, maxfeatures: 100, transformto: "WGS84.PseudoMercator" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -9041,12 +8145,12 @@
                 }
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("anon credential insert", "POINT (0 0)"), function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "POST", createInsertXml("anon credential insert", "POINT (0 0)"), function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Expect anon insert success");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "POST", createInsertXml("admin credential insert", "POINT (1 1)"), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "POST", createInsertXml("admin credential insert", "POINT (1 1)"), function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Expect admin insert success");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -9064,12 +8168,12 @@
                         }
                     }
                 });
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 1", "anon credential update", "POINT (2 2)"), function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Expect anon update success");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "PUT", createUpdateXml("ID = 2", "admin credential update", "POINT (3 3)"), function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Expect admin update success");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -9087,7 +8191,7 @@
                         }
                     }
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "DELETE", { filter: "ID = 2" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Expect admin delete success");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -9099,7 +8203,7 @@
                     self.ok(gj.features.length == 1, "Expected 1 inserted features. Got " + gj.features.length);
                     self.ok(gj.features[0].id == 1, "expected feature ID 2 to be deleted");
                 });
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/RedlineLayer.FeatureSource/features.xml/MarkupSchema/Markup", "DELETE", { filter: "ID = 1" }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
                     self.ok(status == 200, "(" + status + ") - Expect admin delete success");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -9609,7 +8713,7 @@
                     self.ok(status == 200, "(" + status + ") copy operation should've succeeded");
                 });
 
-                api_test(rest_root_url + "/services/createmap", "POST", {
+                api_test(rest_root_url + "/services/createmap.json", "POST", {
                     session: this.anonymousSessionId,
                     mapdefinition: "Library://Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition",
                     targetmapname: "Sheboygan"
@@ -10604,13 +9708,13 @@
             test("GetTile", function() {
                 var self = this;
                 //With raw credentials
-                api_test(rest_root_url + "/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/tile.img/Base Layer Group/6/1/0", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
                 });
-                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/tile.img/Base Layer Group/6/1/0", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
                 });
-                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/tile.img/Base Layer Group/6/1/0", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
                 });
             });
@@ -10625,13 +9729,13 @@
                     self.ok(status == 200, "(" + status + ") copy operation should've succeeded");
                 });
                 //With raw credentials
-                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/tile.img/Base Layer Group/6/1/0", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
                 });
-                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/tile.img/Base Layer Group/6/1/0", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
                 });
-                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/tile/Base Layer Group/6/1/0", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/session/" + this.anonymousSessionId + "/Sheboygan.MapDefinition/tile.img/Base Layer Group/6/1/0", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Should've got a tile at 6,1,0");
                 });
             });
@@ -10837,7 +9941,7 @@
             });
             test("Enum categories", function() {
                 var self = this;
-                api_test(rest_root_url + "/coordsys/categories", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/coordsys/categories.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -10849,30 +9953,6 @@
                 api_test_admin(rest_root_url + "/coordsys/categories.sadgdsfd", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/coordsys/categories", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/coordsys/categories", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/coordsys/categories", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/coordsys/categories", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -10941,7 +10021,7 @@
             });
             test("Enum categories - Australia", function() {
                 var self = this;
-                api_test(rest_root_url + "/coordsys/category/Australia", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/coordsys/category.xml/Australia", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
@@ -10953,30 +10033,6 @@
                 api_test_admin(rest_root_url + "/coordsys/category.sdgfd/Australia", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 400, "(" + status + ") - Expected bad representation response");
                     self.assertMimeType(mimeType, MgMimeType.Html);
-                });
-
-                //With raw credentials
-                api_test_anon(rest_root_url + "/coordsys/category/Australia", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test_admin(rest_root_url + "/coordsys/category/Australia", "GET", null, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-
-                //With session id
-                api_test(rest_root_url + "/coordsys/category/Australia", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
-                });
-                api_test(rest_root_url + "/coordsys/category/Australia", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
-                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
-                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
-                    self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
 
                 //With raw credentials
@@ -11045,18 +10101,18 @@
             });
             test("EPSG for LL84", function() {
                 var self = this;
-                api_test(rest_root_url + "/coordsys/mentor/LL84/epsg", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/coordsys/mentor/LL84/epsg.xml", "GET", null, function(status, result, mimeType) {
                     //ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.ok(status == 200, "(" + status + ") - Response shouldn't require authentication");
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/coordsys/mentor/LL84/epsg", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/coordsys/mentor/LL84/epsg.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf('4326') >= 0, "Expected EPSG of 4326. Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/coordsys/mentor/LL84/epsg", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/coordsys/mentor/LL84/epsg.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf('4326') >= 0, "Expected EPSG of 4326. Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -11075,12 +10131,12 @@
                 });
 
                 //With session id
-                api_test(rest_root_url + "/coordsys/mentor/LL84/epsg", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/coordsys/mentor/LL84/epsg.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf('4326') >= 0, "Expected EPSG of 4326. Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/coordsys/mentor/LL84/epsg", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/coordsys/mentor/LL84/epsg.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf('4326') >= 0, "Expected EPSG of 4326. Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -11101,18 +10157,18 @@
             test("WKT for LL84", function() {
                 var self = this;
                 var expect = "GEOGCS[\"LL84\",DATUM[\"WGS84\",SPHEROID[\"WGS84\",6378137.000,298.25722293]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.01745329251994]]";
-                api_test(rest_root_url + "/coordsys/mentor/LL84/wkt", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/coordsys/mentor/LL84/wkt.xml", "GET", null, function(status, result, mimeType) {
                     //ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.ok(status == 200, "(" + status + ") - Response shouldn't require authentication");
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/coordsys/mentor/LL84/wkt", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/coordsys/mentor/LL84/wkt.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/coordsys/mentor/LL84/wkt", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/coordsys/mentor/LL84/wkt.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -11131,12 +10187,12 @@
                 });
 
                 //With session id
-                api_test(rest_root_url + "/coordsys/mentor/LL84/wkt", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/coordsys/mentor/LL84/wkt.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/coordsys/mentor/LL84/wkt", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/coordsys/mentor/LL84/wkt.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -11157,18 +10213,18 @@
             test("Mentor code for EPSG:4326", function() {
                 var self = this;
                 var expect = "LL84";
-                api_test(rest_root_url + "/coordsys/epsg/4326/mentor", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/coordsys/epsg/4326/mentor.xml", "GET", null, function(status, result, mimeType) {
                     //ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.ok(status == 200, "(" + status + ") - Response shouldn't require authentication");
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/coordsys/epsg/4326/mentor", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/coordsys/epsg/4326/mentor.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf(expect) >= 0, "Expected code of " + expect + ". Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/coordsys/epsg/4326/mentor", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/coordsys/epsg/4326/mentor.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf(expect) >= 0, "Expected code of " + expect + ". Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -11187,12 +10243,12 @@
                 });
 
                 //With session id
-                api_test(rest_root_url + "/coordsys/epsg/4326/mentor", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/coordsys/epsg/4326/mentor.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf(expect) >= 0, "Expected code of " + expect + ". Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/coordsys/epsg/4326/mentor", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/coordsys/epsg/4326/mentor.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf(expect) >= 0, "Expected code of " + expect + ". Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -11213,18 +10269,18 @@
             test("WKT for EPSG:4326", function() {
                 var self = this;
                 var expect = "GEOGCS[\"LL84\",DATUM[\"WGS84\",SPHEROID[\"WGS84\",6378137.000,298.25722293]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.01745329251994]]";
-                api_test(rest_root_url + "/coordsys/epsg/4326/wkt", "GET", null, function(status, result, mimeType) {
+                api_test(rest_root_url + "/coordsys/epsg/4326/wkt.xml", "GET", null, function(status, result, mimeType) {
                     //ok(status == 401, "(" + status + ") - Request should've required authentication");
                     self.ok(status == 200, "(" + status + ") - Response shouldn't require authentication");
                 });
 
                 //With raw credentials
-                api_test_anon(rest_root_url + "/coordsys/epsg/4326/wkt", "GET", null, function(status, result, mimeType) {
+                api_test_anon(rest_root_url + "/coordsys/epsg/4326/wkt.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test_admin(rest_root_url + "/coordsys/epsg/4326/wkt", "GET", null, function(status, result, mimeType) {
+                api_test_admin(rest_root_url + "/coordsys/epsg/4326/wkt.xml", "GET", null, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
@@ -11243,12 +10299,12 @@
                 });
 
                 //With session id
-                api_test(rest_root_url + "/coordsys/epsg/4326/wkt", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/coordsys/epsg/4326/wkt.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);
                 });
-                api_test(rest_root_url + "/coordsys/epsg/4326/wkt", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                api_test(rest_root_url + "/coordsys/epsg/4326/wkt.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
                     self.ok(status == 200, "(" + status + ") - Response should've been ok");
                     self.ok(result.indexOf(encodeHTML(expect)) >= 0, "Expected WKT of " + expect + ". Got: " + result);
                     self.assertMimeType(mimeType, MgMimeType.Xml);

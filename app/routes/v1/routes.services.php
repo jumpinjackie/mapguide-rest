@@ -33,26 +33,6 @@ require_once dirname(__FILE__)."/../../controller/restservicecontroller.php";
 
 /**
  * @SWG\Api(
- *     path="/services/fusiontemplates",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="EnumerateApplicationTemplates",
- *        summary="Enumerates available templates for a fusion application",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/services/fusiontemplates", function() use ($app) {
-    $ctrl = new MgRestServiceController($app);
-    $ctrl->EnumerateApplicationTemplates("xml");
-});
-/**
- * @SWG\Api(
  *     path="/services/fusiontemplates.{type}",
  *     @SWG\Operation(
  *        method="GET",
@@ -74,26 +54,6 @@ $app->get("/services/fusiontemplates.:format", function($format) use ($app) {
 });
 /**
  * @SWG\Api(
- *     path="/services/fusionwidgets",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="EnumerateApplicationWidgets",
- *        summary="Enumerates available widgets for a fusion application",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/services/fusionwidgets", function() use ($app) {
-    $ctrl = new MgRestServiceController($app);
-    $ctrl->EnumerateApplicationWidgets("xml");
-});
-/**
- * @SWG\Api(
  *     path="/services/fusionwidgets.{type}",
  *     @SWG\Operation(
  *        method="GET",
@@ -112,26 +72,6 @@ $app->get("/services/fusionwidgets", function() use ($app) {
 $app->get("/services/fusionwidgets.:format", function($format) use ($app) {
     $ctrl = new MgRestServiceController($app);
     $ctrl->EnumerateApplicationWidgets($format);
-});
-/**
- * @SWG\Api(
- *     path="/services/fusioncontainers",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="EnumerateApplicationContainers",
- *        summary="Enumerates available containers for a fusion application",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/services/fusioncontainers", function() use ($app) {
-    $ctrl = new MgRestServiceController($app);
-    $ctrl->EnumerateApplicationContainers("xml");
 });
 /**
  * @SWG\Api(
@@ -178,28 +118,6 @@ $app->get("/services/fusioncontainers.:format", function($format) use ($app) {
 $app->post("/services/listunmanageddata.:format", function($format) use ($app) {
     $ctrl = new MgResourceServiceController($app);
     $ctrl->EnumerateUnmanagedData($format);
-});
-/**
- * @SWG\Api(
- *     path="/services/getschemamapping",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetSchemaMapping",
- *        summary="Gets schema mapping of a feature source",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="provider", paramType="query", required=true, type="string", description="The FDO Provider"),
- *          @SWG\parameter(name="connection", paramType="query", required=true, type="string", description="The partial connection string")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/services/getschemamapping", function() use ($app) {
-    $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetSchemaMapping("xml");
 });
 /**
  * @SWG\Api(
@@ -292,33 +210,6 @@ $app->post("/services/moveresource", function() use ($app) {
 $app->post("/services/transformcoords", function() use ($app) {
     $ctrl = new MgCoordinateSystemController($app);
     $ctrl->TransformCoordinates();
-});
-/**
- * @SWG\Api(
- *     path="/services/createmap",
- *     @SWG\Operation(
- *        method="POST",
- *        nickname="CreateRuntimeMap",
- *        summary="Creates a new Runtime Map (MgMap) instance from the specified map definition and returns detailed information about its layer/group structure if requested",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID. If none specified you must pass the basic http authentication challenge"),
- *          @SWG\parameter(name="mapdefinition", paramType="form", required=true, type="string", description="The Map Definition ID to create a new runtime map from"),
- *          @SWG\parameter(name="targetmapname", paramType="form", required=false, type="string", description="The target map name to associate the Runtime Map by. By default, the name is generated from the Map Definition ID"),
- *          @SWG\parameter(name="requestedfeatures", paramType="form", required=false, type="integer", description="A bitmask of the information about the Runtime Map that you would like returned. 1=Layer/Group structure, 2=icons, 4=Feature Source Information"),
- *          @SWG\parameter(name="iconformat", paramType="form", required=false, type="string", description="The desired icon image format if icons are requested", enum="['PNG','JPG','PNG8','GIF']"),
- *          @SWG\parameter(name="iconwidth", paramType="form", required=false, type="integer", description="The desired width of generated icons if icons are requested"),
- *          @SWG\parameter(name="iconheight", paramType="form", required=false, type="integer", description="The desired height of generated icons if icons are requested"),
- *          @SWG\parameter(name="iconsperscalerange", paramType="form", required=false, type="integer", description="The number of icons to generate per scale range if icons are requested")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->post("/services/createmap", function() use ($app) {
-    $ctrl = new MgMappingServiceController($app);
-    $ctrl->CreateRuntimeMap("xml");
 });
 /**
  * @SWG\Api(

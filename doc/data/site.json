@@ -5,35 +5,6 @@
     "resourcePath": "/site",
     "apis": [
         {
-            "path": "/site/groups",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Lists the current user groups",
-                    "nickname": "EnumerateGroups",
-                    "parameters": [
-                        {
-                            "paramType": "query",
-                            "name": "session",
-                            "type": "string",
-                            "required": false,
-                            "description": "Your MapGuide Session ID"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/site/groups.{type}",
             "operations": [
                 {
@@ -58,42 +29,6 @@
                                 "xml",
                                 "json"
                             ]
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/site/groups/{groupName}/users",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Lists the users for the specified group",
-                    "nickname": "EnumerateUsersForGroup",
-                    "parameters": [
-                        {
-                            "paramType": "query",
-                            "name": "session",
-                            "type": "string",
-                            "required": false,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "groupName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The group name"
                         }
                     ],
                     "responseMessages": [
@@ -157,35 +92,6 @@
             ]
         },
         {
-            "path": "/site/info",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets the information of the current Site Server",
-                    "nickname": "GetSiteInformation",
-                    "parameters": [
-                        {
-                            "paramType": "query",
-                            "name": "session",
-                            "type": "string",
-                            "required": false,
-                            "description": "Your MapGuide Session ID"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/site/info.{type}",
             "operations": [
                 {
@@ -226,35 +132,6 @@
             ]
         },
         {
-            "path": "/site/status",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets the status of the current Site Server",
-                    "nickname": "GetSiteStatus",
-                    "parameters": [
-                        {
-                            "paramType": "query",
-                            "name": "session",
-                            "type": "string",
-                            "required": false,
-                            "description": "Your MapGuide Session ID"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/site/status.{type}",
             "operations": [
                 {
@@ -279,42 +156,6 @@
                                 "xml",
                                 "json"
                             ]
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/site/user/{userName}/groups",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Lists the groups for the specified user",
-                    "nickname": "EnumerateGroupsForUser",
-                    "parameters": [
-                        {
-                            "paramType": "query",
-                            "name": "session",
-                            "type": "string",
-                            "required": false,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "userName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The user name"
                         }
                     ],
                     "responseMessages": [
@@ -378,42 +219,6 @@
             ]
         },
         {
-            "path": "/site/user/{userName}/roles",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Lists the roles for the specified user",
-                    "nickname": "EnumerateRolesForUser",
-                    "parameters": [
-                        {
-                            "paramType": "query",
-                            "name": "session",
-                            "type": "string",
-                            "required": false,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "userName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The user name"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/site/user/{userName}/roles.{type}",
             "operations": [
                 {
@@ -445,35 +250,6 @@
                                 "xml",
                                 "json"
                             ]
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/site/version",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets the version of the current Site Server",
-                    "nickname": "GetSiteVersion",
-                    "parameters": [
-                        {
-                            "paramType": "query",
-                            "name": "session",
-                            "type": "string",
-                            "required": false,
-                            "description": "Your MapGuide Session ID"
                         }
                     ],
                     "responseMessages": [

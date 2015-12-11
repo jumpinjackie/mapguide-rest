@@ -5,26 +5,6 @@
     "resourcePath": "/session",
     "apis": [
         {
-            "path": "/session",
-            "operations": [
-                {
-                    "method": "POST",
-                    "summary": "Creates a new MapGuide session",
-                    "nickname": "CreateSession",
-                    "responseMessages": [
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/session.{type}",
             "operations": [
                 {
@@ -64,39 +44,6 @@
                     "method": "DELETE",
                     "summary": "Destroys the specified session",
                     "nickname": "DestroySession",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/session/{session}/timeout",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets the session timeout of the specified session",
-                    "nickname": "GetSessionTimeout",
                     "parameters": [
                         {
                             "paramType": "path",
@@ -195,87 +142,6 @@
                             "type": "string",
                             "required": true,
                             "description": "The Map Definition XML"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/session/{session}/{mapName}.Map/description",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Describe an existing MgMap instance from the specified mapname and session id and returns detailed information about its layer/group structure if requested",
-                    "nickname": "DescribeRuntimeMap",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": false,
-                            "description": "Your MapGuide Session ID. If none specified you must pass the basic http authentication challenge"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "mapName",
-                            "type": "string",
-                            "required": false,
-                            "description": "The map name used to identify the MgMap instance"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "requestedfeatures",
-                            "type": "integer",
-                            "required": false,
-                            "description": "A bitmask of the information about the Runtime Map that you would like returned. 1=Layer/Group structure, 2=icons, 4=Feature Source Information"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "iconformat",
-                            "type": "string",
-                            "required": false,
-                            "description": "The desired icon image format if icons are requested",
-                            "enum": [
-                                "PNG",
-                                "JPG",
-                                "PNG8",
-                                "GIF"
-                            ]
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "iconwidth",
-                            "type": "integer",
-                            "required": false,
-                            "description": "The desired width of generated icons if icons are requested"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "iconheight",
-                            "type": "integer",
-                            "required": false,
-                            "description": "The desired height of generated icons if icons are requested"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "iconsperscalerange",
-                            "type": "integer",
-                            "required": false,
-                            "description": "The number of icons to generate per scale range if icons are requested"
                         }
                     ],
                     "responseMessages": [
@@ -572,46 +438,6 @@
             ]
         },
         {
-            "path": "/session/{session}/{mapName}.Map/layergroups",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets the layer groups of the specified runtime map",
-                    "nickname": "EnumerateMapLayerGroups",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "mapName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The name of the runtime map"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/session/{session}/{mapName}.Map/layergroups.{type}",
             "operations": [
                 {
@@ -643,94 +469,6 @@
                                 "xml",
                                 "json"
                             ]
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/session/{session}/{mapName}.Map/layers",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets the layers of the specified runtime map",
-                    "nickname": "EnumerateMapLayers",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "mapName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The name of the runtime map"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "requestedfeatures",
-                            "type": "integer",
-                            "required": false,
-                            "description": "A bitmask of the additional information that you would like returned. 2=icons, 4=Feature Source Information"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "iconformat",
-                            "type": "string",
-                            "required": false,
-                            "description": "The desired icon image format if icons are requested",
-                            "enum": [
-                                "PNG",
-                                "JPG",
-                                "PNG8",
-                                "GIF"
-                            ]
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "iconwidth",
-                            "type": "integer",
-                            "required": false,
-                            "description": "The desired width of generated icons if icons are requested"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "iconheight",
-                            "type": "integer",
-                            "required": false,
-                            "description": "The desired height of generated icons if icons are requested"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "iconsperscalerange",
-                            "type": "integer",
-                            "required": false,
-                            "description": "The number of icons to generate per scale range if icons are requested"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "group",
-                            "type": "string",
-                            "required": false,
-                            "description": "Only return layers belonging to the specified group"
                         }
                     ],
                     "responseMessages": [
@@ -830,6 +568,57 @@
                             "type": "string",
                             "required": false,
                             "description": "Only return layers belonging to the specified group"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Session ID or MapGuide credentials not specified"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An error occurred during the operation"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/session/{session}/{mapName}.Map/layersandgroups.{type}",
+            "operations": [
+                {
+                    "method": "GET",
+                    "summary": "Update the layers and groups of the runtime map",
+                    "nickname": "UpdateMapLayersAndGroups",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "session",
+                            "type": "string",
+                            "required": true,
+                            "description": "Your MapGuide Session ID"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "mapName",
+                            "type": "string",
+                            "required": true,
+                            "description": "The name of the runtime map"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "type",
+                            "type": "string",
+                            "required": true,
+                            "description": "xml or json",
+                            "enum": [
+                                "xml",
+                                "json"
+                            ]
                         }
                     ],
                     "responseMessages": [
@@ -1048,113 +837,6 @@
                             "type": "string",
                             "required": false,
                             "description": "A comma-separated list of layer group ids"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/session/{session}/{mapName}.Map/plot",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Plot the map to an EPlot DWF using the center and scale from the map",
-                    "nickname": "GeneratePlot",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "mapName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The name of the runtime map"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "papersize",
-                            "type": "string",
-                            "required": true,
-                            "description": "The paper size",
-                            "enum": [
-                                "A3",
-                                "A4",
-                                "A5",
-                                "Letter",
-                                "Legal"
-                            ]
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "orientation",
-                            "type": "string",
-                            "required": true,
-                            "description": "The plot orientation L=Landscape, P=Portrait",
-                            "enum": [
-                                "L",
-                                "P"
-                            ]
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "marginleft",
-                            "type": "double",
-                            "required": false,
-                            "description": "left margin in inches"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "marginright",
-                            "type": "double",
-                            "required": false,
-                            "description": "right margin in inches"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "margintop",
-                            "type": "double",
-                            "required": false,
-                            "description": "top margin in inches"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "marginbottom",
-                            "type": "double",
-                            "required": false,
-                            "description": "bottom margin in inches"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "printlayout",
-                            "type": "string",
-                            "required": false,
-                            "description": "The PrintLayout resource to use for plotting. Only applies if plotting to DWF"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "title",
-                            "type": "string",
-                            "required": false,
-                            "description": "The title to put in the plot"
                         }
                     ],
                     "responseMessages": [
@@ -1545,107 +1227,6 @@
             ]
         },
         {
-            "path": "/session/{session}/{mapName}.Selection/features/{layerName}",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets the features from the given layer in the selection set",
-                    "nickname": "GetSelectedFeatures",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "mapName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The name of the runtime map"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "layerName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The name of the layer in the selection set"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "mappedonly",
-                            "type": "boolean",
-                            "required": false,
-                            "description": "Only return properties mapped in the Layer Definition"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "transformto",
-                            "type": "string",
-                            "required": false,
-                            "description": "The CS-Map coordinate system code to transform these features to"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/session/{session}/{mapName}.Selection/layers",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets the layers of the current selection set",
-                    "nickname": "GetSelectionLayerNames",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "mapName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The name of the runtime map"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/session/{session}/{mapName}.Selection/layers.{type}",
             "operations": [
                 {
@@ -1697,52 +1278,12 @@
             ]
         },
         {
-            "path": "/session/{session}/{mapName}.Selection/layersandgroups",
+            "path": "/session/{session}/{mapName}.Selection/overview.{type}",
             "operations": [
                 {
                     "method": "GET",
-                    "summary": "Update the layers and groups of the runtime map",
-                    "nickname": "UpdateMapLayersAndGroups",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "mapName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The name of the runtime map"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/session/{session}/{mapName}.Selection/layersandgroups.{type}",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Update the layers and groups of the runtime map",
-                    "nickname": "UpdateMapLayersAndGroups",
+                    "summary": "Gets the layers of the current selection set",
+                    "nickname": "GetSelectionOverview",
                     "parameters": [
                         {
                             "paramType": "path",
@@ -2034,72 +1575,6 @@
             ]
         },
         {
-            "path": "/session/{session}/{resName}.FeatureSource/aggregates/{aggregateType}/{schemaName}/{className}",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Queries features from the specified feature source",
-                    "nickname": "SelectAggregates",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "schemaName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The FDO schema name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "className",
-                            "type": "string",
-                            "required": true,
-                            "description": "The class name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "aggregateType",
-                            "type": "string",
-                            "required": true,
-                            "description": "aggregate type",
-                            "enum": [
-                                "count",
-                                "bbox",
-                                "distinctvalues"
-                            ]
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/session/{session}/{resName}.FeatureSource/classdef.{type}/{qualifiedClassName}",
             "operations": [
                 {
@@ -2223,107 +1698,6 @@
             ]
         },
         {
-            "path": "/session/{session}/{resName}.FeatureSource/classdef/{qualifiedClassName}",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets a class definition of the specified name from the feature source",
-                    "nickname": "GetClassDefinition",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "qualifiedClassName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The qualified class name"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/session/{session}/{resName}.FeatureSource/classdef/{schemaName}/{className}",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets a class definition of the specified name from the feature source",
-                    "nickname": "GetClassDefinition",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "schemaName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The FDO schema name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "className",
-                            "type": "string",
-                            "required": true,
-                            "description": "The class name"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/session/{session}/{resName}.FeatureSource/classes.{type}/{schemaName}",
             "operations": [
                 {
@@ -2362,53 +1736,6 @@
                                 "xml",
                                 "json"
                             ]
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/session/{session}/{resName}.FeatureSource/classes/{schemaName}",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets the class names of the given schema for a feature source",
-                    "nickname": "GetClassNames",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "schemaName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The name of the schema to describe"
                         }
                     ],
                     "responseMessages": [
@@ -2730,263 +2057,6 @@
             ]
         },
         {
-            "path": "/session/{session}/{resName}.FeatureSource/features/{schemaName}/{className}",
-            "operations": [
-                {
-                    "method": "POST",
-                    "summary": "Inserts one or more features into the given feature class for th specified feature source",
-                    "nickname": "InsertFeatures",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "schemaName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The FDO schema name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "className",
-                            "type": "string",
-                            "required": true,
-                            "description": "The class name"
-                        },
-                        {
-                            "paramType": "body",
-                            "name": "body",
-                            "type": "string",
-                            "required": true,
-                            "description": "The Feature Set XML describing the features to be inserted"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                },
-                {
-                    "method": "PUT",
-                    "summary": "Updates one or more features into the given feature class for th specified feature source",
-                    "nickname": "UpdateFeatures",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "schemaName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The FDO schema name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "className",
-                            "type": "string",
-                            "required": true,
-                            "description": "The class name"
-                        },
-                        {
-                            "paramType": "body",
-                            "name": "body",
-                            "type": "string",
-                            "required": true,
-                            "description": "The XML envelope describing the features to be update"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                },
-                {
-                    "method": "DELETE",
-                    "summary": "Deletes one or more features from the given feature class for th specified feature source",
-                    "nickname": "DeleteFeatures",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "schemaName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The FDO schema name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "className",
-                            "type": "string",
-                            "required": true,
-                            "description": "The class name"
-                        },
-                        {
-                            "paramType": "form",
-                            "name": "filter",
-                            "type": "string",
-                            "required": true,
-                            "description": "The FDO filter determining what features to delete"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                },
-                {
-                    "method": "GET",
-                    "summary": "Queries features from the specified feature source",
-                    "nickname": "SelectFeatures",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "schemaName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The FDO schema name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "className",
-                            "type": "string",
-                            "required": true,
-                            "description": "The class name"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "filter",
-                            "type": "string",
-                            "required": false,
-                            "description": "The FDO filter to apply"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "properties",
-                            "type": "string",
-                            "required": false,
-                            "description": "A comma-separated list of proprety names"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "maxfeatures",
-                            "type": "string",
-                            "required": false,
-                            "description": "The maximum number of features to restrict this response to"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "transformto",
-                            "type": "string",
-                            "required": false,
-                            "description": "The CS-Map coordinate system code to transform the resulting features into"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "bbox",
-                            "type": "string",
-                            "required": false,
-                            "description": "A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/session/{session}/{resName}.FeatureSource/json",
             "operations": [
                 {
@@ -3014,53 +2084,6 @@
                             "type": "string",
                             "required": true,
                             "description": "The JSON that describes the Feature Source to create"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/session/{session}/{resName}.FeatureSource/longtransactions",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets long transactions of a feature source",
-                    "nickname": "GetLongTransactions",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "active",
-                            "type": "boolean",
-                            "required": false,
-                            "description": "Return only active long transactions if true, otherwise returns all long transactions"
                         }
                     ],
                     "responseMessages": [
@@ -3244,97 +2267,8 @@
             ]
         },
         {
-            "path": "/session/{session}/{resName}.FeatureSource/schema/{schemaName}",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets the full description of the specified schema",
-                    "nickname": "DescribeSchema",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "schemaName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The name of the schema to describe"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "classnames",
-                            "type": "string",
-                            "required": false,
-                            "description": "The dot-separated list of class names"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/session/{session}/{resName}.FeatureSource/schemas",
             "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets the schema names of a feature source",
-                    "nickname": "GetSchemaNames",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                },
                 {
                     "method": "GET",
                     "summary": "Gets the schema names of a feature source",
@@ -3364,46 +2298,6 @@
                                 "xml",
                                 "json"
                             ]
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/session/{session}/{resName}.FeatureSource/spatialcontexts",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets spatial contexts of a feature source",
-                    "nickname": "GetSpatialContexts",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
                         }
                     ],
                     "responseMessages": [
@@ -3542,81 +2436,6 @@
                             "type": "string",
                             "required": true,
                             "description": "The XML that describes the Feature Source to create"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/session/{session}/{resName}.LayerDefinition/features",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Queries features from the specified layer definition. Any hyperlink and tooltip expressions will be computed and returned in the response",
-                    "nickname": "SelectFeatures",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The feature source name"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "filter",
-                            "type": "string",
-                            "required": false,
-                            "description": "The FDO filter to apply"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "properties",
-                            "type": "string",
-                            "required": false,
-                            "description": "A comma-separated list of proprety names"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "maxfeatures",
-                            "type": "string",
-                            "required": false,
-                            "description": "The maximum number of features to restrict this response to"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "transformto",
-                            "type": "string",
-                            "required": false,
-                            "description": "The CS-Map coordinate system code to transform the resulting features into"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "bbox",
-                            "type": "string",
-                            "required": false,
-                            "description": "A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"
                         }
                     ],
                     "responseMessages": [
@@ -4324,88 +3143,6 @@
             ]
         },
         {
-            "path": "/session/{session}/{resName}/content",
-            "operations": [
-                {
-                    "method": "POST",
-                    "summary": "Sets the resource content for the given resource",
-                    "nickname": "SetResourceContent",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The resource name (including extension)"
-                        },
-                        {
-                            "paramType": "body",
-                            "name": "body",
-                            "type": "string",
-                            "required": true,
-                            "description": "The resource XML content"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                },
-                {
-                    "method": "GET",
-                    "summary": "Gets the specified resource content for the given resource ID",
-                    "nickname": "GetResourceContent",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The resource name (including extension)"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/session/{session}/{resName}/content.{type}",
             "operations": [
                 {
@@ -4437,53 +3174,6 @@
                                 "xml",
                                 "json"
                             ]
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/session/{session}/{resName}/contentorheader",
-            "operations": [
-                {
-                    "method": "POST",
-                    "summary": "Sets the resource content for the given resource. This API exists to provide consistency with the library-based version",
-                    "nickname": "SetResourceContentOrHeader",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The resource name (including extension)"
-                        },
-                        {
-                            "paramType": "form",
-                            "name": "content",
-                            "type": "file",
-                            "required": true,
-                            "description": "The resource XML content"
                         }
                     ],
                     "responseMessages": [
@@ -4712,46 +3402,6 @@
             ]
         },
         {
-            "path": "/session/{session}/{resName}/datalist",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Lists the resource data for a given resource",
-                    "nickname": "EnumerateResourceData",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resourcePath",
-                            "type": "string",
-                            "required": true,
-                            "description": "The resource name (including extension)"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/session/{session}/{resName}/datalist.{type}",
             "operations": [
                 {
@@ -4783,46 +3433,6 @@
                                 "xml",
                                 "json"
                             ]
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/session/{session}/{resName}/references",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Lists the resources that reference the given resource",
-                    "nickname": "EnumerateResourceReferences",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The resource name (including extension)"
                         }
                     ],
                     "responseMessages": [
@@ -4952,74 +3562,6 @@
                             "enum": [
                                 "img"
                             ]
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/session/{session}/{resName}/tile/{groupName}/{scaleIndex}/{col}/{row}",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets the specified tile for the given map definition",
-                    "nickname": "GetTile",
-                    "parameters": [
-                        {
-                            "paramType": "path",
-                            "name": "session",
-                            "type": "string",
-                            "required": true,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "resName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The name of the Map Definition"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "groupName",
-                            "type": "string",
-                            "required": true,
-                            "description": "The tiled group of the Map Definition"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "scaleIndex",
-                            "type": "integer",
-                            "required": true,
-                            "description": "The finite scale index"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "col",
-                            "type": "integer",
-                            "required": true,
-                            "description": "The column of the tile to fetch"
-                        },
-                        {
-                            "paramType": "path",
-                            "name": "row",
-                            "type": "integer",
-                            "required": true,
-                            "description": "The row of the tile to fetch"
                         }
                     ],
                     "responseMessages": [

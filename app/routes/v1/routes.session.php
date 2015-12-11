@@ -38,22 +38,6 @@ require_once dirname(__FILE__)."/../../util/utils.php";
 
 /**
  * @SWG\Api(
- *     path="/session",
- *     @SWG\Operation(
- *        method="POST",
- *        nickname="CreateSession",
- *        summary="Creates a new MapGuide session",
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->post("/session", function() use ($app) {
-    $ctrl = new MgRestServiceController($app);
-    $ctrl->CreateSession("xml");
-});
-/**
- * @SWG\Api(
  *     path="/session.{type}",
  *     @SWG\Operation(
  *        method="POST",
@@ -90,26 +74,6 @@ $app->post("/session.:format", function($format) use ($app) {
 $app->delete("/session/:sessionId", function($sessionId) use ($app) {
     $ctrl = new MgRestServiceController($app);
     $ctrl->DestroySession($sessionId);
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/timeout",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetSessionTimeout",
- *        summary="Gets the session timeout of the specified session",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/timeout", function($sessionId) use ($app) {
-    $ctrl = new MgRestServiceController($app);
-    $ctrl->GetSessionTimeout($sessionId, "xml");
 });
 /**
  * @SWG\Api(
@@ -228,33 +192,6 @@ $app->get("/session/:sessionId/:mapName.Map/legendimage.:format", function($sess
 });
 /**
  * @SWG\Api(
- *     path="/session/{session}/{mapName}.Map/layers",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="EnumerateMapLayers",
- *        summary="Gets the layers of the specified runtime map",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map"),
- *          @SWG\parameter(name="requestedfeatures", paramType="query", required=false, type="integer", description="A bitmask of the additional information that you would like returned. 2=icons, 4=Feature Source Information"),
- *          @SWG\parameter(name="iconformat", paramType="query", required=false, type="string", description="The desired icon image format if icons are requested", enum="['PNG','JPG','PNG8','GIF']"),
- *          @SWG\parameter(name="iconwidth", paramType="query", required=false, type="integer", description="The desired width of generated icons if icons are requested"),
- *          @SWG\parameter(name="iconheight", paramType="query", required=false, type="integer", description="The desired height of generated icons if icons are requested"),
- *          @SWG\parameter(name="iconsperscalerange", paramType="query", required=false, type="integer", description="The number of icons to generate per scale range if icons are requested"),
- *          @SWG\parameter(name="group", paramType="query", required=false, type="string", description="Only return layers belonging to the specified group")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:mapName.Map/layers", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgMapController($app);
-    $ctrl->EnumerateMapLayers($sessionId, $mapName, "xml");
-});
-/**
- * @SWG\Api(
  *     path="/session/{session}/{mapName}.Map/layers.{type}",
  *     @SWG\Operation(
  *        method="GET",
@@ -283,27 +220,6 @@ $app->get("/session/:sessionId/:mapName.Map/layers.:format", function($sessionId
 });
 /**
  * @SWG\Api(
- *     path="/session/{session}/{mapName}.Map/layergroups",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="EnumerateMapLayerGroups",
- *        summary="Gets the layer groups of the specified runtime map",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:mapName.Map/layergroups", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgMapController($app);
-    $ctrl->EnumerateMapLayerGroups($sessionId, $mapName, "xml");
-});
-/**
- * @SWG\Api(
  *     path="/session/{session}/{mapName}.Map/layergroups.{type}",
  *     @SWG\Operation(
  *        method="GET",
@@ -323,35 +239,6 @@ $app->get("/session/:sessionId/:mapName.Map/layergroups", function($sessionId, $
 $app->get("/session/:sessionId/:mapName.Map/layergroups.:format", function($sessionId, $mapName, $format) use ($app) {
     $ctrl = new MgMapController($app);
     $ctrl->EnumerateMapLayerGroups($sessionId, $mapName, $format);
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/{mapName}.Map/plot",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GeneratePlot",
- *        summary="Plot the map to an EPlot DWF using the center and scale from the map",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map"),
- *          @SWG\parameter(name="papersize", paramType="query", required=true, type="string", description="The paper size", enum="['A3','A4','A5','Letter','Legal']"),
- *          @SWG\parameter(name="orientation", paramType="query", required=true, type="string", description="The plot orientation L=Landscape, P=Portrait", enum="['L','P']"),
- *          @SWG\parameter(name="marginleft", paramType="query", required=false, type="double", description="left margin in inches"),
- *          @SWG\parameter(name="marginright", paramType="query", required=false, type="double", description="right margin in inches"),
- *          @SWG\parameter(name="margintop", paramType="query", required=false, type="double", description="top margin in inches"),
- *          @SWG\parameter(name="marginbottom", paramType="query", required=false, type="double", description="bottom margin in inches"),
- *          @SWG\parameter(name="printlayout", paramType="query", required=false, type="string", description="The PrintLayout resource to use for plotting. Only applies if plotting to DWF"),
- *          @SWG\parameter(name="title", paramType="query", required=false, type="string", description="The title to put in the plot")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:mapName.Map/plot", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgMappingServiceController($app);
-    $ctrl->GeneratePlot($sessionId, $mapName, "dwf");
 });
 /**
  * @SWG\Api(
@@ -386,32 +273,6 @@ $app->get("/session/:sessionId/:mapName.Map/plot.:format", function($sessionId, 
 });
 /**
  * @SWG\Api(
- *     path="/session/{session}/{mapName}.Map/description",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="DescribeRuntimeMap",
- *        summary="Describe an existing MgMap instance from the specified mapname and session id and returns detailed information about its layer/group structure if requested",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=false, type="string", description="Your MapGuide Session ID. If none specified you must pass the basic http authentication challenge"),
- *          @SWG\parameter(name="mapName", paramType="path", required=false, type="string", description="The map name used to identify the MgMap instance"),
- *          @SWG\parameter(name="requestedfeatures", paramType="query", required=false, type="integer", description="A bitmask of the information about the Runtime Map that you would like returned. 1=Layer/Group structure, 2=icons, 4=Feature Source Information"),
- *          @SWG\parameter(name="iconformat", paramType="query", required=false, type="string", description="The desired icon image format if icons are requested", enum="['PNG','JPG','PNG8','GIF']"),
- *          @SWG\parameter(name="iconwidth", paramType="query", required=false, type="integer", description="The desired width of generated icons if icons are requested"),
- *          @SWG\parameter(name="iconheight", paramType="query", required=false, type="integer", description="The desired height of generated icons if icons are requested"),
- *          @SWG\parameter(name="iconsperscalerange", paramType="query", required=false, type="integer", description="The number of icons to generate per scale range if icons are requested")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:mapName.Map/description", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgMappingServiceController($app);
-    $ctrl->DescribeRuntimeMap($sessionId, $mapName, "xml");
-});
-/**
- * @SWG\Api(
  *     path="/session/{session}/{mapName}.Map/description.{type}",
  *     @SWG\Operation(
  *        method="GET",
@@ -436,27 +297,6 @@ $app->get("/session/:sessionId/:mapName.Map/description", function($sessionId, $
 $app->get("/session/:sessionId/:mapName.Map/description.:format", function($sessionId, $mapName, $format) use ($app) {
     $ctrl = new MgMappingServiceController($app);
     $ctrl->DescribeRuntimeMap($sessionId, $mapName, $format);
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/{mapName}.Map/layersandgroups",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="UpdateMapLayersAndGroups",
- *        summary="Update the layers and groups of the runtime map",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->put("/session/:sessionId/:mapName.Map/layersandgroups", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgMapController($app);
-    $ctrl->UpdateMapLayersAndGroups($sessionId, $mapName, "xml");
 });
 /**
  * @SWG\Api(
@@ -525,49 +365,6 @@ $app->get("/session/:sessionId/:mapName.Selection/layers.:format", function($ses
 });
 /**
  * @SWG\Api(
- *     path="/session/{session}/{mapName}.Selection/layers",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetSelectionLayerNames",
- *        summary="Gets the layers of the current selection set",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:mapName.Selection/layers", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgMapController($app);
-    $ctrl->GetSelectionLayerNames($sessionId, $mapName, "xml");
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/{mapName}.Selection/overview",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetSelectionOverview",
- *        summary="Gets the layers of the current selection set",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:mapName.Selection/overview", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgMapController($app);
-    $ctrl->GetSelectionOverview($sessionId, $mapName, "xml");
-});
-/**
- * @SWG\Api(
  *     path="/session/{session}/{mapName}.Selection/overview.{type}",
  *     @SWG\Operation(
  *        method="GET",
@@ -587,30 +384,6 @@ $app->get("/session/:sessionId/:mapName.Selection/overview", function($sessionId
 $app->get("/session/:sessionId/:mapName.Selection/overview.:format", function($sessionId, $mapName, $format) use ($app) {
     $ctrl = new MgMapController($app);
     $ctrl->GetSelectionOverview($sessionId, $mapName, $format);
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/{mapName}.Selection/features/{layerName}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetSelectedFeatures",
- *        summary="Gets the features from the given layer in the selection set",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="mapName", paramType="path", required=true, type="string", description="The name of the runtime map"),
- *          @SWG\parameter(name="layerName", paramType="path", required=true, type="string", description="The name of the layer in the selection set"),
- *          @SWG\parameter(name="mappedonly", paramType="path", required=false, type="boolean", description="Only return properties mapped in the Layer Definition"),
- *          @SWG\parameter(name="transformto", paramType="path", required=false, type="string", description="The CS-Map coordinate system code to transform these features to")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:mapName.Selection/features/:layerName", function($sessionId, $mapName, $layerName) use ($app) {
-    $ctrl = new MgMapController($app);
-    $ctrl->GetSelectedFeatures($sessionId, $mapName, $layerName, "xml");
 });
 /**
  * @SWG\Api(
@@ -752,28 +525,6 @@ $app->get("/session/:sessionId/:resName.FeatureSource/status", function($session
 });
 /**
  * @SWG\Api(
- *     path="/session/{session}/{resName}.FeatureSource/spatialcontexts",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetSpatialContexts",
- *        summary="Gets spatial contexts of a feature source",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:resName.FeatureSource/spatialcontexts", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetSpatialContexts($resId, "xml");
-});
-/**
- * @SWG\Api(
  *     path="/session/{session}/{resName}.FeatureSource/spatialcontexts.{type}",
  *     @SWG\Operation(
  *        method="GET",
@@ -794,33 +545,6 @@ $app->get("/session/:sessionId/:resName.FeatureSource/spatialcontexts.:format", 
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetSpatialContexts($resId, $format);
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/{resName}.FeatureSource/longtransactions",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetLongTransactions",
- *        summary="Gets long transactions of a feature source",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
- *          @SWG\parameter(name="active", paramType="query", required=false, type="boolean", description="Return only active long transactions if true, otherwise returns all long transactions")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:resName.FeatureSource/longtransactions", function($sessionId, $resName) use ($app) {
-    $count = count($resourcePath);
-    if ($count > 0) {
-        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
-    }
-    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetLongTransactions($resId, "xml");
 });
 /**
  * @SWG\Api(
@@ -859,28 +583,6 @@ $app->get("/session/:sessionId/:resName.FeatureSource/longtransactions.:format",
  *        summary="Gets the schema names of a feature source",
  *        @SWG\parameters(
  *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:resName.FeatureSource/schemas", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetSchemaNames($resId, "xml");
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/{resName}.FeatureSource/schemas",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetSchemaNames",
- *        summary="Gets the schema names of a feature source",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
  *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
  *        ),
@@ -894,30 +596,6 @@ $app->get("/session/:sessionId/:resName.FeatureSource/schemas.:format", function
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetSchemaNames($resId, $format);
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/{resName}.FeatureSource/schema/{schemaName}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="DescribeSchema",
- *        summary="Gets the full description of the specified schema",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
- *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The name of the schema to describe"),
- *          @SWG\parameter(name="classnames", paramType="query", required=false, type="string", description="The dot-separated list of class names")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:resName.FeatureSource/schema/:schemaName", function($sessionId, $resName, $schemaName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
-    $ctrl->DescribeSchema($resId, $schemaName, "xml");
 });
 /**
  * @SWG\Api(
@@ -946,29 +624,6 @@ $app->get("/session/:sessionId/:resName.FeatureSource/schema.:format/:schemaName
 });
 /**
  * @SWG\Api(
- *     path="/session/{session}/{resName}.FeatureSource/classes/{schemaName}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetClassNames",
- *        summary="Gets the class names of the given schema for a feature source",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
- *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The name of the schema to describe")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:resName.FeatureSource/classes/:schemaName", function($sessionId, $resName, $schemaName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetClassNames($resId, $schemaName, "xml");
-});
-/**
- * @SWG\Api(
  *     path="/session/{session}/{resName}.FeatureSource/classes.{type}/{schemaName}",
  *     @SWG\Operation(
  *        method="GET",
@@ -990,30 +645,6 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classes.:format/:schemaNam
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetClassNames($resId, $schemaName, $format);
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/{resName}.FeatureSource/classdef/{schemaName}/{className}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetClassDefinition",
- *        summary="Gets a class definition of the specified name from the feature source",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
- *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
- *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:resName.FeatureSource/classdef/:schemaName/:className", function($sessionId, $resName, $schemaName, $className) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetClassDefinition($resId, $schemaName, $className, "xml");
 });
 /**
  * @SWG\Api(
@@ -1039,38 +670,6 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:schemaNa
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetClassDefinition($resId, $schemaName, $className, $format);
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/{resName}.FeatureSource/classdef/{qualifiedClassName}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetClassDefinition",
- *        summary="Gets a class definition of the specified name from the feature source",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
- *          @SWG\parameter(name="qualifiedClassName", paramType="path", required=true, type="string", description="The qualified class name")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:resName.FeatureSource/classdef/:qualifiedClassName", function($sessionId, $resName, $qualifiedClassName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
-    $tokens = explode(":", $qualifiedClassName);
-    $schemaName = "";
-    $className = "";
-    if (count($tokens) == 2) {
-        $schemaName = $tokens[0];
-        $className = $tokens[1];
-    } else {
-        $className = $qualifiedClassName;
-    }
-    $ctrl->GetClassDefinition($resId, $schemaName, $className, "xml");
 });
 /**
  * @SWG\Api(
@@ -1153,31 +752,6 @@ $app->post("/session/:sessionId/:resName.FeatureSource/json", function($sessionI
 });
 /**
  * @SWG\Api(
- *     path="/session/{session}/{resName}.FeatureSource/features/{schemaName}/{className}",
- *     @SWG\Operation(
- *        method="POST",
- *        nickname="InsertFeatures",
- *        summary="Inserts one or more features into the given feature class for th specified feature source",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
- *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
- *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
- *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The Feature Set XML describing the features to be inserted")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->post("/session/:sessionId/:resName.FeatureSource/features/:schemaName/:className", function($sessionId, $resName, $schemaName, $className) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
-    $ctrl->InsertFeatures($resId, $schemaName, $className, "xml");
-});
-/**
- * @SWG\Api(
  *     path="/session/{session}/{resName}.FeatureSource/features.{type}/{schemaName}/{className}",
  *     @SWG\Operation(
  *        method="POST",
@@ -1201,31 +775,6 @@ $app->post("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaN
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->InsertFeatures($resId, $schemaName, $className, $format);
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/{resName}.FeatureSource/features/{schemaName}/{className}",
- *     @SWG\Operation(
- *        method="PUT",
- *        nickname="UpdateFeatures",
- *        summary="Updates one or more features into the given feature class for th specified feature source",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
- *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
- *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
- *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The XML envelope describing the features to be update")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->put("/session/:sessionId/:resName.FeatureSource/features/:schemaName/:className", function($sessionId, $resName, $schemaName, $className) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
-    $ctrl->UpdateFeatures($resId, $schemaName, $className, "xml");
 });
 /**
  * @SWG\Api(
@@ -1255,31 +804,6 @@ $app->put("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaNa
 });
 /**
  * @SWG\Api(
- *     path="/session/{session}/{resName}.FeatureSource/features/{schemaName}/{className}",
- *     @SWG\Operation(
- *        method="DELETE",
- *        nickname="DeleteFeatures",
- *        summary="Deletes one or more features from the given feature class for th specified feature source",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
- *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
- *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
- *          @SWG\parameter(name="filter", paramType="form", required=true, type="string", description="The FDO filter determining what features to delete")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->delete("/session/:sessionId/:resName.FeatureSource/features/:schemaName/:className", function($sessionId, $resName, $schemaName, $className) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
-    $ctrl->DeleteFeatures($resId, $schemaName, $className, "xml");
-});
-/**
- * @SWG\Api(
  *     path="/session/{session}/{resName}.FeatureSource/features.{type}/{schemaName}/{className}",
  *     @SWG\Operation(
  *        method="DELETE",
@@ -1303,35 +827,6 @@ $app->delete("/session/:sessionId/:resName.FeatureSource/features.:format/:schem
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->DeleteFeatures($resId, $schemaName, $className, $format);
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/{resName}.FeatureSource/features/{schemaName}/{className}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="SelectFeatures",
- *        summary="Queries features from the specified feature source",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
- *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
- *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
- *          @SWG\parameter(name="filter", paramType="query", required=false, type="string", description="The FDO filter to apply"),
- *          @SWG\parameter(name="properties", paramType="query", required=false, type="string", description="A comma-separated list of proprety names"),
- *          @SWG\parameter(name="maxfeatures", paramType="query", required=false, type="string", description="The maximum number of features to restrict this response to"),
- *          @SWG\parameter(name="transformto", paramType="query", required=false, type="string", description="The CS-Map coordinate system code to transform the resulting features into"),
- *          @SWG\parameter(name="bbox", paramType="query", required=false, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:resName.FeatureSource/features/:schemaName/:className", function($sessionId, $resName, $schemaName, $className) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
-    $ctrl->SelectFeatures($resId, $schemaName, $className, "xml");
 });
 /**
  * @SWG\Api(
@@ -1365,33 +860,6 @@ $app->get("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaNa
 });
 /**
  * @SWG\Api(
- *     path="/session/{session}/{resName}.LayerDefinition/features",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="SelectFeatures",
- *        summary="Queries features from the specified layer definition. Any hyperlink and tooltip expressions will be computed and returned in the response",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
- *          @SWG\parameter(name="filter", paramType="query", required=false, type="string", description="The FDO filter to apply"),
- *          @SWG\parameter(name="properties", paramType="query", required=false, type="string", description="A comma-separated list of proprety names"),
- *          @SWG\parameter(name="maxfeatures", paramType="query", required=false, type="string", description="The maximum number of features to restrict this response to"),
- *          @SWG\parameter(name="transformto", paramType="query", required=false, type="string", description="The CS-Map coordinate system code to transform the resulting features into"),
- *          @SWG\parameter(name="bbox", paramType="query", required=false, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:resName.LayerDefinition/features", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
-    $ctrl = new MgFeatureServiceController($app);
-    $ctrl->SelectLayerFeatures($resId, "xml");
-});
-/**
- * @SWG\Api(
  *     path="/session/{session}/{resName}.LayerDefinition/features.{type}",
  *     @SWG\Operation(
  *        method="GET",
@@ -1417,31 +885,6 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/features.:format", funct
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->SelectLayerFeatures($resId, $format);
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/{resName}.FeatureSource/aggregates/{aggregateType}/{schemaName}/{className}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="SelectAggregates",
- *        summary="Queries features from the specified feature source",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The feature source name"),
- *          @SWG\parameter(name="schemaName", paramType="path", required=true, type="string", description="The FDO schema name"),
- *          @SWG\parameter(name="className", paramType="path", required=true, type="string", description="The class name"),
- *          @SWG\parameter(name="aggregateType", paramType="path", required=true, type="string", description="aggregate type", enum="['count','bbox','distinctvalues']")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:resName.FeatureSource/aggregates/:type/:schemaName/:className", function($sessionId, $resName, $type, $schemaName, $className) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
-    $ctrl->SelectAggregates($resId, $schemaName, $className, $type, "xml");
 });
 /**
  * @SWG\Api(
@@ -1471,28 +914,6 @@ $app->get("/session/:sessionId/:resName.FeatureSource/aggregates.:format/:type/:
 });
 //========================= Resource Service APIs ================================
 
-/**
- * @SWG\Api(
- *     path="/session/{session}/{resName}/datalist",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="EnumerateResourceData",
- *        summary="Lists the resource data for a given resource",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resourcePath", paramType="path", required=true, type="string", description="The resource name (including extension)")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:resName/datalist", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
-    $ctrl->EnumerateResourceData($resId, "xml");
-});
 /**
  * @SWG\Api(
  *     path="/session/{session}/{resName}/datalist.{type}",
@@ -1603,29 +1024,6 @@ $app->get("/session/:sessionId/:resName/header.:format", function($sessionId, $r
 
 /**
  * @SWG\Api(
- *     path="/session/{session}/{resName}/contentorheader",
- *     @SWG\Operation(
- *        method="POST",
- *        nickname="SetResourceContentOrHeader",
- *        summary="Sets the resource content for the given resource. This API exists to provide consistency with the library-based version",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The resource name (including extension)"),
- *          @SWG\parameter(name="content", paramType="form", required=true, type="file", description="The resource XML content")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->post("/session/:sessionId/:resName/contentorheader", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
-    $ctrl->SetResourceContentOrHeader($resId, "xml");
-});
-/**
- * @SWG\Api(
  *     path="/session/{session}/{resName}/contentorheader.{type}",
  *     @SWG\Operation(
  *        method="POST",
@@ -1647,29 +1045,6 @@ $app->post("/session/:sessionId/:resName/contentorheader.:format", function($ses
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->SetResourceContentOrHeader($resId, $format);
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/{resName}/content",
- *     @SWG\Operation(
- *        method="POST",
- *        nickname="SetResourceContent",
- *        summary="Sets the resource content for the given resource",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The resource name (including extension)"),
- *          @SWG\parameter(name="body", paramType="body", required=true, type="string", description="The resource XML content")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->post("/session/:sessionId/:resName/content", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
-    $ctrl->SetResourceContent($resId, "xml");
 });
 /**
  * @SWG\Api(
@@ -1697,28 +1072,6 @@ $app->post("/session/:sessionId/:resName/content.:format", function($sessionId, 
 });
 /**
  * @SWG\Api(
- *     path="/session/{session}/{resName}/content",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetResourceContent",
- *        summary="Gets the specified resource content for the given resource ID",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The resource name (including extension)")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:resName/content", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
-    $ctrl->GetResourceContent($resId, "xml");
-});
-/**
- * @SWG\Api(
  *     path="/session/{session}/{resName}/content.{type}",
  *     @SWG\Operation(
  *        method="GET",
@@ -1739,28 +1092,6 @@ $app->get("/session/:sessionId/:resName/content.:format", function($sessionId, $
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->GetResourceContent($resId, $format);
-});
-/**
- * @SWG\Api(
- *     path="/session/{session}/{resName}/references",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="EnumerateResourceReferences",
- *        summary="Lists the resources that reference the given resource",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The resource name (including extension)")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:resName/references", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
-    $ctrl->EnumerateResourceReferences($resId, "xml");
 });
 /**
  * @SWG\Api(
@@ -1809,32 +1140,6 @@ $app->delete("/session/:sessionId/:resName", function($sessionId, $resName) use 
 });
 //================================== Tile Service APIs =======================================
 
-/**
- * @SWG\Api(
- *     path="/session/{session}/{resName}/tile/{groupName}/{scaleIndex}/{col}/{row}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetTile",
- *        summary="Gets the specified tile for the given map definition",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="resName", paramType="path", required=true, type="string", description="The name of the Map Definition"),
- *          @SWG\parameter(name="groupName", paramType="path", required=true, type="string", description="The tiled group of the Map Definition"),
- *          @SWG\parameter(name="scaleIndex", paramType="path", required=true, type="integer", description="The finite scale index"),
- *          @SWG\parameter(name="col", paramType="path", required=true, type="integer", description="The column of the tile to fetch"),
- *          @SWG\parameter(name="row", paramType="path", required=true, type="integer", description="The row of the tile to fetch")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
- *     )
- *   )
- */
-$app->get("/session/:sessionId/:resName.MapDefinition/tile/:groupName/:scaleIndex/:col/:row", function($sessionId, $resName, $groupName, $scaleIndex, $col, $row) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
-    $ctrl = new MgTileServiceController($app);
-    $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, "img");
-});
 /**
  * @SWG\Api(
  *     path="/session/{session}/{resName}/tile.{type}/{groupName}/{scaleIndex}/{col}/{row}",

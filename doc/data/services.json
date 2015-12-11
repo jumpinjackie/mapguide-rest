@@ -52,94 +52,6 @@
             ]
         },
         {
-            "path": "/services/createmap",
-            "operations": [
-                {
-                    "method": "POST",
-                    "summary": "Creates a new Runtime Map (MgMap) instance from the specified map definition and returns detailed information about its layer/group structure if requested",
-                    "nickname": "CreateRuntimeMap",
-                    "parameters": [
-                        {
-                            "paramType": "form",
-                            "name": "session",
-                            "type": "string",
-                            "required": false,
-                            "description": "Your MapGuide Session ID. If none specified you must pass the basic http authentication challenge"
-                        },
-                        {
-                            "paramType": "form",
-                            "name": "mapdefinition",
-                            "type": "string",
-                            "required": true,
-                            "description": "The Map Definition ID to create a new runtime map from"
-                        },
-                        {
-                            "paramType": "form",
-                            "name": "targetmapname",
-                            "type": "string",
-                            "required": false,
-                            "description": "The target map name to associate the Runtime Map by. By default, the name is generated from the Map Definition ID"
-                        },
-                        {
-                            "paramType": "form",
-                            "name": "requestedfeatures",
-                            "type": "integer",
-                            "required": false,
-                            "description": "A bitmask of the information about the Runtime Map that you would like returned. 1=Layer/Group structure, 2=icons, 4=Feature Source Information"
-                        },
-                        {
-                            "paramType": "form",
-                            "name": "iconformat",
-                            "type": "string",
-                            "required": false,
-                            "description": "The desired icon image format if icons are requested",
-                            "enum": [
-                                "PNG",
-                                "JPG",
-                                "PNG8",
-                                "GIF"
-                            ]
-                        },
-                        {
-                            "paramType": "form",
-                            "name": "iconwidth",
-                            "type": "integer",
-                            "required": false,
-                            "description": "The desired width of generated icons if icons are requested"
-                        },
-                        {
-                            "paramType": "form",
-                            "name": "iconheight",
-                            "type": "integer",
-                            "required": false,
-                            "description": "The desired height of generated icons if icons are requested"
-                        },
-                        {
-                            "paramType": "form",
-                            "name": "iconsperscalerange",
-                            "type": "integer",
-                            "required": false,
-                            "description": "The number of icons to generate per scale range if icons are requested"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/services/createmap.{type}",
             "operations": [
                 {
@@ -239,39 +151,6 @@
             ]
         },
         {
-            "path": "/services/fusioncontainers",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Enumerates available containers for a fusion application",
-                    "nickname": "EnumerateApplicationContainers",
-                    "parameters": [
-                        {
-                            "paramType": "query",
-                            "name": "session",
-                            "type": "string",
-                            "required": false,
-                            "description": "Your MapGuide Session ID"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/services/fusioncontainers.{type}",
             "operations": [
                 {
@@ -296,39 +175,6 @@
                                 "xml",
                                 "json"
                             ]
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/services/fusiontemplates",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Enumerates available templates for a fusion application",
-                    "nickname": "EnumerateApplicationTemplates",
-                    "parameters": [
-                        {
-                            "paramType": "query",
-                            "name": "session",
-                            "type": "string",
-                            "required": false,
-                            "description": "Your MapGuide Session ID"
                         }
                     ],
                     "responseMessages": [
@@ -393,39 +239,6 @@
             ]
         },
         {
-            "path": "/services/fusionwidgets",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Enumerates available widgets for a fusion application",
-                    "nickname": "EnumerateApplicationWidgets",
-                    "parameters": [
-                        {
-                            "paramType": "query",
-                            "name": "session",
-                            "type": "string",
-                            "required": false,
-                            "description": "Your MapGuide Session ID"
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "path": "/services/fusionwidgets.{type}",
             "operations": [
                 {
@@ -450,53 +263,6 @@
                                 "xml",
                                 "json"
                             ]
-                        }
-                    ],
-                    "responseMessages": [
-                        {
-                            "code": 400,
-                            "message": "You supplied a bad request due to one or more missing or invalid parameters"
-                        },
-                        {
-                            "code": 401,
-                            "message": "Session ID or MapGuide credentials not specified"
-                        },
-                        {
-                            "code": 500,
-                            "message": "An error occurred during the operation"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "path": "/services/getschemamapping",
-            "operations": [
-                {
-                    "method": "GET",
-                    "summary": "Gets schema mapping of a feature source",
-                    "nickname": "GetSchemaMapping",
-                    "parameters": [
-                        {
-                            "paramType": "query",
-                            "name": "session",
-                            "type": "string",
-                            "required": false,
-                            "description": "Your MapGuide Session ID"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "provider",
-                            "type": "string",
-                            "required": true,
-                            "description": "The FDO Provider"
-                        },
-                        {
-                            "paramType": "query",
-                            "name": "connection",
-                            "type": "string",
-                            "required": true,
-                            "description": "The partial connection string"
                         }
                     ],
                     "responseMessages": [
