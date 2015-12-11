@@ -439,7 +439,7 @@ $app->get("/session/:sessionId/:mapName.Map/description.:format", function($sess
 });
 /**
  * @SWG\Api(
- *     path="/session/{session}/{mapName}.Selection/layersandgroups",
+ *     path="/session/{session}/{mapName}.Map/layersandgroups",
  *     @SWG\Operation(
  *        method="GET",
  *        nickname="UpdateMapLayersAndGroups",
@@ -460,7 +460,7 @@ $app->put("/session/:sessionId/:mapName.Map/layersandgroups", function($sessionI
 });
 /**
  * @SWG\Api(
- *     path="/session/{session}/{mapName}.Selection/layersandgroups.{type}",
+ *     path="/session/{session}/{mapName}.Map/layersandgroups.{type}",
  *     @SWG\Operation(
  *        method="GET",
  *        nickname="UpdateMapLayersAndGroups",
