@@ -30,152 +30,124 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  */
 
 /**
- * @SWG\Api(
- *     path="/data/configs.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetDataConfigurations",
+ *     @SWG\Get(
+ *        path="/data/configs.{type}",
+ *        operationId="GetDataConfigurations",
  *        summary="Enumerates all data configurations",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"data"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/data/configs.:format", function($format) use ($app) {
     $ctrl = new MgDataController($app);
     $ctrl->EnumerateDataConfigurations($format);
 });
 /**
- * @SWG\Api(
- *     path="/data/{uriPart}/config",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetDataConfiguration",
+ *     @SWG\Get(
+ *        path="/data/{uriPart}/config",
+ *        operationId="GetDataConfiguration",
  *        summary="Gets the data configuration for the given URI part",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="uriPart", paramType="path", required=true, type="string", description="The URI part")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"data"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="uriPart", in="path", required=true, type="string", description="The URI part"),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/data/:args+/config", function($args) use ($app) {
     $ctrl = new MgDataController($app);
     $ctrl->GetDataConfiguration($args);
 });
 /**
- * @SWG\Api(
- *     path="/data/{uriPart}/config",
- *     @SWG\Operation(
- *        method="POST",
- *        nickname="SetDataConfigurations",
+ *     @SWG\Post(
+ *        path="/data/{uriPart}/config",
+ *        operationId="SetDataConfigurations",
  *        summary="Set the given data configuration",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="uriPart", paramType="path", required=true, type="string", description="The URI part"),
- *          @SWG\parameter(name="data", paramType="form", required=true, type="file", description="The data configuration file to load")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"data"},
+ *          @SWG\Parameter(name="session", in="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="uriPart", in="path", required=true, type="string", description="The URI part"),
+ *          @SWG\Parameter(name="data", in="form", required=true, type="file", description="The data configuration file to load"),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->post("/data/:args+/config", function($args) use ($app) {
     $ctrl = new MgDataController($app);
     $ctrl->PutDataConfiguration($args);
 });
 /**
- * @SWG\Api(
- *     path="/data/{uriPart}/config",
- *     @SWG\Operation(
- *        method="DELETE",
- *        nickname="DeleteDataConfigurations",
+ *     @SWG\Delete(
+ *        path="/data/{uriPart}/config",
+ *        operationId="DeleteDataConfigurations",
  *        summary="Delete the given data configuration",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="uriPart", paramType="path", required=true, type="string", description="The URI part")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"data"},
+ *          @SWG\Parameter(name="session", in="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="uriPart", in="path", required=true, type="string", description="The URI part"),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->delete("/data/:args+/config", function($args) use ($app) {
     $ctrl = new MgDataController($app);
     $ctrl->DeleteConfiguration($args);
 });
 /**
- * @SWG\Api(
- *     path="/data/{uriPart}/files.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetDataConfigurationFiles",
+ *     @SWG\Get(
+ *        path="/data/{uriPart}/files.{type}",
+ *        operationId="GetDataConfigurationFiles",
  *        summary="Gets the list of files for the given data configuration",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="uriPart", paramType="path", required=true, type="string", description="The URI part"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"data"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="uriPart", in="path", required=true, type="string", description="The URI part"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/data/:args+/files.:format", function($args, $format) use ($app) {
     $ctrl = new MgDataController($app);
     $ctrl->EnumerateDataFiles($args, $format);
 });
 /**
- * @SWG\Api(
- *     path="/data/{uriPart}/file",
- *     @SWG\Operation(
- *        method="POST",
- *        nickname="SetDataFile",
+ *     @SWG\Post(
+ *        path="/data/{uriPart}/file",
+ *        operationId="SetDataFile",
  *        summary="Upload a file for a given data configuration",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="uriPart", paramType="path", required=true, type="string", description="The URI part"),
- *          @SWG\parameter(name="filename", paramType="form", required=true, type="string", description="The file name to upload to"),
- *          @SWG\parameter(name="data", paramType="form", required=true, type="file", description="The file to load")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"data"},
+ *          @SWG\Parameter(name="session", in="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="uriPart", in="path", required=true, type="string", description="The URI part"),
+ *          @SWG\Parameter(name="filename", in="form", required=true, type="string", description="The file name to upload to"),
+ *          @SWG\Parameter(name="data", in="form", required=true, type="file", description="The file to load"),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->post("/data/:args+/file", function($args) use ($app) {
     $ctrl = new MgDataController($app);
     $ctrl->PutDataFile($args);
 });
 /**
- * @SWG\Api(
- *     path="/data/{uriPart}/file",
- *     @SWG\Operation(
- *        method="DELETE",
- *        nickname="DeleteDataFile",
+ *     @SWG\Delete(
+ *        path="/data/{uriPart}/file",
+ *        operationId="DeleteDataFile",
  *        summary="Deletes a file for a given data configuration",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="uriPart", paramType="path", required=true, type="string", description="The URI part"),
- *          @SWG\parameter(name="filename", paramType="form", required=true, type="string", description="The file name to upload to")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"data"},
+ *          @SWG\Parameter(name="session", in="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="uriPart", in="path", required=true, type="string", description="The URI part"),
+ *          @SWG\Parameter(name="filename", in="form", required=true, type="string", description="The file name to upload to"),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->delete("/data/:args+/file", function($args) use ($app) {
     $ctrl = new MgDataController($app);

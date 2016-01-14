@@ -30,214 +30,174 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  */
 
 /**
- * @SWG\Api(
- *     path="/coordsys/baselibrary",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetBaseLibrary",
+ *     @SWG\Get(
+ *        path="/coordsys/baselibrary",
+ *        operationId="GetBaseLibrary",
  *        summary="Returns the base library name for this coordinate system library",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"coordsys"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/coordsys/baselibrary", function() use ($app) {
     $ctrl = new MgCoordinateSystemController($app);
     $ctrl->GetBaseLibrary();
 });
 /**
- * @SWG\Api(
- *     path="/coordsys/validatewkt",
- *     @SWG\Operation(
- *        method="POST",
- *        nickname="ValidateWkt",
+ *     @SWG\Post(
+ *        path="/coordsys/validatewkt",
+ *        operationId="ValidateWkt",
  *        summary="Checks if the given coordinate system WKT string is valid",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="wkt", paramType="form", required=false, type="string", description="The Coordinate System WKT string")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"coordsys"},
+ *          @SWG\Parameter(name="session", in="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="wkt", in="form", required=false, type="string", description="The Coordinate System WKT string"),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->post("/coordsys/validatewkt", function() use ($app) {
     $ctrl = new MgCoordinateSystemController($app);
     $ctrl->ValidateWkt();
 });
 /**
- * @SWG\Api(
- *     path="/coordsys/wkttoepsg",
- *     @SWG\Operation(
- *        method="POST",
- *        nickname="WktToEpsg",
+ *     @SWG\Post(
+ *        path="/coordsys/wkttoepsg",
+ *        operationId="WktToEpsg",
  *        summary="Converts the given Coordinate System WKT string to its equivalent EPSG code",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="wkt", paramType="form", required=false, type="string", description="The Coordinate System WKT string")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"coordsys"},
+ *          @SWG\Parameter(name="session", in="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="wkt", in="form", required=false, type="string", description="The Coordinate System WKT string"),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->post("/coordsys/wkttoepsg", function() use ($app) {
     $ctrl = new MgCoordinateSystemController($app);
     $ctrl->WktToEpsg();
 });
 /**
- * @SWG\Api(
- *     path="/coordsys/wkttomentor",
- *     @SWG\Operation(
- *        method="POST",
- *        nickname="WktToMentor",
+ *     @SWG\Post(
+ *         path="/coordsys/wkttomentor",
+ *        operationId="WktToMentor",
  *        summary="Converts the given Coordinate System WKT string to its equivalent CS-Map coordinate system code",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="form", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="wkt", paramType="form", required=false, type="string", description="The Coordinate System WKT string")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"coordsys"},
+ *          @SWG\Parameter(name="session", in="form", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="wkt", in="form", required=false, type="string", description="The Coordinate System WKT string"),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->post("/coordsys/wkttomentor", function() use ($app) {
     $ctrl = new MgCoordinateSystemController($app);
     $ctrl->WktToMentor();
 });
 /**
- * @SWG\Api(
- *     path="/coordsys/categories.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="EnumerateCategories",
+ *     @SWG\Get(
+ *        path="/coordsys/categories.{type}",
+ *        operationId="EnumerateCategories",
  *        summary="Enumerates coordinate system categories and returns the result in the desired format",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"coordsys"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/coordsys/categories.:format", function($format) use ($app) {
     $ctrl = new MgCoordinateSystemController($app);
     $ctrl->EnumerateCategories($format); 
 });
 /**
- * @SWG\Api(
- *     path="/coordsys/category/{category}.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="EnumerateCoordinateSystemsByCategory",
+ *     @SWG\Get(
+ *        path="/coordsys/category/{category}.{type}",
+ *        operationId="EnumerateCoordinateSystemsByCategory",
  *        summary="Enumerates coordinate systems under the specified category",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="category", paramType="path", required=true, type="string", description="The Coordinate System Category"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"coordsys"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="category", in="path", required=true, type="string", description="The Coordinate System Category"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}, enum={"xml", "json"}),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/coordsys/category.:format/:category", function($format, $category) use ($app) {
     $ctrl = new MgCoordinateSystemController($app);
     $ctrl->EnumerateCoordinateSystemsByCategory($category, $format);
 });
 /**
- * @SWG\Api(
- *     path="/coordsys/mentor/{cscode}/epsg.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="ConvertCsCodeToEpsg",
+ *     @SWG\Get(
+ *        path="/coordsys/mentor/{cscode}/epsg.{type}",
+ *        operationId="ConvertCsCodeToEpsg",
  *        summary="Converts the given CS-Map coordinate system code to EPSG",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="cscode", paramType="path", required=true, type="string", description="The CS-Map Coordinate System Code"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"coordsys"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="cscode", in="path", required=true, type="string", description="The CS-Map Coordinate System Code"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/coordsys/mentor/:cscode/epsg.:format", function($cscode, $format) use ($app) {
     $ctrl = new MgCoordinateSystemController($app);
     $ctrl->ConvertCsCodeToEpsg($cscode, $format);
 });
 /**
- * @SWG\Api(
- *     path="/coordsys/mentor/{cscode}/wkt.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="ConvertCsCodeToWkt",
+ *     @SWG\Get(
+ *        path="/coordsys/mentor/{cscode}/wkt.{type}",
+ *        operationId="ConvertCsCodeToWkt",
  *        summary="Converts the given CS-Map coordinate system code to WKT",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="cscode", paramType="path", required=true, type="string", description="The CS-Map Coordinate System Code"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"coordsys"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="cscode", in="path", required=true, type="string", description="The CS-Map Coordinate System Code"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/coordsys/mentor/:cscode/wkt.:format", function($cscode, $format) use ($app) {
     $ctrl = new MgCoordinateSystemController($app);
     $ctrl->ConvertCsCodeToWkt($cscode, $format); 
 });
 /**
- * @SWG\Api(
- *     path="/coordsys/epsg/{epsg}/mentor.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="ConvertEpsgToCsCode",
+ *     @SWG\Get(
+ *        path="/coordsys/epsg/{epsg}/mentor.{type}",
+ *        operationId="ConvertEpsgToCsCode",
  *        summary="Converts the given EPSG code to its CS-Map coordinate system code",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="epsg", paramType="path", required=true, type="string", description="The EPSG code"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"coordsys"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="epsg", in="path", required=true, type="string", description="The EPSG code"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/coordsys/epsg/:epsg/mentor.:format", function($epsg, $format) use ($app) {
     $ctrl = new MgCoordinateSystemController($app);
     $ctrl->ConvertEpsgToCsCode($epsg, $format);
 });
 /**
- * @SWG\Api(
- *     path="/coordsys/epsg/{epsg}/wkt.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="ConvertEpsgToCsCode",
+ *     @SWG\Get(
+ *        path="/coordsys/epsg/{epsg}/wkt.{type}",
+ *        operationId="ConvertEpsgToCsCode",
  *        summary="Converts the given EPSG code to WKT",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="epsg", paramType="path", required=true, type="string", description="The EPSG code"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=400, message="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"coordsys"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="epsg", in="path", required=true, type="string", description="The EPSG code"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/coordsys/epsg/:epsg/wkt.:format", function($epsg, $format) use ($app) {
     $ctrl = new MgCoordinateSystemController($app);

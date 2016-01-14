@@ -30,143 +30,115 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  */
 
 /**
- * @SWG\Api(
- *     path="/site/status.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetSiteStatus",
+ *     @SWG\Get(
+ *        path="/site/status.{type}",
+ *        operationId="GetSiteStatus",
  *        summary="Gets the status of the current Site Server",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"site"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/site/status.:format", function($format) use ($app) {
     $ctrl = new MgSiteAdminController($app);
     $ctrl->GetSiteStatus($format);
 });
 /**
- * @SWG\Api(
- *     path="/site/info.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetSiteInformation",
+ *     @SWG\Get(
+ *        path="/site/info.{type}",
+ *        operationId="GetSiteInformation",
  *        summary="Gets the information of the current Site Server",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="response output format", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"site"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="response output format", enum={"xml", "json"}),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/site/info.:format", function($format) use ($app) {
     $ctrl = new MgSiteAdminController($app);
     $ctrl->GetSiteInformation($format);
 });
 /**
- * @SWG\Api(
- *     path="/site/version.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="GetSiteVersion",
+ *     @SWG\Get(
+ *        path="/site/version.{type}",
+ *        operationId="GetSiteVersion",
  *        summary="Gets the version of the current Site Server",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="response output format", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"site"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="response output format", enum={"xml", "json"}),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/site/version.:format", function($format) use ($app) {
     $ctrl = new MgSiteAdminController($app);
     $ctrl->GetSiteVersion($format);
 });
 /**
- * @SWG\Api(
- *     path="/site/groups.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="EnumerateGroups",
+ *     @SWG\Get(
+ *        path="/site/groups.{type}",
+ *        operationId="EnumerateGroups",
  *        summary="Lists the current user groups",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"site"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/site/groups.:format", function($format) use ($app) {
     $ctrl = new MgSiteAdminController($app);
     $ctrl->EnumerateGroups($format);
 });
 /**
- * @SWG\Api(
- *     path="/site/groups/{groupName}/users.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="EnumerateUsersForGroup",
+ *     @SWG\Get(
+ *        path="/site/groups/{groupName}/users.{type}",
+ *        operationId="EnumerateUsersForGroup",
  *        summary="Lists the users for the specified group",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="groupName", paramType="path", required=true, type="string", description="The group name"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"site"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="groupName", in="path", required=true, type="string", description="The group name"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/site/groups/:groupName/users.:format", function($groupName, $format) use ($app) {
     $ctrl = new MgSiteAdminController($app);
     $ctrl->EnumerateUsersForGroup($groupName, $format);
 });
 /**
- * @SWG\Api(
- *     path="/site/user/{userName}/groups.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="EnumerateGroupsForUser",
+ *     @SWG\Get(
+ *        path="/site/user/{userName}/groups.{type}",
+ *        operationId="EnumerateGroupsForUser",
  *        summary="Lists the groups for the specified user",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="userName", paramType="path", required=true, type="string", description="The user name"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"site"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="userName", in="path", required=true, type="string", description="The user name"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/site/user/:userName/groups.:format", function($userName, $format) use ($app) {
     $ctrl = new MgSiteAdminController($app);
     $ctrl->EnumerateGroupsForUser($userName, $format);
 });
 /**
- * @SWG\Api(
- *     path="/site/user/{userName}/roles.{type}",
- *     @SWG\Operation(
- *        method="GET",
- *        nickname="EnumerateRolesForUser",
+ *     @SWG\Get(
+ *        path="/site/user/{userName}/roles.{type}",
+ *        operationId="EnumerateRolesForUser",
  *        summary="Lists the roles for the specified user",
- *        @SWG\parameters(
- *          @SWG\parameter(name="session", paramType="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\parameter(name="userName", paramType="path", required=true, type="string", description="The user name"),
- *          @SWG\parameter(name="type", paramType="path", required=true, type="string", description="xml or json", enum="['xml','json']")
- *        ),
- *        @SWG\ResponseMessage(code=401, message="Session ID or MapGuide credentials not specified"),
- *        @SWG\ResponseMessage(code=500, message="An error occurred during the operation")
+ *        tags={"site"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="userName", in="path", required=true, type="string", description="The user name"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(code=500, description="An error occurred during the operation")
  *     )
- *   )
  */
 $app->get("/site/user/:userName/roles.:format", function($userName, $format) use ($app) {
     $ctrl = new MgSiteAdminController($app);
