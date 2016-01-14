@@ -174,8 +174,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -221,8 +221,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -268,8 +268,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -315,8 +315,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -362,8 +362,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -409,8 +409,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -449,8 +449,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -607,8 +607,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -3802,8 +3802,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -3856,8 +3856,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -3910,8 +3910,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -3971,8 +3971,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -4011,8 +4011,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -4051,8 +4051,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -4091,8 +4091,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -4164,8 +4164,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -4218,8 +4218,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -4365,8 +4365,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -4460,8 +4460,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -4493,8 +4493,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -4559,8 +4559,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -4949,8 +4949,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -5044,8 +5044,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -5253,8 +5253,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -5300,8 +5300,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -5424,8 +5424,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -5471,8 +5471,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -5715,8 +5715,8 @@
                         "required": false,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -5841,8 +5841,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -5888,8 +5888,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -5942,8 +5942,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -5996,8 +5996,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -6057,8 +6057,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -6118,8 +6118,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -6172,8 +6172,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -6399,8 +6399,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -6465,8 +6465,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -6531,8 +6531,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -6707,8 +6707,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -6754,8 +6754,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -6945,8 +6945,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -6999,8 +6999,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -7044,8 +7044,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -7098,8 +7098,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],

@@ -94,7 +94,7 @@ $app->post("/coordsys/wkttomentor", function() use ($app) {
  *        summary="Enumerates coordinate system categories and returns the result in the desired format",
  *        tags={"coordsys"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -112,7 +112,7 @@ $app->get("/coordsys/categories.:format", function($format) use ($app) {
  *        tags={"coordsys"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="category", in="path", required=true, type="string", description="The Coordinate System Category"),
- *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}, enum={"xml", "json"}),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}, enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -130,7 +130,7 @@ $app->get("/coordsys/category.:format/:category", function($format, $category) u
  *        tags={"coordsys"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="cscode", in="path", required=true, type="string", description="The CS-Map Coordinate System Code"),
- *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -148,7 +148,7 @@ $app->get("/coordsys/mentor/:cscode/epsg.:format", function($cscode, $format) us
  *        tags={"coordsys"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="cscode", in="path", required=true, type="string", description="The CS-Map Coordinate System Code"),
- *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -166,7 +166,7 @@ $app->get("/coordsys/mentor/:cscode/wkt.:format", function($cscode, $format) use
  *        tags={"coordsys"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="epsg", in="path", required=true, type="string", description="The EPSG code"),
- *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -184,7 +184,7 @@ $app->get("/coordsys/epsg/:epsg/mentor.:format", function($epsg, $format) use ($
  *        tags={"coordsys"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="epsg", in="path", required=true, type="string", description="The EPSG code"),
- *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")

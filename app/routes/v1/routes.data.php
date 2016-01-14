@@ -27,7 +27,7 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  *        summary="Enumerates all data configurations",
  *        tags={"data"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -97,7 +97,7 @@ $app->delete("/data/:args+/config", function($args) use ($app) {
  *        tags={"data"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="uriPart", in="path", required=true, type="string", description="The URI part"),
- *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")

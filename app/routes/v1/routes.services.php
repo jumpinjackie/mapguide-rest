@@ -29,7 +29,7 @@ require_once dirname(__FILE__)."/../../controller/restservicecontroller.php";
  *        summary="Enumerates available templates for a fusion application",
  *        tags={"services"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -46,7 +46,7 @@ $app->get("/services/fusiontemplates.:format", function($format) use ($app) {
  *        summary="Enumerates available widgets for a fusion application",
  *        tags={"services"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -63,7 +63,7 @@ $app->get("/services/fusionwidgets.:format", function($format) use ($app) {
  *        summary="Enumerates available containers for a fusion application",
  *        tags={"services"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
- *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -84,7 +84,7 @@ $app->get("/services/fusioncontainers.:format", function($format) use ($app) {
  *          @SWG\Parameter(name="type", in="formData", required=true, type="string", description="", enum={"Folders","Files","Both"}),
  *          @SWG\Parameter(name="filter", in="formData", required=false, type="string", description=""),
  *          @SWG\Parameter(name="recursive", in="formData", required=true, type="boolean", description=""),
- *          @SWG\Parameter(name="responseType", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *          @SWG\Parameter(name="responseType", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -103,7 +103,7 @@ $app->post("/services/listunmanageddata.:format", function($format) use ($app) {
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="provider", in="query", required=true, type="string", description="The FDO Provider"),
  *          @SWG\Parameter(name="connection", in="query", required=true, type="string", description="The partial connection string"),
- *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -160,7 +160,7 @@ $app->post("/services/moveresource", function() use ($app) {
  *          @SWG\Parameter(name="from", in="formData", required=true, type="string", description="The Source Coordinate System Code"),
  *          @SWG\Parameter(name="to", in="formData", required=true, type="string", description="The Target Coordinate System Code"),
  *          @SWG\Parameter(name="coords", in="formData", required=true, type="string", description="A comma-delimited list of space-delimited coordinate pairs"),
- *          @SWG\Parameter(name="format", in="formData", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *          @SWG\Parameter(name="format", in="formData", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -184,7 +184,7 @@ $app->post("/services/transformcoords", function() use ($app) {
  *          @SWG\Parameter(name="iconwidth", in="formData", required=false, type="integer", description="The desired width of generated icons if icons are requested"),
  *          @SWG\Parameter(name="iconheight", in="formData", required=false, type="integer", description="The desired height of generated icons if icons are requested"),
  *          @SWG\Parameter(name="iconsperscalerange", in="formData", required=false, type="integer", description="The number of icons to generate per scale range if icons are requested"),
- *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
