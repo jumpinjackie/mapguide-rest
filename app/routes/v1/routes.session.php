@@ -28,23 +28,14 @@ require_once dirname(__FILE__)."/../../controller/renderingservicecontroller.php
 require_once dirname(__FILE__)."/../../util/utils.php";
 
 /**
- * @SWG\Resource(
- *      apiVersion="1.0",
- *      swaggerVersion="1.2",
- *      description="Session Repository",
- *      resourcePath="/session"
- * )
- */
-
-/**
  *     @SWG\Post(
  *        path="/session.{type}",
  *        operationId="CreateSession",
  *        summary="Creates a new MapGuide session",
  *        tags={"session"},
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->post("/session.:format", function($format) use ($app) {
@@ -58,9 +49,9 @@ $app->post("/session.:format", function($format) use ($app) {
  *        summary="Destroys the specified session",
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->delete("/session/:sessionId", function($sessionId) use ($app) {
@@ -75,9 +66,9 @@ $app->delete("/session/:sessionId", function($sessionId) use ($app) {
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/timeout.:format", function($sessionId, $format) use ($app) {
@@ -94,7 +85,7 @@ $app->get("/session/:sessionId/timeout.:format", function($sessionId, $format) u
  *          @SWG\Parameter(name="mapName", in="path", required=true, type="string", description="The name of the runtime map"),
  *          @SWG\Parameter(name="x", in="query", required=true, type="integer", description="The X coordinate of the map center to render"),
  *          @SWG\Parameter(name="y", in="query", required=true, type="integer", description="The Y coordinate of the map center to render"),
- *          @SWG\Parameter(name="scale", in="query", required=true, type="double", description="The map scale to render"),
+ *          @SWG\Parameter(name="scale", in="query", required=true, type="number", description="The map scale to render"),
  *          @SWG\Parameter(name="width", in="query", required=true, type="integer", description="The width of the image"),
  *          @SWG\Parameter(name="height", in="query", required=true, type="integer", description="The height of the image"),
  *          @SWG\Parameter(name="keepselection", in="query", required=false, type="boolean", description="Indicates whether any selection should be retained"),
@@ -105,9 +96,9 @@ $app->get("/session/:sessionId/timeout.:format", function($sessionId, $format) u
  *          @SWG\Parameter(name="showgroups", in="query", required=false, type="string", description="A comma-separated list of layer group ids"),
  *          @SWG\Parameter(name="hidelayers", in="query", required=false, type="string", description="A comma-separated list of layer object ids"),
  *          @SWG\Parameter(name="hidegroups", in="query", required=false, type="string", description="A comma-separated list of layer group ids"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/image.:format", function($sessionId, $mapName, $format) use ($app) {
@@ -126,7 +117,7 @@ $app->get("/session/:sessionId/:mapName.Map/image.:format", function($sessionId,
  *          @SWG\Parameter(name="behavior", in="path", required=true, type="integer", description="A bitmask controlling rendering behavior. 1=Render Selection, 2=Render layers, 4=Keep Selection, 8=Render Base Layers (only for MapGuide Open Source 2.5 and above)"),
  *          @SWG\Parameter(name="x", in="query", required=true, type="integer", description="The X coordinate of the map center to render"),
  *          @SWG\Parameter(name="y", in="query", required=true, type="integer", description="The Y coordinate of the map center to render"),
- *          @SWG\Parameter(name="scale", in="query", required=true, type="double", description="The map scale to render"),
+ *          @SWG\Parameter(name="scale", in="query", required=true, type="number", description="The map scale to render"),
  *          @SWG\Parameter(name="width", in="query", required=false, type="integer", description="The width of the image"),
  *          @SWG\Parameter(name="height", in="query", required=false, type="integer", description="The height of the image"),
  *          @SWG\Parameter(name="keepselection", in="query", required=false, type="boolean", description="Indicates whether any selection should be retained"),
@@ -137,9 +128,9 @@ $app->get("/session/:sessionId/:mapName.Map/image.:format", function($sessionId,
  *          @SWG\Parameter(name="showgroups", in="query", required=false, type="string", description="A comma-separated list of layer group ids"),
  *          @SWG\Parameter(name="hidelayers", in="query", required=false, type="string", description="A comma-separated list of layer object ids"),
  *          @SWG\Parameter(name="hidegroups", in="query", required=false, type="string", description="A comma-separated list of layer group ids"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/overlayimage.:format", function($sessionId, $mapName, $format) use ($app) {
@@ -157,9 +148,9 @@ $app->get("/session/:sessionId/:mapName.Map/overlayimage.:format", function($ses
  *          @SWG\Parameter(name="width", in="query", required=false, type="integer", description="The width of the image"),
  *          @SWG\Parameter(name="height", in="query", required=false, type="integer", description="The height of the image"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="The image type", enum={"PNG", "PNG8", "JPG", "GIF"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/legendimage.:format", function($sessionId, $mapName, $format) use ($app) {
@@ -181,9 +172,9 @@ $app->get("/session/:sessionId/:mapName.Map/legendimage.:format", function($sess
  *          @SWG\Parameter(name="iconheight", in="query", required=false, type="integer", description="The desired height of generated icons if icons are requested"),
  *          @SWG\Parameter(name="iconsperscalerange", in="query", required=false, type="integer", description="The number of icons to generate per scale range if icons are requested"),
  *          @SWG\Parameter(name="group", in="query", required=false, type="string", description="Only return layers belonging to the specified group"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/layers.:format", function($sessionId, $mapName, $format) use ($app) {
@@ -199,9 +190,9 @@ $app->get("/session/:sessionId/:mapName.Map/layers.:format", function($sessionId
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="mapName", in="path", required=true, type="string", description="The name of the runtime map"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/layergroups.:format", function($sessionId, $mapName, $format) use ($app) {
@@ -218,17 +209,17 @@ $app->get("/session/:sessionId/:mapName.Map/layergroups.:format", function($sess
  *          @SWG\Parameter(name="mapName", in="path", required=true, type="string", description="The name of the runtime map"),
 **          @SWG\Parameter(name="papersize", in="query", required=true, type="string", description="The paper size", enum={"A3", "A4", "A5", "Letter", "Legal"}),
  *          @SWG\Parameter(name="orientation", in="query", required=true, type="string", description="The plot orientation L=Landscape, P=Portrait", enum={"L", "P"}),
- *          @SWG\Parameter(name="marginleft", in="query", required=false, type="double", description="left margin in inches"),
- *          @SWG\Parameter(name="marginright", in="query", required=false, type="double", description="right margin in inches"),
- *          @SWG\Parameter(name="margintop", in="query", required=false, type="double", description="top margin in inches"),
- *          @SWG\Parameter(name="marginbottom", in="query", required=false, type="double", description="bottom margin in inches"),
+ *          @SWG\Parameter(name="marginleft", in="query", required=false, type="number", description="left margin in inches"),
+ *          @SWG\Parameter(name="marginright", in="query", required=false, type="number", description="right margin in inches"),
+ *          @SWG\Parameter(name="margintop", in="query", required=false, type="number", description="top margin in inches"),
+ *          @SWG\Parameter(name="marginbottom", in="query", required=false, type="number", description="bottom margin in inches"),
  *          @SWG\Parameter(name="printlayout", in="query", required=false, type="string", description="The PrintLayout resource to use for plotting. Only applies if plotting to DWF"),
  *          @SWG\Parameter(name="title", in="query", required=false, type="string", description="The title to put in the plot"),
  *          @SWG\Parameter(name="layeredpdf", in="query", required=false, type="boolean", description="Indicates whether to produce a layered PDF. Only applies if plotting PDFs. This is slower than regular PDF plot, but produces a PDF with the same layer structure as the map"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="The plot type", enum={"dwf", "pdf"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/plot.:format", function($sessionId, $mapName, $format) use ($app) {
@@ -249,9 +240,9 @@ $app->get("/session/:sessionId/:mapName.Map/plot.:format", function($sessionId, 
  *          @SWG\Parameter(name="iconheight", in="query", required=false, type="integer", description="The desired height of generated icons if icons are requested"),
  *          @SWG\Parameter(name="iconsperscalerange", in="query", required=false, type="integer", description="The number of icons to generate per scale range if icons are requested"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/description.:format", function($sessionId, $mapName, $format) use ($app) {
@@ -267,9 +258,9 @@ $app->get("/session/:sessionId/:mapName.Map/description.:format", function($sess
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="mapName", in="path", required=true, type="string", description="The name of the runtime map"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->put("/session/:sessionId/:mapName.Map/layersandgroups.:format", function($sessionId, $mapName, $format) use ($app) {
@@ -284,9 +275,9 @@ $app->put("/session/:sessionId/:mapName.Map/layersandgroups.:format", function($
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="mapName", in="path", required=true, type="string", description="The name of the runtime map"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $mapName) use ($app) {
@@ -302,9 +293,9 @@ $app->get("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $ma
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="mapName", in="path", required=true, type="string", description="The name of the runtime map"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Selection/layers.:format", function($sessionId, $mapName, $format) use ($app) {
@@ -321,9 +312,9 @@ $app->get("/session/:sessionId/:mapName.Selection/layers.:format", function($ses
  *          @SWG\Parameter(name="mapName", in="path", required=true, type="string", description="The name of the runtime map"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
  *          @SWG\Parameter(name="bounds", in="query", required=false, type="boolean", description="If true, includes the bounds of the whole selection"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Selection/overview.:format", function($sessionId, $mapName, $format) use ($app) {
@@ -345,9 +336,9 @@ $app->get("/session/:sessionId/:mapName.Selection/overview.:format", function($s
  *          @SWG\Parameter(name="pagesize", in="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the number of results for the page."),
  *          @SWG\Parameter(name="page", in="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply."),
  *          @SWG\Parameter(name="orientation", in="query", required=false, type="string", description="The display orientation of feature attribuutes. Only applies if type is html. h=horizontal, v=vertical", enum={"h", "v"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Selection/features.:format/:layerName", function($sessionId, $mapName, $format, $layerName) use ($app) {
@@ -363,9 +354,9 @@ $app->get("/session/:sessionId/:mapName.Selection/features.:format/:layerName", 
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="mapName", in="path", required=true, type="string", description="The name of the runtime map"),
  *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The new selection XML"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->post("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $mapName) use ($app) {
@@ -380,22 +371,22 @@ $app->post("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $m
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="mapName", in="path", required=true, type="string", description="The name of the runtime map"),
- *          @SWG\Parameter(name="layernames", in="form", required=false, type="string", description="A comma-separated list of layer names"),
- *          @SWG\Parameter(name="geometry", in="form", required=false, type="string", description="The WKT of the intersecting geometry"),
- *          @SWG\Parameter(name="maxfeatures", in="form", required=false, type="integer", description="The maximum number features to select as a result of this operation"),
- *          @SWG\Parameter(name="selectionvariant", in="form", required=true, type="string", description="The geometry operator to apply", enum={"TOUCHES", "INTERSECTS", "WITHIN", "ENVELOPEINTERSECTS"}),
- *          @SWG\Parameter(name="selectioncolor", in="form", required=false, type="string", description="The selection color"),
- *          @SWG\Parameter(name="selectionformat", in="form", required=false, type="string", description="The selection image format", enum={"PNG", "PNG8", "JPG", "GIF"}),
- *          @SWG\Parameter(name="persist", in="form", required=false, type="boolean", description="If true, will cause this operation to modify the selection set"),
- *          @SWG\Parameter(name="requestdata", in="form", required=true, type="string", description="A bitmask specifying the information to return in the response. 1=Attributes, 2=Inline Selection, 4=Tooltip, 8=Hyperlink"),
- *          @SWG\Parameter(name="featurefilter", in="form", required=false, type="string", description="An XML selection string containing the required feature IDs"),
- *          @SWG\Parameter(name="layerattributefilter", in="form", required=false, type="string", description="Bitmask value determining which layers will be queried. 1=Visible, 2=Selectable, 4=HasTooltips"),
- *          @SWG\Parameter(name="selectionxml", in="form", required=false, type="boolean", description="Indicates if the 'featurefilter' parameter is to be treated as selection XML. Otherwise the input is treated as a SelectionUpdate XML document"),
- *          @SWG\Parameter(name="append", in="form", required=false, type="boolean", description="Indicates if the this query selection indicated by the 'featurefilter' parameter should append to the current selection"),
- *          @SWG\Parameter(name="format", in="form", required=false, type="string", description="The format of the response", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *          @SWG\Parameter(name="layernames", in="formData", required=false, type="string", description="A comma-separated list of layer names"),
+ *          @SWG\Parameter(name="geometry", in="formData", required=false, type="string", description="The WKT of the intersecting geometry"),
+ *          @SWG\Parameter(name="maxfeatures", in="formData", required=false, type="integer", description="The maximum number features to select as a result of this operation"),
+ *          @SWG\Parameter(name="selectionvariant", in="formData", required=true, type="string", description="The geometry operator to apply", enum={"TOUCHES", "INTERSECTS", "WITHIN", "ENVELOPEINTERSECTS"}),
+ *          @SWG\Parameter(name="selectioncolor", in="formData", required=false, type="string", description="The selection color"),
+ *          @SWG\Parameter(name="selectionformat", in="formData", required=false, type="string", description="The selection image format", enum={"PNG", "PNG8", "JPG", "GIF"}),
+ *          @SWG\Parameter(name="persist", in="formData", required=false, type="boolean", description="If true, will cause this operation to modify the selection set"),
+ *          @SWG\Parameter(name="requestdata", in="formData", required=true, type="string", description="A bitmask specifying the information to return in the response. 1=Attributes, 2=Inline Selection, 4=Tooltip, 8=Hyperlink"),
+ *          @SWG\Parameter(name="featurefilter", in="formData", required=false, type="string", description="An XML selection string containing the required feature IDs"),
+ *          @SWG\Parameter(name="layerattributefilter", in="formData", required=false, type="string", description="Bitmask value determining which layers will be queried. 1=Visible, 2=Selectable, 4=HasTooltips"),
+ *          @SWG\Parameter(name="selectionxml", in="formData", required=false, type="boolean", description="Indicates if the 'featurefilter' parameter is to be treated as selection XML. Otherwise the input is treated as a SelectionUpdate XML document"),
+ *          @SWG\Parameter(name="append", in="formData", required=false, type="boolean", description="Indicates if the this query selection indicated by the 'featurefilter' parameter should append to the current selection"),
+ *          @SWG\Parameter(name="format", in="formData", required=false, type="string", description="The format of the response", enum={"xml", "json"}),
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->put("/session/:sessionId/:mapName.Selection", function($sessionId, $mapName) use ($app) {
@@ -411,9 +402,9 @@ $app->put("/session/:sessionId/:mapName.Selection", function($sessionId, $mapNam
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="mapName", in="path", required=true, type="string", description="The name of the runtime map"),
  *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The Map Definition XML"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->post("/session/:sessionId/:resName.Map", function($sessionId, $resName) use($app) {
@@ -438,9 +429,9 @@ $app->post("/session/:sessionId/:resName.Map", function($sessionId, $resName) us
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The feature source name"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/status", function($sessionId, $resName) use ($app) {
@@ -457,9 +448,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/status", function($session
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The feature source name"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/spatialcontexts.:format", function($sessionId, $resName, $format) use ($app) {
@@ -477,9 +468,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/spatialcontexts.:format", 
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The feature source name"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
  *          @SWG\Parameter(name="active", in="query", required=false, type="boolean", description="Return only active long transactions if true, otherwise returns all long transactions"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/longtransactions.:format", function($sessionId, $resName, $format) use ($app) {
@@ -500,9 +491,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/longtransactions.:format",
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The feature source name"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/schemas.:format", function($sessionId, $resName, $format) use ($app) {
@@ -521,9 +512,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/schemas.:format", function
  *          @SWG\Parameter(name="schemaName", in="path", required=true, type="string", description="The name of the schema to describe"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
  *          @SWG\Parameter(name="classnames", in="query", required=false, type="string", description="The dot-separated list of class names"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/schema.:format/:schemaName", function($sessionId, $resName, $format, $schemaName) use ($app) {
@@ -541,9 +532,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/schema.:format/:schemaName
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The feature source name"),
  *          @SWG\Parameter(name="schemaName", in="path", required=true, type="string", description="The name of the schema to describe"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/classes.:format/:schemaName", function($sessionId, $resName, $format, $schemaName) use ($app) {
@@ -562,9 +553,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classes.:format/:schemaNam
  *          @SWG\Parameter(name="schemaName", in="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\Parameter(name="className", in="path", required=true, type="string", description="The class name"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
@@ -582,9 +573,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:schemaNa
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The feature source name"),
  *          @SWG\Parameter(name="qualifiedClassName", in="path", required=true, type="string", description="The qualified class name"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:qualifiedClassName", function($sessionId, $resName, $format, $qualifiedClassName) use ($app) {
@@ -610,9 +601,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:qualifie
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The feature source name"),
  *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The XML that describes the Feature Source to create"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->post("/session/:sessionId/:resName.FeatureSource/xml", function($sessionId, $resName) use ($app) {
@@ -629,9 +620,9 @@ $app->post("/session/:sessionId/:resName.FeatureSource/xml", function($sessionId
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The feature source name"),
  *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The JSON that describes the Feature Source to create"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->post("/session/:sessionId/:resName.FeatureSource/json", function($sessionId, $resName) use ($app) {
@@ -651,9 +642,9 @@ $app->post("/session/:sessionId/:resName.FeatureSource/json", function($sessionI
  *          @SWG\Parameter(name="schemaName", in="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\Parameter(name="className", in="path", required=true, type="string", description="The class name"),
  *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The Feature Set XML describing the features to be inserted"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->post("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
@@ -673,9 +664,9 @@ $app->post("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaN
  *          @SWG\Parameter(name="schemaName", in="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\Parameter(name="className", in="path", required=true, type="string", description="The class name"),
  *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The XML envelope describing the features to be update"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->put("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
@@ -694,10 +685,10 @@ $app->put("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaNa
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
  *          @SWG\Parameter(name="schemaName", in="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\Parameter(name="className", in="path", required=true, type="string", description="The class name"),
- *          @SWG\Parameter(name="filter", in="form", required=true, type="string", description="The FDO filter determining what features to delete"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *          @SWG\Parameter(name="filter", in="formData", required=true, type="string", description="The FDO filter determining what features to delete"),
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->delete("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
@@ -721,9 +712,9 @@ $app->delete("/session/:sessionId/:resName.FeatureSource/features.:format/:schem
  *          @SWG\Parameter(name="transformto", in="query", required=false, type="string", description="The CS-Map coordinate system code to transform the resulting features into"),
  *          @SWG\Parameter(name="bbox", in="query", required=false, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "geojson"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
@@ -745,9 +736,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaNa
  *          @SWG\Parameter(name="transformto", in="query", required=false, type="string", description="The CS-Map coordinate system code to transform the resulting features into"),
  *          @SWG\Parameter(name="bbox", in="query", required=false, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "geojson"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.LayerDefinition/features.:format", function($sessionId, $resName, $format) use ($app) {
@@ -767,9 +758,9 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/features.:format", funct
  *          @SWG\Parameter(name="className", in="path", required=true, type="string", description="The class name"),
  *          @SWG\Parameter(name="aggregateType", in="path", required=true, type="string", description="aggregate type", enum={"count", "bbox", "distinctvalues"}),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/aggregates.:format/:type/:schemaName/:className", function($sessionId, $resName, $format, $type, $schemaName, $className) use ($app) {
@@ -788,9 +779,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/aggregates.:format/:type/:
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The resource name (including extension)"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName/datalist.:format", function($sessionId, $resName, $format) use ($app) {
@@ -807,9 +798,9 @@ $app->get("/session/:sessionId/:resName/datalist.:format", function($sessionId, 
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The resource name (including extension)"),
  *          @SWG\Parameter(name="dataName", in="path", required=true, type="string", description="The name of the resource data to retrieve"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) use ($app) {
@@ -826,11 +817,11 @@ $app->get("/session/:sessionId/:resName/data/:dataName", function($sessionId, $r
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The resource name (including extension)"),
  *          @SWG\Parameter(name="dataName", in="path", required=true, type="string", description="The name of the resource data to retrieve"),
- *          @SWG\Parameter(name="type", in="form", required=true, type="string", description="The type of resource data", enum={"File", "Stream", "String"}),
- *          @SWG\Parameter(name="data", in="form", required=true, type="file", description="The resource data file to load"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *          @SWG\Parameter(name="type", in="formData", required=true, type="string", description="The type of resource data", enum={"File", "Stream", "String"}),
+ *          @SWG\Parameter(name="data", in="formData", required=true, type="file", description="The resource data file to load"),
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->post("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) use ($app) {
@@ -847,9 +838,9 @@ $app->post("/session/:sessionId/:resName/data/:dataName", function($sessionId, $
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The resource name (including extension)"),
  *          @SWG\Parameter(name="dataName", in="path", required=true, type="string", description="The name of the resource data to retrieve"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->delete("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) use ($app) {
@@ -880,10 +871,10 @@ $app->get("/session/:sessionId/:resName/header.:format", function($sessionId, $r
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The resource name (including extension)"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *          @SWG\Parameter(name="content", in="form", required=true, type="file", description="The resource XML content"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *          @SWG\Parameter(name="content", in="formData", required=true, type="file", description="The resource XML content"),
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->post("/session/:sessionId/:resName/contentorheader.:format", function($sessionId, $resName, $format) use ($app) {
@@ -901,9 +892,9 @@ $app->post("/session/:sessionId/:resName/contentorheader.:format", function($ses
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The resource name (including extension)"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
  *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The resource XML content"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->post("/session/:sessionId/:resName/content.:format", function($sessionId, $resName, $format) use ($app) {
@@ -920,9 +911,9 @@ $app->post("/session/:sessionId/:resName/content.:format", function($sessionId, 
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The resource name (including extension)"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName/content.:format", function($sessionId, $resName, $format) use ($app) {
@@ -939,9 +930,9 @@ $app->get("/session/:sessionId/:resName/content.:format", function($sessionId, $
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The resource name (including extension)"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName/references.:format", function($sessionId, $resName, $format) use ($app) {
@@ -957,9 +948,9 @@ $app->get("/session/:sessionId/:resName/references.:format", function($sessionId
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The resource name (including extension)"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->delete("/session/:sessionId/:resName", function($sessionId, $resName) use ($app) {
@@ -982,9 +973,9 @@ $app->delete("/session/:sessionId/:resName", function($sessionId, $resName) use 
  *          @SWG\Parameter(name="col", in="path", required=true, type="integer", description="The column of the tile to fetch"),
  *          @SWG\Parameter(name="row", in="path", required=true, type="integer", description="The row of the tile to fetch"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="The tile type", enum={"img"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.MapDefinition/tile.:format/:groupName/:scaleIndex/:col/:row", function($sessionId, $resName, $format, $groupName, $scaleIndex, $col, $row) use ($app) {
@@ -1002,15 +993,15 @@ $app->get("/session/:sessionId/:resName.MapDefinition/tile.:format/:groupName/:s
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The name of the Layer Definition"),
- *          @SWG\Parameter(name="scale", in="path", required=true, type="double", description="The scale at which the symbolization is requested"),
+ *          @SWG\Parameter(name="scale", in="path", required=true, type="number", description="The scale at which the symbolization is requested"),
  *          @SWG\Parameter(name="geomType", in="path", required=true, type="integer", description="The type of symbolization required: 1=Point, 2=Line, 3=Area, 4=Composite"),
  *          @SWG\Parameter(name="themecat", in="path", required=true, type="integer", description="The value indicating which theme category swatch to return. Used when there is a theme defined at this scale"),
  *          @SWG\Parameter(name="width", in="query", required=true, type="integer", description="The requested image width in pixels"),
  *          @SWG\Parameter(name="height", in="query", required=true, type="integer", description="The requested image height in pixels"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="The icon image type", enum={"PNG", "PNG8", "JPG", "GIF"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.LayerDefinition/legend/:scale/:geomtype/:themecat/icon.:format", function($sessionId, $resName, $scale, $geomtype, $themecat, $format) use ($app) {
@@ -1030,16 +1021,16 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/legend/:scale/:geomtype/
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The name of the Map Definition"),
  *          @SWG\Parameter(name="x", in="query", required=true, type="integer", description="The X coordinate of the map center to render"),
  *          @SWG\Parameter(name="y", in="query", required=true, type="integer", description="The Y coordinate of the map center to render"),
- *          @SWG\Parameter(name="scale", in="query", required=true, type="double", description="The map scale to render"),
+ *          @SWG\Parameter(name="scale", in="query", required=true, type="number", description="The map scale to render"),
  *          @SWG\Parameter(name="width", in="query", required=true, type="integer", description="The width of the image"),
  *          @SWG\Parameter(name="height", in="query", required=true, type="integer", description="The height of the image"),
  *          @SWG\Parameter(name="keepselection", in="query", required=false, type="boolean", description="Indicates whether any selection should be retained"),
  *          @SWG\Parameter(name="clip", in="query", required=false, type="boolean", description="Apply clipping"),
  *          @SWG\Parameter(name="dpi", in="query", required=false, type="integer", description="The display DPI. If not specified, defaults to 96"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="The image type", enum={"PNG", "PNG8", "JPG", "GIF"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.MapDefinition/image.:format", function($sessionId, $resName, $format) use ($app) {
@@ -1058,9 +1049,9 @@ $app->get("/session/:sessionId/:resName.MapDefinition/image.:format", function($
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The name of the Map Definition"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.WebLayout/viewer", function($sessionId, $resName) use ($app) {
@@ -1078,9 +1069,9 @@ $app->get("/session/:sessionId/:resName.WebLayout/viewer", function($sessionId, 
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The name of the Map Definition"),
  *          @SWG\Parameter(name="template", in="path", required=true, type="string", description="The fusion template to invoke"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.ApplicationDefinition/viewer/:template", function($sessionId, $resName, $template) use ($app) {
@@ -1097,9 +1088,9 @@ $app->get("/session/:sessionId/:resName.ApplicationDefinition/viewer/:template",
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The name of the Map Definition"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/preview", function($sessionId, $resName) use ($app) {
@@ -1116,9 +1107,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/preview", function($sessio
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The name of the Map Definition"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.LayerDefinition/preview", function($sessionId, $resName) use ($app) {
@@ -1135,9 +1126,9 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/preview", function($sess
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The name of the Map Definition"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.MapDefinition/preview", function($sessionId, $resName) use ($app) {
@@ -1154,9 +1145,9 @@ $app->get("/session/:sessionId/:resName.MapDefinition/preview", function($sessio
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The name of the Map Definition"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.SymbolDefinition/preview", function($sessionId, $resName) use ($app) {
@@ -1173,9 +1164,9 @@ $app->get("/session/:sessionId/:resName.SymbolDefinition/preview", function($ses
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The name of the Map Definition"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.WatermarkDefinition/preview", function($sessionId, $resName) use ($app) {
@@ -1195,9 +1186,9 @@ $app->get("/session/:sessionId/:resName.WatermarkDefinition/preview", function($
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="mapName", in="path", required=true, type="string", description="The name of the runtime map"),
  *          @SWG\Parameter(name="native", in="query", required=false, type="boolean", description="If true, this operation will simply pass through to the mapagent. This is much faster, but note that all network link URLs will be referring to the mapagent instead of downstream RESTful layer KML URLs."),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/kml", function($sessionId, $mapName) use ($app) {
@@ -1214,9 +1205,9 @@ $app->get("/session/:sessionId/:mapName.Map/kml", function($sessionId, $mapName)
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The feature source name"),
  *          @SWG\Parameter(name="native", in="query", required=false, type="boolean", description="If true, this operation will simply pass through to the mapagent. This is much faster, but note that all network link URLs will be referring to the mapagent instead of downstream RESTful layer KML URLs."),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.MapDefinition/kml", function($sessionId, $resName) use ($app) {
@@ -1239,9 +1230,9 @@ $app->get("/session/:sessionId/:resName.MapDefinition/kml", function($sessionId,
  *          @SWG\Parameter(name="width", in="query", required=true, type="integer", description="The display width of the KML viewport"),
  *          @SWG\Parameter(name="height", in="query", required=true, type="integer", description="The display height of the KML viewport"),
  *          @SWG\Parameter(name="draworder", in="query", required=true, type="integer", description="The draw order of this layer"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.LayerDefinition/kml", function($sessionId, $resName) use ($app) {
@@ -1263,9 +1254,9 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/kml", function($sessionI
  *          @SWG\Parameter(name="width", in="query", required=true, type="integer", description="The display width of the KML viewport"),
  *          @SWG\Parameter(name="height", in="query", required=true, type="integer", description="The display height of the KML viewport"),
  *          @SWG\Parameter(name="draworder", in="query", required=true, type="integer", description="The draw order of this layer"),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/session/:sessionId/:resName.LayerDefinition/kmlfeatures", function($sessionId, $resName) use ($app) {

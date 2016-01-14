@@ -31,7 +31,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/coordsys/validatewkt": {
@@ -44,20 +54,30 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "wkt",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The Coordinate System WKT string",
                         "required": false,
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/coordsys/wkttoepsg": {
@@ -70,20 +90,30 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "wkt",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The Coordinate System WKT string",
                         "required": false,
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/coordsys/wkttomentor": {
@@ -96,20 +126,30 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "wkt",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The Coordinate System WKT string",
                         "required": false,
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/coordsys/categories.{type}": {
@@ -139,7 +179,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/coordsys/category/{category}.{type}": {
@@ -176,7 +226,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/coordsys/mentor/{cscode}/epsg.{type}": {
@@ -213,7 +273,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/coordsys/mentor/{cscode}/wkt.{type}": {
@@ -250,7 +320,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/coordsys/epsg/{epsg}/mentor.{type}": {
@@ -287,7 +367,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/coordsys/epsg/{epsg}/wkt.{type}": {
@@ -324,7 +414,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/data/configs.{type}": {
@@ -354,7 +454,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/data/{uriPart}/config": {
@@ -380,7 +490,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "post": {
                 "tags": [
@@ -391,7 +511,7 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
@@ -405,13 +525,23 @@
                     },
                     {
                         "name": "data",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The data configuration file to load",
                         "required": true,
                         "type": "file"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "delete": {
                 "tags": [
@@ -422,7 +552,7 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
@@ -435,7 +565,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/data/{uriPart}/files.{type}": {
@@ -472,7 +612,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/data/{uriPart}/file": {
@@ -485,7 +635,7 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
@@ -499,20 +649,30 @@
                     },
                     {
                         "name": "filename",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The file name to upload to",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "data",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The file to load",
                         "required": true,
                         "type": "file"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "delete": {
                 "tags": [
@@ -523,7 +683,7 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
@@ -537,13 +697,23 @@
                     },
                     {
                         "name": "filename",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The file name to upload to",
                         "required": true,
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.FeatureSource/status.{type}": {
@@ -580,7 +750,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.FeatureSource/editcapabilities.{type}": {
@@ -617,7 +797,23 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/RestEditCapabilities"
+                        }
+                    },
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "post": {
                 "tags": [
@@ -666,7 +862,20 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "201": {
+                        "description": "Capabilities set successfully"
+                    },
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.FeatureSource/xml": {
@@ -702,7 +911,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.FeatureSource/json": {
@@ -741,7 +960,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.FeatureSource/spatialcontexts.{type}": {
@@ -778,7 +1007,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.FeatureSource/longtransactions.{type}": {
@@ -822,7 +1061,17 @@
                         "type": "boolean"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.FeatureSource/schemas.{type}": {
@@ -859,7 +1108,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.FeatureSource/schema.{type}/{schemaName}": {
@@ -910,7 +1169,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.FeatureSource/classes.{type}/{schemaName}": {
@@ -954,7 +1223,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.FeatureSource/classdef.{type}/{schemaName}/{className}": {
@@ -1005,7 +1284,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.FeatureSource/classdef.{type}/{qualifiedClassName}": {
@@ -1049,7 +1338,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.FeatureSource/features.{type}/{schemaName}/{className}": {
@@ -1174,7 +1473,17 @@
                         "type": "integer"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "put": {
                 "tags": [
@@ -1189,7 +1498,7 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
@@ -1237,7 +1546,20 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "403": {
+                        "description": "Feature Source is not configured to allow updates"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "post": {
                 "tags": [
@@ -1252,7 +1574,7 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
@@ -1300,7 +1622,95 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "403": {
+                        "description": "Feature Source is not configured to allow inserts"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
+            }
+        },
+        "/library/{resourcePath}.FeatureSource/features/{schemaName}/{className}": {
+            "delete": {
+                "tags": [
+                    "library"
+                ],
+                "summary": "Deletes one or more features from the given feature class for the specified feature source. The Feature Source in question must have _MgRestAllowDelete=1 in its resource header otherwise deletes will be forbidden. If _MgRestUseTransaction=1 in the resource header, transactions will be used.",
+                "operationId": "DeleteFeatures",
+                "consumes": [
+                    "application/xml",
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "session",
+                        "in": "formData",
+                        "description": "Your MapGuide Session ID",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "resourcePath",
+                        "in": "path",
+                        "description": "The path of the resource ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "schemaName",
+                        "in": "path",
+                        "description": "The FDO schema name",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "className",
+                        "in": "path",
+                        "description": "The class name",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "description": "xml or json",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "json",
+                            "xml"
+                        ]
+                    },
+                    {
+                        "name": "filter",
+                        "in": "formData",
+                        "description": "The FDO filter determining what features to delete",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "403": {
+                        "description": "Feature Source is not configured to allow deletes"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.LayerDefinition/features.{type}": {
@@ -1395,7 +1805,17 @@
                         "type": "integer"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.FeatureSource/aggregates.{type}/{aggregateType}/{schemaName}/{className}": {
@@ -1465,7 +1885,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library": {
@@ -1481,27 +1911,37 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "MAX_FILE_SIZE",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Maximum file size",
                         "required": true,
                         "type": "integer"
                     },
                     {
                         "name": "package",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The package file to load",
                         "required": true,
                         "type": "file"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}/datalist.{type}": {
@@ -1538,7 +1978,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/list.{dataType}": {
@@ -1603,7 +2053,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}/list.{dataType}": {
@@ -1675,7 +2135,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}/data/{dataName}": {
@@ -1708,7 +2178,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "post": {
                 "tags": [
@@ -1719,7 +2199,7 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
@@ -1740,7 +2220,7 @@
                     },
                     {
                         "name": "type",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The type of resource data",
                         "required": true,
                         "type": "string",
@@ -1752,13 +2232,23 @@
                     },
                     {
                         "name": "data",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The resource data file to load",
                         "required": true,
                         "type": "file"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "delete": {
                 "tags": [
@@ -1769,7 +2259,7 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
@@ -1789,7 +2279,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}/header.{type}": {
@@ -1830,7 +2330,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "post": {
                 "tags": [
@@ -1845,7 +2355,7 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
@@ -1876,7 +2386,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}/contentorheader.{type}": {
@@ -1893,7 +2413,7 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
@@ -1907,14 +2427,14 @@
                     },
                     {
                         "name": "content",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The resource XML content",
                         "required": true,
                         "type": "file"
                     },
                     {
                         "name": "header",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The resource XML header",
                         "required": true,
                         "type": "file"
@@ -1931,7 +2451,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}/content.{type}": {
@@ -1968,7 +2498,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "post": {
                 "tags": [
@@ -1983,7 +2523,7 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
@@ -2014,7 +2554,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}/html": {
@@ -2040,7 +2590,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}/references.{type}": {
@@ -2077,7 +2637,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}": {
@@ -2103,7 +2673,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.MapDefinition/xyz/{groupName}/{z}/{x}/{y}/tile.{format}": {
@@ -2171,7 +2751,20 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "304": {
+                        "description": "This tile has not been modified. Your previously fetched tile is still the current one"
+                    },
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.MapDefinition/xyz/{groupName}/{layerName}/{z}/{x}/{y}/tile.{format}": {
@@ -2242,7 +2835,20 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "304": {
+                        "description": "This tile has not been modified. Your previously fetched tile is still the current one"
+                    },
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.MapDefinition/tile.{type}/{groupName}/{scaleIndex}/{col}/{row}": {
@@ -2306,7 +2912,20 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "304": {
+                        "description": "This tile has not been modified. Your previously fetched tile is still the current one"
+                    },
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.TileSetDefinition/tile.{type}/{groupName}/{scaleIndex}/{col}/{row}": {
@@ -2370,7 +2989,20 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "304": {
+                        "description": "This tile has not been modified. Your previously fetched tile is still the current one"
+                    },
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.LayerDefinition/legend/{scale}/{geomType}/{themecat}/icon.{type}": {
@@ -2400,7 +3032,7 @@
                         "in": "path",
                         "description": "The scale at which the symbolization is requested",
                         "required": true,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "geomType",
@@ -2444,7 +3076,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.MapDefinition/plot.{type}": {
@@ -2488,7 +3130,7 @@
                         "in": "query",
                         "description": "The map scale to plot",
                         "required": true,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "papersize",
@@ -2520,28 +3162,28 @@
                         "in": "query",
                         "description": "left margin in inches",
                         "required": false,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "marginright",
                         "in": "query",
                         "description": "right margin in inches",
                         "required": false,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "margintop",
                         "in": "query",
                         "description": "top margin in inches",
                         "required": false,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "marginbottom",
                         "in": "query",
                         "description": "bottom margin in inches",
                         "required": false,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "printlayout",
@@ -2569,7 +3211,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.MapDefinition/image.{type}": {
@@ -2613,7 +3265,7 @@
                         "in": "query",
                         "description": "The map scale to render",
                         "required": true,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "width",
@@ -2664,7 +3316,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.WebLayout/viewer": {
@@ -2690,7 +3352,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.ApplicationDefinition/{template}": {
@@ -2723,7 +3395,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.FeatureSource/preview": {
@@ -2749,7 +3431,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.LayerDefinition/preview": {
@@ -2775,7 +3467,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.MapDefinition/preview": {
@@ -2801,7 +3503,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.SymbolDefinition/preview": {
@@ -2827,7 +3539,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.WatermarkDefinition/preview": {
@@ -2853,7 +3575,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.MapDefinition/kml": {
@@ -2886,7 +3618,17 @@
                         "type": "boolean"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.LayerDefinition/kml": {
@@ -2954,7 +3696,17 @@
                         "type": "integer"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/library/{resourcePath}.LayerDefinition/kmlfeatures": {
@@ -3015,7 +3767,17 @@
                         "type": "integer"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/providers.{type}": {
@@ -3045,7 +3807,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/providers/{providerName}/capabilities.{type}": {
@@ -3089,7 +3861,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/providers/{providerName}/datastores.{type}": {
@@ -3133,7 +3915,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/providers/{providerName}/connectvalues.{type}/{propName}": {
@@ -3184,7 +3976,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/services/fusiontemplates.{type}": {
@@ -3214,7 +4016,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/services/fusionwidgets.{type}": {
@@ -3244,7 +4056,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/services/fusioncontainers.{type}": {
@@ -3274,7 +4096,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/services/listunmanageddata.{responseType}": {
@@ -3287,21 +4119,21 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "path",
-                        "in": "form",
+                        "in": "formData",
                         "description": "",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "type",
-                        "in": "form",
+                        "in": "formData",
                         "description": "",
                         "required": true,
                         "type": "string",
@@ -3313,14 +4145,14 @@
                     },
                     {
                         "name": "filter",
-                        "in": "form",
+                        "in": "formData",
                         "description": "",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "recursive",
-                        "in": "form",
+                        "in": "formData",
                         "description": "",
                         "required": true,
                         "type": "boolean"
@@ -3337,7 +4169,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/services/getschemamapping.{type}": {
@@ -3381,7 +4223,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/services/copyresource": {
@@ -3394,27 +4246,37 @@
                 "parameters": [
                     {
                         "name": "source",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The Source Resource ID",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "destination",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The Target Resource ID",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "overwrite",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Indicates whether to overwrite the target resource if it exists",
                         "required": false,
                         "type": "boolean"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/services/moveresource": {
@@ -3427,34 +4289,44 @@
                 "parameters": [
                     {
                         "name": "source",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The Source Resource ID",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "destination",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The Target Resource ID",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "overwrite",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Indicates whether to overwrite the target resource if it exists",
                         "required": false,
                         "type": "boolean"
                     },
                     {
                         "name": "cascade",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Indicates whether to cascade any reference changes in related documents as a result of this change",
                         "required": false,
                         "type": "boolean"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/services/transformcoords": {
@@ -3467,28 +4339,28 @@
                 "parameters": [
                     {
                         "name": "from",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The Source Coordinate System Code",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "to",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The Target Coordinate System Code",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "coords",
-                        "in": "form",
+                        "in": "formData",
                         "description": "A comma-delimited list of space-delimited coordinate pairs",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "format",
-                        "in": "form",
+                        "in": "formData",
                         "description": "xml or json",
                         "required": true,
                         "type": "string",
@@ -3498,7 +4370,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/services/createmap.{type}": {
@@ -3511,35 +4393,35 @@
                 "parameters": [
                     {
                         "name": "session",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Your MapGuide Session ID. If none specified you must pass the basic http authentication challenge",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "mapdefinition",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The Map Definition ID to create a new runtime map from",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "targetmapname",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The target map name to associate the Runtime Map by. By default, the name is generated from the Map Definition ID",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "requestedfeatures",
-                        "in": "form",
+                        "in": "formData",
                         "description": "A bitmask of the information about the Runtime Map that you would like returned. 1=Layer/Group structure, 2=icons, 4=Feature Source Information",
                         "required": false,
                         "type": "integer"
                     },
                     {
                         "name": "iconformat",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The desired icon image format if icons are requested",
                         "required": false,
                         "type": "string",
@@ -3552,21 +4434,21 @@
                     },
                     {
                         "name": "iconwidth",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The desired width of generated icons if icons are requested",
                         "required": false,
                         "type": "integer"
                     },
                     {
                         "name": "iconheight",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The desired height of generated icons if icons are requested",
                         "required": false,
                         "type": "integer"
                     },
                     {
                         "name": "iconsperscalerange",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The number of icons to generate per scale range if icons are requested",
                         "required": false,
                         "type": "integer"
@@ -3583,7 +4465,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session.{type}": {
@@ -3606,7 +4498,14 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}": {
@@ -3625,7 +4524,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/timeout.{type}": {
@@ -3655,7 +4564,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Map/image.{type}": {
@@ -3699,7 +4618,7 @@
                         "in": "query",
                         "description": "The map scale to render",
                         "required": true,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "width",
@@ -3778,7 +4697,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Map/overlayimage.{type}": {
@@ -3836,7 +4765,7 @@
                         "in": "query",
                         "description": "The map scale to render",
                         "required": true,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "width",
@@ -3915,7 +4844,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Map/legendimage.{type}": {
@@ -3968,7 +4907,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Map/layers.{type}": {
@@ -4053,7 +5002,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Map/layergroups.{type}": {
@@ -4090,7 +5049,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Map/plot.{type}": {
@@ -4145,28 +5114,28 @@
                         "in": "query",
                         "description": "left margin in inches",
                         "required": false,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "marginright",
                         "in": "query",
                         "description": "right margin in inches",
                         "required": false,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "margintop",
                         "in": "query",
                         "description": "top margin in inches",
                         "required": false,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "marginbottom",
                         "in": "query",
                         "description": "bottom margin in inches",
                         "required": false,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "printlayout",
@@ -4201,7 +5170,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Map/description.{type}": {
@@ -4279,7 +5258,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Map/layersandgroups.{type}": {
@@ -4316,7 +5305,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Selection/xml": {
@@ -4342,7 +5341,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "post": {
                 "tags": [
@@ -4373,7 +5382,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Selection/layers.{type}": {
@@ -4410,7 +5429,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Selection/overview.{type}": {
@@ -4454,7 +5483,17 @@
                         "type": "boolean"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Selection/features.{type}/{layerName}": {
@@ -4538,7 +5577,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Selection": {
@@ -4565,28 +5614,28 @@
                     },
                     {
                         "name": "layernames",
-                        "in": "form",
+                        "in": "formData",
                         "description": "A comma-separated list of layer names",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "geometry",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The WKT of the intersecting geometry",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "maxfeatures",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The maximum number features to select as a result of this operation",
                         "required": false,
                         "type": "integer"
                     },
                     {
                         "name": "selectionvariant",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The geometry operator to apply",
                         "required": true,
                         "type": "string",
@@ -4599,14 +5648,14 @@
                     },
                     {
                         "name": "selectioncolor",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The selection color",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "selectionformat",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The selection image format",
                         "required": false,
                         "type": "string",
@@ -4619,49 +5668,49 @@
                     },
                     {
                         "name": "persist",
-                        "in": "form",
+                        "in": "formData",
                         "description": "If true, will cause this operation to modify the selection set",
                         "required": false,
                         "type": "boolean"
                     },
                     {
                         "name": "requestdata",
-                        "in": "form",
+                        "in": "formData",
                         "description": "A bitmask specifying the information to return in the response. 1=Attributes, 2=Inline Selection, 4=Tooltip, 8=Hyperlink",
                         "required": true,
                         "type": "string"
                     },
                     {
                         "name": "featurefilter",
-                        "in": "form",
+                        "in": "formData",
                         "description": "An XML selection string containing the required feature IDs",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "layerattributefilter",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Bitmask value determining which layers will be queried. 1=Visible, 2=Selectable, 4=HasTooltips",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "selectionxml",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Indicates if the 'featurefilter' parameter is to be treated as selection XML. Otherwise the input is treated as a SelectionUpdate XML document",
                         "required": false,
                         "type": "boolean"
                     },
                     {
                         "name": "append",
-                        "in": "form",
+                        "in": "formData",
                         "description": "Indicates if the this query selection indicated by the 'featurefilter' parameter should append to the current selection",
                         "required": false,
                         "type": "boolean"
                     },
                     {
                         "name": "format",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The format of the response",
                         "required": false,
                         "type": "string",
@@ -4671,7 +5720,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Map": {
@@ -4704,7 +5763,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.FeatureSource/status": {
@@ -4730,7 +5799,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.FeatureSource/spatialcontexts.{type}": {
@@ -4767,7 +5846,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.FeatureSource/longtransactions.{type}": {
@@ -4811,7 +5900,17 @@
                         "type": "boolean"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.FeatureSource/schemas": {
@@ -4848,7 +5947,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.FeatureSource/schema.{type}/{schemaName}": {
@@ -4899,7 +6008,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.FeatureSource/classes.{type}/{schemaName}": {
@@ -4943,7 +6062,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.FeatureSource/classdef.{type}/{schemaName}/{className}": {
@@ -4994,7 +6123,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.FeatureSource/classdef.{type}/{qualifiedClassName}": {
@@ -5038,7 +6177,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.FeatureSource/xml": {
@@ -5071,7 +6220,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.FeatureSource/json": {
@@ -5104,7 +6263,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.FeatureSource/features.{type}/{schemaName}/{className}": {
@@ -5190,7 +6359,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "put": {
                 "tags": [
@@ -5246,7 +6425,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "post": {
                 "tags": [
@@ -5302,7 +6491,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "delete": {
                 "tags": [
@@ -5352,13 +6551,23 @@
                     },
                     {
                         "name": "filter",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The FDO filter determining what features to delete",
                         "required": true,
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.LayerDefinition/features.{type}": {
@@ -5430,7 +6639,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.FeatureSource/aggregates.{type}/{aggregateType}/{schemaName}/{className}": {
@@ -5493,7 +6712,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}/datalist.{type}": {
@@ -5530,7 +6759,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}/data/{dataName}": {
@@ -5563,7 +6802,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "post": {
                 "tags": [
@@ -5595,7 +6844,7 @@
                     },
                     {
                         "name": "type",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The type of resource data",
                         "required": true,
                         "type": "string",
@@ -5607,13 +6856,23 @@
                     },
                     {
                         "name": "data",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The resource data file to load",
                         "required": true,
                         "type": "file"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "delete": {
                 "tags": [
@@ -5644,7 +6903,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}/contentorheader.{type}": {
@@ -5682,13 +6951,23 @@
                     },
                     {
                         "name": "content",
-                        "in": "form",
+                        "in": "formData",
                         "description": "The resource XML content",
                         "required": true,
                         "type": "file"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}/content.{type}": {
@@ -5725,7 +7004,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             },
             "post": {
                 "tags": [
@@ -5767,7 +7056,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}/references.{type}": {
@@ -5804,7 +7103,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}": {
@@ -5830,7 +7139,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}/tile.{type}/{groupName}/{scaleIndex}/{col}/{row}": {
@@ -5894,7 +7213,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.LayerDefinition/legend/{scale}/{geomType}/{themecat}/icon.{type}": {
@@ -5924,7 +7253,7 @@
                         "in": "path",
                         "description": "The scale at which the symbolization is requested",
                         "required": true,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "geomType",
@@ -5968,7 +7297,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.MapDefinition/image.{type}": {
@@ -6012,7 +7351,7 @@
                         "in": "query",
                         "description": "The map scale to render",
                         "required": true,
-                        "type": "double"
+                        "type": "number"
                     },
                     {
                         "name": "width",
@@ -6063,7 +7402,17 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.WebLayout/viewer": {
@@ -6089,7 +7438,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.ApplicationDefinition/viewer/{template}": {
@@ -6122,7 +7481,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.FeatureSource/preview": {
@@ -6148,7 +7517,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.LayerDefinition/preview": {
@@ -6174,7 +7553,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.MapDefinition/preview": {
@@ -6200,7 +7589,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.SymbolDefinition/preview": {
@@ -6226,7 +7625,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.WatermarkDefinition/preview": {
@@ -6252,7 +7661,17 @@
                         "type": "string"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{mapName}.Map/kml": {
@@ -6285,7 +7704,17 @@
                         "type": "boolean"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.MapDefinition/kml": {
@@ -6318,7 +7747,17 @@
                         "type": "boolean"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.LayerDefinition/kml": {
@@ -6386,7 +7825,17 @@
                         "type": "integer"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/session/{session}/{resName}.LayerDefinition/kmlfeatures": {
@@ -6447,7 +7896,17 @@
                         "type": "integer"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/site/status.{type}": {
@@ -6477,7 +7936,14 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/site/info.{type}": {
@@ -6507,7 +7973,14 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/site/version.{type}": {
@@ -6537,7 +8010,14 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/site/groups.{type}": {
@@ -6567,7 +8047,14 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/site/groups/{groupName}/users.{type}": {
@@ -6604,7 +8091,14 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/site/user/{userName}/groups.{type}": {
@@ -6641,7 +8135,14 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         },
         "/site/user/{userName}/roles.{type}": {
@@ -6678,7 +8179,14 @@
                         ]
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
             }
         }
     },

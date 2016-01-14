@@ -21,15 +21,6 @@ require_once dirname(__FILE__)."/../../controller/siteadmincontroller.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
 
 /**
- * @SWG\Resource(
- *      apiVersion="1.0",
- *      swaggerVersion="1.2",
- *      description="Site Service",
- *      resourcePath="/site"
- * )
- */
-
-/**
  *     @SWG\Get(
  *        path="/site/status.{type}",
  *        operationId="GetSiteStatus",
@@ -37,8 +28,8 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  *        tags={"site"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/site/status.:format", function($format) use ($app) {
@@ -53,8 +44,8 @@ $app->get("/site/status.:format", function($format) use ($app) {
  *        tags={"site"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="response output format", enum={"xml", "json"}),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/site/info.:format", function($format) use ($app) {
@@ -69,8 +60,8 @@ $app->get("/site/info.:format", function($format) use ($app) {
  *        tags={"site"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="response output format", enum={"xml", "json"}),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/site/version.:format", function($format) use ($app) {
@@ -85,8 +76,8 @@ $app->get("/site/version.:format", function($format) use ($app) {
  *        tags={"site"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/site/groups.:format", function($format) use ($app) {
@@ -102,8 +93,8 @@ $app->get("/site/groups.:format", function($format) use ($app) {
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="groupName", in="path", required=true, type="string", description="The group name"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/site/groups/:groupName/users.:format", function($groupName, $format) use ($app) {
@@ -119,8 +110,8 @@ $app->get("/site/groups/:groupName/users.:format", function($groupName, $format)
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="userName", in="path", required=true, type="string", description="The user name"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/site/user/:userName/groups.:format", function($userName, $format) use ($app) {
@@ -136,8 +127,8 @@ $app->get("/site/user/:userName/groups.:format", function($userName, $format) us
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="userName", in="path", required=true, type="string", description="The user name"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/site/user/:userName/roles.:format", function($userName, $format) use ($app) {

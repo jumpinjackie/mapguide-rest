@@ -21,15 +21,6 @@ require_once dirname(__FILE__)."/../../controller/featureservicecontroller.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
 
 /**
- * @SWG\Resource(
- *      apiVersion="1.0",
- *      swaggerVersion="1.2",
- *      description="FDO Provider Registry",
- *      resourcePath="/providers"
- * )
- */
-
-/**
  *     @SWG\Get(
  *        path="/providers.{type}",
  *        operationId="GetFeatureProviders",
@@ -37,9 +28,9 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  *        tags={"providers"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/providers.:format", function($format) use ($app) {
@@ -56,9 +47,9 @@ $app->get("/providers.:format", function($format) use ($app) {
  *          @SWG\Parameter(name="providerName", in="path", required=true, type="string", description="The FDO Provider"),
  *          @SWG\Parameter(name="connection", in="query", required=true, type="string", description="The partial connection string"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/providers/:providerName/capabilities.:format", function($providerName, $format) use ($app) {
@@ -75,9 +66,9 @@ $app->get("/providers/:providerName/capabilities.:format", function($providerNam
  *          @SWG\Parameter(name="providerName", in="path", required=true, type="string", description="The FDO Provider"),
  *          @SWG\Parameter(name="connection", in="query", required=true, type="string", description="The partial connection string"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/providers/:providerName/datastores.:format", function($providerName, $format) use ($app) {
@@ -95,9 +86,9 @@ $app->get("/providers/:providerName/datastores.:format", function($providerName,
  *          @SWG\Parameter(name="propName", in="path", required=true, type="string", description="The FDO Provider"),
  *          @SWG\Parameter(name="connection", in="query", required=false, type="string", description="The partial connection string"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"xml", "json"}),
- *        @SWG\Response(code=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
- *        @SWG\Response(code=401, description="Session ID or MapGuide credentials not specified"),
- *        @SWG\Response(code=500, description="An error occurred during the operation")
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
 $app->get("/providers/:providerName/connectvalues.:format/:propName", function($providerName, $format, $propName) use ($app) {
