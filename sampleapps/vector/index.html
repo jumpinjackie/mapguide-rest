@@ -283,13 +283,13 @@
                 minZoom: 5,
                 maxZoom: 19
             });
-            var tileLayer = new ol.layer.Vector({
-              source: new ol.source.Vector({
+            var tileLayer = new ol.layer.VectorTile({
+              source: new ol.source.VectorTile({
                 format: new ol.format.GeoJSON({
                   defaultProjection: 'EPSG:4326'
                 }),
                 projection: 'EPSG:3857',
-                strategy: ol.loadingstrategy.tile(tileGrid),
+                tileGrid: tileGrid,
                 url: restUrl + '/library/Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition/xyz/Base Layer Group/{z}/{x}/{y}/tile.json'
               }),
               style: styleFunc
