@@ -371,7 +371,7 @@ class MgMappingServiceController extends MgBaseController {
         $iconHeight = $this->app->request->params("iconheight");
         $iconsPerScaleRange = $this->app->request->params("iconsperscalerange");
 
-        $this->EnsureAuthenticationForSite($session, true);
+        $this->EnsureAuthenticationForSite($session);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
 
