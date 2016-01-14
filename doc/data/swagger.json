@@ -575,8 +575,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -612,8 +612,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -625,6 +625,10 @@
                 ],
                 "summary": "Sets the REST API edit capabilities of the given Feature Source",
                 "operationId": "SetRestEditCapabilities",
+                "consumes": [
+                    "application/json",
+                    "application/xml"
+                ],
                 "parameters": [
                     {
                         "name": "session",
@@ -647,8 +651,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -656,6 +660,9 @@
                         "in": "body",
                         "description": "The edit capabilities XML or JSON",
                         "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/RestEditCapabilities"
+                        },
                         "type": "string"
                     }
                 ],
@@ -669,6 +676,9 @@
                 ],
                 "summary": "Creates the given Feature Source",
                 "operationId": "CreateFeatureSource",
+                "consumes": [
+                    "application/xml"
+                ],
                 "parameters": [
                     {
                         "name": "session",
@@ -702,6 +712,9 @@
                 ],
                 "summary": "Creates the given Feature Source",
                 "operationId": "CreateFeatureSource",
+                "consumes": [
+                    "application/json"
+                ],
                 "parameters": [
                     {
                         "name": "session",
@@ -722,6 +735,9 @@
                         "in": "body",
                         "description": "The JSON that describes the Feature Source to create",
                         "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CreateFeatureSourceEnvelope"
+                        },
                         "type": "string"
                     }
                 ],
@@ -757,8 +773,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -794,8 +810,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -838,8 +854,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -882,8 +898,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -933,8 +949,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -984,8 +1000,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -1028,8 +1044,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -1166,6 +1182,10 @@
                 ],
                 "summary": "Updates one or more features into the given feature class for the specified feature source. The Feature Source in question must have _MgRestAllowUpdate=1 in its resource header otherwise updates will be forbidden. If _MgRestUseTransaction=1 in the resource header, transactions will be used.",
                 "operationId": "UpdateFeatures",
+                "consumes": [
+                    "application/json",
+                    "application/xml"
+                ],
                 "parameters": [
                     {
                         "name": "session",
@@ -1202,8 +1222,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -1211,6 +1231,9 @@
                         "in": "body",
                         "description": "The XML envelope describing the features to be update",
                         "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UpdateFeaturesEnvelope"
+                        },
                         "type": "string"
                     }
                 ],
@@ -1222,6 +1245,10 @@
                 ],
                 "summary": "Inserts one or more features into the given feature class for the specified feature source. The Feature Source in question must have _MgRestAllowInsert=1 in its resource header otherwise inserts will be forbidden. If _MgRestUseTransaction=1 in the resource header, transactions will be used.",
                 "operationId": "InsertFeatures",
+                "consumes": [
+                    "application/json",
+                    "application/xml"
+                ],
                 "parameters": [
                     {
                         "name": "session",
@@ -1258,8 +1285,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -1267,6 +1294,9 @@
                         "in": "body",
                         "description": "The Feature Set XML describing the features to be inserted",
                         "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/InsertFeaturesEnvelope"
+                        },
                         "type": "string"
                     }
                 ],
@@ -1430,9 +1460,45 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/library": {
+            "post": {
+                "tags": [
+                    "library"
+                ],
+                "summary": "Loads the specified package into the Site Repository",
+                "operationId": "ApplyResourcePackage",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "parameters": [
+                    {
+                        "name": "session",
+                        "in": "form",
+                        "description": "Your MapGuide Session ID",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "MAX_FILE_SIZE",
+                        "in": "form",
+                        "description": "Maximum file size",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "package",
+                        "in": "form",
+                        "description": "The package file to load",
+                        "required": true,
+                        "type": "file"
                     }
                 ],
                 "responses": {}
@@ -1467,8 +1533,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -1733,6 +1799,10 @@
                 ],
                 "summary": "Gets the specified resource header item for the given resource",
                 "operationId": "GetResourceHeader",
+                "consumes": [
+                    "application/json",
+                    "application/xml"
+                ],
                 "parameters": [
                     {
                         "name": "session",
@@ -1755,8 +1825,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -1768,6 +1838,10 @@
                 ],
                 "summary": "Sets the resource header for the given resource",
                 "operationId": "SetResourceHeader",
+                "consumes": [
+                    "application/json",
+                    "application/xml"
+                ],
                 "parameters": [
                     {
                         "name": "session",
@@ -1790,8 +1864,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -1812,6 +1886,10 @@
                 ],
                 "summary": "Sets the resource content and/or header for the given resource",
                 "operationId": "SetResourceContentOrHeader",
+                "consumes": [
+                    "application/json",
+                    "application/xml"
+                ],
                 "parameters": [
                     {
                         "name": "session",
@@ -1848,8 +1926,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -1885,8 +1963,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -1898,6 +1976,10 @@
                 ],
                 "summary": "Sets the resource content for the given resource",
                 "operationId": "SetResourceContent",
+                "consumes": [
+                    "application/json",
+                    "application/xml"
+                ],
                 "parameters": [
                     {
                         "name": "session",
@@ -1920,8 +2002,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     },
                     {
@@ -1990,8 +2072,8 @@
                         "required": true,
                         "type": "string",
                         "enum": [
-                            "xml",
-                            "json"
+                            "json",
+                            "xml"
                         ]
                     }
                 ],
@@ -6600,7 +6682,374 @@
             }
         }
     },
-    "definitions": {},
+    "definitions": {
+        "RestEditCapabilities": {
+            "properties": {
+                "RestCapabilities": {
+                    "description": "",
+                    "$ref": "#/definitions/RestCapabilities"
+                }
+            },
+            "xml": {
+                "name": "RestEditCapabilities"
+            }
+        },
+        "RestCapabilities": {
+            "properties": {
+                "AllowInsert": {
+                    "description": "Allow inserts on this feature source",
+                    "type": "boolean"
+                },
+                "AllowDelete": {
+                    "description": "Allow deletes on this feature source",
+                    "type": "boolean"
+                },
+                "AllowUpdate": {
+                    "description": "Allow updates on this feature source",
+                    "type": "boolean"
+                },
+                "UseTransaction": {
+                    "description": "Use transactions for inserts/updates/deletes. The feature source must support transactions for this to have any effect",
+                    "type": "boolean"
+                }
+            },
+            "xml": {
+                "name": "RestCapabilities"
+            }
+        },
+        "PrimitiveValueEnvelope": {
+            "properties": {
+                "PrimitiveValue": {
+                    "description": "",
+                    "$ref": "#/definitions/PrimitiveValue"
+                }
+            },
+            "xml": {
+                "name": "PrimitiveValueEnvelope"
+            }
+        },
+        "PrimitiveValue": {
+            "properties": {
+                "Type": {
+                    "description": "The type of the primitive value",
+                    "type": "string",
+                    "enum": [
+                        "Boolean",
+                        "Int32",
+                        "Int64",
+                        "String"
+                    ]
+                },
+                "Value": {
+                    "description": "The underlying value",
+                    "type": "string"
+                }
+            },
+            "xml": {
+                "name": "PrimitiveValue"
+            }
+        },
+        "CreateFeatureSourceEnvelope": {
+            "properties": {
+                "FeatureSourceParams": {
+                    "description": "",
+                    "$ref": "#/definitions/FeatureSourceParams"
+                }
+            },
+            "xml": {
+                "name": "CreateFeatureSourceEnvelope"
+            }
+        },
+        "FeatureSourceParams": {
+            "properties": {
+                "File": {
+                    "description": "",
+                    "$ref": "#/definitions/FeatureSourceFile"
+                },
+                "SpatialContext": {
+                    "description": "",
+                    "$ref": "#/definitions/FeatureSourceSpatialContext"
+                },
+                "FeatureSchema": {
+                    "description": "",
+                    "$ref": "#/definitions/FeatureSourceSchema"
+                }
+            },
+            "xml": {
+                "name": "FeatureSourceParams"
+            }
+        },
+        "FeatureSourceFile": {
+            "properties": {
+                "Provider": {
+                    "description": "The FDO provider",
+                    "type": "string",
+                    "enum": [
+                        "OSGeo.SDF",
+                        "OSGeo.SHP",
+                        "OSGeo.SQLite"
+                    ]
+                },
+                "FileName": {
+                    "description": "The file name",
+                    "type": "string"
+                }
+            },
+            "xml": {
+                "name": "FeatureSourceFile"
+            }
+        },
+        "SchemaElement": {
+            "properties": {
+                "Name": {
+                    "description": "",
+                    "type": "string"
+                },
+                "Description": {
+                    "description": "",
+                    "type": "string"
+                }
+            },
+            "xml": {
+                "name": "SchemaElement"
+            }
+        },
+        "FeatureSourceSpatialContext": {
+            "properties": {
+                "CoordinateSystem": {
+                    "description": "",
+                    "type": "string"
+                },
+                "XYTolerance": {
+                    "description": "",
+                    "type": "number",
+                    "format": "double"
+                },
+                "ZTolerance": {
+                    "description": "",
+                    "type": "number",
+                    "format": "double"
+                },
+                "Name": {
+                    "description": "",
+                    "type": "string"
+                },
+                "Description": {
+                    "description": "",
+                    "type": "string"
+                }
+            },
+            "xml": {
+                "name": "FeatureSourceSpatialContext"
+            }
+        },
+        "FeatureSourceSchema": {
+            "properties": {
+                "ClassDefinition": {
+                    "description": "",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ClassDefinition"
+                    }
+                },
+                "Name": {
+                    "description": "",
+                    "type": "string"
+                },
+                "Description": {
+                    "description": "",
+                    "type": "string"
+                }
+            },
+            "xml": {
+                "name": "FeatureSourceSchema"
+            }
+        },
+        "ClassDefinition": {
+            "properties": {
+                "PropertyDefinition": {
+                    "description": "",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PropertyDefinition"
+                    }
+                },
+                "DefaultGeometryPropertyName": {
+                    "description": "The name of the default geometry property. This must exist int the PropertyDefinition collection",
+                    "type": "string"
+                },
+                "Name": {
+                    "description": "",
+                    "type": "string"
+                },
+                "Description": {
+                    "description": "",
+                    "type": "string"
+                }
+            },
+            "xml": {
+                "name": "ClassDefinition"
+            }
+        },
+        "PropertyDefinition": {
+            "properties": {
+                "IsIdentity": {
+                    "description": "",
+                    "type": "boolean"
+                },
+                "PropertyType": {
+                    "description": "",
+                    "type": "integer"
+                },
+                "DataType": {
+                    "description": "",
+                    "type": "integer"
+                },
+                "Nullable": {
+                    "description": "",
+                    "type": "boolean"
+                },
+                "IsAutoGenerated": {
+                    "description": "",
+                    "type": "boolean"
+                },
+                "DefaultValue": {
+                    "description": "",
+                    "type": "string"
+                },
+                "Length": {
+                    "description": "",
+                    "type": "integer"
+                },
+                "Precision": {
+                    "description": "",
+                    "type": "integer"
+                },
+                "Scale": {
+                    "description": "",
+                    "type": "integer"
+                },
+                "GeometryType": {
+                    "description": "",
+                    "type": "integer"
+                },
+                "HasElevation": {
+                    "description": "",
+                    "type": "boolean"
+                },
+                "SpatialContextAssociation": {
+                    "description": "",
+                    "type": "string"
+                },
+                "ReadOnly": {
+                    "description": "",
+                    "type": "boolean"
+                },
+                "Name": {
+                    "description": "",
+                    "type": "string"
+                },
+                "Description": {
+                    "description": "",
+                    "type": "string"
+                }
+            },
+            "xml": {
+                "name": "PropertyDefinition"
+            }
+        },
+        "InsertFeaturesEnvelope": {
+            "properties": {
+                "FeatureSet": {
+                    "description": "",
+                    "$ref": "#/definitions/InsertFeatureSet"
+                }
+            },
+            "xml": {
+                "name": "InsertFeaturesEnvelope"
+            }
+        },
+        "InsertFeatureSet": {
+            "properties": {
+                "Features": {
+                    "description": "",
+                    "$ref": "#/definitions/InsertFeatureCollection"
+                }
+            },
+            "xml": {
+                "name": "InsertFeatureSet"
+            }
+        },
+        "InsertFeatureCollection": {
+            "properties": {
+                "Feature": {
+                    "description": "",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/FeatureToInsert"
+                    }
+                }
+            },
+            "xml": {
+                "name": "InsertFeatureCollection"
+            }
+        },
+        "FeatureToInsert": {
+            "properties": {
+                "Property": {
+                    "description": "",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/NameValuePair"
+                    }
+                }
+            },
+            "xml": {
+                "name": "FeatureToInsert"
+            }
+        },
+        "NameValuePair": {
+            "properties": {
+                "Name": {
+                    "description": "",
+                    "type": "string"
+                },
+                "Value": {
+                    "description": "",
+                    "type": "string"
+                }
+            },
+            "xml": {
+                "name": "NameValuePair"
+            }
+        },
+        "UpdateFeaturesEnvelope": {
+            "properties": {
+                "UpdateOperation": {
+                    "description": "",
+                    "$ref": "#/definitions/UpdateOperation"
+                }
+            },
+            "xml": {
+                "name": "UpdateFeaturesEnvelope"
+            }
+        },
+        "UpdateOperation": {
+            "properties": {
+                "Filter": {
+                    "description": "",
+                    "type": "string"
+                },
+                "UpdateProperties": {
+                    "description": "",
+                    "$ref": "#/definitions/FeatureToInsert"
+                }
+            },
+            "xml": {
+                "name": "UpdateOperations"
+            }
+        }
+    },
     "tags": [
         {
             "name": "coordsys",
