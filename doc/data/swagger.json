@@ -6601,6 +6601,36 @@
         }
     },
     "definitions": {},
+    "tags": [
+        {
+            "name": "coordsys",
+            "description": "Coordinate System Catalog"
+        },
+        {
+            "name": "data",
+            "description": "Data Publishing Framework"
+        },
+        {
+            "name": "library",
+            "description": "Site Repository"
+        },
+        {
+            "name": "providers",
+            "description": "FDO Provider Registry"
+        },
+        {
+            "name": "services",
+            "description": "Additional Services"
+        },
+        {
+            "name": "session",
+            "description": "Session Repository"
+        },
+        {
+            "name": "site",
+            "description": "Site Service"
+        }
+    ],
     "externalDocs": {
         "description": "mapguide-rest on GitHub",
         "url": "https://github.com/jumpinjackie/mapguide-rest"
