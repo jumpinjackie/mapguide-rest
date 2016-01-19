@@ -1465,9 +1465,31 @@ class MgUtils
      * output content
      */
     public static function ApplyCorsIfApplicable($app) {
-        $origin = $app->config("Cors.AccessControlAllowOrigin");
-        if ($origin != null)
-            header("Access-Control-Allow-Origin: $origin", true);
+        $corsOptions = $app->config("MapGuide.Cors");
+        if ($corsOptions != null) {
+            foreach ($corsOptions as $key => $value) {
+                switch ($key) {
+                    case "origin":
+                        if (is_array($value))
+                            header("Access-Control-Allow-Origin: ".implode(",", $value), true);
+                        else
+                            header("Access-Control-Allow-Origin: $value", true);
+                        break;
+                    case "maxAge":
+                        header("Access-Control-Max-Age: $value", true);
+                        break;
+                    case "allowCredentials":
+                        header("Access-Control-Allow-Credentials: ".($value ? "true" : "false"), true);
+                        break;
+                    case "allowMethods":
+                        header("Access-Control-Allow-Methods: ".implode(",", $value), true);
+                        break;
+                    case "allowHeaders":
+                        header("Access-Control-Allow-Headers: ".implode(",", $value), true);
+                        break;
+                }
+            }
+        }
     }
 
     /*

@@ -37,13 +37,21 @@ return array(
     "MapGuide.MapAgentUrl" => "../mapagent/mapagent.fcgi",
 
     //
-    //Cors.AccessControlAllowOrigin
+    //MapGuide.Cors
     //
     //If specified, will append the specified value as the Access-Control-Allow-Origin response header
     //
-    //NOTE: CORS will not be enaled for KML service operations when native=1 is passed 
-    "Cors.AccessControlAllowOrigin" => "*",
-
+    //NOTE: CORS will not be enabled for KML service operations when native=1 is passed
+    /* 
+    "MapGuide.Cors" => array(
+        "origin" => "*",
+        //"exposeHeaders" => array("X-My-Custom-Header", "X-Another-Custom-Header"),
+        "maxAge" => 1728000,
+        "allowCredentials" => True,
+        //"allowMethods" => array("POST, GET"),
+        //"allowHeaders" => array("X-PINGOTHER")
+    ),
+    */
     //
     //GeoRest.ConfigPath
     //

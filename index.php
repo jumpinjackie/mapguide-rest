@@ -66,12 +66,8 @@ $config = array_merge($config, $logConfig);
 //Pull in the appropriate string bundle
 $strings = require_once dirname(__FILE__)."/app/res/lang/".$config["Locale"].".php";
 $app = new \Slim\Slim($config);
-$origin = $app->config("Cors.AccessControlAllowOrigin");
-$corsOptions = null;
-if ($origin != null) {
-    $corsOptions = array(
-        "origin" => $origin
-    );
+$corsOptions = $app->config("MapGuide.Cors");
+if ($corsOptions != null) {
     $app->add(new \CorsSlim\CorsSlim($corsOptions));
 }
 //Override error handler for unhandled exceptions
