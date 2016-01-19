@@ -40,6 +40,8 @@ return array(
     //Cors.AccessControlAllowOrigin
     //
     //If specified, will append the specified value as the Access-Control-Allow-Origin response header
+    //
+    //NOTE: CORS will not be enaled for KML service operations when native=1 is passed 
     "Cors.AccessControlAllowOrigin" => "*",
 
     //

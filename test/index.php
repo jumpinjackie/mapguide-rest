@@ -11,6 +11,11 @@ if (array_key_exists("dump", $_GET) && $_GET["dump"] == "1") {
     $dump = true;
 }
 
+$loadOnly = false;
+if (array_key_exists("loadonly", $_GET) && $_GET["loadonly"] == "1") {
+    $loadOnly = true;
+}
+
 $namespace = null;
 if (array_key_exists("namespace", $_GET)) {
     $namespace = $_GET["namespace"];
@@ -22,6 +27,10 @@ if (array_key_exists("no_url_rewrite", $_GET) && $_GET["no_url_rewrite"] == "1")
 if (!$dump) {
     try {    
         SetupTestData();
+        if ($loadOnly) {
+            echo "Test data loaded";
+            die;
+        }
     } catch (MgException $ex) {
         echo "Failed to bootstrap the test suite. Exception was: ".$ex->GetDetails();
         die;
@@ -382,6 +391,8 @@ if ($dump) {
             // - Add tests for JSON and other representations once implemented
             // - Do actual content verification in addition to response status verification
 
+            //If running this test runner from a different domain:port, set this to true and adjust the rest_root_url to match
+            var CORS_TESTING = false;
             <? if ($namespace != null) { ?>
             var rest_root_url = "<?= $selfUrl ?>/<?= $namespace ?>";
             <? } else { ?>

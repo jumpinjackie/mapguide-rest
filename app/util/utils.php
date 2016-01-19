@@ -1457,6 +1457,18 @@ class MgUtils
             }
         }
     }
+    
+    /**
+     * Applies necessary CORS headers with raw PHP constructs if enabled
+     *
+     * Call this for any controller action that does not use Slim (ie. Raw echo) to
+     * output content
+     */
+    public static function ApplyCorsIfApplicable($app) {
+        $origin = $app->config("Cors.AccessControlAllowOrigin");
+        if ($origin != null)
+            header("Access-Control-Allow-Origin: $origin", true);
+    }
 
     /*
     private static function OutputPropertyDefinition($propDef, $isIdentity = false) {

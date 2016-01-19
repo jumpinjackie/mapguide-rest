@@ -138,6 +138,7 @@ class MgKmlServiceController extends MgBaseController {
     }
 
     private function _GetKmlForMap($map, $sessionId, $format = "kml", $chunk = "1") {
+        MgUtils::ApplyCorsIfApplicable($this->app);
         if ($chunk === "0")
             $writer = new MgSlimChunkWriter($this->app);
         else
