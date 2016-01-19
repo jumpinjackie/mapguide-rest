@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a0faf8b872d06ff6accae41d181da74c",
+    "hash": "ae84089a60b5e0abafd39e1f7953e110",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -265,6 +265,50 @@
             "description": "This tool check syntax of PHP files about 20x faster than serial check.",
             "homepage": "https://github.com/JakubOnderka/PHP-Parallel-Lint",
             "time": "2015-06-16 10:17:07"
+        },
+        {
+            "name": "palanik/corsslim",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/palanik/CorsSlim.git",
+                "reference": "ebd2bca1fcf4711a69db43f65bb63d10c7016030"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/palanik/CorsSlim/zipball/ebd2bca1fcf4711a69db43f65bb63d10c7016030",
+                "reference": "ebd2bca1fcf4711a69db43f65bb63d10c7016030",
+                "shasum": ""
+            },
+            "require": {
+                "slim/slim": ">=2.4.0 <3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "CorsSlim\\": "."
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "palanik"
+                }
+            ],
+            "description": "Cross-origin resource sharing (CORS) middleware for PHP Slim.",
+            "homepage": "https://github.com/palanik/CorsSlim",
+            "keywords": [
+                "cors",
+                "corsslim",
+                "cross-origin",
+                "preflight",
+                "slim",
+                "slimphp"
+            ],
+            "time": "2015-12-16 23:57:06"
         },
         {
             "name": "phing/phing",

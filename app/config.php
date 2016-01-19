@@ -37,6 +37,12 @@ return array(
     "MapGuide.MapAgentUrl" => "../mapagent/mapagent.fcgi",
 
     //
+    //Cors.AccessControlAllowOrigin
+    //
+    //If specified, will append the specified value as the Access-Control-Allow-Origin response header
+    "Cors.AccessControlAllowOrigin" => "*",
+
+    //
     //GeoRest.ConfigPath
     //
     //The root path where RESTful data source configuration files are stored

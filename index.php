@@ -66,6 +66,14 @@ $config = array_merge($config, $logConfig);
 //Pull in the appropriate string bundle
 $strings = require_once dirname(__FILE__)."/app/res/lang/".$config["Locale"].".php";
 $app = new \Slim\Slim($config);
+$origin = $app->config("Cors.AccessControlAllowOrigin");
+$corsOptions = null;
+if ($origin != null) {
+    $corsOptions = array(
+        "origin" => $origin
+    );
+    $app->add(new \CorsSlim\CorsSlim($corsOptions));
+}
 //Override error handler for unhandled exceptions
 $app->error(function($err) use ($app) {
     $title = $app->localizer->getText("E_UNHANDLED_EXCEPTION");

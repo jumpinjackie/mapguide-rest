@@ -17,9 +17,11 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+/*
 $app->get("/admin/:args+", function($args) use ($app) {
     var_dump($args);
     var_dump($app->request->get());
 });
+*/
 
 ?>
