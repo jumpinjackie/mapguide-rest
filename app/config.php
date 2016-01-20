@@ -39,9 +39,10 @@ return array(
     //
     //MapGuide.Cors
     //
-    //If specified, will append the specified value as the Access-Control-Allow-Origin response header
+    //If specified, will enable mapguide-rest to work with cross-domain requests
     //
-    //NOTE: CORS will not be enabled for KML service operations when native=1 is passed
+    //NOTE: CORS will not be enabled for KML service operations when native=1 is passed, and such cross-domain
+    //requests on these service operations will fail
     /* 
     "MapGuide.Cors" => array(
         "origin" => "*",
