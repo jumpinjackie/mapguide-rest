@@ -15,7 +15,7 @@
         "https"
     ],
     "paths": {
-        "/coordsys/baselibrary": {
+        "/coordsys/baselibrary.{type}": {
             "get": {
                 "tags": [
                     "coordsys"
@@ -29,6 +29,17 @@
                         "description": "Your MapGuide Session ID",
                         "required": false,
                         "type": "string"
+                    },
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "description": "xml or json",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "json",
+                            "xml"
+                        ]
                     }
                 ],
                 "responses": {
@@ -44,7 +55,7 @@
                 }
             }
         },
-        "/coordsys/validatewkt": {
+        "/coordsys/validatewkt.{type}": {
             "post": {
                 "tags": [
                     "coordsys"
@@ -65,6 +76,17 @@
                         "description": "The Coordinate System WKT string",
                         "required": false,
                         "type": "string"
+                    },
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "description": "xml or json",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "json",
+                            "xml"
+                        ]
                     }
                 ],
                 "responses": {
@@ -80,7 +102,7 @@
                 }
             }
         },
-        "/coordsys/wkttoepsg": {
+        "/coordsys/wkttoepsg.{type}": {
             "post": {
                 "tags": [
                     "coordsys"
@@ -101,6 +123,17 @@
                         "description": "The Coordinate System WKT string",
                         "required": false,
                         "type": "string"
+                    },
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "description": "xml or json",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "json",
+                            "xml"
+                        ]
                     }
                 ],
                 "responses": {
@@ -116,7 +149,7 @@
                 }
             }
         },
-        "/coordsys/wkttomentor": {
+        "/coordsys/wkttomentor.{type}": {
             "post": {
                 "tags": [
                     "coordsys"
@@ -137,6 +170,17 @@
                         "description": "The Coordinate System WKT string",
                         "required": false,
                         "type": "string"
+                    },
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "description": "xml or json",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "json",
+                            "xml"
+                        ]
                     }
                 ],
                 "responses": {

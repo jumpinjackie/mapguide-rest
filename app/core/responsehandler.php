@@ -125,7 +125,7 @@ abstract class MgResponseHandler
                                     $body = MgBoxedValue::Boolean($resultObj->GetBoolValue(), $fmt);
                                     break;
                                 case 2:
-                                    $body = MgBoxedValue::Integer($resultObj->GetIntegerValue(), $fmt);
+                                    $body = MgBoxedValue::Int32($resultObj->GetIntegerValue(), $fmt);
                                     break;
                                 case 3:
                                     $body = MgBoxedValue::String($resultObj->GetStringValue(), $fmt);

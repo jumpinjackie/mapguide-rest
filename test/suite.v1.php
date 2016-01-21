@@ -9949,6 +9949,359 @@
                     self.assertMimeType(mimeType, MgMimeType.Json);
                 });
             });
+            test("Get Base Library", function() {
+                var self = this;
+                //With raw credentials
+                api_test_anon(rest_root_url + "/coordsys/baselibrary.xml", "GET", null, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test_admin(rest_root_url + "/coordsys/baselibrary.xml", "GET", null, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+
+                //With session id
+                api_test(rest_root_url + "/coordsys/baselibrary.xml", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test(rest_root_url + "/coordsys/baselibrary.xml", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/coordsys/baselibrary.json", "GET", null, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/coordsys/baselibrary.json", "GET", null, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+
+                //With session id
+                api_test(rest_root_url + "/coordsys/baselibrary.json", "GET", { session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/coordsys/baselibrary.json", "GET", { session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+            });
+            test("Validate WKT", function() {
+                var GOOD_WKT = 'GEOGCS["LL84",DATUM["WGS84",SPHEROID["WGS84",6378137.000,298.25722293]],PRIMEM["Greenwich",0],UNIT["Degree",0.01745329251994]]';
+                var BAD_WKT = 'This is not a valid coordinate system wkt';
+
+                // --------------------------------- GOOD WKT ----------------------------------- //
+            
+                var self = this;
+                //With raw credentials
+                api_test_anon(rest_root_url + "/coordsys/validatewkt.xml", "POST", { wkt: GOOD_WKT }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test_admin(rest_root_url + "/coordsys/validatewkt.xml", "POST", { wkt: GOOD_WKT }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+
+                //With session id
+                api_test(rest_root_url + "/coordsys/validatewkt.xml", "POST", { wkt: GOOD_WKT, session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test(rest_root_url + "/coordsys/validatewkt.xml", "POST", { wkt: GOOD_WKT, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/coordsys/validatewkt.json", "POST", { wkt: GOOD_WKT }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value, "Expected valid = true");
+                });
+                api_test_admin(rest_root_url + "/coordsys/validatewkt.json", "POST", { wkt: GOOD_WKT }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value, "Expected valid = true");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/coordsys/validatewkt.json", "POST", { wkt: GOOD_WKT, session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value, "Expected valid = true");
+                });
+                api_test(rest_root_url + "/coordsys/validatewkt.json", "POST", { wkt: GOOD_WKT, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value, "Expected valid = true");
+                });
+                
+                // --------------------------------- BAD WKT ----------------------------------- //
+                
+                //With raw credentials
+                api_test_anon(rest_root_url + "/coordsys/validatewkt.xml", "POST", { wkt: BAD_WKT }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test_admin(rest_root_url + "/coordsys/validatewkt.xml", "POST", { wkt: BAD_WKT }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+
+                //With session id
+                api_test(rest_root_url + "/coordsys/validatewkt.xml", "POST", { wkt: BAD_WKT, session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test(rest_root_url + "/coordsys/validatewkt.xml", "POST", { wkt: BAD_WKT, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/coordsys/validatewkt.json", "POST", { wkt: BAD_WKT }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value == false, "Expected valid = false");
+                });
+                api_test_admin(rest_root_url + "/coordsys/validatewkt.json", "POST", { wkt: BAD_WKT }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value == false, "Expected valid = false");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/coordsys/validatewkt.json", "POST", { wkt: BAD_WKT, session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value == false, "Expected valid = false");
+                });
+                api_test(rest_root_url + "/coordsys/validatewkt.json", "POST", { wkt: BAD_WKT, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value == false, "Expected valid = false");
+                });
+            });
+            test("WKT to Mentor", function() {
+                var GOOD_WKT = 'GEOGCS["LL84",DATUM["WGS84",SPHEROID["WGS84",6378137.000,298.25722293]],PRIMEM["Greenwich",0],UNIT["Degree",0.01745329251994]]';
+                var BAD_WKT = 'This is not a valid coordinate system wkt';
+
+                // --------------------------------- GOOD WKT ----------------------------------- //
+            
+                var self = this;
+                //With raw credentials
+                api_test_anon(rest_root_url + "/coordsys/wkttomentor.xml", "POST", { wkt: GOOD_WKT }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test_admin(rest_root_url + "/coordsys/wkttomentor.xml", "POST", { wkt: GOOD_WKT }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+
+                //With session id
+                api_test(rest_root_url + "/coordsys/wkttomentor.xml", "POST", { wkt: GOOD_WKT, session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test(rest_root_url + "/coordsys/wkttomentor.xml", "POST", { wkt: GOOD_WKT, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/coordsys/wkttomentor.json", "POST", { wkt: GOOD_WKT }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value == "LL84", "Expected LL84");
+                });
+                api_test_admin(rest_root_url + "/coordsys/wkttomentor.json", "POST", { wkt: GOOD_WKT }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value == "LL84", "Expected LL84");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/coordsys/wkttomentor.json", "POST", { wkt: GOOD_WKT, session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value == "LL84", "Expected LL84");
+                });
+                api_test(rest_root_url + "/coordsys/wkttomentor.json", "POST", { wkt: GOOD_WKT, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value == "LL84", "Expected LL84");
+                });
+                
+                // --------------------------------- BAD WKT ----------------------------------- //
+                
+                //With raw credentials
+                api_test_anon(rest_root_url + "/coordsys/wkttomentor.xml", "POST", { wkt: BAD_WKT }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test_admin(rest_root_url + "/coordsys/wkttomentor.xml", "POST", { wkt: BAD_WKT }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+
+                //With session id
+                api_test(rest_root_url + "/coordsys/wkttomentor.xml", "POST", { wkt: BAD_WKT, session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test(rest_root_url + "/coordsys/wkttomentor.xml", "POST", { wkt: BAD_WKT, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/coordsys/wkttomentor.json", "POST", { wkt: BAD_WKT }, function(status, result, mimeType) {
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/coordsys/wkttomentor.json", "POST", { wkt: BAD_WKT }, function(status, result, mimeType) {
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+
+                //With session id
+                api_test(rest_root_url + "/coordsys/wkttomentor.json", "POST", { wkt: BAD_WKT, session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/coordsys/wkttomentor.json", "POST", { wkt: BAD_WKT, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+            });
+            test("WKT to EPSG", function() {
+                var GOOD_WKT = 'GEOGCS["LL84",DATUM["WGS84",SPHEROID["WGS84",6378137.000,298.25722293]],PRIMEM["Greenwich",0],UNIT["Degree",0.01745329251994]]';
+                var BAD_WKT = 'This is not a valid coordinate system wkt';
+
+                // --------------------------------- GOOD WKT ----------------------------------- //
+            
+                var self = this;
+                //With raw credentials
+                api_test_anon(rest_root_url + "/coordsys/wkttoepsg.xml", "POST", { wkt: GOOD_WKT }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test_admin(rest_root_url + "/coordsys/wkttoepsg.xml", "POST", { wkt: GOOD_WKT }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+
+                //With session id
+                api_test(rest_root_url + "/coordsys/wkttoepsg.xml", "POST", { wkt: GOOD_WKT, session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test(rest_root_url + "/coordsys/wkttoepsg.xml", "POST", { wkt: GOOD_WKT, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/coordsys/wkttoepsg.json", "POST", { wkt: GOOD_WKT }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value == 4326, "Expected 4326");
+                });
+                api_test_admin(rest_root_url + "/coordsys/wkttoepsg.json", "POST", { wkt: GOOD_WKT }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value == 4326, "Expected 4326");
+                });
+
+                //With session id
+                api_test(rest_root_url + "/coordsys/wkttoepsg.json", "POST", { wkt: GOOD_WKT, session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value == 4326, "Expected 4326");
+                });
+                api_test(rest_root_url + "/coordsys/wkttoepsg.json", "POST", { wkt: GOOD_WKT, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 200, "(" + status + ") - Response should've been ok");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                    self.ok(JSON.parse(result).PrimitiveValue.Value == 4326, "Expected 4326");
+                });
+                
+                // --------------------------------- BAD WKT ----------------------------------- //
+                
+                //With raw credentials
+                api_test_anon(rest_root_url + "/coordsys/wkttoepsg.xml", "POST", { wkt: BAD_WKT }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test_admin(rest_root_url + "/coordsys/wkttoepsg.xml", "POST", { wkt: BAD_WKT }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+
+                //With session id
+                api_test(rest_root_url + "/coordsys/wkttoepsg.xml", "POST", { wkt: BAD_WKT, session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+                api_test(rest_root_url + "/coordsys/wkttoepsg.xml", "POST", { wkt: BAD_WKT, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Xml);
+                });
+
+                //With raw credentials
+                api_test_anon(rest_root_url + "/coordsys/wkttoepsg.json", "POST", { wkt: BAD_WKT }, function(status, result, mimeType) {
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test_admin(rest_root_url + "/coordsys/wkttoepsg.json", "POST", { wkt: BAD_WKT }, function(status, result, mimeType) {
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+
+                //With session id
+                api_test(rest_root_url + "/coordsys/wkttoepsg.json", "POST", { wkt: BAD_WKT, session: this.adminSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+                api_test(rest_root_url + "/coordsys/wkttoepsg.json", "POST", { wkt: BAD_WKT, session: this.anonymousSessionId }, function(status, result, mimeType) {
+                    self.ok(status == 500, "(" + status + ") - Expected server error");
+                    self.assertMimeType(mimeType, MgMimeType.Json);
+                });
+            });
             test("Enum categories", function() {
                 var self = this;
                 api_test(rest_root_url + "/coordsys/categories.xml", "GET", null, function(status, result, mimeType) {

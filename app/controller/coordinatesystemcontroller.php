@@ -25,52 +25,80 @@ class MgCoordinateSystemController extends MgBaseController {
         parent::__construct($app);
     }
 
-    public function GetBaseLibrary() {
+    public function GetBaseLibrary($format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $mimeType = $this->GetMimeTypeForFormat($format);
         $sessionId = $this->app->request->params("session");
 
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that) {
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $mimeType) {
             $param->AddParameter("OPERATION", "CS.GETBASELIBRARY");
             $param->AddParameter("VERSION", "1.0.0");
+            $param->AddParameter("FORMAT", $mimeType); //Not used internally, but needed to return exceptions in the proper format
+            if ($fmt == "json") {
+                $param->AddParameter("X-FORCE-JSON-CONVERSION", "true");
+            }
             $that->ExecuteHttpRequest($req);
         }, false, "", $sessionId);
     }
 
-    public function ValidateWkt() {
+    public function ValidateWkt($format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $mimeType = $this->GetMimeTypeForFormat($format);
         $sessionId = $this->app->request->params("session");
         $wkt = $this->app->request->params("wkt");
 
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $wkt) {
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $wkt, $fmt, $mimeType) {
             $param->AddParameter("OPERATION", "CS.ISVALID");
             $param->AddParameter("VERSION", "1.0.0");
             $param->AddParameter("CSWKT", $wkt);
+            $param->AddParameter("FORMAT", $mimeType); //Not used internally, but needed to return exceptions in the proper format
+            if ($fmt == "json") {
+                $param->AddParameter("X-FORCE-JSON-CONVERSION", "true");
+            }
             $that->ExecuteHttpRequest($req);
         }, false, "", $sessionId);
     }
 
-    public function WktToEpsg() {
+    public function WktToEpsg($format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $mimeType = $this->GetMimeTypeForFormat($format);
         $sessionId = $this->app->request->params("session");
         $wkt = $this->app->request->params("wkt");
 
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $wkt) {
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $wkt, $fmt, $mimeType) {
             $param->AddParameter("OPERATION", "CS.CONVERTWKTTOEPSGCODE");
             $param->AddParameter("VERSION", "1.0.0");
             $param->AddParameter("CSWKT", $wkt);
+            $param->AddParameter("FORMAT", $mimeType); //Not used internally, but needed to return exceptions in the proper format
+            if ($fmt == "json") {
+                $param->AddParameter("X-FORCE-JSON-CONVERSION", "true");
+            }
             $that->ExecuteHttpRequest($req);
         }, false, "", $sessionId);
     }
 
-    public function WktToMentor() {
+    public function WktToMentor($format) {
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $mimeType = $this->GetMimeTypeForFormat($format);
         $sessionId = $this->app->request->params("session");
         $wkt = $this->app->request->params("wkt");
 
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $wkt) {
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $wkt, $fmt, $mimeType) {
             $param->AddParameter("OPERATION", "CS.CONVERTWKTTOCOORDINATESYSTEMCODE");
             $param->AddParameter("VERSION", "1.0.0");
             $param->AddParameter("CSWKT", $wkt);
+            $param->AddParameter("FORMAT", $mimeType); //Not used internally, but needed to return exceptions in the proper format
+            if ($fmt == "json") {
+                $param->AddParameter("X-FORCE-JSON-CONVERSION", "true");
+            }
             $that->ExecuteHttpRequest($req);
         }, false, "", $sessionId);
     }
