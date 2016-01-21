@@ -2850,6 +2850,25 @@
                         self.ok(status == 200, "Expected OK on session destruction");
                     });
                 });
+                api_test(rest_root_url + "/session.json", "POST", { username: "Anonymous", password: "" }, function(status, result, mimeType) {
+                    self.ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                    self.ok(status == 201, "(" + status+ ") - Expected created response");
+                    var sessionId = JSON.parse(result).PrimitiveValue.Value;
+                    self.ok(sessionId.match(/^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}_[A-Za-z]{2}_\w+[A-Fa-f0-9]{12}$/g) != null, "Expected session id pattern");
+
+                    api_test(rest_root_url + "/session/" + sessionId, "DELETE", null, function(status, result, mimeType) {
+                        self.ok(status == 200, "Expected OK on session destruction");
+                    });
+                });
+                api_test(rest_root_url + "/session.json", "POST", { username: "<?= $adminUser ?>", password: "<?= $adminPass ?>" }, function(status, result, mimeType) {
+                    self.ok(status != 401, "(" + status+ ") - Request should've been authenticated");
+                    self.ok(status == 201, "(" + status+ ") - Expected created response");
+                    var sessionId = JSON.parse(result).PrimitiveValue.Value;
+                    self.ok(sessionId.match(/^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}_[A-Za-z]{2}_\w+[A-Fa-f0-9]{12}$/g) != null, "Expected session id pattern");
+                    api_test(rest_root_url + "/session/" + sessionId, "DELETE", null, function(status, result, mimeType) {
+                        self.ok(status == 200, "Expected OK on session destruction");
+                    });
+                });
             });
 
             module("Resource Service - Library", {

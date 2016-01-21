@@ -34,6 +34,8 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  *        summary="Creates a new MapGuide session",
  *        tags={"session"},
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
+ *          @SWG\Parameter(name="username", in="formData", required=true, type="string", description="The MapGuide username"),
+ *          @SWG\Parameter(name="password", in="formData", required=false, type="string", description="The password"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
@@ -59,7 +61,7 @@ $app->delete("/session/:sessionId", function($sessionId) use ($app) {
     $ctrl->DestroySession($sessionId);
 });
 /**
- *     @SWG\GET(
+ *     @SWG\Get(
  *        path="/session/{session}/timeout.{type}",
  *        operationId="GetSessionTimeout",
  *        summary="Gets the session timeout of the specified session",

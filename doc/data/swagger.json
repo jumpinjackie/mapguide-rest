@@ -4540,6 +4540,20 @@
                             "json",
                             "xml"
                         ]
+                    },
+                    {
+                        "name": "username",
+                        "in": "formData",
+                        "description": "The MapGuide username",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "The password",
+                        "required": false,
+                        "type": "string"
                     }
                 ],
                 "responses": {
