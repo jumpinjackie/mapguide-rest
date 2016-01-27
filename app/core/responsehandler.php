@@ -166,25 +166,7 @@ abstract class MgResponseHandler
     }
 
     protected function GetMimeTypeForFormat($format) {
-        $fmt = strtoupper($format);
-        switch ($fmt) {
-            case "PNG":
-            case "PNG8":
-                return MgMimeType::Png;
-            case "GIF":
-                return MgMimeType::Gif;
-            case "JPG":
-                return MgMimeType::Jpeg;
-            case "KML":
-                return MgMimeType::Kml;
-            case "XML":
-                return MgMimeType::Xml;
-            case "JSON":
-            case "GEOJSON":
-            case "CZML":
-                return MgMimeType::Json;
-        }
-        return $format;
+        return MgUtils::GetMimeTypeForFormat($format);
     }
 
     private function OutputError($result, $mimeType = MgMimeType::Html) {

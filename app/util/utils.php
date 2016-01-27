@@ -1491,6 +1491,28 @@ class MgUtils
             }
         }
     }
+    
+    public static function GetMimeTypeForFormat($format) {
+        $fmt = strtoupper($format);
+        switch ($fmt) {
+            case "PNG":
+            case "PNG8":
+                return MgMimeType::Png;
+            case "GIF":
+                return MgMimeType::Gif;
+            case "JPG":
+                return MgMimeType::Jpeg;
+            case "KML":
+                return MgMimeType::Kml;
+            case "XML":
+                return MgMimeType::Xml;
+            case "JSON":
+            case "GEOJSON":
+            case "CZML":
+                return MgMimeType::Json;
+        }
+        return $format;
+    }
 
     /*
     private static function OutputPropertyDefinition($propDef, $isIdentity = false) {

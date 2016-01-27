@@ -18,6 +18,7 @@
 //
 
 require_once "controller.php";
+require_once dirname(__FILE__)."/../util/lockutil.php";
 
 class MgTileServiceController extends MgBaseController {
     public function __construct($app) {
@@ -185,7 +186,7 @@ class MgTileServiceController extends MgBaseController {
             return $mcsH * $metersPerUnit / ($devH * $metersPerPixel); // height-limited
     }
 
-    private function PutVectorTileXYZ($map, $groupName, $siteConn, $metersPerUnit, $csFactory, $path, $boundsMinx, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames) {
+    public function PutVectorTileXYZ($map, $groupName, $siteConn, $metersPerUnit, $csFactory, $path, $boundsMinx, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames) {
         $wktRw = new MgWktReaderWriter();
         $agfRw = new MgAgfReaderWriter();
 
@@ -290,7 +291,7 @@ class MgTileServiceController extends MgBaseController {
         return $path;
     }
 
-    private function PutTileImageXYZ($map, $groupName, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames, $requestId) {
+    public function PutTileImageXYZ($map, $groupName, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames, $requestId) {
         //We don't use RenderTile (as it uses key parameters that are locked to serverconfig.ini), we use RenderMap instead
         $bufferPx = $this->app->config("MapGuide.XYZTileBuffer");
         $ratio = $bufferPx / self::XYZ_TILE_WIDTH;
@@ -413,269 +414,21 @@ class MgTileServiceController extends MgBaseController {
     public function GetTileXYZ($resId, $groupName, $x, $y, $z, $type, $layerNames = NULL) {
         $fmt = $this->ValidateRepresentation($type, array("json", "png", "png8", "jpg", "gif"));
         $path = self::GetTilePath($this->app, $resId, $groupName, $z, $x, $y, $type, $layerNames);
-        clearstatcache();
-
-        $dir = dirname($path);
-        $lockPath = "$dir/lock_".$y.".lck";
-        $attempts = 0;
-        while (!@is_dir($dir)) {
-            try {
-                mkdir($dir, 0777, true);
-            } catch (Exception $e) { //Another tile request may have already created this since
-                $attempts++;
-                //Bail after MAX_RETRY_ATTEMPTS
-                if ($attempts >= self::MAX_RETRY_ATTEMPTS)
-                    $this->ServerError($this->app->localizer->getText("E_FAILED_TO_CREATE_DIR_AFTER_N_ATTEMPTS", $attempts), $this->GetMimeTypeForFormat($type));
-            }
-        }
-
-        //If there's a dangling lock file, attempt to remove it
-        if (file_exists($lockPath))
-            unlink($lockPath);
-
-        $fpLockFile = fopen($lockPath, "a+");
-
-        //Message of any exception caught will be set to this variable
-        $tileError = null;
-
+        
         $requestId = rand();
-        $this->app->log->debug("($requestId) Checking if $path exists");
-
-        $attempts = 0;
-        while (!file_exists($path)) {
-            //Bail after MAX_RETRY_ATTEMPTS
-            if ($attempts >= self::MAX_RETRY_ATTEMPTS)
-                $this->ServerError($this->app->localizer->getText("E_FAILED_TO_GENERATE_TILE_AFTER_N_ATTEMPTS", $attempts), $this->GetMimeTypeForFormat($type));
-            $attempts++;
-
-            $this->app->log->debug("($requestId) $path does not exist. Locking for writing");
-
-            $bLocked = false;
-            flock($fpLockFile, LOCK_EX);
-            fwrite($fpLockFile, ".");
-            $bLocked = true;
-
-            $this->app->log->debug("($requestId) Acquired lock for $path. Checking if path exists again.");
-
-            //check once more to see if the cache file was created while waiting for
-            //the lock
-            clearstatcache();
-            if (!file_exists($path)) {
-                try {
-                    $this->app->log->debug("($requestId) Rendering tile to $path");
-
-                    $bOldPath = true;
-                    if ($type != "json") {
-                        //if this is MGOS 3.0 and we're dealing with a tile set, we invoke GETTILEIMAGE as that we can pass in Tile Set Definition
-                        //resource ids without issues. We cannot create MgMaps from Tile Set Definitions that are not using the default tile provider.
-                        //
-                        //The given tile set is assumed to be using the XYZ provider, the case where the Tile Set Definition is using the default provider
-                        //is not handled
-                        if ($this->app->MG_VERSION[0] >= 3 && $resId->GetResourceType() == "TileSetDefinition") {
-                            $bOldPath = false;
-                            $sessionId = "";
-                            if ($resId->GetRepositoryType() === MgRepositoryType::Session && $this->app->request->get("session") == null) {
-                                $sessionId = $resId->GetRepositoryName();
-                            }
-                            $resIdStr = $resId->ToString();
-                            $that = $this;
-                            $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr, $groupName, $x, $y, $z, $requestId, $path) {
-                                $param->AddParameter("OPERATION", "GETTILEIMAGE");
-                                $param->AddParameter("VERSION", "1.2.0");
-                                $param->AddParameter("MAPDEFINITION", $resIdStr);
-                                $param->AddParameter("BASEMAPLAYERGROUPNAME", $groupName);
-                                $param->AddParameter("SCALEINDEX", $z);
-                                $param->AddParameter("TILEROW", $x);
-                                $param->AddParameter("TILECOL", $y);
-                                $that->app->log->debug("($requestId) Executing GETTILEIMAGE");
-                                $that->ExecuteHttpRequest($req, function($result, $status) use ($path) {
-                                    if ($status == 200) {
-                                        //Need to dump the rendered tile to the specified path so the caching stuff below can still do its thing
-                                        $resultObj = $result->GetResultObject();
-                                        $sink = new MgByteSink($resultObj);
-                                        $sink->ToFile($path);
-                                    }
-                                });
-                            }, true, "", $sessionId); //Tile access can be anonymous, so allow for it if credentials/session specified, but if this is a session-based Map Definition, use the session id as the nominated one
-                        }
-                    }
-
-                    //Pre MGOS 3.0 code path
-                    if ($bOldPath) {
-                        $this->app->log->debug("($requestId) Going down old code path");
-                        $this->EnsureAuthenticationForSite("", true);
-                        $siteConn = new MgSiteConnection();
-                        $siteConn->Open($this->userInfo);
-
-                        $map = new MgMap($siteConn);
-                        $map->Create($resId, "VectorTileMap");
-
-                        $renderSvc = $siteConn->CreateService(MgServiceType::RenderingService);
-
-                        $groups = $map->GetLayerGroups();
-                        $baseGroup = $groups->GetItem($groupName); //Will throw MgObjectNotFoundException -> 404 if no such group exists
-
-                        $factory = new MgCoordinateSystemFactory();
-                        $mapCsWkt = $map->GetMapSRS();
-                        $mapCs = $factory->Create($mapCsWkt);
-
-                        $mapExtent = $map->GetMapExtent();
-                        $mapExLL = $mapExtent->GetLowerLeftCoordinate();
-                        $mapExUR = $mapExtent->GetUpperRightCoordinate();
-
-                        $metersPerUnit = $mapCs->ConvertCoordinateSystemUnitsToMeters(1.0);
-
-                        $this->app->log->debug("($requestId) Calc bounds from XYZ");
-                        //XYZ to lat/lon math. From this we can convert to the bounds in the map's CS
-                        //
-                        //Source: http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-                        $n = pow(2, $z);
-                        $lonMin = $x / $n * 360.0 - 180.0;
-                        $latMin = rad2deg(atan(sinh(pi() * (1 - 2 * $y / $n))));
-                        $lonMax = ($x + 1) / $n * 360.0 - 180.0;
-                        $latMax = rad2deg(atan(sinh(pi() * (1 - 2 * ($y + 1) / $n))));
-
-                        $boundsMinX = min($lonMin, $lonMax);
-                        $boundsMinY = min($latMin, $latMax);
-                        $boundsMaxX = max($lonMax, $lonMin);
-                        $boundsMaxY = max($latMax, $latMin);
-
-                        if ($mapCs->GetCsCode() != "LL84") {
-                            $llCs = $factory->CreateFromCode("LL84");
-                            $trans = $factory->GetTransform($llCs, $mapCs);
-
-                            $ul = $trans->Transform($lonMin, $latMin);
-                            $lr = $trans->Transform($lonMax, $latMax);
-
-                            $boundsMinX = min($lr->GetX(), $ul->GetX());
-                            $boundsMinY = min($lr->GetY(), $ul->GetY());
-                            $boundsMaxX = max($lr->GetX(), $ul->GetX());
-                            $boundsMaxY = max($lr->GetY(), $ul->GetY());
-                        }
-
-                        //Set all layers under group to be visible
-                        $layers = $map->GetLayers();
-                        
-                        $layerCount = $layers->GetCount();
-                        $groupCount = $groups->GetCount();
-
-                        //Turn all groups that are not the given group to be hidden
-                        for ($i = 0; $i < $groupCount; $i++) {
-                            $group = $groups->GetItem($i);
-                            if ($group->GetName() != $groupName) {
-                                $group->SetVisible(false);
-                            } else {
-                                $group->SetVisible(true);
-                            }
-                        }
-
-                        for ($i = 0; $i < $layerCount; $i++) {
-                            $layer = $layers->GetItem($i);
-                            $group = $layer->GetGroup();
-                            if (null == $group) {
-                                continue;
-                            }
-                            if ($group->GetName() != $groupName && $layer->GetLayerType() == MgLayerType::Dynamic) {
-                                $layer->SetVisible(false);
-                                continue;
-                            }
-                            if ($layer->GetLayerType() == MgLayerType::Dynamic)
-                                $layer->SetVisible(true);
-                        }
-
-                        if ($type == "json") {
-                            //error_log("($requestId) Render vector tile");
-                            $this->PutVectorTileXYZ($map, $groupName, $siteConn, $metersPerUnit, $factory, $path, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames);
-                        } else {
-                            $format = strtoupper($type);
-                            //error_log("($requestId) Render image tile");
-                            $this->PutTileImageXYZ($map, $groupName, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames, $requestId);
-                        }
-                    }
-                } catch (MgException $ex) {
-                    if ($bLocked) {
-                        $this->app->log->debug("($requestId) MgException caught ".$ex->GetDetails()."\n".$ex->getTraceAsString()."\n. Releasing lock for $path");
-                        $tileError = $ex->GetExceptionMessage();
-                        flock($fpLockFile, LOCK_UN);
-                        $bLocked = false;
-                    }
-                    if ($ex instanceof MgResourceNotFoundException || $ex instanceof MgObjectNotFoundException) {
-                        $this->NotFound($ex->GetExceptionMessage(), $this->GetMimeTypeForFormat($fmt));
-                    }
-                    else if ($ex instanceof MgConnectionFailedException) {
-                        $this->ServiceUnavailable($ex->GetExceptionMessage(), $this->GetMimeTypeForFormat($fmt));
-                    }
-                } catch (Exception $ex) {
-                    if ($bLocked) {
-                        $tileError = get_class($ex)." - ".$ex->getMessage();
-                        $this->app->log->debug("($requestId) Exception caught ($tileError). Releasing lock for $path");
-                        flock($fpLockFile, LOCK_UN);
-                        $bLocked = false;
-                    }
-                }
-            }
-
-            if ($bLocked) {
-                $this->app->log->debug("($requestId) Releasing lock for $path");
-                flock($fpLockFile, LOCK_UN);
-                $bLocked = false;
-            }
-        }
-
-        //An exception occurred, try to clean up lock before bailing
-        if ($tileError != null) {
-            try {
-                fclose($fpLockFile);
-                unlink($lockPath);
-            } catch (Exception $ex) {
-                $this->app->log->debug("($requestId) Failed to delete lock file. Perhaps another concurrent request to the same tile is happening?");
-            }
-            throw new Exception($tileError);
-        }
-
-        $modTime = filemtime($path);
-        $this->app->lastModified($modTime);
-
-        $this->app->log->debug("($requestId) Acquiring shared lock for $path");
-        //acquire shared lock for reading to prevent a problem that could occur
-        //if a tile exists but is only partially generated.
-        flock($fpLockFile, LOCK_SH);
-
-        $this->app->log->debug("($requestId) Outputting $path");
-
-        $ext = strtoupper(pathinfo($path, PATHINFO_EXTENSION));
-        $mimeType = "";
-        switch ($ext) {
-            case "PNG": //MgImageFormats::Png:
-                $mimeType = MgMimeType::Png;
-                break;
-            case "GIF": //MgImageFormats::Gif:
-                $mimeType = MgMimeType::Gif;
-                break;
-            case "JPG": //MgImageFormats::Jpeg:
-                $mimeType = MgMimeType::Jpeg;
-                break;
-            case "JSON":
-                $mimeType = MgMimeType::Json;
-                break;
-        }
-
-        $this->app->response->header("Content-Type", $mimeType);
-        $this->app->expires("+6 months");
-        $this->app->response->header("Cache-Control", "max-age=31536000, must-revalidate");
-        $this->app->response->setBody(file_get_contents($path));
-
-        $this->app->log->debug("($requestId) Releasing shared lock for $path");
-
-        //Release lock
-        flock($fpLockFile, LOCK_UN);
-        //Try to delete the lock file
-        try {
-            fclose($fpLockFile);
-            unlink($lockPath);
-        } catch (Exception $ex) {
-            $this->app->log->debug("($requestId) Failed to delete lock file. Perhaps another concurrent request to the same tile is happening?");
-        }
+        $lockUtil = new MgFileLockUtil($this->app, $path, $requestId, self::MAX_RETRY_ATTEMPTS);
+        
+        $lock = $lockUtil->Acquire($y);
+        
+        $section = new MgGetTileXYZCriticalSection($this, $resId, $groupName, $x, $y, $z, $layerNames, $type);
+        $lock->EnterCriticalSection($this->app, $section);
+    }
+    
+    public function AcquireConnectionForGetTileXYZ() {
+        $this->EnsureAuthenticationForSite("", true);
+        $siteConn = new MgSiteConnection();
+        $siteConn->Open($this->userInfo);
+        return $siteConn;
     }
 }
 
