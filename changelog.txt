@@ -1,3 +1,18 @@
+1.0 RC4
+=======
+ - #115: Added Layer/Group/Selection mutation APIs with new sample app demonstrating these APIs
+ - #118: Disable anon access to CreateRuntimeMap
+ - #119: Added selection overview route
+ - #123: Updated Swagger UI and API spec file. Where possible, input and output model schemas are included. 
+ - #124: Add missing JSON support for various /coordsys APIs
+ - #125: Added CORS support
+ - #122: Implicit XML routes have been removed
+ - Refactored file-locking (used in XYZ tile caching) to be more object-oriented
+ - Updated ol3-cesium to 1.11
+    - Cesium 1.16
+    - OpenLayers 3.12.1
+ - Fix Vector Tile example
+
 1.0 RC3
 =======
  - #111: Whitelisting expanded to cover Resource Service operations
