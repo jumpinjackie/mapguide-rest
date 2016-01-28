@@ -1513,6 +1513,21 @@ class MgUtils
         }
         return $format;
     }
+    
+    public static function MergeSelections($sel, $sel2) {
+        $layers = $sel2->GetLayers();
+        if ($layers != NULL) {
+            $count = $layers->GetCount();
+            for ($i = 0; $i < $count; $i++) {
+                $layer = $layers->GetItem($i);
+                //Funnel selected features into original selection
+                $clsDef = $layer->GetClassDefinition();
+                $fr = $sel2->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), false);
+                $sel->AddFeatures($layer, $fr, 0);
+                $fr->Close();
+            }
+        }
+    }
 
     /*
     private static function OutputPropertyDefinition($propDef, $isIdentity = false) {

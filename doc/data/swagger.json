@@ -4443,6 +4443,20 @@
                         "type": "string"
                     },
                     {
+                        "name": "username",
+                        "in": "formData",
+                        "description": "The MapGuide username",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "The password",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
                         "name": "mapdefinition",
                         "in": "formData",
                         "description": "The Map Definition ID to create a new runtime map from",

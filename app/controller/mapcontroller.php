@@ -20,16 +20,12 @@
 require_once "controller.php";
 require_once "mappingservicecontroller.php";
 require_once dirname(__FILE__)."/../util/readerchunkedresult.php";
+require_once dirname(__FILE__)."/../util/selectionrenderer.php";
 
 class MgMapController extends MgBaseController {
     public function __construct($app) {
         parent::__construct($app);
     }
-
-    const REQUEST_ATTRIBUTES       = 1;
-    const REQUEST_INLINE_SELECTION = 2;
-    const REQUEST_TOOLTIP          = 4;
-    const REQUEST_HYPERLINK        = 8;
 
     const RenderSelection   = 1;
     const RenderLayers      = 2;
@@ -169,24 +165,139 @@ class MgMapController extends MgBaseController {
         $sel->Open($resSvc, $mapName);
         
         $sel2 = new MgSelection($map, $featFilter);
-        self::MergeSelections($sel, $sel2);
+        MgUtils::MergeSelections($sel, $sel2);
         return $sel->ToXml();
     }
     
-    private static function MergeSelections($sel, $sel2) {
-        $layers = $sel2->GetLayers();
-        if ($layers != NULL) {
-            $count = $layers->GetCount();
-            for ($i = 0; $i < $count; $i++) {
-                $layer = $layers->GetItem($i);
-                //Funnel selected features into original selection
-                $clsDef = $layer->GetClassDefinition();
-                $fr = $sel2->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), false);
-                $sel->AddFeatures($layer, $fr, 0);
-                $fr->Close();
-            }
+// ================================ NOTE ====================================== //
+// This was supposed to be the implementation of stateless QueryMapFeatures, but
+// unfortunately the MapGuide API does not provide the sufficient functionality for
+// this to be possible, namely the ability to set width/height/dpi/center/scale of
+// an MgMap instance directly. We can't use the MgHttpRequest/MgHttpResponse/GETDYNAMICMAPOVERLAYIMAGE
+// trick to set these parameters as that requires a session-based map, which we 
+// are trying to avoid in the first place!
+
+// ====================================== Miscellaneous APIs ============================================== //
+/**
+ *     @SWG\Post(
+ *        path="/library/{resourcePath}.MapDefinition/query.{type}",
+ *        operationId="QueryFeaturesStatelessly",
+ *        summary="Performs a selection query against a Map Definition. ",
+ *        tags={"library"},
+ *          @SWG\Parameter(name="session", in="formData", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="username", in="formData", required=false, type="string", description="The MapGuide username"),
+ *          @SWG\Parameter(name="password", in="formData", required=false, type="string", description="The password"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
+ *          @SWG\Parameter(name="resourcePath", in="path", required=true, type="string", description="The path of the Map Definition"),
+ *          @SWG\Parameter(name="layernames", in="formData", required=false, type="string", description="A comma-separated list of layer names"),
+ *          @SWG\Parameter(name="geometry", in="formData", required=false, type="string", description="The WKT of the intersecting geometry"),
+ *          @SWG\Parameter(name="maxfeatures", in="formData", required=false, type="integer", description="The maximum number features to select as a result of this operation"),
+ *          @SWG\Parameter(name="selectionvariant", in="formData", required=true, type="string", description="The geometry operator to apply", enum={"TOUCHES", "INTERSECTS", "WITHIN", "ENVELOPEINTERSECTS"}),
+ *          @SWG\Parameter(name="selectioncolor", in="formData", required=false, type="string", description="The selection color"),
+ *          @SWG\Parameter(name="selectionformat", in="formData", required=false, type="string", description="The selection image format", enum={"PNG", "PNG8", "JPG", "GIF"}),
+ *          @SWG\Parameter(name="requestdata", in="formData", required=true, type="string", description="A bitmask specifying the information to return in the response. 1=Attributes, 2=Inline Selection, 4=Tooltip, 8=Hyperlink"),
+ *          @SWG\Parameter(name="layerattributefilter", in="formData", required=false, type="string", description="Bitmask value determining which layers will be queried. 1=Visible, 2=Selectable, 4=HasTooltips"),
+ *          @SWG\Parameter(name="selection", in="formData", required=false, type="string", description="An XML selection string containing the required feature IDs"),
+ *          @SWG\Parameter(name="append", in="formData", required=false, type="boolean", description="Indicates if the this query selection indicated by the 'featurefilter' parameter should append to the current selection"),
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
+ *     )
+ */
+/*
+$app->post("/library/:resourcePath+.MapDefinition/query.:format", function($resourcePath, $format) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $ctrl = new MgMapController($app);
+    $ctrl->QueryMapDefinitionFeatures($resId, $format);
+});
+
+    public function QueryMapDefinitionFeatures($resId, $format) {
+        $format = $this->ValidateRepresentation($format, array("xml", "json"));
+        
+        $layerNames = $this->app->request->params("layernames");
+        $geometry = $this->app->request->params("geometry");
+        $maxFeatures = $this->app->request->params("maxfeatures");
+        $selVariant = $this->app->request->params("selectionvariant");
+        $selColor = $this->app->request->params("selectioncolor");
+        $selFormat = $this->app->request->params("selectionformat");
+        $reqData = $this->app->request->params("requestdata");
+        $featFilter = $this->app->request->params("featurefilter");
+        $bAppend = $this->app->request->params("append");
+        
+        $layerAttFilter = $this->app->request->params("layerattributefilter");
+        $format = $this->app->request->params("format");
+
+        //Convert or coerce to defaults
+        if ($maxFeatures == null)
+            $maxFeatures = -1;
+        else
+            $maxFeatures = intval($maxFeatures);
+
+        if ($selFormat == null)
+            $selFormat = "PNG";
+        else
+            $selFormat = strtoupper($selFormat);
+
+        if ($layerAttFilter == null)
+            $layerAttFilter = 3; //visible and selectable
+        else
+            $layerAttFilter = intval($layerAttFilter);
+ 
+        if ($bAppend == null)
+            $bAppend = false;
+        else
+            $bAppend = ($bAppend == "1" || $bAppend == "true");
+
+        if ($reqData == null)
+            $reqData = 0;
+        else
+            $reqData = intval($reqData);
+
+        if ($selColor == null)
+            $selColor = "0x0000FFFF";
+        
+        $this->TrySetCredentialsFromRequest($this->app->request);
+        try {
+            $this->EnsureAuthenticationForSite();
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+
+            $map = new MgMap($siteConn);
+            $map->Create($resId, $resId->GetName());
+            $selection = new MgSelection($map);
+            
+            $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+            $renderSvc = $siteConn->CreateService(MgServiceType::RenderingService);
+            $updater = new MgNullSelectionUpdater();
+            $renderer = new MgStatelessSelectionRenderer();
+        
+            $this->QueryMapFeaturesInternal($map,
+                                            $selection,
+                                            $resSvc,
+                                            $renderSvc,
+                                            $layerNames,
+                                            $selVariant,
+                                            $geometry,
+                                            $featFilter,
+                                            $maxFeatures,
+                                            $layerAttFilter,
+                                            $reqData,
+                                            $selColor,
+                                            $selFormat,
+                                            $bAppend,
+                                            $format,
+                                            $updater,
+                                            $renderer);
+
+        } catch (MgException $ex) {
+            $this->OnException($ex, $this->GetMimeTypeForFormat($format));
         }
     }
+    */
 
     public function QueryMapFeatures($sessionId, $mapName) {
         //TODO: Append only works in featurefilter mode. Add append support for geometry-based selections
@@ -238,7 +349,7 @@ class MgMapController extends MgBaseController {
             $bSelectionXml = ($bSelectionXml == "1" || $bSelectionXml == "true");
             
         if ($bAppend == null)
-            $bAppend = true;
+            $bAppend = false;
         else
             $bAppend = ($bAppend == "1" || $bAppend == "true");
 
@@ -285,7 +396,8 @@ class MgMapController extends MgBaseController {
             //$this->app->log->debug("GEOMETRY: $geometry");
             //$this->app->log->debug("FILTER: $featFilter");
             //$this->app->log->debug("Can use native: $bCanUseNative");
-            if ($bCanUseNative) {
+            //if ($bCanUseNative) {
+            if (false) {
                 $req = new MgHttpRequest("");
                 $param = $req->GetRequestParam();
     
@@ -313,204 +425,104 @@ class MgMapController extends MgBaseController {
                     $param->AddParameter("FORMAT", MgMimeType::Xml);
                 $this->ExecuteHttpRequest($req);
             } else { //Shim the response
-                $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-                $renderSvc = $siteConn->CreateService(MgServiceType::RenderingService);
-    
-                $layersToQuery = null;
-                if ($layerNames != null) {
-                    $layersToQuery = new MgStringCollection();
-                    $names = explode(",", $layerNames);
-                    foreach ($names as $name) {
-                        $layersToQuery->Add($name);
-                    }
-                }
-    
-                $variant = 0;
-                if ($selVariant === "TOUCHES")
-                    $variant = MgFeatureSpatialOperations::Touches;
-                else if ($selVariant === "INTERSECTS")
-                    $variant = MgFeatureSpatialOperations::Intersects;
-                else if ($selVariant === "WITHIN")
-                    $variant = MgFeatureSpatialOperations::Within;
-                else if ($selVariant === "ENVELOPEINTERSECTS")
-                    $variant = MgFeatureSpatialOperations::EnvelopeIntersects;
-    
                 $map = new MgMap($siteConn);
                 $map->Open($mapName);
                 $selection = new MgSelection($map);
-    
-                $wktRw = new MgWktReaderWriter();
-                $selectGeom = null;
-                if ($geometry != null)
-                    $selectGeom = $wktRw->Read($geometry);
-    
-                $featInfo = $renderSvc->QueryFeatures($map, $layersToQuery, $selectGeom, $variant, $featFilter, $maxFeatures, $layerAttFilter);
-                $bHasNewSelection = false;
-                if ($persist) {
-                    $sel = $featInfo->GetSelection();
-                    if ($sel != null) {
-                        $selXml = $sel->ToXml();
-                        //$this->app->log->debug("Query selection:\n$selXml");
-                        if ($bAppend) {
-                            $selOrig = new MgSelection($map);
-                            $selOrig->Open($resSvc, $mapName);
-                            $selAppend = new MgSelection($map, $selXml);
-                            self::MergeSelections($selOrig, $selAppend);
-                            $selNewXml = $selOrig->ToXml();
-                            //$this->app->log->debug("Appended selection:\n$selNewXml");
-                            $selection->FromXml($selNewXml);
-                        } else {
-                            $selection->FromXml($selXml);
-                        }
-                        $bHasNewSelection = true;
-                    }
-                    $selection->Save($resSvc, $mapName);
-                }
-    
-                // Render an image of this selection if requested
-                $inlineSelectionImg = null;
-                if ((($reqData & self::REQUEST_INLINE_SELECTION) == self::REQUEST_INLINE_SELECTION) && $bHasNewSelection) {
-                    $color = new MgColor($selColor);
-                    $renderOpts = new MgRenderingOptions($selFormat, self::RenderSelection | self::KeepSelection, $color);
-                    $inlineSelectionImg = $renderSvc->RenderDynamicOverlay($map, $selection, $renderOpts);
-                }
-    
-                // Collect any attributes of selected features
-                $bRequestAttributes = (($reqData & self::REQUEST_ATTRIBUTES) == self::REQUEST_ATTRIBUTES);
-    
-                $xml = $this->CollectQueryMapFeaturesResult($resSvc, $reqData, $featInfo, $selection, $bRequestAttributes, $inlineSelectionImg);
-    
-                $bs = new MgByteSource($xml, strlen($xml));
-                $bs->SetMimeType(MgMimeType::Xml);
-                $br = $bs->GetReader();
-                if ($format == "json") {
-                    $this->OutputXmlByteReaderAsJson($br);
-                } else {
-                    $this->OutputByteReader($br);
-                }
+                
+                $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+                $renderSvc = $siteConn->CreateService(MgServiceType::RenderingService);
+                $updater = new MgSelectionUpdater($map, $resSvc, $mapName, $persist);
+                $renderer = new MgSelectionRenderer();
+                
+                $this->QueryMapFeaturesInternal($map,
+                                                $selection,
+                                                $resSvc,
+                                                $renderSvc,
+                                                $layerNames,
+                                                $selVariant,
+                                                $geometry,
+                                                $featFilter,
+                                                $maxFeatures,
+                                                $layerAttFilter,
+                                                $reqData,
+                                                $selColor,
+                                                $selFormat,
+                                                $bAppend,
+                                                $format,
+                                                $updater,
+                                                $renderer);
             }
         } catch (MgException $ex) {
             $this->OnException($ex, $this->GetMimeTypeForFormat($format));
         }
     }
-
-    private function CollectQueryMapFeaturesResult($resSvc, $reqData, $featInfo, $selection, $bRequestAttributes, $inlineSelectionImg) {
-        $xml  = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<FeatureInformation>\n";
-
-        $tooltip = "";
-        $hyperlink = "";
-        if ($featInfo != null) {
-            $tooltip = $featInfo->GetTooltip();
-            $hyperlink = $featInfo->GetHyperlink();
-        }
-
-        $selXml = $selection->ToXml();
-        if (strlen($selXml) > 0) {
-            //Need to strip the XML prolog from this fragment
-            $fsdoc = new DOMDocument();
-            $fsdoc->loadXML($selXml);
-            $selXml = $fsdoc->saveXML($fsdoc->documentElement);
-            $xml .= $selXml;
-        } else {
-            $xml .= "<FeatureSet />\n";
-        }
-        if ((($reqData & self::REQUEST_TOOLTIP) == self::REQUEST_TOOLTIP) && strlen($tooltip) > 0) {
-            $xml .= "<Tooltip>".MgUtils::EscapeXmlChars($tooltip)."</Tooltip>\n";
-        } else {
-            $xml .= "<Tooltip />\n";
-        }
-        if ((($reqData & self::REQUEST_HYPERLINK) == self::REQUEST_HYPERLINK) && strlen($hyperlink) > 0) {
-            $xml .= "<Hyperlink>".MgUtils::EscapeXmlChars($hyperlink)."</Hyperlink>\n";   
-        } else {
-            $xml .= "<Hyperlink />\n";
-        }
-        if ((($reqData & self::REQUEST_INLINE_SELECTION) == self::REQUEST_INLINE_SELECTION) && $inlineSelectionImg != null) {
-            $xml .= "<InlineSelectionImage>\n";
-            $xml .= "<MimeType>".$inlineSelectionImg->GetMimeType()."</MimeType>\n";
-            $b64 = MgUtils::ByteReaderToBase64($inlineSelectionImg);
-            $xml .= "<Content>$b64</Content>\n";
-            $xml .= "</InlineSelectionImage>\n";
-        }
-        if ($bRequestAttributes) {
-            $agfRw = new MgAgfReaderWriter();
-            $layerDoc = new DOMDocument();
-            $xml .= "<SelectedFeatures>";
-
-            $selLayers = $selection->GetLayers();
-            if ($selLayers != null) {
-                $selLayerCount = $selLayers->GetCount();
-                for ($i = 0; $i < $selLayerCount; $i++) {
-                    $selLayer = $selLayers->GetItem($i);
-                    $layerName = $selLayer->GetName();
-
-                    $xml .= "<SelectedLayer id=\"".$selLayer->GetObjectId()."\" name=\"$layerName\">";
-                    $xml .= "<LayerMetadata>\n";
-
-                    $ldfId = $selLayer->GetLayerDefinition();
-                    $layerContent = $resSvc->GetResourceContent($ldfId);
-                    $layerDoc->loadXML($layerContent->ToString());
-                    $propMapNodes = $layerDoc->getElementsByTagName("PropertyMapping");
-                    $clsDef = $selLayer->GetClassDefinition();
-                    $clsProps = $clsDef->GetProperties();
-
-                    $propMappings = array();
-                    for ($j = 0; $j < $propMapNodes->length; $j++) {
-                        $propMapNode = $propMapNodes->item($j);
-                        $propName = $propMapNode->getElementsByTagName("Name")->item(0)->nodeValue;
-                        $pidx = $clsProps->IndexOf($propName);
-                        if ($pidx >= 0) {
-                            $propDispName = MgUtils::EscapeXmlChars($propMapNode->getElementsByTagName("Value")->item(0)->nodeValue);
-                            $propDef = $clsProps->GetItem($pidx);
-                            $propType = MgPropertyType::Null;
-                            if ($propDef->GetPropertyType() == MgFeaturePropertyType::DataProperty) {
-                                $propType = $propDef->GetDataType();
-                            } else if ($propDef->GetPropertyType() == MgFeaturePropertyType::DataProperty) {
-                                $propType = MgPropertyType::Geometry;
-                            }
-                            $xml .= "<Property>\n";
-                            $xml .= "<Name>$propName</Name>\n<Type>$propType</Type>\n<DisplayName>$propDispName</DisplayName>\n";
-                            $xml .= "</Property>\n";
-
-                            $propMappings[$propName] = $propDispName;
-                        }
-                    }
-
-                    $xml .= "</LayerMetadata>\n";
-
-                    $reader = $selection->GetSelectedFeatures($selLayer, $selLayer->GetFeatureClassName(), false);
-                    $rdrClass = $reader->GetClassDefinition();
-                    $geomPropName = $rdrClass->GetDefaultGeometryPropertyName();
-                    while ($reader->ReadNext()) {
-                        $xml .= "<Feature>\n";
-                        $bounds = "";
-                        if (!$reader->IsNull($geomPropName)) {
-                            $agf = $reader->GetGeometry($geomPropName);
-                            $geom = $agfRw->Read($agf);
-                            $env = $geom->Envelope();
-                            $ll = $env->GetLowerLeftCoordinate();
-                            $ur = $env->GetUpperRightCoordinate();
-                            $bounds = $ll->GetX()." ".$ll->GetY()." ".$ur->GetX()." ".$ur->GetY();
-                        }
-                        $xml .= "<Bounds>$bounds</Bounds>\n";
-                        foreach ($propMappings as $propName => $displayName) {
-                            $value = MgUtils::EscapeXmlChars(MgUtils::GetBasicValueFromReader($reader, $propName));
-                            $xml .= "<Property>\n";
-                            $xml .= "<Name>$displayName</Name>\n";
-                            if (!$reader->IsNull($propName))
-                                $xml .= "<Value>$value</Value>\n";
-                            $xml .= "</Property>\n";
-                        }
-                        $xml .= "</Feature>\n";
-                    }
-                    $reader->Close();
-
-                    $xml .= "</SelectedLayer>";
-                }
+    
+    private function QueryMapFeaturesInternal($map,
+                                              $selection,
+                                              $resSvc,
+                                              $renderSvc,
+                                              $layerNames,
+                                              $selVariant,
+                                              $geometry,
+                                              $featFilter,
+                                              $maxFeatures,
+                                              $layerAttFilter,
+                                              $reqData,
+                                              $selColor,
+                                              $selFormat,
+                                              $bAppend,
+                                              $format,
+                                              $updater,
+                                              $renderer) {
+        $layersToQuery = null;
+        if ($layerNames != null) {
+            $layersToQuery = new MgStringCollection();
+            $names = explode(",", $layerNames);
+            foreach ($names as $name) {
+                $layersToQuery->Add($name);
             }
-            $xml .= "</SelectedFeatures>";
         }
-        $xml .= "</FeatureInformation>";
-        return $xml;
+
+        $variant = 0;
+        if ($selVariant === "TOUCHES")
+            $variant = MgFeatureSpatialOperations::Touches;
+        else if ($selVariant === "INTERSECTS")
+            $variant = MgFeatureSpatialOperations::Intersects;
+        else if ($selVariant === "WITHIN")
+            $variant = MgFeatureSpatialOperations::Within;
+        else if ($selVariant === "ENVELOPEINTERSECTS")
+            $variant = MgFeatureSpatialOperations::EnvelopeIntersects;
+
+        $wktRw = new MgWktReaderWriter();
+        $selectGeom = null;
+        if ($geometry != null)
+            $selectGeom = $wktRw->Read($geometry);
+
+        $featInfo = $renderSvc->QueryFeatures($map, $layersToQuery, $selectGeom, $variant, $featFilter, $maxFeatures, $layerAttFilter);
+        
+        $updater->Update($selection, $featInfo, $bAppend);
+
+        // Render an image of this selection if requested
+        $inlineSelectionImg = null;
+        if ((($reqData & MgSelectionRequestedFeatures::REQUEST_INLINE_SELECTION) == MgSelectionRequestedFeatures::REQUEST_INLINE_SELECTION) && $updater->HasNewSelection()) {
+            $color = new MgColor($selColor);
+            $renderOpts = new MgRenderingOptions($selFormat, self::RenderSelection | self::KeepSelection, $color);
+            $inlineSelectionImg = $renderSvc->RenderDynamicOverlay($map, $selection, $renderOpts);
+        }
+
+        // Collect any attributes of selected features
+        $bRequestAttributes = (($reqData & MgSelectionRequestedFeatures::REQUEST_ATTRIBUTES) == MgSelectionRequestedFeatures::REQUEST_ATTRIBUTES);
+
+        $xml = $renderer->Render($resSvc, $reqData, $featInfo, $selection, $bRequestAttributes, $inlineSelectionImg);
+
+        $bs = new MgByteSource($xml, strlen($xml));
+        $bs->SetMimeType(MgMimeType::Xml);
+        $br = $bs->GetReader();
+        if ($format == "json") {
+            $this->OutputXmlByteReaderAsJson($br);
+        } else {
+            $this->OutputByteReader($br);
+        }
     }
 
     public function CreateMap($resId) {

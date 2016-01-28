@@ -1272,5 +1272,4 @@ $app->get("/library/:resourcePath+.LayerDefinition/kmlfeatures", function($resou
     $ctrl->GetFeaturesKml($resId, "kml");
 });
 
-
 ?>
