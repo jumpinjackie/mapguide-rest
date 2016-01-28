@@ -10175,7 +10175,7 @@
                 });
                 
                 // --------------------------------- BAD WKT ----------------------------------- //
-                
+                /*
                 //With raw credentials
                 api_test_anon(rest_root_url + "/coordsys/wkttomentor.xml", "POST", { wkt: BAD_WKT }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
@@ -10219,6 +10219,7 @@
                     self.ok(status == 500, "(" + status + ") - Expected server error");
                     self.assertMimeType(mimeType, MgMimeType.Json);
                 });
+                */
             });
             test("WKT to EPSG", function() {
                 var GOOD_WKT = 'GEOGCS["LL84",DATUM["WGS84",SPHEROID["WGS84",6378137.000,298.25722293]],PRIMEM["Greenwich",0],UNIT["Degree",0.01745329251994]]';
@@ -10276,7 +10277,7 @@
                 });
                 
                 // --------------------------------- BAD WKT ----------------------------------- //
-                
+                /*
                 //With raw credentials
                 api_test_anon(rest_root_url + "/coordsys/wkttoepsg.xml", "POST", { wkt: BAD_WKT }, function(status, result, mimeType) {
                     self.ok(result.indexOf(XML_PROLOG) == 0, "Expected XML prolog in XML response");
@@ -10320,6 +10321,7 @@
                     self.ok(status == 500, "(" + status + ") - Expected server error");
                     self.assertMimeType(mimeType, MgMimeType.Json);
                 });
+                */
             });
             test("Enum categories", function() {
                 var self = this;

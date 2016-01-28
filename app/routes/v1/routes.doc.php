@@ -28,9 +28,20 @@ require_once dirname(__FILE__)."/../../version.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
 
 $app->get("/apidoc/", function() use ($app) {
+    $prefix = MgUtils::GetApiVersionNamespace($app, "/apidoc");
     $path = $app->config("AppRootDir")."/doc/data/swagger.json";
+    
+    $data = null;
+    if (strlen($prefix) > 0) {
+        $doc = json_decode(file_get_contents($path));
+        $doc->basePath .= "/".$prefix;
+        $data = json_encode($doc);
+    } else {
+        $data = file_get_contents($path);
+    }
+    
     $app->response->header("Content-Type", "application/json");
-    $app->response->setBody(file_get_contents($path));
+    $app->response->setBody($data);
     /*
     //HACK: swagger-php doesn't seem to support annotations for describing the API
     //So we'll intercept the api-docs.json request via this route to inject that
