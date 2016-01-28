@@ -602,7 +602,7 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:qualifie
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The feature source name"),
- *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The XML that describes the Feature Source to create"),
+ *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The XML that describes the Feature Source to create", @SWG\Schema(ref="#/definitions/CreateFeatureSourceEnvelope")),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -621,7 +621,7 @@ $app->post("/session/:sessionId/:resName.FeatureSource/xml", function($sessionId
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The feature source name"),
- *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The JSON that describes the Feature Source to create"),
+ *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The JSON that describes the Feature Source to create", @SWG\Schema(ref="#/definitions/CreateFeatureSourceEnvelope")),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -643,7 +643,7 @@ $app->post("/session/:sessionId/:resName.FeatureSource/json", function($sessionI
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *          @SWG\Parameter(name="schemaName", in="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\Parameter(name="className", in="path", required=true, type="string", description="The class name"),
- *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The Feature Set XML describing the features to be inserted"),
+ *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The Feature Set XML describing the features to be inserted", @SWG\Schema(ref="#/definitions/InsertFeaturesEnvelope")),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
@@ -665,7 +665,7 @@ $app->post("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaN
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *          @SWG\Parameter(name="schemaName", in="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\Parameter(name="className", in="path", required=true, type="string", description="The class name"),
- *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The XML envelope describing the features to be update"),
+ *          @SWG\Parameter(name="body", in="body", required=true, type="string", description="The XML envelope describing the features to be updated", @SWG\Schema(ref="#/definitions/UpdateFeaturesEnvelope")),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")

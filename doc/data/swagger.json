@@ -6289,6 +6289,9 @@
                         "in": "body",
                         "description": "The XML that describes the Feature Source to create",
                         "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CreateFeatureSourceEnvelope"
+                        },
                         "type": "string"
                     }
                 ],
@@ -6332,6 +6335,9 @@
                         "in": "body",
                         "description": "The JSON that describes the Feature Source to create",
                         "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CreateFeatureSourceEnvelope"
+                        },
                         "type": "string"
                     }
                 ],
@@ -6492,8 +6498,11 @@
                     {
                         "name": "body",
                         "in": "body",
-                        "description": "The XML envelope describing the features to be update",
+                        "description": "The XML envelope describing the features to be updated",
                         "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UpdateFeaturesEnvelope"
+                        },
                         "type": "string"
                     }
                 ],
@@ -6560,6 +6569,9 @@
                         "in": "body",
                         "description": "The Feature Set XML describing the features to be inserted",
                         "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/InsertFeaturesEnvelope"
+                        },
                         "type": "string"
                     }
                 ],

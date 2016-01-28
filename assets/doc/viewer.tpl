@@ -64,7 +64,7 @@
           log("Unable to Load SwaggerUI");
         },
         docExpansion: "none",
-        jsonEditor: true,
+        jsonEditor: false,
         apisSorter: "alpha",
         defaultModelRendering: 'schema',
         showRequestHeaders: true
