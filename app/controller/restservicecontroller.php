@@ -92,7 +92,7 @@ class MgRestServiceController extends MgBaseController {
     public function CreateSession($format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         try {
-            TrySetCredentialsFromRequest($this->app->request);
+            $this->TrySetCredentialsFromRequest($this->app->request);
             $this->EnsureAuthenticationForSite();
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
