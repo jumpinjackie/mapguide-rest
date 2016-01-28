@@ -1,5 +1,8 @@
 1.0 RC4
 =======
+ - username/password as POST parameters supported for:
+    - /session.{type}
+    - /services/createmap.{type}
  - #115: Added Layer/Group/Selection mutation APIs with new sample app demonstrating these APIs
  - #118: Disable anon access to CreateRuntimeMap
  - #119: Added selection overview route
