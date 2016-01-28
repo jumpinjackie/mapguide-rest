@@ -177,6 +177,8 @@ $app->post("/services/transformcoords", function() use ($app) {
  *        summary="Creates a new Runtime Map (MgMap) instance from the specified map definition and returns detailed information about its layer/group structure if requested",
  *        tags={"services"},
  *          @SWG\Parameter(name="session", in="formData", required=false, type="string", description="Your MapGuide Session ID. If none specified you must pass the basic http authentication challenge"),
+ *          @SWG\Parameter(name="username", in="formData", required=false, type="string", description="The MapGuide username"),
+ *          @SWG\Parameter(name="password", in="formData", required=false, type="string", description="The password"),
  *          @SWG\Parameter(name="mapdefinition", in="formData", required=true, type="string", description="The Map Definition ID to create a new runtime map from"),
  *          @SWG\Parameter(name="targetmapname", in="formData", required=false, type="string", description="The target map name to associate the Runtime Map by. By default, the name is generated from the Map Definition ID"),
  *          @SWG\Parameter(name="requestedfeatures", in="formData", required=false, type="integer", description="A bitmask of the information about the Runtime Map that you would like returned. 1=Layer/Group structure, 2=icons, 4=Feature Source Information"),

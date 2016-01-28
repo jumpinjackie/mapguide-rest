@@ -92,18 +92,7 @@ class MgRestServiceController extends MgBaseController {
     public function CreateSession($format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         try {
-            //HACK-ish: We must allow username/password request parameters for this
-            //operation instead of the normal base64 encoded Basic authentication header
-            //
-            //So if we find such parameters, stuff them in the PHP_AUTH_USER and PHP_AUTH_PW
-            //$_SERVER vars before calling EnsureAuthenticationForSite()
-            $user = $this->app->request->params("username");
-            $pwd = $this->app->request->params("password");
-            if ($user != null) {
-                $_SERVER['PHP_AUTH_USER'] = $user;
-                if ($pwd != null)
-                    $_SERVER['PHP_AUTH_PW'] = $pwd;
-            }
+            TrySetCredentialsFromRequest($this->app->request);
             $this->EnsureAuthenticationForSite();
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
