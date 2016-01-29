@@ -396,8 +396,7 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
             //$this->app->log->debug("GEOMETRY: $geometry");
             //$this->app->log->debug("FILTER: $featFilter");
             //$this->app->log->debug("Can use native: $bCanUseNative");
-            //if ($bCanUseNative) {
-            if (false) {
+            if ($bCanUseNative) {
                 $req = new MgHttpRequest("");
                 $param = $req->GetRequestParam();
     
