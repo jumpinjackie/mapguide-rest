@@ -243,8 +243,16 @@ class MgDataController extends MgBaseController {
         if ($path === false) {
             $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
         } else {
-            $docUrl = $this->app->config("SelfUrl")."/data/$uriPath/apidoc";
-            $assetUrlRoot = $this->app->config("SelfUrl")."/doc";
+            
+            $verPrefix = MgUtils::GetApiVersionNamespace($this->app, "/data/$uriPath");
+            $selfUrlUnprefixed = $this->app->config("SelfUrl");
+            $selfUrl = $selfUrlUnprefixed;
+            if (strlen($verPrefix) > 0) {
+                $selfUrl = $selfUrlUnprefixed."/".$verPrefix;
+            }
+            
+            $docUrl = "$selfUrl/data/$uriPath/apidoc";
+            $assetUrlRoot = "$selfUrlUnprefixed/doc";
             $docTpl = $this->app->config("AppRootDir")."/assets/doc/viewer.tpl";
 
             $smarty = new Smarty();
@@ -268,13 +276,21 @@ class MgDataController extends MgBaseController {
             $config = json_decode(file_get_contents($path), true);
             
             $urlRoot = "/data/$uriPath";
-
+            $hostPart = ((!array_key_exists("HTTPS", $_SERVER) || ($_SERVER['HTTPS'] === "off")) ? "http://" : "https://") . $_SERVER['HTTP_HOST'];
+            $verPrefix = MgUtils::GetApiVersionNamespace($this->app, "/data/$uriPath");
+            $selfUrl = $this->app->config("SelfUrl");
+            if (strlen($verPrefix) > 0) {
+                $selfUrl .= "/" . $verPrefix;
+            }
+            $basePath = substr($selfUrl, strlen($hostPart));
+            
             $apidoc = new stdClass();
-            $apidoc->basePath = $this->app->config("SelfUrl");
-            $apidoc->swaggerVersion = SWAGGER_API_VERSION;
-            $apidoc->apiVersion = MG_REST_API_VERSION;
-            $apidoc->resourcePath = $urlRoot;
-            $apidoc->apis = array();
+            $apidoc->swagger = SWAGGER_API_VERSION;
+            $apidoc->info = new stdClass();
+            $apidoc->info->version = MG_REST_API_VERSION;
+            $apidoc->basePath = $basePath;
+            $apidoc->schemes = array("http", "https");
+            $apidoc->paths = array();
 
             if (array_key_exists("Representations", $config)) {
                 $reps = $config["Representations"];
@@ -296,7 +312,7 @@ class MgDataController extends MgBaseController {
                         $singleConf->extraParams = array();
 
                         $pId = new stdClass();
-                        $pId->paramType = "path";
+                        $pId->in = "path";
                         $pId->name = "id";
                         $pId->type = "string";
                         $pId->required = true;
@@ -306,20 +322,16 @@ class MgDataController extends MgBaseController {
 
                         $confs = array($multiConf, $singleConf);
                         foreach ($confs as $conf) {
-                            $repDoc = new stdClass();
-                            $repDoc->path = $conf->url;
-                            $ops = array();
-
+                            $repDoc = array();
                             $methodsConf = $adapterConfig["Methods"];
                             foreach ($methodsConf as $method => $methodOptions) {
                                 $op = $documentor->DocumentOperation($this->app, $method, $extension, $conf->single);
                                 foreach ($conf->extraParams as $extraParam) {
                                     array_push($op->parameters, $extraParam);
                                 }
-                                array_push($ops, $op);
+                                $repDoc[strtolower($method)] = $op;
                             }
-                            $repDoc->operations = $ops;
-                            array_push($apidoc->apis, $repDoc);
+                            $apidoc->paths[$conf->url] = $repDoc;
                         }
                     }
                 }

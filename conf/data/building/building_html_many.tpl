@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Buidling Results</title>
+        <title>Building Results</title>
         <link rel="stylesheet" href="{$helper->GetAssetPath('common/css/bootstrap.min.css')}" />
         <script type="text/javascript">
 

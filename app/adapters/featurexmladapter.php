@@ -25,7 +25,7 @@ class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
         $params = parent::GetAdditionalParameters($app, $bSingle, $method);
         if ($method == "POST") {
             $pPostBody = new stdClass();
-            $pPostBody->paramType = "body";
+            $pPostBody->in = "body";
             $pPostBody->name = "body";
             $pPostBody->type = "string";
             $pPostBody->required = true;
@@ -34,7 +34,7 @@ class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
             array_push($params, $pPostBody);
         } else if ($method == "PUT") {
             $pPutBody = new stdClass();
-            $pPutBody->paramType = "body";
+            $pPutBody->in = "body";
             $pPutBody->name = "body";
             $pPutBody->type = "string";
             $pPutBody->required = true;
@@ -43,7 +43,7 @@ class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
             array_push($params, $pPutBody);
         } else if ($method == "DELETE") {
             $pFilter = new stdClass();
-            $pFilter->paramType = "form";
+            $pFilter->in = "form";
             $pFilter->name = "filter";
             $pFilter->type = "string";
             $pFilter->required = false;

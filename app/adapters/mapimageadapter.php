@@ -24,28 +24,28 @@ class MgMapImageRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
         $params = parent::GetAdditionalParameters($app, $bSingle, $method);
         if ($method == "GET") {
             $pWidth = new stdClass();
-            $pWidth->paramType = "query";
+            $pWidth->in = "query";
             $pWidth->name = "width";
             $pWidth->type = "integer";
             $pWidth->required = false;
             $pWidth->description = "The width of the image";
 
             $pHeight = new stdClass();
-            $pHeight->paramType = "query";
+            $pHeight->in = "query";
             $pHeight->name = "height";
             $pHeight->type = "integer";
             $pHeight->required = false;
             $pHeight->description = "The height of the image";
 
             $pDpi = new stdClass();
-            $pDpi->paramType = "query";
+            $pDpi->in = "query";
             $pDpi->name = "dpi";
             $pDpi->type = "integer";
             $pDpi->required = false;
             $pDpi->description = "The dpi of the image";
 
             $pScale = new stdClass();
-            $pScale->paramType = "query";
+            $pScale->in = "query";
             $pScale->name = "scale";
             $pScale->type = "integer";
             $pScale->required = false;

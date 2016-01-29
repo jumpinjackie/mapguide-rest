@@ -419,9 +419,8 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
 
     public function DocumentOperation($app, $method, $extension, $bSingle) {
         $op = new stdClass();
-        $op->method = $method;
         $op->summary = $this->DescribeMethodSummary($app, $method, $extension);
-        $op->nickname = $this->GetMethodNickname($method, $extension);
+        $op->operationId = $this->GetMethodNickname($method, $extension);
         $op->parameters = array();
         if ($bSingle) {
 
@@ -429,7 +428,7 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
             if ($method == "GET") {
                 //filter
                 $pFilter = new stdClass();
-                $pFilter->paramType = "query";
+                $pFilter->in = "query";
                 $pFilter->name = "filter";
                 $pFilter->type = "string";
                 $pFilter->required = false;
@@ -437,7 +436,7 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
                 
                 //bbox
                 $pbbox = new stdClass();
-                $pbbox->paramType = "query";
+                $pbbox->in = "query";
                 $pbbox->name = "bbox";
                 $pbbox->type = "string";
                 $pbbox->required = false;
@@ -463,7 +462,7 @@ abstract class MgFeatureRestAdapterDocumentor extends MgRestAdapterDocumentor {
             if ($method == "GET") {
                 //page
                 $pPage = new stdClass();
-                $pPage->paramType = "query";
+                $pPage->in = "query";
                 $pPage->name = "page";
                 $pPage->type = "integer";
                 $pPage->required = false;
