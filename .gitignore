@@ -20,3 +20,4 @@
 /.phpintel
 /node_modules
 /test/data/Sheboygan.mgp
+/.vscode
