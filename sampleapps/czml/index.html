@@ -9,6 +9,7 @@
     <title>CZML Example </title>
     <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
     <script src="../../assets/ol3-cesium/cesium/Cesium.js"></script>
+    <script src="../../assets/common/js/czinit.js"></script>
     <style>
       @import url(../../assets/ol3-cesium/cesium/Widgets/widgets.css);
       #cesiumContainer {
@@ -29,7 +30,7 @@
     </style>
     <script type="text/javascript">
       window.onload = function() {
-        var viewer = new Cesium.Viewer('cesiumContainer');
+        var viewer = createViewer('cesiumContainer', '../../assets/ol3-cesium');
 
         var parcelsSource = new Cesium.CzmlDataSource();
         var treesSource = new Cesium.CzmlDataSource();
