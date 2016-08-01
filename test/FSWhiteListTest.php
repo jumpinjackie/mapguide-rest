@@ -18,6 +18,7 @@
 //
 
 require_once dirname(__FILE__)."/../app/util/whitelist.php";
+require_once dirname(__FILE__)."/TestUtils.php";
 
 class FSWhiteListTest extends PHPUnit_Framework_TestCase
 {
