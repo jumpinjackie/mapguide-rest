@@ -9069,7 +9069,7 @@
                 var reqFeatures = (1|2|4);
                 var anonMapName = null;
                 var adminMapName = null;
-                
+                var self = this;
                 function createLayerXml(fsId, className, geom) {
                     var xml = '<LayerDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="1.0.0" xsi:noNamespaceSchemaLocation="LayerDefinition-1.0.0.xsd">';
                     xml += "<VectorLayerDefinition>";
@@ -9318,7 +9318,7 @@
                 var reqFeatures = (1|2|4);
                 var anonMapName = null;
                 var adminMapName = null;
-                
+                var self = this;
                 function createLayerJson(fsId, className, geom) {
                     return {
                         "LayerDefinition": {

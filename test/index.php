@@ -457,8 +457,8 @@ if ($dump) {
                 context.ok = function(assertion, message) {
                     ok(assertion, message);
                 };
-                context.assertMimeType = function(expected, actual) {
-                    context.ok(actual == expected, "(" + actual + ") Expected mime type of: " + expected);
+                context.assertMimeType = function(actual, expected) {
+                    context.ok(actual.indexOf(expected) >= 0, "(" + expected + ") Expected mime type to contain: " + actual);
                 };
             }
 
@@ -562,9 +562,10 @@ if ($dump) {
                 return api_test_with_credentials(url, type, data, "<?= $adminUser ?>", "<?= $adminPass ?>", callback);
             }
 
-            function assertMimeType(expected, actual) {
-                ok(actual == expected, "(" + actual + ") Expected mime type of: " + expected);
-            }
+            //function assertMimeType(actual, expected) {
+            //    ok(actual == expected, "(" + actual + ") Expected mime type of: " + expected);
+            //    context.ok(actual.indexOf(expected) >= 0, "(" + expected + ") Expected mime type to contain: " + actual);
+            //}
 
             function encodeHTML(str) {
                 return str.replace(/&/g, '&amp;')
