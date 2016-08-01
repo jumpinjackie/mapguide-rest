@@ -9,6 +9,7 @@
         "glenscott/url-normalizer": "1.2.0",
         "jakub-onderka/php-parallel-lint": "0.9",
         "phpunit/phpunit": "4.6.*",
-        "palanik/corsslim": "1.1.0"
+        "palanik/corsslim": "1.1.0",
+        "kriswallsmith/buzz": "^0.15.0"
     }
 }
