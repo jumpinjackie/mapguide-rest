@@ -25,6 +25,30 @@ class Configuration {
         }
         return $root . $relPart;
     }
+    public static function getAdminLogin() {
+        $resp = new stdClass();
+        $resp->user = "Administrator";
+        $resp->pass = "admin";
+        return $resp;
+    }
+    public static function getAuthorLogin() {
+        $resp = new stdClass();
+        $resp->user = "Author";
+        $resp->pass = "author";
+        return $resp;
+    }
+    public static function getWfsLogin() {
+        $resp = new stdClass();
+        $resp->user = "WfsUser";
+        $resp->pass = "wfs";
+        return $resp;
+    }
+    public static function getWmsLogin() {
+        $resp = new stdClass();
+        $resp->user = "WmsUser";
+        $resp->pass = "wms";
+        return $resp;
+    }
 }
 
 ?>

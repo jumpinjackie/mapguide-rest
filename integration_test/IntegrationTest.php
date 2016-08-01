@@ -26,7 +26,8 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
     }
 
     protected function apiTestAdmin($url, $type, $data) {
-        return $this->apiTestWithCredentials($url, $type, $data, "Administrator", "admin");
+        $admin = Configuration::getAdminLogin();
+        return $this->apiTestWithCredentials($url, $type, $data, $admin->user, $admin->pass);
     }
 
     protected function apiTest($url, $type, $data) {
