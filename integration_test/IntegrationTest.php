@@ -42,17 +42,30 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
             $type = "POST";
         
         $absUrl = Configuration::getRestUrl($url);
-        if ($type == "POST" && is_array($data)) {
+        if ($type == "POST") {
             $request = new Buzz\Message\Form\FormRequest($type);
-            $fields = array();
-            foreach ($data as $key => $value) {
-                $fields[$key] = $value;
+            if (is_array($data)) {
+                $fields = array();
+                foreach ($data as $key => $value) {
+                    $fields[$key] = $value;
+                }
+                $request->setFields($fields);
             }
-            $request->setFields($fields);
-        } else {
+            $request->fromUrl($absUrl);
+        } else { //GET
             $request = new Buzz\Message\Request($type);
+            $pairs = array();
+            if (is_array($data)) {
+                foreach ($data as $key => $value) {
+                    array_push($pairs, "$key=$value");
+                }
+            }
+            if (count($pairs) > 0) {
+                $request->fromUrl($absUrl . "?" . implode("&", $pairs));
+            } else {
+                $request->fromUrl($absUrl);
+            }
         }
-        $request->fromUrl($absUrl);
 
         if ($origType == "PUT")
             $request->addHeader("X-HTTP-Method-Override: PUT");
@@ -80,6 +93,22 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
         echo "\n====================== END RESPONSE ==========================\n";
         */
         return $response;
+    }
+
+    protected function assertXmlContent($response) {
+        $this->assertTrue(strpos($response->getContent(), "<?xml") !== FALSE);
+    }
+
+    protected function assertMimeType($expectedMime, $response) {
+        $headers = $response->getHeaders();
+        foreach ($headers as $hdr) {
+            if (strpos($hdr, "Content-Type") === FALSE) {
+                continue;
+            }
+            $this->assertContains($expectedMime, $hdr);
+            return;
+        }
+        $this->fail("No Content-Type found in response");
     }
 }
 

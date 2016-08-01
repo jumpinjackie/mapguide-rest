@@ -18,6 +18,7 @@
 //
 
 class Configuration {
+    const MIME_XML = "text/xml";
     public static function getRestUrl($relPart) {
         $root = "http://localhost/mapguide/rest";
         if (array_key_exists("MG_REST_ROOT_URL", $_SERVER)) {
@@ -47,6 +48,18 @@ class Configuration {
         $resp = new stdClass();
         $resp->user = "WmsUser";
         $resp->pass = "wms";
+        return $resp;
+    }
+    public static function getUser1Login() {
+        $resp = new stdClass();
+        $resp->user = "User1";
+        $resp->pass = "user1";
+        return $resp;
+    }
+    public static function getUser2Login() {
+        $resp = new stdClass();
+        $resp->user = "User2";
+        $resp->pass = "user2";
         return $resp;
     }
 }
