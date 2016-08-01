@@ -4,6 +4,7 @@
     <title>Cesium </title>
     <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
     <script src="../../assets/ol3-cesium/cesium/Cesium.js"></script>
+    <script src="../../assets/common/js/czinit.js"></script>
     <style>
       @import url(../../assets/ol3-cesium/cesium/Widgets/widgets.css);
       #cesiumContainer {
@@ -37,7 +38,7 @@
   </nav>
   <div id="cesiumContainer"></div>
   <script>
-    var viewer = new Cesium.Viewer('cesiumContainer');
+    var viewer = createViewer('cesiumContainer', '../../assets/ol3-cesium');
     viewer.scene.camera.flyTo({
         destination: Cesium.Cartesian3.fromDegrees(-87.727283, 43.749034, 15000.0)
     });
