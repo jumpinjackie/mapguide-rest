@@ -104,7 +104,15 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
             case "xml":
                 $this->assertXmlContent($resp);
                 break;
+            case "json":
+                $this->assertJsonContent($resp);
+                break;
         }
+    }
+
+    protected function assertJsonContent($response) {
+        $json = json_decode($response->getContent());
+        $this->assertNotNull($json, $response->dump());
     }
 
     protected function assertXmlContent($response) {

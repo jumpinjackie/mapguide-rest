@@ -49,44 +49,54 @@ class EnumerateResourceDataTest extends ServiceTest {
         $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.$extension", "GET", null, "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertMimeType($mimeType, $resp);
+        $this->assertContentKind($resp, $extension);
 
         $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.$extension", "GET", array("depth" => "-1", "type" => "LayerDefinition"), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertMimeType($mimeType, $resp);
+        $this->assertContentKind($resp, $extension);
 
         //Raw credentials
         $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.$extension", "GET", null);
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType($mimeType, $resp);
+        $this->assertContentKind($resp, $extension);
 
         $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.$extension", "GET", array("depth" => "-1", "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType($mimeType, $resp);
+        $this->assertContentKind($resp, $extension);
 
         $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.$extension", "GET", null);
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType($mimeType, $resp);
+        $this->assertContentKind($resp, $extension);
 
         $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.$extension", "GET", array("depth" => "-1", "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType($mimeType, $resp);
+        $this->assertContentKind($resp, $extension);
 
         //Session ID
         $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.$extension", "GET", array("session" => $this->anonymousSessionId));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType($mimeType, $resp);
+        $this->assertContentKind($resp, $extension);
 
         $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.$extension", "GET", array("session" => $this->anonymousSessionId, "depth" => "-1", "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType($mimeType, $resp);
+        $this->assertContentKind($resp, $extension);
 
         $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.$extension", "GET", array("session" => $this->adminSessionId));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType($mimeType, $resp);
+        $this->assertContentKind($resp, $extension);
 
         $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/datalist.$extension", "GET", array("session" => $this->adminSessionId, "depth" => "-1", "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType($mimeType, $resp);
+        $this->assertContentKind($resp, $extension);
     }
     public function testXml() {
         $this->__testBase("xml", Configuration::MIME_XML);
