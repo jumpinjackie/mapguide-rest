@@ -29,6 +29,22 @@
     </target>
 
     <!-- ============================================  -->
+    <!-- Target: unit_test                             -->
+    <!-- ============================================  -->
+    <target name="unit_test">
+        <!-- NOTE: Window-ism -->
+        <exec command="vendor\bin\phpunit test" dir="." logoutput="true" checkReturn="true" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: integration_test                      -->
+    <!-- ============================================  -->
+    <target name="integration_test">
+        <!-- NOTE: Window-ism -->
+        <exec command="vendor\bin\paratest --phpunit vendor\bin\phpunit integration_test" dir="." logoutput="true" checkReturn="true" />
+    </target>
+
+    <!-- ============================================  -->
     <!-- Target: build                                 -->
     <!-- ============================================  -->
     <target name="build" depends="prepare, docgen">
