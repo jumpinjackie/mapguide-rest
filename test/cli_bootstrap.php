@@ -39,6 +39,27 @@ if (!class_exists("MgResourceDataType")) {
     }
 }
 
+function SetupUserTestData($resSvc, $path) {
+    $srcId = new MgResourceIdentifier("Library://Samples/Sheboygan/Data/Parcels.FeatureSource");
+    $dstId = new MgResourceIdentifier("Library://RestUnitTests/$path/Parcels.FeatureSource");
+    $resSvc->CopyResource($srcId, $dstId, true);
+
+    $bsWriteable = new MgByteSource(dirname(__FILE__)."/data/Parcels_Writeable.FeatureSource.xml");
+    $brWriteable = $bsWriteable->GetReader();
+    $resSvc->SetResource($dstId, $brWriteable, null);
+
+    $rdsdfsource = new MgByteSource(dirname(__FILE__)."/data/RedlineLayer.sdf");
+    $rdsdfrdr = $rdsdfsource->GetReader();
+    $resId = new MgResourceIdentifier("Library://RestUnitTests/$path/RedlineLayer.FeatureSource");
+
+    $rdXml = '<?xml version="1.0"?><FeatureSource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="FeatureSource-1.0.0.xsd"><Provider>OSGeo.SDF</Provider><Parameter><Name>File</Name><Value>%MG_DATA_FILE_PATH%RedlineLayer.sdf</Value></Parameter></FeatureSource>';
+    $rdXmlSource = new MgByteSource($rdXml, strlen($rdXml));
+    $rdXmlRdr = $rdXmlSource->GetReader();
+
+    $resSvc->SetResource($resId, $rdXmlRdr, null);
+    $resSvc->SetResourceData($resId, "RedlineLayer.sdf", MgResourceDataType::File, $rdsdfrdr);
+}
+
 //If you changed this, change it here too
 $adminUser = "Administrator";
 $adminPass = "admin";
@@ -120,6 +141,14 @@ try {
     $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
     $resSvc->ApplyResourcePackage($br);
 
+    SetupUserTestData($resSvc, "test_anonymous");
+    SetupUserTestData($resSvc, "test_author");
+    SetupUserTestData($resSvc, "test_administrator");
+    SetupUserTestData($resSvc, "test_wfsuser");
+    SetupUserTestData($resSvc, "test_wmsuser");
+    SetupUserTestData($resSvc, "test_group");
+    SetupUserTestData($resSvc, "test_mixed");
+    /*
     $srcId = new MgResourceIdentifier("Library://Samples/Sheboygan/Data/Parcels.FeatureSource");
     $dstId = new MgResourceIdentifier("Library://RestUnitTests/Parcels.FeatureSource");
     $resSvc->CopyResource($srcId, $dstId, true);
@@ -138,7 +167,7 @@ try {
 
     $resSvc->SetResource($resId, $rdXmlRdr, null);
     $resSvc->SetResourceData($resId, "RedlineLayer.sdf", MgResourceDataType::File, $rdsdfrdr);
-
+    */
     echo "\nTest data loaded. Proceeding with test execution\n\n";
 } catch (MgException $ex) {
     echo $ex->GetDetails();

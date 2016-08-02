@@ -20,7 +20,7 @@
 require_once dirname(__FILE__)."/IntegrationTest.php";
 require_once dirname(__FILE__)."/Config.php";
 
-class RestPublishingTests extends IntegrationTest {
+abstract class RestPublishingTest extends IntegrationTest {
     private $anonymousSessionId;
     private $wfsSessionId;
     private $wmsSessionId;
@@ -91,7 +91,7 @@ class RestPublishingTests extends IntegrationTest {
         $this->assertNotNull($this->user2SessionId);
     }
 
-    private function createInsertPayload($extension, $text, $geom, $session = null) {
+    protected function createInsertPayload($extension, $text, $geom, $session = null) {
         switch ($extension) {
             case "xml":
                 return $this->createInsertXml($text, $geom, $session);
@@ -100,7 +100,7 @@ class RestPublishingTests extends IntegrationTest {
         }
     }
 
-    private function createUpdatePayload($extension, $filter, $text, $geom, $session = null) {
+    protected function createUpdatePayload($extension, $filter, $text, $geom, $session = null) {
         switch ($extension) {
             case "xml":
                 return $this->createUpdateXml($filter, $text, $geom, $session);
@@ -109,7 +109,7 @@ class RestPublishingTests extends IntegrationTest {
         }
     }
 
-    private function createInsertXml($text, $geom, $session = null) {
+    protected function createInsertXml($text, $geom, $session = null) {
         $xml = "<FeatureSet>";
         if ($session != null && $session != "") {
             $xml .= "<SessionID>" . $session . "</SessionID>";
@@ -120,7 +120,7 @@ class RestPublishingTests extends IntegrationTest {
         $xml .= "</Feature></Features></FeatureSet>";
         return $xml;
     }
-    private function createUpdateXml($filter, $text, $geom, $session = null) {
+    protected function createUpdateXml($filter, $text, $geom, $session = null) {
         $xml = "<UpdateOperation>";
         if ($session != null && $session != "") {
             $xml .= "<SessionID>" . $session . "</SessionID>";
@@ -135,7 +135,7 @@ class RestPublishingTests extends IntegrationTest {
         $xml .= "</UpdateOperation>";
         return $xml;
     }
-    private function createInsertJson($text, $geom, $session = null) {
+    protected function createInsertJson($text, $geom, $session = null) {
         $sessionPart = "";
         if ($session != null && $session != "") {
             $sessionPart = "\"SessionID\": \"$session\",\n";
@@ -157,8 +157,7 @@ class RestPublishingTests extends IntegrationTest {
         }";
         return $json;
     }
-
-    private function createUpdateJson($filter, $text, $geom, $session = null) {
+    protected function createUpdateJson($filter, $text, $geom, $session = null) {
         $sessionPart = "";
         if ($session != null && $session != "") {
             $sessionPart = "\"SessionID\": \"$session\",\n";
@@ -182,7 +181,7 @@ class RestPublishingTests extends IntegrationTest {
         return $json;
     }
 
-    private function assertContentKind($resp, $extension) {
+    protected function assertContentKind($resp, $extension) {
         switch ($extension) {
             case "xml":
                 $this->assertXmlContent($resp);
@@ -190,7 +189,7 @@ class RestPublishingTests extends IntegrationTest {
         }
     }
 
-    private function getExpectedStatusCodeForSession($username, $session) {
+    protected function getExpectedStatusCodeForSession($username, $session) {
         switch (strtolower($username)) {
             case "anonymous":
                 return $this->anonymousSessionId === $session ? 200 : 403;
@@ -209,7 +208,7 @@ class RestPublishingTests extends IntegrationTest {
         }
     }
 
-    private function getExpectedStatusCodeForLogin($username, $login) {
+    protected function getExpectedStatusCodeForLogin($username, $login) {
         if (is_string($login)) {
             return (strtolower($username) === strtolower($login)) ? 200 : 403;
         } else {
@@ -217,7 +216,7 @@ class RestPublishingTests extends IntegrationTest {
         }
     }
     
-    private function __testACL($testIds, $extension, $username, $mimeType) {
+    protected function __testACL($testIds, $extension, $username, $mimeType) {
         $testID1 = $testIds[0];
         $testID2 = $testIds[1];
         $testID3 = $testIds[2];
@@ -730,50 +729,9 @@ class RestPublishingTests extends IntegrationTest {
         //Delete - single access - Session ID
     }
 
-    // ------------------------------------------------------------------------------- //
-    //                    T O D O:
-    //
-    // To improve parallel-ism with paratest, the bootstrapper should load the required
-    // datasets to separate directories (hitting the same SDF file with concurrent writes
-    // is not safe) and this class should become a base class from which the specific
-    // ACL tests can derive from
-    // ------------------------------------------------------------------------------- //
-
-    public function testACLAnonymousXml() {
-        $this->__testACL(array(42, 43, 1234), "xml", "anonymous", Configuration::MIME_XML);
-    }
-
-    public function testACLAnonymousJson() {
-        $this->__testACL(array(47, 48, 2345), "json", "anonymous", Configuration::MIME_JSON);
-    }
-
     //public function testACLAdministratorXml() {
     //    $this->__testACL(array(22, 23, 234), "xml", "administrator", Configuration::MIME_XML);
     //}
-
-    public function testACLAuthorXml() {
-        $this->__testACL(array(12, 13, 1134), "xml", "author", Configuration::MIME_XML);
-    }
-
-    public function testACLAuthorJson() {
-        $this->__testACL(array(37, 38, 1345), "json", "author", Configuration::MIME_JSON);
-    }
-
-    public function testACLWfsUserXml() {
-        $this->__testACL(array(52, 53, 1254), "xml", "wfsuser", Configuration::MIME_XML);
-    }
-
-    public function testACLWfsUserJson() {
-        $this->__testACL(array(67, 68, 2645), "json", "wfsuser", Configuration::MIME_JSON);
-    }
-
-    public function testACLWmsUserXml() {
-        $this->__testACL(array(72, 73, 1237), "xml", "wmsuser", Configuration::MIME_XML);
-    }
-
-    public function testACLWmsUserJson() {
-        $this->__testACL(array(87, 88, 2385), "json", "wmsuser", Configuration::MIME_JSON);
-    }
 }
 
 ?>

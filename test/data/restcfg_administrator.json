@@ -1,7 +1,7 @@
 {
     "Source": {
         "Type": "MapGuide",
-        "FeatureSource": "Library://RestUnitTests/Parcels.FeatureSource",
+        "FeatureSource": "Library://RestUnitTests/test_administrator/Parcels.FeatureSource",
         "FeatureClass": "SHP_Schema:Parcels"
     },
     "Representations": {
