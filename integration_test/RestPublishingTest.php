@@ -182,14 +182,6 @@ class RestPublishingTests extends IntegrationTest {
         return $json;
     }
 
-    public function testACLAnonymousXml() {
-        $this->__testACLAnonymous(array(42, 43, 1234), "xml", "anonymous", Configuration::MIME_XML);
-    }
-
-    public function testACLAnonymousJson() {
-        $this->__testACLAnonymous(array(47, 48, 2345), "json", "anonymous", Configuration::MIME_JSON);
-    }
-
     private function assertContentKind($resp, $extension) {
         switch ($extension) {
             case "xml":
@@ -218,13 +210,14 @@ class RestPublishingTests extends IntegrationTest {
     }
 
     private function getExpectedStatusCodeForLogin($username, $login) {
-        if (is_string($login))
+        if (is_string($login)) {
             return (strtolower($username) === strtolower($login)) ? 200 : 403;
-        else
+        } else {
             return (strtolower($username) === strtolower($login->user)) ? 200 : 403;
+        }
     }
     
-    private function __testACLAnonymous($testIds, $extension, $username, $mimeType) {
+    private function __testACL($testIds, $extension, $username, $mimeType) {
         $testID1 = $testIds[0];
         $testID2 = $testIds[1];
         $testID3 = $testIds[2];
@@ -735,6 +728,42 @@ class RestPublishingTests extends IntegrationTest {
 
         //Delete - single access - credentials
         //Delete - single access - Session ID
+    }
+
+    public function testACLAnonymousXml() {
+        $this->__testACL(array(42, 43, 1234), "xml", "anonymous", Configuration::MIME_XML);
+    }
+
+    public function testACLAnonymousJson() {
+        $this->__testACL(array(47, 48, 2345), "json", "anonymous", Configuration::MIME_JSON);
+    }
+
+    //public function testACLAdministratorXml() {
+    //    $this->__testACL(array(22, 23, 234), "xml", "administrator", Configuration::MIME_XML);
+    //}
+
+    public function testACLAuthorXml() {
+        $this->__testACL(array(12, 13, 1134), "xml", "author", Configuration::MIME_XML);
+    }
+
+    public function testACLAuthorJson() {
+        $this->__testACL(array(37, 38, 1345), "json", "author", Configuration::MIME_JSON);
+    }
+
+    public function testACLWfsUserXml() {
+        $this->__testACL(array(52, 53, 1254), "xml", "wfsuser", Configuration::MIME_XML);
+    }
+
+    public function testACLWfsUserJson() {
+        $this->__testACL(array(67, 68, 2645), "json", "wfsuser", Configuration::MIME_JSON);
+    }
+
+    public function testACLWmsUserXml() {
+        $this->__testACL(array(72, 73, 1237), "xml", "wmsuser", Configuration::MIME_XML);
+    }
+
+    public function testACLWmsUserJson() {
+        $this->__testACL(array(87, 88, 2385), "json", "wmsuser", Configuration::MIME_JSON);
     }
 }
 

@@ -141,7 +141,7 @@ class Bootstrap {
             $resSvc->SetResource($resId, $rdXmlRdr, null);
             $resSvc->SetResourceData($resId, "RedlineLayer.sdf", MgResourceDataType::File, $rdsdfrdr);
             
-            echo "Test data loaded. Proceeding with test execution\n";
+            echo "\nTest data loaded. Proceeding with test execution\n\n";
             
             self::$init = true;
         }

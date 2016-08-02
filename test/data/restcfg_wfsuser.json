@@ -23,6 +23,25 @@
                     "AllowUsers": ["WfsUser"]
                 }
             }
+        },
+        "json": {
+            "Adapter": "FeatureSetGeoJson",
+            "Methods": {
+                "GET": {
+                    "PageSize": 100,
+                    "MaxCount": 500,
+                    "AllowUsers": ["WfsUser"]
+                },
+                "POST": {
+                    "AllowUsers": ["WfsUser"]
+                },
+                "PUT": {
+                    "AllowUsers": ["WfsUser"]
+                },
+                "DELETE": {
+                    "AllowUsers": ["WfsUser"]
+                }
+            }
         }
     }
 }

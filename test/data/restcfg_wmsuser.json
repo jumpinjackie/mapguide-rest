@@ -23,6 +23,25 @@
                     "AllowUsers": ["WmsUser"]
                 }
             }
+        },
+        "json": {
+            "Adapter": "FeatureSetGeoJson",
+            "Methods": {
+                "GET": {
+                    "PageSize": 100,
+                    "MaxCount": 500,
+                    "AllowUsers": ["WmsUser"]
+                },
+                "POST": {
+                    "AllowUsers": ["WmsUser"]
+                },
+                "PUT": {
+                    "AllowUsers": ["WmsUser"]
+                },
+                "DELETE": {
+                    "AllowUsers": ["WmsUser"]
+                }
+            }
         }
     }
 }
