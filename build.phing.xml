@@ -41,7 +41,7 @@
     <!-- ============================================  -->
     <target name="integration_test">
         <!-- NOTE: Window-ism -->
-        <exec command="vendor\bin\paratest --phpunit vendor\bin\phpunit integration_test" dir="." logoutput="true" checkReturn="true" />
+        <exec command="vendor\bin\paratest --bootstrap test\cli_bootstrap.php --phpunit vendor\bin\phpunit integration_test" dir="." logoutput="true" checkReturn="true" />
     </target>
 
     <!-- ============================================  -->

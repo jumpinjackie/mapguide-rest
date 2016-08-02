@@ -19,20 +19,9 @@
 
 require_once dirname(__FILE__)."/Config.php";
 require_once dirname(__FILE__)."/ApiResponse.php";
-require_once dirname(__FILE__)."/Bootstrap.php";
 
 abstract class IntegrationTest extends PHPUnit_Framework_TestCase
 {
-    public static function setUpBeforeClass()
-    {
-        Bootstrap::run();
-    }
-
-    public static function tearDownAfterClass()
-    {
-        
-    }
-
     protected function apiTestAnon($url, $type, $data) {
         return $this->apiTestWithCredentials($url, $type, $data, "Anonymous", "");
     }

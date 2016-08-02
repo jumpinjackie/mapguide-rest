@@ -730,6 +730,15 @@ class RestPublishingTests extends IntegrationTest {
         //Delete - single access - Session ID
     }
 
+    // ------------------------------------------------------------------------------- //
+    //                    T O D O:
+    //
+    // To improve parallel-ism with paratest, the bootstrapper should load the required
+    // datasets to separate directories (hitting the same SDF file with concurrent writes
+    // is not safe) and this class should become a base class from which the specific
+    // ACL tests can derive from
+    // ------------------------------------------------------------------------------- //
+
     public function testACLAnonymousXml() {
         $this->__testACL(array(42, 43, 1234), "xml", "anonymous", Configuration::MIME_XML);
     }
