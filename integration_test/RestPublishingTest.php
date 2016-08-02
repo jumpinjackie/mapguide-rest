@@ -90,7 +90,7 @@ class RestPublishingTests extends IntegrationTest {
         $this->assertNotNull($this->user1SessionId);
         $this->assertNotNull($this->user2SessionId);
     }
-    private function createInsertXml($text, $geom, $session) {
+    private function createInsertXml($text, $geom, $session = null) {
         $xml = "<FeatureSet>";
         if ($session != null && $session != "") {
             $xml .= "<SessionID>" . $session . "</SessionID>";
@@ -99,9 +99,9 @@ class RestPublishingTests extends IntegrationTest {
         $xml .= "<Property><Name>RNAME</Name><Value>" . $text . "</Value></Property>";
         $xml .= "<Property><Name>SHPGEOM</Name><Value>" . $geom . "</Value></Property>";
         $xml .= "</Feature></Features></FeatureSet>";
-        return xml;
+        return $xml;
     }
-    private function createUpdateXml($filter, $text, $geom, $session) {
+    private function createUpdateXml($filter, $text, $geom, $session = null) {
         $xml = "<UpdateOperation>";
         if ($session != null && $session != "") {
             $xml .= "<SessionID>" . $session . "</SessionID>";
@@ -114,9 +114,9 @@ class RestPublishingTests extends IntegrationTest {
         $xml .= "<Property><Name>SHPGEOM</Name><Value>" . $geom . "</Value></Property>";
         $xml .= "</UpdateProperties>";
         $xml .= "</UpdateOperation>";
-        return xml;
+        return $xml;
     }
-    private function createInsertJson($text, $geom, $session) {
+    private function createInsertJson($text, $geom, $session = null) {
         $sessionPart = "";
         if (typeof(session) != 'undefined' && session != null && session != "") {
             $sessionPart = "\"SessionID\": $session,\n";
@@ -335,6 +335,52 @@ class RestPublishingTests extends IntegrationTest {
         $this->assertMimeType(Configuration::MIME_XML, $resp);
 
         //Insert - Credentials
+        $resp = $this->apiTestWithCredentials("/data/test_anonymous/.xml", "POST", $this->createInsertXml("invalid credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Foo", "Bar");
+        $this->assertEquals(401, $resp->getStatusCode());
+        $this->assertXmlContent($resp);
+        $this->assertMimeType(Configuration::MIME_XML, $resp);
+
+        $resp = $this->apiTestWithCredentials("/data/test_anonymous/.xml", "POST", $this->createInsertXml("anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), "Anonymous", "");
+        $this->assertEquals(200, $resp->getStatusCode());
+        $this->assertXmlContent($resp);
+        $this->assertMimeType(Configuration::MIME_XML, $resp);
+
+        $login = Configuration::getAdminLogin();
+        $resp = $this->apiTestWithCredentials("/data/test_anonymous/.xml", "POST", $this->createInsertXml("admin credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), $login->user, $login->pass);
+        $this->assertEquals(403, $resp->getStatusCode());
+        $this->assertXmlContent($resp);
+        $this->assertMimeType(Configuration::MIME_XML, $resp);
+
+        $login = Configuration::getWfsLogin();
+        $resp = $this->apiTestWithCredentials("/data/test_anonymous/.xml", "POST", $this->createInsertXml("wfsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), $login->user, $login->pass);
+        $this->assertEquals(403, $resp->getStatusCode());
+        $this->assertXmlContent($resp);
+        $this->assertMimeType(Configuration::MIME_XML, $resp);
+
+        $login = Configuration::getWmsLogin();
+        $resp = $this->apiTestWithCredentials("/data/test_anonymous/.xml", "POST", $this->createInsertXml("wmsuser credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), $login->user, $login->pass);
+        $this->assertEquals(403, $resp->getStatusCode());
+        $this->assertXmlContent($resp);
+        $this->assertMimeType(Configuration::MIME_XML, $resp);
+
+        $login = Configuration::getAuthorLogin();
+        $resp = $this->apiTestWithCredentials("/data/test_anonymous/.xml", "POST", $this->createInsertXml("author credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), $login->user, $login->pass);
+        $this->assertEquals(403, $resp->getStatusCode());
+        $this->assertXmlContent($resp);
+        $this->assertMimeType(Configuration::MIME_XML, $resp);
+
+        $login = Configuration::getUser1Login();
+        $resp = $this->apiTestWithCredentials("/data/test_anonymous/.xml", "POST", $this->createInsertXml("user1 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), $login->user, $login->pass);
+        $this->assertEquals(403, $resp->getStatusCode());
+        $this->assertXmlContent($resp);
+        $this->assertMimeType(Configuration::MIME_XML, $resp);
+
+        $login = Configuration::getUser2Login();
+        $resp = $this->apiTestWithCredentials("/data/test_anonymous/.xml", "POST", $this->createInsertXml("user2 credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))"), $login->user, $login->pass);
+        $this->assertEquals(403, $resp->getStatusCode());
+        $this->assertXmlContent($resp);
+        $this->assertMimeType(Configuration::MIME_XML, $resp);
+
         //Insert - Session ID
         //Update - Credentials
         //Update - Session ID

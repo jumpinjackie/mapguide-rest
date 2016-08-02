@@ -18,6 +18,7 @@
 //
 
 require_once dirname(__FILE__)."/Config.php";
+require_once dirname(__FILE__)."/ApiResponse.php";
 
 abstract class IntegrationTest extends PHPUnit_Framework_TestCase
 {
@@ -42,57 +43,50 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
             $type = "POST";
         
         $absUrl = Configuration::getRestUrl($url);
-        if ($type == "POST") {
-            $request = new Buzz\Message\Form\FormRequest($type);
-            if (is_array($data)) {
-                $fields = array();
-                foreach ($data as $key => $value) {
-                    $fields[$key] = $value;
+
+        if ($type == "GET") {
+            //form the http request for GET requests
+            //encode all non-alphanumeric characters except -_
+            if (is_array($data))
+            {
+                $absUrl .= "?";
+                foreach ($data as $param => $value)
+                {
+                    $absUrl .= $param."=".urlencode($value)."&";
                 }
-                $request->setFields($fields);
-            }
-            $request->fromUrl($absUrl);
-        } else { //GET
-            $request = new Buzz\Message\Request($type);
-            $pairs = array();
-            if (is_array($data)) {
-                foreach ($data as $key => $value) {
-                    array_push($pairs, "$key=$value");
-                }
-            }
-            if (count($pairs) > 0) {
-                $request->fromUrl($absUrl . "?" . implode("&", $pairs));
-            } else {
-                $request->fromUrl($absUrl);
             }
         }
 
+        $curl = curl_init($absUrl);
+        curl_setopt($curl, CURLOPT_HTTPGET, true);
+        $headers = array();
         if ($origType == "PUT")
-            $request->addHeader("X-HTTP-Method-Override: PUT");
+            $headers[] = "X-HTTP-Method-Override: PUT";
         else if ($origType == "DELETE")
-            $request->addHeader("X-HTTP-Method-Override: DELETE");
-        $request->addHeader("x-mapguide-test-harness: true");
-        $auth = "Basic ";
+            $headers[] = "X-HTTP-Method-Override: DELETE";
+        $headers[] = "x-mapguide-test-harness: true";
         if ($username != null) {
-            $auth .= base64_encode($username.":".$password);
+            curl_setopt($curl, CURLOPT_USERPWD, $username . ":" . $password);
         }
-        
-        $request->addHeader("Authorization: $auth");
-        $response = new Buzz\Message\Response();
-        //echo "*** $auth (".strlen($auth).")\n";
-        $client = new Buzz\Client\Curl();
-        /*
-        echo "\n===================== BEGIN REQUEST =========================\n";
-        echo $request;
-        echo "\n====================== END REQUEST ==========================\n";
-        */
-        $client->send($request, $response);
-        /*
-        echo "\n===================== BEGIN RESPONSE =========================\n";
-        echo $response;
-        echo "\n====================== END RESPONSE ==========================\n";
-        */
-        return $response;
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        if ($type == "POST") {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        }
+
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($curl);
+
+        //echo "**** $type ($origType) $absUrl\n";
+        //echo "======================= BEGIN RESPONSE =========================\n$response\n";
+        //echo "======================== END RESPONSE ==========================\n";
+
+        $contentType = curl_getinfo($curl, CURLINFO_CONTENT_TYPE);
+        $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        return new ApiResponse($status, $contentType, $response);
     }
 
     protected function assertXmlContent($response) {
@@ -100,15 +94,7 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
     }
 
     protected function assertMimeType($expectedMime, $response) {
-        $headers = $response->getHeaders();
-        foreach ($headers as $hdr) {
-            if (strpos($hdr, "Content-Type") === FALSE) {
-                continue;
-            }
-            $this->assertContains($expectedMime, $hdr);
-            return;
-        }
-        $this->fail("No Content-Type found in response");
+        $this->assertContains($expectedMime, $response->getContentType());
     }
 }
 
