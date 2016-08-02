@@ -21,14 +21,29 @@ class ApiResponse {
     private $contentType;
     private $content;
     private $status;
-    public function __construct($status, $contentType, $content) {
+    private $url;
+    private $headers;
+    private $method;
+    private $reqData;
+    public function __construct($status, $contentType, $content, $url, $headers, $method, $reqData) {
         $this->contentType = $contentType;
         $this->content = $content;
         $this->status = $status;
+        $this->url = $url;
+        $this->headers = $headers;
+        $this->method = $method;
+        $this->reqData = $reqData;
     }
+    public function getRequestMethod() { return $this->method; }
+    public function getRequestUrl() { return $this->url; }
+    public function getRequestHeaders() { return $this->headers; }
     public function getContentType() { return $this->contentType; }
     public function getStatusCode() { return $this->status; }
     public function getContent() { return $this->content; }
+
+    public function dump() {
+        return "Action: ".$this->getRequestMethod()." ".$this->url."\nRequest: ".var_export($this->reqData, true)."\nContent Type: ".$this->contentType."\nResponse was:\n".$this->content;
+    }
 }
 
 ?>

@@ -19,9 +19,20 @@
 
 require_once dirname(__FILE__)."/Config.php";
 require_once dirname(__FILE__)."/ApiResponse.php";
+require_once dirname(__FILE__)."/Bootstrap.php";
 
 abstract class IntegrationTest extends PHPUnit_Framework_TestCase
 {
+    public static function setUpBeforeClass()
+    {
+        Bootstrap::run();
+    }
+
+    public static function tearDownAfterClass()
+    {
+        
+    }
+
     protected function apiTestAnon($url, $type, $data) {
         return $this->apiTestWithCredentials($url, $type, $data, "Anonymous", "");
     }
@@ -86,7 +97,7 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
         $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
-        return new ApiResponse($status, $contentType, $response);
+        return new ApiResponse($status, $contentType, $response, $absUrl, $headers, $origType, $data);
     }
 
     protected function assertXmlContent($response) {
@@ -95,6 +106,14 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
 
     protected function assertMimeType($expectedMime, $response) {
         $this->assertContains($expectedMime, $response->getContentType());
+    }
+
+    protected function assertStatusCodeIs($code, $resp) {
+        $this->assertEquals($code, $resp->getStatusCode(), $resp->dump());
+    }
+
+    protected function assertStatusCodeIsNot($code, $resp) {
+        $this->assertNotEquals($code, $resp->getStatusCode(), $resp->dump());
     }
 }
 

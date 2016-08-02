@@ -19,12 +19,19 @@
 
 class Configuration {
     const MIME_XML = "text/xml";
+    const MIME_JSON = "application/json";
     public static function getRestUrl($relPart) {
         $root = "http://localhost/mapguide/rest";
         if (array_key_exists("MG_REST_ROOT_URL", $_SERVER)) {
             $root = $_SERVER["MG_REST_ROOT_URL"];
         }
         return $root . $relPart;
+    }
+    public static function getAnonLogin() {
+        $resp = new stdClass();
+        $resp->user = "Anonymous";
+        $resp->pass = "";
+        return $resp;
     }
     public static function getAdminLogin() {
         $resp = new stdClass();
