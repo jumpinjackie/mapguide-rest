@@ -40,6 +40,7 @@ if (!class_exists("MgResourceDataType")) {
 }
 
 function SetupUserTestData($resSvc, $path) {
+    echo "Setting up test data under: Library://RestUnitTests/$path/\n";
     $srcId = new MgResourceIdentifier("Library://Samples/Sheboygan/Data/Parcels.FeatureSource");
     $dstId = new MgResourceIdentifier("Library://RestUnitTests/$path/Parcels.FeatureSource");
     $resSvc->CopyResource($srcId, $dstId, true);
@@ -141,6 +142,14 @@ try {
     $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
     $resSvc->ApplyResourcePackage($br);
 
+    echo "\n\n";
+
+    $rootFolder = new MgResourceIdentifier("Library://RestUnitTests/");
+    if ($resSvc->ResourceExists($rootFolder)) {
+        echo "Removing root repository folder from a previous run\n";
+        $resSvc->DeleteResource($rootFolder);
+    }
+
     SetupUserTestData($resSvc, "test_anonymous");
     SetupUserTestData($resSvc, "test_author");
     SetupUserTestData($resSvc, "test_administrator");
@@ -168,11 +177,11 @@ try {
     $resSvc->SetResource($resId, $rdXmlRdr, null);
     $resSvc->SetResourceData($resId, "RedlineLayer.sdf", MgResourceDataType::File, $rdsdfrdr);
     */
-    echo "\nTest data loaded. Proceeding with test execution\n\n";
+    echo "Test data loaded. Proceeding with test execution\n\n";
 } catch (MgException $ex) {
     echo $ex->GetDetails();
     echo $ex->getTraceAsString();
-    echo "\nWARNING: An exception was thrown while setting up the test data. If any tests fail, this may be the cause\n\n";
+    echo "WARNING: An exception was thrown while setting up the test data. If any tests fail, this may be the cause\n\n";
 }
 
 ?>

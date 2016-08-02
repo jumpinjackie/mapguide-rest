@@ -17,14 +17,14 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 require_once dirname(__FILE__)."/RestPublishingTest.php";
-require_once dirname(__FILE__)."/Config.php";
+require_once dirname(__FILE__)."/../Config.php";
 
-class RestAclWmsUserTest extends RestPublishingTest {
+class RestAclWfsUserTest extends RestPublishingTest {
     public function testXml() {
-        $this->__testACL(array(72, 73, 1237), "xml", "wmsuser", Configuration::MIME_XML);
+        $this->__testACL(array(52, 53, 1254), "xml", "wfsuser", Configuration::MIME_XML);
     }
     public function testJson() {
-        $this->__testACL(array(87, 88, 2385), "json", "wmsuser", Configuration::MIME_JSON);
+        $this->__testACL(array(67, 68, 2645), "json", "wfsuser", Configuration::MIME_JSON);
     }
 }
 

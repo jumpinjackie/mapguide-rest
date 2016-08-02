@@ -17,8 +17,8 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-require_once dirname(__FILE__)."/IntegrationTest.php";
-require_once dirname(__FILE__)."/Config.php";
+require_once dirname(__FILE__)."/../IntegrationTest.php";
+require_once dirname(__FILE__)."/../Config.php";
 
 abstract class RestPublishingTest extends IntegrationTest {
     private $anonymousSessionId;
@@ -80,15 +80,6 @@ abstract class RestPublishingTest extends IntegrationTest {
         $resp = $this->apiTest("/session/".$this->user2SessionId, "DELETE", null);
         $this->assertStatusCodeIs(200, $resp);
         $this->user2SessionId = null;
-    }
-    public function testHasIds() {
-        $this->assertNotNull($this->anonymousSessionId);
-        $this->assertNotNull($this->wfsSessionId);
-        $this->assertNotNull($this->wmsSessionId);
-        $this->assertNotNull($this->authorSessionId);
-        $this->assertNotNull($this->adminSessionId);
-        $this->assertNotNull($this->user1SessionId);
-        $this->assertNotNull($this->user2SessionId);
     }
 
     protected function createInsertPayload($extension, $text, $geom, $session = null) {
@@ -179,14 +170,6 @@ abstract class RestPublishingTest extends IntegrationTest {
             }
         }";
         return $json;
-    }
-
-    protected function assertContentKind($resp, $extension) {
-        switch ($extension) {
-            case "xml":
-                $this->assertXmlContent($resp);
-                break;
-        }
     }
 
     protected function getExpectedStatusCodeForSession($username, $session) {

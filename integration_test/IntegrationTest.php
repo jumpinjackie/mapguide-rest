@@ -20,6 +20,10 @@
 require_once dirname(__FILE__)."/Config.php";
 require_once dirname(__FILE__)."/ApiResponse.php";
 
+/**
+ * This is the base class of all our integration tests. Provides common boilerplates and
+ * functions for integration tests to use.
+ */
 abstract class IntegrationTest extends PHPUnit_Framework_TestCase
 {
     protected function apiTestAnon($url, $type, $data) {
@@ -83,10 +87,24 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
         //echo "======================== END RESPONSE ==========================\n";
 
         $contentType = curl_getinfo($curl, CURLINFO_CONTENT_TYPE);
+
+        //Huh? Must be a bug in curl or PHP's wrapper
+        if ($contentType == "html") {
+            $contentType = Configuration::MIME_HTML;
+        }
+
         $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
         return new ApiResponse($status, $contentType, $response, $absUrl, $headers, $origType, $data);
+    }
+
+    protected function assertContentKind($resp, $extension) {
+        switch ($extension) {
+            case "xml":
+                $this->assertXmlContent($resp);
+                break;
+        }
     }
 
     protected function assertXmlContent($response) {
@@ -94,7 +112,7 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
     }
 
     protected function assertMimeType($expectedMime, $response) {
-        $this->assertContains($expectedMime, $response->getContentType());
+        $this->assertContains($expectedMime, $response->getContentType(), $response->dump());
     }
 
     protected function assertStatusCodeIs($code, $resp) {
