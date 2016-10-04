@@ -601,6 +601,7 @@ class MgXmlSchemaInfo
         $type = self::GetXmlType($parent, "/@" . $domAttr->name);
         $result = null;
         $text = addslashes($domAttr->value);
+        $text = str_replace("\n", "\\n", $text);
         switch($type)
         {
             case self::XML_DATA_TYPE_BOOLEAN:
@@ -644,6 +645,7 @@ class MgXmlSchemaInfo
         /* text node, just return content */
         $text = trim($domElement->textContent);
         $text = addslashes($text);
+        $text = str_replace("\n", "\\n", $text);
         switch($type)
         {
             case self::XML_DATA_TYPE_BOOLEAN:
