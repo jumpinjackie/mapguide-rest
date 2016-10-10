@@ -694,7 +694,7 @@ class MgUtils
                             {
                                 if ($bNull) {
                                     $dtVal = new MgDateTimeProperty($name, null);
-                                    $dtVal>SetNull(true);
+                                    $dtVal->SetNull(true);
                                 } else {
                                     //We're expecting this: YYYY-MM-DD HH:mm:ss
                                     $dtMajorParts = explode(" ", $value);
