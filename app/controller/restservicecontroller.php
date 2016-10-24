@@ -91,9 +91,10 @@ class MgRestServiceController extends MgBaseController {
 
     public function CreateSession($format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $mimeType = $this->GetMimeTypeForFormat($format);
         try {
             $this->TrySetCredentialsFromRequest($this->app->request);
-            $this->EnsureAuthenticationForSite();
+            $this->EnsureAuthenticationForSite("", false, $mimeType);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
             $site = $siteConn->GetSite();
@@ -101,14 +102,10 @@ class MgRestServiceController extends MgBaseController {
 
             $this->app->response->setStatus(201);
             $body = MgBoxedValue::String($session, $fmt);
-            if ($fmt == "xml") {
-                $this->app->response->header("Content-Type", MgMimeType::Xml);
-            } else {
-                $this->app->response->header("Content-Type", MgMimeType::Json);
-            }
+            $this->app->response->header("Content-Type", $mimeType);
             $this->app->response->setBody($body);
         } catch (MgException $ex) {
-            $this->OnException($ex, $this->GetMimeTypeForFormat($format));
+            $this->OnException($ex, $mimeType);
         }
     }
 
