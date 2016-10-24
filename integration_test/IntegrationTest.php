@@ -96,7 +96,11 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
         $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
-        return new ApiResponse($status, $contentType, $response, $absUrl, $headers, $origType, $data);
+        $apiResponse = new ApiResponse($status, $contentType, $response, $absUrl, $headers, $origType, $data);
+        if ($origType == "PUT" || $origType == "DELETE") {
+            $apiResponse->setOverrideMethod($origType);
+        }
+        return $apiResponse;
     }
 
     protected function assertContentKind($resp, $extension) {

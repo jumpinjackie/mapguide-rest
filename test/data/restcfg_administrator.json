@@ -23,6 +23,25 @@
                     "AllowUsers": ["Administrator"]
                 }
             }
+        },
+        "json": {
+            "Adapter": "FeatureSetGeoJson",
+            "Methods": {
+                "GET": {
+                    "PageSize": 100,
+                    "MaxCount": 500,
+                    "AllowUsers": ["Administrator"]
+                },
+                "POST": {
+                    "AllowUsers": ["Administrator"]
+                },
+                "PUT": {
+                    "AllowUsers": ["Administrator"]
+                },
+                "DELETE": {
+                    "AllowUsers": ["Administrator"]
+                }
+            }
         }
     }
 }
