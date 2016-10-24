@@ -51,38 +51,39 @@ class MgSiteAdminController extends MgBaseController {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $sessionId = $this->app->request->params("session");
+        $mimeType = $this->GetMimeTypeForFormat($format);
         try {
-            $this->EnsureAuthenticationForSite($sessionId, false, $this->GetMimeTypeForFormat($format));
+            $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
+            //WTF?: MgServerAdmin::Open will happily work with bogus credentials????
+            //HACK: Check with a MgSiteConnection first
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
             $admin = new MgServerAdmin();
             $admin->Open($this->userInfo);
             $status = $admin->GetSiteStatus();
-
-            $mimeType = MgMimeType::Xml;
-            if ($fmt === "json") {
-                $mimeType = MgMimeType::Json;
-            }
             $this->OutputMgPropertyCollection($status, $mimeType);
         } catch (MgException $ex) {
-            $this->OnException($ex, $this->GetMimeTypeForFormat($format));
+            $this->OnException($ex, $mimeType);
         }
     }
 
     public function GetSiteVersion($format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $mimeType = $this->GetMimeTypeForFormat($format);
         try {
-            $this->EnsureAuthenticationForSite();
+            $this->EnsureAuthenticationForSite("", false, $mimeType);
+            //WTF?: MgServerAdmin::Open will happily work with bogus credentials????
+            $siteConn = new MgSiteConnection();
+            $siteConn->Open($this->userInfo);
+            //HACK: Check with a MgSiteConnection first
             $admin = new MgServerAdmin();
             $admin->Open($this->userInfo);
             $body = MgBoxedValue::String($admin->GetSiteVersion(), $fmt);
-            if ($fmt == "xml") {
-                $this->app->response->header("Content-Type", MgMimeType::Xml);
-            } else {
-                $this->app->response->header("Content-Type", MgMimeType::Json);
-            }
+            $this->app->response->header("Content-Type", $mimeType);
             $this->app->response->setBody($body);
         } catch (MgException $ex) {
-            $this->OnException($ex);
+            $this->OnException($ex, $mimeType);
         }
     }
 
@@ -129,11 +130,11 @@ class MgSiteAdminController extends MgBaseController {
 
     public function EnumerateGroupsForUser($userName, $format) {
         $sessionId = $this->app->request->params("session");
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $mimeType = $this->GetMimeTypeForFormat($format);
         try {
-            //Check for unsupported representations
-            $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
-
-            $this->EnsureAuthenticationForSite($sessionId, false, $this->GetMimeTypeForFormat($format));
+            $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
@@ -142,7 +143,7 @@ class MgSiteAdminController extends MgBaseController {
                 $user = $site->GetUserForSession();
                 //Hmmm. Should we allow Anonymous to discover its own roles?
                 if($user === "Anonymous" && $userName !== "Anonymous") {
-                    $this->Unauthorized($this->GetMimeTypeForFormat($format));
+                    $this->Unauthorized($mimeType);
                 }
             } catch (MgException $ex) {
                 //Could happen if we have non-anonymous credentials in the http authentication header
@@ -155,17 +156,17 @@ class MgSiteAdminController extends MgBaseController {
                 $this->OutputByteReader($content);
             }
         } catch (MgException $ex) {
-            $this->OnException($ex, $this->GetMimeTypeForFormat($format));
+            $this->OnException($ex, $mimeType);
         }
     }
 
     public function EnumerateRolesForUser($userName, $format) {
         $sessionId = $this->app->request->params("session");
+        //Check for unsupported representations
+        $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
+        $mimeType = $this->GetMimeTypeForFormat($format);
         try {
-            //Check for unsupported representations
-            $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
-
-            $this->EnsureAuthenticationForSite($sessionId, false, $this->GetMimeTypeForFormat($format));
+            $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
@@ -174,21 +175,17 @@ class MgSiteAdminController extends MgBaseController {
                 $user = $site->GetUserForSession();
                 //Hmmm. Should we allow Anonymous to discover its own roles?
                 if($user === "Anonymous" && $userName !== "Anonymous") {
-                    $this->Unauthorized($this->GetMimeTypeForFormat($format));
+                    $this->Unauthorized($mimeType);
                 }
             } catch (MgException $ex) {
                 //Could happen if we have non-anonymous credentials in the http authentication header
             }
 
             $content = $site->EnumerateRoles($userName);
-            $mimeType = MgMimeType::Xml;
-            if ($fmt === "json") {
-                $mimeType = MgMimeType::Json;
-            } 
             $this->app->response->header("Content-Type", $mimeType);
             $this->OutputMgStringCollection($content, $mimeType);
         } catch (MgException $ex) {
-            $this->OnException($ex, $this->GetMimeTypeForFormat($format));
+            $this->OnException($ex, $mimeType);
         }
     }
 }
