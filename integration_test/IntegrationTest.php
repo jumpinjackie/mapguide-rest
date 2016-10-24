@@ -51,7 +51,7 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
         if ($type == "GET") {
             //form the http request for GET requests
             //encode all non-alphanumeric characters except -_
-            if (is_array($data))
+            if (is_array($data) && count($data) > 0)
             {
                 $absUrl .= "?";
                 foreach ($data as $param => $value)
@@ -81,6 +81,10 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
+        if ($response === false) {
+            $err = curl_error($curl);
+            throw new Exception("Curl Error: $err");
+        }
 
         //echo "**** $type ($origType) $absUrl\n";
         //echo "======================= BEGIN RESPONSE =========================\n$response\n";

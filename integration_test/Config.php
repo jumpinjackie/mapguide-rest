@@ -26,7 +26,7 @@ class Configuration {
         if (array_key_exists("MG_REST_ROOT_URL", $_SERVER)) {
             $root = $_SERVER["MG_REST_ROOT_URL"];
         }
-        return $root . $relPart;
+        return $root . str_replace(" ", "%20", $relPart);
     }
     public static function getAnonLogin() {
         $resp = new stdClass();
