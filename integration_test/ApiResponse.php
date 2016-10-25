@@ -49,12 +49,11 @@ class ApiResponse {
     public function getOverrideMethod() { return $this->ovMethod; }
 
     private function dumpContent() {
-        switch ($this->contentType) {
-            case Configuration::MIME_XML:
-            case Configuration::MIME_KML:
-            case Configuration::MIME_JSON:
-            case Configuration::MIME_HTML:
-                return $this->content;
+        if (strpos($this->contentType, Configuration::MIME_XML) >= 0 ||
+            strpos($this->contentType, Configuration::MIME_KML) >= 0 ||
+            strpos($this->contentType, Configuration::MIME_JSON) >= 0 ||
+            strpos($this->contentType, Configuration::MIME_HTML) >= 0) {
+            return $this->content;
         }
         return "<non-textual content>";
     }
