@@ -79,6 +79,7 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
             curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
         }
 
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true); //We want to test against final status if redirected
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
         if ($response === false) {

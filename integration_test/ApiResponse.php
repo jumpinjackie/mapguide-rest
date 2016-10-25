@@ -51,6 +51,7 @@ class ApiResponse {
     private function dumpContent() {
         switch ($this->contentType) {
             case Configuration::MIME_XML:
+            case Configuration::MIME_KML:
             case Configuration::MIME_JSON:
             case Configuration::MIME_HTML:
                 return $this->content;

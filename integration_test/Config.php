@@ -26,6 +26,7 @@ class Configuration {
     const MIME_GIF = "image/gif";
     const MIME_DWF = "model/vnd.dwf";
     const MIME_PDF = "application/pdf";
+    const MIME_KML = "application/vnd.google-earth.kml+xml";
     public static function getRestUrl($relPart) {
         $root = "http://localhost/mapguide/rest";
         if (array_key_exists("MG_REST_ROOT_URL", $_SERVER)) {
