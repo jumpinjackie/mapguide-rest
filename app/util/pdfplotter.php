@@ -790,7 +790,7 @@ class MgPdfPlotter
             $mExt = $this->DrawExtentCS($legendWidthIn);
         }
         
-        $this->app->response->header("Content-Type", "application/pdf");
+        //NOTE: TCPDF will output the Content-Type header, so we don't need to do it ourselves
         $mode = 'I';
         $name = 'Map.pdf';
         if (strlen($this->title) > 0)

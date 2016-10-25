@@ -24,6 +24,8 @@ class Configuration {
     const MIME_PNG = "image/png";
     const MIME_JPEG = "image/jpeg";
     const MIME_GIF = "image/gif";
+    const MIME_DWF = "model/vnd.dwf";
+    const MIME_PDF = "application/pdf";
     public static function getRestUrl($relPart) {
         $root = "http://localhost/mapguide/rest";
         if (array_key_exists("MG_REST_ROOT_URL", $_SERVER)) {

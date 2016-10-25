@@ -17,6 +17,8 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+require_once dirname(__FILE__)."/Config.php";
+
 class ApiResponse {
     private $contentType;
     private $content;
@@ -46,8 +48,18 @@ class ApiResponse {
     public function setOverrideMethod($method) { $this->ovMethod = $method; }
     public function getOverrideMethod() { return $this->ovMethod; }
 
+    private function dumpContent() {
+        switch ($this->contentType) {
+            case Configuration::MIME_XML:
+            case Configuration::MIME_JSON:
+            case Configuration::MIME_HTML:
+                return $this->content;
+        }
+        return "<non-textual content>";
+    }
+
     public function dump() {
-        return "Action: ".$this->getRequestMethod().($this->ovMethod != null ? " (Ov: ".$this->ovMethod.")" : "")." ".$this->url."\nRequest: ".var_export($this->reqData, true)."\nContent Type: ".$this->contentType."\nResponse was:\n".$this->content;
+        return "Action: ".$this->getRequestMethod().($this->ovMethod != null ? " (Ov: ".$this->ovMethod.")" : "")." ".$this->url."\nRequest: ".var_export($this->reqData, true)."\nContent Type: ".$this->contentType."\nResponse was:\n".$this->dumpContent();
     }
 }
 
