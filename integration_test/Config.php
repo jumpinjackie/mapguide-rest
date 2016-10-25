@@ -21,6 +21,9 @@ class Configuration {
     const MIME_XML = "text/xml";
     const MIME_JSON = "application/json";
     const MIME_HTML = "text/html";
+    const MIME_PNG = "image/png";
+    const MIME_JPEG = "image/jpeg";
+    const MIME_GIF = "image/gif";
     public static function getRestUrl($relPart) {
         $root = "http://localhost/mapguide/rest";
         if (array_key_exists("MG_REST_ROOT_URL", $_SERVER)) {
