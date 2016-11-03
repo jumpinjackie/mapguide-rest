@@ -95,34 +95,155 @@ class MgMappingServiceController extends MgBaseController {
         if ($xmldoc != null) {
             $type = 0;
             $scaleRanges = $xmldoc->getElementsByTagName('VectorScaleRange');
-            if($scaleRanges->length == 0) {
-                $scaleRanges = $xmldoc->getElementsByTagName('GridScaleRange');
-                if($scaleRanges->length == 0) {
-                    $scaleRanges = $xmldoc->getElementsByTagName('DrawingLayerDefinition');
-                    if($scaleRanges->length == 1) {
+            $gridRanges = null;
+            $drawLayerDef = null;
+            if ($scaleRanges->length == 0) { //No vector scale ranges
+                $gridRanges = $xmldoc->getElementsByTagName('GridScaleRange');
+                if ($gridRanges->length == 0) { //No grid scale ranges
+                    $drawLayerDef = $xmldoc->getElementsByTagName('DrawingLayerDefinition');
+                    if ($drawLayerDef->length == 1) { //Found a DrawingLayerDefinition
                         $type = 2;
                     }
                 } else {
                     $type = 1;
                 }
             }
-            $typeStyles = array("PointTypeStyle", "LineTypeStyle", "AreaTypeStyle", "CompositeTypeStyle");
-            $ruleNames = array("PointRule", "LineRule", "AreaRule", "CompositeRule");
-            for($sc = 0; $sc < $scaleRanges->length; $sc++)
-            {
-                $scaleRange = $scaleRanges->item($sc);
-                $minElt = $scaleRange->getElementsByTagName('MinScale');
-                $maxElt = $scaleRange->getElementsByTagName('MaxScale');
+            if ($type == 0) { //Vector
+                $typeStyles = array("PointTypeStyle", "LineTypeStyle", "AreaTypeStyle", "CompositeTypeStyle");
+                $ruleNames = array("PointRule", "LineRule", "AreaRule", "CompositeRule");
+                for($sc = 0; $sc < $scaleRanges->length; $sc++)
+                {
+                    $scaleRange = $scaleRanges->item($sc);
+                    $minElt = $scaleRange->getElementsByTagName('MinScale');
+                    $maxElt = $scaleRange->getElementsByTagName('MaxScale');
+                    $minScale = "0";
+                    $maxScale = 'infinity';  // as MDF's VectorScaleRange::MAX_MAP_SCALE
+                    if($minElt->length > 0)
+                        $minScale = $minElt->item(0)->nodeValue;
+                    if($maxElt->length > 0)
+                        $maxScale = $maxElt->item(0)->nodeValue;
+
+                    if ($type != 0) {
+                        break;
+                    }
+
+                    $scaleVal = 42;
+                    if (strcmp($maxScale, "infinity") == 0)
+                        $scaleVal = intval($minScale);
+                    else
+                        $scaleVal = (intval($minScale) + intval($maxScale)) / 2.0;
+
+                    $minScale = intval($minScale);
+                    if (strcmp($maxScale, "infinity") == 0)
+                        $maxScale = 1000000000000;
+                    else
+                        $maxScale = intval($maxScale);
+
+                    $xml .= "<ScaleRange>\n<MinScale>$minScale</MinScale>\n<MaxScale>$maxScale</MaxScale>\n";
+
+                    // 2 passes: First to compile icon count (to determine compression), second to write the actual XML
+                    $iconCount = 0;
+                    for ($ts=0, $count = count($typeStyles); $ts < $count; $ts++) {
+                        $typeStyle = $scaleRange->getElementsByTagName($typeStyles[$ts]);
+                        for ($st = 0; $st < $typeStyle->length; $st++) {
+                            // We will check if this typestyle is going to be shown in the legend
+                            $showInLegend = $typeStyle->item($st)->getElementsByTagName("ShowInLegend");
+                            if($showInLegend->length > 0)
+                                if($showInLegend->item(0)->nodeValue == "false")
+                                    continue;   // This typestyle does not need to be shown in the legend
+
+                            $rules = $typeStyle->item($st)->getElementsByTagName($ruleNames[$ts]);
+                            $iconCount += $rules->length;                            
+                        }
+                    }
+                    $bCompress = ($iconCount > $iconsPerScaleRange);
+
+                    for ($ts=0, $count = count($typeStyles); $ts < $count; $ts++) {
+                        $typeStyle = $scaleRange->getElementsByTagName($typeStyles[$ts]);
+                        $catIndex = 0;
+
+                        if ($typeStyle->length == 0)
+                            continue;
+
+                        $xml .= "<FeatureStyle>\n";
+                        $xml .= "<Type>".($ts+1)."</Type>\n";
+
+                        for($st = 0; $st < $typeStyle->length; $st++) {
+
+                            // We will check if this typestyle is going to be shown in the legend
+                            $showInLegend = $typeStyle->item($st)->getElementsByTagName("ShowInLegend");
+                            if($showInLegend->length > 0)
+                                if($showInLegend->item(0)->nodeValue == "false")
+                                    continue;   // This typestyle does not need to be shown in the legend
+
+                            $rules = $typeStyle->item($st)->getElementsByTagName($ruleNames[$ts]);
+                            for($r = 0; $r < $rules->length; $r++) {
+
+                                $bRequestIcon = false;
+                                if (!$bCompress) {
+                                    $bRequestIcon = true;
+                                } else { //This is a compressed theme
+                                    $bRequestIcon = ($r == 0 || $r == ($rules->length - 1)); //Only first and last rule
+                                }
+
+                                $rule = $rules->item($r);
+                                $label = $rule->getElementsByTagName("LegendLabel");
+                                $filter = $rule->getElementsByTagName("Filter");
+
+                                $labelText = MgUtils::EscapeXmlChars($label->length==1? $label->item(0)->nodeValue: "");
+                                $filterText = MgUtils::EscapeXmlChars($filter->length==1? $filter->item(0)->nodeValue: "");
+                                $geomType = ($ts+1);
+                                $themeCategory = $catIndex++;
+
+                                $xml .= "<Rule>\n<LegendLabel>$labelText</LegendLabel>\n<Filter>$filterText</Filter>\n";
+                                if ($bRequestIcon) {
+                                    $xml .= "<Icon>\n";
+                                    $xml .= MgUtils::GetLegendImageInline($mappingService, $ldfId, $scaleVal, $geomType, $themeCategory, $iconWidth, $iconHeight, $iconFormat);
+                                    $xml .= "</Icon>\n";
+                                }
+                                $xml .= "</Rule>";
+                            }
+                        }
+                        $xml .= "</FeatureStyle>";
+                    }
+                    $xml .= "</ScaleRange>";
+                }
+            } else if ($type == 1) { //Raster
+                for ($sc = 0; $sc < $gridRanges->length; $sc++) {
+                    $scaleRange = $gridRanges->item($sc);
+                    $minElt = $scaleRange->getElementsByTagName('MinScale');
+                    $maxElt = $scaleRange->getElementsByTagName('MaxScale');
+                    $minScale = "0";
+                    $maxScale = 'infinity';  // as MDF's VectorScaleRange::MAX_MAP_SCALE
+                    if ($minElt->length > 0)
+                        $minScale = $minElt->item(0)->nodeValue;
+                    if ($maxElt->length > 0)
+                        $maxScale = $maxElt->item(0)->nodeValue;
+
+                    $scaleVal = 42;
+                    if (strcmp($maxScale, "infinity") == 0)
+                        $scaleVal = intval($minScale);
+                    else
+                        $scaleVal = (intval($minScale) + intval($maxScale)) / 2.0;
+
+                    $minScale = intval($minScale);
+                    if (strcmp($maxScale, "infinity") == 0)
+                        $maxScale = 1000000000000;
+                    else
+                        $maxScale = intval($maxScale);
+
+                    $xml .= "<ScaleRange>\n<MinScale>$minScale</MinScale>\n<MaxScale>$maxScale</MaxScale>\n</ScaleRange>\n";
+                }
+            } else if ($type == 2) { //Drawing
+                $dl = $drawLayerDef->item(0);
+                $minElt = $dl->getElementsByTagName('MinScale');
+                $maxElt = $dl->getElementsByTagName('MaxScale');
                 $minScale = "0";
                 $maxScale = 'infinity';  // as MDF's VectorScaleRange::MAX_MAP_SCALE
-                if($minElt->length > 0)
+                if ($minElt->length > 0)
                     $minScale = $minElt->item(0)->nodeValue;
-                if($maxElt->length > 0)
+                if ($maxElt->length > 0)
                     $maxScale = $maxElt->item(0)->nodeValue;
-
-                if ($type != 0) {
-                    break;
-                }
 
                 $scaleVal = 42;
                 if (strcmp($maxScale, "infinity") == 0)
@@ -136,75 +257,7 @@ class MgMappingServiceController extends MgBaseController {
                 else
                     $maxScale = intval($maxScale);
 
-                $xml .= "<ScaleRange>\n<MinScale>$minScale</MinScale>\n<MaxScale>$maxScale</MaxScale>\n";
-
-                // 2 passes: First to compile icon count (to determine compression), second to write the actual XML
-                $iconCount = 0;
-                for ($ts=0, $count = count($typeStyles); $ts < $count; $ts++) {
-                    $typeStyle = $scaleRange->getElementsByTagName($typeStyles[$ts]);
-                    for ($st = 0; $st < $typeStyle->length; $st++) {
-                        // We will check if this typestyle is going to be shown in the legend
-                        $showInLegend = $typeStyle->item($st)->getElementsByTagName("ShowInLegend");
-                        if($showInLegend->length > 0)
-                            if($showInLegend->item(0)->nodeValue == "false")
-                                continue;   // This typestyle does not need to be shown in the legend
-
-                        $rules = $typeStyle->item($st)->getElementsByTagName($ruleNames[$ts]);
-                        $iconCount += $rules->length;                            
-                    }
-                }
-                $bCompress = ($iconCount > $iconsPerScaleRange);
-
-                for ($ts=0, $count = count($typeStyles); $ts < $count; $ts++) {
-                    $typeStyle = $scaleRange->getElementsByTagName($typeStyles[$ts]);
-                    $catIndex = 0;
-
-                    if ($typeStyle->length == 0)
-                        continue;
-
-                    $xml .= "<FeatureStyle>\n";
-                    $xml .= "<Type>".($ts+1)."</Type>\n";
-
-                    for($st = 0; $st < $typeStyle->length; $st++) {
-
-                        // We will check if this typestyle is going to be shown in the legend
-                        $showInLegend = $typeStyle->item($st)->getElementsByTagName("ShowInLegend");
-                        if($showInLegend->length > 0)
-                            if($showInLegend->item(0)->nodeValue == "false")
-                                continue;   // This typestyle does not need to be shown in the legend
-
-                        $rules = $typeStyle->item($st)->getElementsByTagName($ruleNames[$ts]);
-                        for($r = 0; $r < $rules->length; $r++) {
-
-                            $bRequestIcon = false;
-                            if (!$bCompress) {
-                                $bRequestIcon = true;
-                            } else { //This is a compressed theme
-                                $bRequestIcon = ($r == 0 || $r == ($rules->length - 1)); //Only first and last rule
-                            }
-
-                            $rule = $rules->item($r);
-                            $label = $rule->getElementsByTagName("LegendLabel");
-                            $filter = $rule->getElementsByTagName("Filter");
-
-                            $labelText = MgUtils::EscapeXmlChars($label->length==1? $label->item(0)->nodeValue: "");
-                            $filterText = MgUtils::EscapeXmlChars($filter->length==1? $filter->item(0)->nodeValue: "");
-                            $geomType = ($ts+1);
-                            $themeCategory = $catIndex++;
-
-                            $xml .= "<Rule>\n<LegendLabel>$labelText</LegendLabel>\n<Filter>$filterText</Filter>\n";
-                            if ($bRequestIcon) {
-                                $xml .= "<Icon>\n";
-                                $xml .= MgUtils::GetLegendImageInline($mappingService, $ldfId, $scaleVal, $geomType, $themeCategory, $iconWidth, $iconHeight, $iconFormat);
-                                $xml .= "</Icon>\n";
-                            }
-                            $xml .= "</Rule>";
-                        }
-                    }
-                    $xml .= "</FeatureStyle>";
-                }
-
-                $xml .= "</ScaleRange>";
+                $xml .= "<ScaleRange>\n<MinScale>$minScale</MinScale>\n<MaxScale>$maxScale</MaxScale>\n</ScaleRange>\n";
             }
         } else {
             $xml .= "<ScaleRange />";
