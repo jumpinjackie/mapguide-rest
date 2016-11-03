@@ -968,6 +968,7 @@ $app->get("/library/:resourcePath+.LayerDefinition/legend/:scale/:geomtype/:them
  *          @SWG\Parameter(name="x", in="query", required=true, type="integer", description="The X coordinate of the map center to plot"),
  *          @SWG\Parameter(name="y", in="query", required=true, type="integer", description="The Y coordinate of the map center to plot"),
  *          @SWG\Parameter(name="scale", in="query", required=true, type="number", description="The map scale to plot"),
+ *          @SWG\Parameter(name="dpi", in="query", required=false, type="integer", description="The map display DPI to plot at. Defaults to 96 if not specified. Only applicable for PDF plots"),
  *          @SWG\Parameter(name="papersize", in="query", required=true, type="string", description="The paper size", enum={"A3", "A4", "A5", "Letter", "Legal"}),
  *          @SWG\Parameter(name="orientation", in="query", required=true, type="string", description="The plot orientation L=Landscape, P=Portrait", enum={"L", "P"}),
  *          @SWG\Parameter(name="marginleft", in="query", required=false, type="number", description="left margin in inches"),

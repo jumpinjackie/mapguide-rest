@@ -631,6 +631,7 @@ class MgMappingServiceController extends MgBaseController {
         $x = $this->GetRequestParameter("x", "");
         $y = $this->GetRequestParameter("y", "");
         $scale = $this->GetRequestParameter("scale", "");
+        $dpi = intval($this->GetRequestParameter("dpi", "96"));
 
         if ($x == "")
             $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "x"), MgMimeType::Html);
@@ -675,6 +676,7 @@ class MgMappingServiceController extends MgBaseController {
                 $layout = new MgLayout($layoutRes, $title, MgPageUnitsType::Inches);
             }
 
+            $map->SetDisplayDpi($dpi);
             $br = $mappingSvc->GeneratePlot($map, $center, floatval($scale), $plotSpec, $layout, $dwfVersion);
             //Apply download headers
             $downloadFlag = $this->app->request->params("download");
@@ -698,7 +700,7 @@ class MgMappingServiceController extends MgBaseController {
                 $bLayered = ($bLayered == "1" || $bLayered == "true");
             */
             $renderingService = $siteConn->CreateService(MgServiceType::RenderingService);
-            $plotter = new MgPdfPlotter($this->app, $renderingService, $map);
+            $plotter = new MgPdfPlotter($this->app, $renderingService, $map, $dpi);
             $plotter->SetTitle($title);
             $plotter->SetPaperType($paperSize);
             $plotter->SetOrientation($orientation);
