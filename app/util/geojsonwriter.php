@@ -36,7 +36,7 @@ class MgGeoJsonWriter
                     switch($propType) {
                         case MgPropertyType::DateTime:
                             $dt = $reader->GetDateTime($i);
-                            $idVal = '"'.$dt->ToString().'"';
+                            $idVal = '"'.MgUtils::DateTimeToString($dt).'"';
                             break;
                         case MgPropertyType::Double:
                             $idVal = $reader->GetDouble($i);
@@ -68,7 +68,7 @@ class MgGeoJsonWriter
                             break;
                         case MgPropertyType::DateTime:
                             $dt = $reader->GetDateTime($i);
-                            array_push($propVals, '"'.$name.'": "'.$dt->ToString().'"');
+                            array_push($propVals, '"'.$name.'": "'.MgUtils::DateTimeToString($dt).'"');
                             break;
                         case MgPropertyType::Decimal:
                         case MgPropertyType::Double:
