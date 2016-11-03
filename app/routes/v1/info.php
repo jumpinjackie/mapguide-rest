@@ -24,7 +24,9 @@
  *     @SWG\Info(
  *         version="1.0.0",
  *         title="mapguide-rest",
- *         description="<p>mapguide-rest provides a REST API for MapGuide Open Source and Autodesk Infrastructure Map Server</p><p><strong>NOTE:</strong> Basic HTTP authentication credentials will generally be cached by the web browser for a short period should you choose to use this method instead of passing in session ids</p>",
+ *         description="mapguide-rest provides a REST API for MapGuide Open Source and Autodesk Infrastructure Map Server
+ 
+ **NOTE:** Basic HTTP authentication credentials will generally be cached by the web browser for a short period should you choose to use this method instead of passing in session ids",
  *         @SWG\License(
  *             name="LGPL 2.1",
  *             url="http://www.gnu.org/licenses/lgpl-2.1.txt"

@@ -10,15 +10,17 @@
   <link href='{$docAssetRoot}/css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
   <link href='{$docAssetRoot}/css/reset.css' media='print' rel='stylesheet' type='text/css'/>
   <link href='{$docAssetRoot}/css/print.css' media='print' rel='stylesheet' type='text/css'/>
+  <script src='{$docAssetRoot}/lib/object-assign-pollyfill.js' type='text/javascript'></script>
   <script src='{$docAssetRoot}/lib/jquery-1.8.0.min.js' type='text/javascript'></script>
   <script src='{$docAssetRoot}/lib/jquery.slideto.min.js' type='text/javascript'></script>
   <script src='{$docAssetRoot}/lib/jquery.wiggle.min.js' type='text/javascript'></script>
   <script src='{$docAssetRoot}/lib/jquery.ba-bbq.min.js' type='text/javascript'></script>
-  <script src='{$docAssetRoot}/lib/handlebars-2.0.0.js' type='text/javascript'></script>
-  <script src='{$docAssetRoot}/lib/underscore-min.js' type='text/javascript'></script>
+  <script src='{$docAssetRoot}/lib/handlebars-4.0.5.js' type='text/javascript'></script>
+  <script src='{$docAssetRoot}/lib/lodash.min.js' type='text/javascript'></script>
   <script src='{$docAssetRoot}/lib/backbone-min.js' type='text/javascript'></script>
   <script src='{$docAssetRoot}/swagger-ui.js' type='text/javascript'></script>
-  <script src='{$docAssetRoot}/lib/highlight.7.3.pack.js' type='text/javascript'></script>
+  <script src='{$docAssetRoot}/lib/highlight.9.1.0.pack.js' type='text/javascript'></script>
+  <script src='{$docAssetRoot}/lib/highlight.9.1.0.pack_extended.js' type='text/javascript'></script>
   <script src='{$docAssetRoot}/lib/jsoneditor.min.js' type='text/javascript'></script>
   <script src='{$docAssetRoot}/lib/marked.js' type='text/javascript'></script>
   <script src='{$docAssetRoot}/lib/swagger-oauth.js' type='text/javascript'></script>
@@ -31,6 +33,10 @@
   <script type="text/javascript">
     $(function () {
       var url = "{$docUrl}";
+
+      hljs.configure({
+        highlightSizeThreshold: 5000
+      });
 
       // Pre load translate...
       if(window.SwaggerTranslator) {
@@ -46,8 +52,8 @@
               clientId: "your-client-id",
               clientSecret: "your-client-secret-if-required",
               realm: "your-realms",
-              appName: "your-app-name", 
-              scopeSeparator: ",",
+              appName: "your-app-name",
+              scopeSeparator: " ",
               additionalQueryStringParams: {}
             });
           }
@@ -55,19 +61,14 @@
           if(window.SwaggerTranslator) {
             window.SwaggerTranslator.translate();
           }
-
-          $('pre code').each(function(i, e) {
-            hljs.highlightBlock(e)
-          });
         },
         onFailure: function(data) {
           log("Unable to Load SwaggerUI");
         },
         docExpansion: "none",
         jsonEditor: false,
-        apisSorter: "alpha",
         defaultModelRendering: 'schema',
-        showRequestHeaders: true
+        showRequestHeaders: false
       });
 
       window.swaggerUi.load();
