@@ -790,7 +790,12 @@ class MgPdfPlotter
             $mExt = $this->DrawExtentCS($legendWidthIn);
         }
         
-        //NOTE: TCPDF will output the Content-Type header, so we don't need to do it ourselves
+        //NOTE: TCPDF will output the Content-Type header, but for some reason
+        //chrome will refuse to display the PDF inline despite a Content-Type
+        //header sent. Doing this will most likely double up the mime type, but
+        //will ensure we can view pdfs inline in chrome. I've erred on letting
+        //the mime type double up 
+        $this->app->response->header("Content-Type", "application/pdf");
         $mode = 'I';
         $name = 'Map.pdf';
         if (strlen($this->title) > 0)
