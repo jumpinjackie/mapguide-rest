@@ -1,5 +1,90 @@
 # Changelog
 
+# v 1.21 - 2016-11-02
+
+* Changes
+  * Add olcs.OLCesium.trackedFeature property to make Cesium automatically track an
+    OpenLayers point feature. When active, the Cesium camera will follow changes of
+    the feature position. This requires using stacked view.
+  * Port to OpenLayers 3.19.1.
+  * Port to Cesium 1.27.
+
+# v 1.20 - 2016-09-02
+
+* Changes
+  * Port to Cesium 1.25.
+  * Port to OpenLayers 3.18.2.
+
+# v 1.19 - 2016-08-08
+
+* Changes
+  * Require node 4 or 6.
+  * Port to Cesium 1.24.
+
+# v 1.18 - 2016-07-18
+
+* Changes
+  * Port to Cesium 1.23.
+  * Port to OL 3.17.1 (include OL3 typedefs.js and rename some symbols).
+  * In examples, use OSM instead of obsolete MapQuest tiles.
+
+# v 1.17 - 2016-06-23
+
+* Changes
+  * Port to Cesium 1.22.
+  * Add olcs.core.convertUrlToCesium function to help convert OpenLayers urls
+    to Cesium.
+  * Handle arbitrary line widths on Windows OS.
+
+## v 1.16 - 2016-05-30
+
+* Changes
+  * Switch to eslint.
+  * Update npm dependencies.
+  * Port to Cesium 1.21.
+  * Port to OL 3.16.0.
+  * Add support for drawing rectangles according to the longitude and latitude
+    curves instead of straight lines. This functionality can be activated by
+    setting the olcs.polygon_kind property to 'rectangle' on the OpenLayers
+    geometry.
+  * Add support to set a proxy for Cesium to load layer not accessible 
+    due to missing CORS headers (eg. when user can't modify configuration 
+    of the mapservice used). This functionality can be activated by 
+    setting the olcs.proxy property to the OpenLayers source.
+
+## v 1.15 - 2016-04-28
+
+* Changes
+  * Use fast pixelated canvas scaling on supported browsers. See
+    PR 3288 / commit 322df7b in Cesium. On unsupported browsers, render at
+    full resolution (slow).
+  * Port to OL 3.15.1.
+  * Port to Cesium 1.20.
+
+## v 1.14 - 2016-03-31
+
+* Changes
+  * Accept a mode=dev parameter in examples to ease debugging.
+  * Port to OL 3.14.2.
+  * Port to Cesium 1.19.
+
+## v 1.13 - 2016-02-29
+
+* Changes
+  * Port to Cesium 1.18.
+  * Port to OL 3.14.0.
+
+## v1.12 - 2016-01-30
+
+* Breaking changes
+  * Remove dragbox functionality due to the removal of the Cesium.RectanglePrimitive
+    by upstream. See the commit message for hints about how to reimplement it.
+  * Remove Cesium.RectanglePrimitive, Cesium.PerspectiveFrustrum.getPixelSize,
+    Cesium.OpenStreetMapImageryProvider from Cesium externs.
+* Changes
+  * Port to OL 3.13.0.
+  * Port to Cesium 1.17.
+
 ## v1.11 - 2015-12-23
 
 * Changes

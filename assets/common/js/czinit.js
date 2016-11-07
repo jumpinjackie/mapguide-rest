@@ -10,7 +10,7 @@ function createViewer(target, scriptUrlRoot) {
             tooltip: "OpenStreetMap",
             iconUrl: scriptUrlRoot + "/Cesium/Widgets/Images/ImageryProviders/openStreetMap.png",
             creationFunction: function () {
-                return new Cesium.OpenStreetMapImageryProvider();
+                return Cesium.createOpenStreetMapImageryProvider();
             }
         }),
         new Cesium.ProviderViewModel({
@@ -18,7 +18,7 @@ function createViewer(target, scriptUrlRoot) {
             tooltip: "Stamen Toner",
             iconUrl: scriptUrlRoot + "/Cesium/Widgets/Images/ImageryProviders/stamenToner.png",
             creationFunction: function () {
-                return new Cesium.OpenStreetMapImageryProvider({
+                return Cesium.createOpenStreetMapImageryProvider({
                     url: "//stamen-tiles.a.ssl.fastly.net/toner/",
                     credit: "Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under CC BY SA"
                 });
