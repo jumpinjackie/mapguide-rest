@@ -567,6 +567,7 @@ class MgResourceServiceController extends MgBaseController {
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
+        $resIdStr = $resId->ToString();
         
         $this->VerifyWhitelist($resIdStr, $mimeType, "GETRESOURCEINFO", $fmt, $site, $this->userName);
 
