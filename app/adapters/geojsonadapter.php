@@ -153,7 +153,7 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
                         break;
                     case MgPropertyType::DateTime:
                         $dt = $reader->GetDateTime($i);
-                        array_push($propVals, '"'.$name.'": "'.$dt->ToString().'"');
+                        array_push($propVals, '"'.$name.'": "'.MgUtils::DateTimeToString($dt).'"');
                         break;
                     case MgPropertyType::Decimal:
                     case MgPropertyType::Double:

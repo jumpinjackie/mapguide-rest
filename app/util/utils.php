@@ -1086,20 +1086,35 @@ class MgUtils
 
     public static function DateTimeToString($dt) {
         $val = "";
-        if ($dt->IsDate()) {
+        //WTF: IsDateTime() = true does not imply IsDate() = true and IsTime() = true
+        //Therefore, we must explicitly test for the IsDateTime() case!
+        //This is a completely illogical API in MgDateTime!
+        if ($dt->IsDateTime()) {
             $val .= sprintf("%s-%s-%s",
                 ($dt->GetYear().""),
                 str_pad($dt->GetMonth()."", 2, '0', STR_PAD_LEFT),
                 str_pad($dt->GetDay()."", 2, '0', STR_PAD_LEFT));
-        }
-        if ($dt->IsTime()) {
-            if (strlen($val) > 0)
-                $val .= " ";
+            $val .= " ";
             $val .= sprintf("%s:%s:%s",
                 str_pad($dt->GetHour()."", 2, '0', STR_PAD_LEFT),
                 str_pad($dt->GetMinute()."", 2, '0', STR_PAD_LEFT),
-                str_pad($dt->GetSecond()."", 2, '0', STR_PAD_LEFT)
-            );
+                str_pad($dt->GetSecond()."", 2, '0', STR_PAD_LEFT));
+        } else {
+            if ($dt->IsDate()) {
+                $val .= sprintf("%s-%s-%s",
+                    ($dt->GetYear().""),
+                    str_pad($dt->GetMonth()."", 2, '0', STR_PAD_LEFT),
+                    str_pad($dt->GetDay()."", 2, '0', STR_PAD_LEFT));
+            }
+            if ($dt->IsTime()) {
+                if (strlen($val) > 0) {
+                    $val .= " ";
+                    $val .= sprintf("%s:%s:%s",
+                        str_pad($dt->GetHour()."", 2, '0', STR_PAD_LEFT),
+                        str_pad($dt->GetMinute()."", 2, '0', STR_PAD_LEFT),
+                        str_pad($dt->GetSecond()."", 2, '0', STR_PAD_LEFT));
+                }
+            }
         }
         return $val;
     }
