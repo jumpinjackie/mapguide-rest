@@ -163,7 +163,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
                         break;
                     case MgPropertyType::DateTime:
                         $dt = $reader->GetDateTime($i);
-                        $output .= $dt->ToString();
+                        $output .= MgUtils::DateTimeToString($dt);
                         break;
                     case MgPropertyType::Decimal:
                     case MgPropertyType::Double:

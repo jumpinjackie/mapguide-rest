@@ -489,7 +489,7 @@ abstract class MgResponseHandler
                     $value = "";
                     if ($propType === MgPropertyType::DateTime) {
                         $dt = $prop->GetValue();
-                        $value = $dt->ToString();
+                        $value = MgUtils::DateTimeToString($dt);
                     } else if ($propType === MgPropertyType::Geometry) {
                         if ($wktRw == null)
                             $wktRw = new MgWktReaderWriter();

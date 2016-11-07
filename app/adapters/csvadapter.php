@@ -18,6 +18,7 @@
 //
 
 require_once "restadapter.php";
+require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgCsvRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
     
@@ -92,7 +93,7 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
                         break;
                     case MgPropertyType::DateTime:
                         $dt = $reader->GetDateTime($i);
-                        array_push($values, $this->CsvEscape($dt->ToString()));
+                        array_push($values, $this->CsvEscape(MgUtils::DateTimeToString($dt)));
                         break;
                     case MgPropertyType::Decimal:
                     case MgPropertyType::Double:

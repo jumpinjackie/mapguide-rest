@@ -141,7 +141,7 @@ class MgHtmlBodyModel
                     break;
                 case MgPropertyType::DateTime:
                     $dt = $this->reader->GetDateTime($i);
-                    $output .= $dt->ToString();
+                    $output .= MgUtils::DateTimeToString($dt);
                     break;
                 case MgPropertyType::Decimal:
                 case MgPropertyType::Double:
@@ -344,7 +344,7 @@ class MgReaderChunkedResult
                     break;
                 case MgPropertyType::DateTime:
                     $dt = $reader->GetDateTime($i);
-                    $output .= $dt->ToString();
+                    $output .= MgUtils::DateTimeToString($dt);
                     break;
                 case MgPropertyType::Decimal:
                 case MgPropertyType::Double:
