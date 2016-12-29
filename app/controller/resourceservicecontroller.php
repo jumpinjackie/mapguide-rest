@@ -352,6 +352,8 @@ class MgResourceServiceController extends MgBaseController {
                 $param->AddParameter("FORMAT", MgMimeType::Json);
             } else if ($fmt === "xml") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
+                //HACK: This API doesn't put XML prolog
+                $param->AddParameter("X-PREPEND-XML-PROLOG", "true");
             } else if ($fmt === "html") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
                 $param->AddParameter("X-OVERRIDE-CONTENT-TYPE", MgMimeType::Html);

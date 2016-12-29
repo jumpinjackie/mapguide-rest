@@ -21,13 +21,8 @@ require_once dirname(__FILE__)."/../Config.php";
 require_once dirname(__FILE__)."/../ServiceTest.php";
 
 class SetResourceDataTest extends ServiceTest {
-    private function makeXmlBlob($xml, $prefix = "xmlupload") {
-        $tmp = tempnam(sys_get_temp_dir(), $prefix);
-        file_put_contents($tmp, $xml);
-        return new CURLFile($tmp, "text/xml");
-    }
     public function testBadRequests() {
-        $args = array("type" => "File", "data" => $this->makeXmlBlob("<Test></Test>"));
+        $args = array("type" => "File", "data" => $this->makeContentBlob("<Test></Test>"));
         
         $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/data/test.xml", "POST", $args, "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
@@ -42,7 +37,7 @@ class SetResourceDataTest extends ServiceTest {
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
     }
     public function testOperation() {
-        $args = array("type" => "File", "data" => $this->makeXmlBlob("<Test></Test>"));
+        $args = array("type" => "File", "data" => $this->makeContentBlob("<Test></Test>"));
         //Load the data item
         $mergedArgs = array_merge($args, array("session" => $this->anonymousSessionId));
         $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/data/test.xml", "POST", $mergedArgs);

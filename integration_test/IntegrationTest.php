@@ -125,7 +125,7 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
     }
 
     protected function assertXmlContent($response) {
-        $this->assertTrue(strpos($response->getContent(), "<?xml") !== FALSE);
+        $this->assertTrue(strpos($response->getContent(), "<?xml") !== FALSE, $response->dump());
     }
 
     protected function assertMimeType($expectedMime, $response) {
@@ -138,6 +138,12 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
 
     protected function assertStatusCodeIsNot($code, $resp) {
         $this->assertNotEquals($code, $resp->getStatusCode(), $resp->dump());
+    }
+
+    protected function makeContentBlob($xml, $prefix = "xmlupload", $mimeType = "text/xml") {
+        $tmp = tempnam(sys_get_temp_dir(), $prefix);
+        file_put_contents($tmp, $xml);
+        return new CURLFile($tmp, $mimeType);
     }
 }
 
