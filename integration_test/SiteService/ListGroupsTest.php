@@ -56,6 +56,94 @@ class ListGroupsTest extends ServiceTest {
     public function testJson() {
         $this->__testBase("json", Configuration::MIME_JSON);
     }
+    public function testAnonymousUserBadRequest() {
+        $resp = $this->apiTest("/site/user/Anonymous/groups.xml", "GET", null);
+        $this->assertStatusCodeIs(401, $resp);
+        $this->assertXmlContent($resp);
+
+        $resp = $this->apiTest("/site/user/Anonymous/groups.json", "GET", null);
+        $this->assertStatusCodeIs(401, $resp);
+        $this->assertJsonContent($resp);
+    }
+    public function testAnonymousUserRawCredentials() {
+        $resp = $this->apiTestAnon("/site/user/Anonymous/groups.xml", "GET", null);
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertXmlContent($resp);
+
+        $resp = $this->apiTestAdmin("/site/user/Anonymous/groups.xml", "GET", null);
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertXmlContent($resp);
+
+        $resp = $this->apiTestAnon("/site/user/Anonymous/groups.json", "GET", null);
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertJsonContent($resp);
+
+        $resp = $this->apiTestAdmin("/site/user/Anonymous/groups.json", "GET", null);
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertJsonContent($resp);
+    }
+    public function testAnonymousUserSessionId() {
+        $resp = $this->apiTest("/site/user/Anonymous/groups.xml", "GET", array("session" => $this->adminSessionId));
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertXmlContent($resp);
+        
+        //TODO: Review. Should anonymous be allowed to snoop its own groups and roles?
+        $resp = $this->apiTest("/site/user/Anonymous/groups.xml", "GET", array("session" => $this->anonymousSessionId));
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertXmlContent($resp);
+
+        $resp = $this->apiTest("/site/user/Anonymous/groups.json", "GET", array("session" => $this->adminSessionId));
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertJsonContent($resp);
+        
+        //TODO: Review. Should anonymous be allowed to snoop its own groups and roles?
+        $resp = $this->apiTest("/site/user/Anonymous/groups.json", "GET", array("session" => $this->anonymousSessionId));
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertJsonContent($resp);
+    }
+    public function testAdministratorUserBadRequest() {
+        $resp = $this->apiTest("/site/user/Administrator/groups.xml", "GET", null);
+        $this->assertStatusCodeIs(401, $resp);
+        $this->assertXmlContent($resp);
+
+        $resp = $this->apiTest("/site/user/Administrator/groups.json", "GET", null);
+        $this->assertStatusCodeIs(401, $resp);
+        $this->assertJsonContent($resp);
+    }
+    public function testAdministratorUserRawCredentials() {
+        $resp = $this->apiTestAnon("/site/user/Administrator/groups.xml", "GET", null);
+        $this->assertStatusCodeIs(401, $resp);
+        $this->assertXmlContent($resp);
+
+        $resp = $this->apiTestAdmin("/site/user/Administrator/groups.xml", "GET", null);
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertXmlContent($resp);
+
+        $resp = $this->apiTestAnon("/site/user/Administrator/groups.json", "GET", null);
+        $this->assertStatusCodeIs(401, $resp);
+        $this->assertJsonContent($resp);
+
+        $resp = $this->apiTestAdmin("/site/user/Administrator/groups.json", "GET", null);
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertJsonContent($resp);
+    }
+    public function testAdministratorUserSessionId() {
+        $resp = $this->apiTest("/site/user/Administrator/groups.xml", "GET", array("session" => $this->adminSessionId));
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertXmlContent($resp);
+
+        $resp = $this->apiTest("/site/user/Administrator/groups.xml", "GET", array("session" => $this->anonymousSessionId));
+        $this->assertStatusCodeIs(401, $resp);
+        $this->assertXmlContent($resp);
+
+        $resp = $this->apiTest("/site/user/Administrator/groups.json", "GET", array("session" => $this->adminSessionId));
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertJsonContent($resp);
+
+        $resp = $this->apiTest("/site/user/Administrator/groups.json", "GET", array("session" => $this->anonymousSessionId));
+        $this->assertStatusCodeIs(401, $resp);
+        $this->assertJsonContent($resp);
+    }
 }
 
 ?>
