@@ -39,6 +39,20 @@ if (!class_exists("MgResourceDataType")) {
     }
 }
 
+function SetupRedline($resSvc) {
+    echo "Setup redline data store: Library://RestUnitTests/RedlineLayer.FeatureSource\n";
+    $rdsdfsource = new MgByteSource(dirname(__FILE__)."/data/RedlineLayer.sdf");
+    $rdsdfrdr = $rdsdfsource->GetReader();
+    $resId = new MgResourceIdentifier("Library://RestUnitTests/RedlineLayer.FeatureSource");
+
+    $rdXml = '<?xml version="1.0"?><FeatureSource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="FeatureSource-1.0.0.xsd"><Provider>OSGeo.SDF</Provider><Parameter><Name>File</Name><Value>%MG_DATA_FILE_PATH%RedlineLayer.sdf</Value></Parameter></FeatureSource>';
+    $rdXmlSource = new MgByteSource($rdXml, strlen($rdXml));
+    $rdXmlRdr = $rdXmlSource->GetReader();
+
+    $resSvc->SetResource($resId, $rdXmlRdr, null);
+    $resSvc->SetResourceData($resId, "RedlineLayer.sdf", MgResourceDataType::File, $rdsdfrdr);
+}
+
 function SetupUserTestData($resSvc, $path) {
     echo "Setting up test data under: Library://RestUnitTests/$path/\n";
     $srcId = new MgResourceIdentifier("Library://Samples/Sheboygan/Data/Parcels.FeatureSource");
@@ -150,6 +164,7 @@ try {
         $resSvc->DeleteResource($rootFolder);
     }
 
+    SetupRedline($resSvc);
     SetupUserTestData($resSvc, "test_anonymous");
     SetupUserTestData($resSvc, "test_author");
     SetupUserTestData($resSvc, "test_administrator");
