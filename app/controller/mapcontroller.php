@@ -1198,5 +1198,3 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
         return $bChanged;
     }
 }
-
-?>

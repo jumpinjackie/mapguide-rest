@@ -31,5 +31,3 @@ class MgCentroidCommaSeparatedGeometryOutputFormatter extends MgGeometryOutputFo
         return $coord->GetX().",".$coord->GetY();
     }
 }
-
-?>

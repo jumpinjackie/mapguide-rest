@@ -100,5 +100,3 @@ class MgGeoRssGmlGeometryOutputFormatter extends MgGmlGeometryOutputFormatter {
         return "<georss:where>".parent::OutputGeom($geom, $zval)."</georss:where>";
     }
 }
-
-?>

@@ -398,5 +398,3 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
         return new MgGeoJsonRestAdapterDocumentor();
     }
 }
-
-?>

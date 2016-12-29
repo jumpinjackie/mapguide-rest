@@ -51,5 +51,3 @@ class LocalizerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("FOO_BAR [a,1,b,2]", $loc->getText("FOO_BAR", "a", 1, "b", 2));
     }
 }
-
-?>

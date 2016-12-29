@@ -618,5 +618,3 @@ abstract class MgResponseHandler
         $this->app->halt(401, $errResponse);
     }
 }
-
-?>

@@ -107,5 +107,3 @@ function SetupTestData() {
     $resSvc->SetResource($resId, $rdXmlRdr, null);
     $resSvc->SetResourceData($resId, "RedlineLayer.sdf", MgResourceDataType::File, $rdsdfrdr);
 }
-
-?>

@@ -78,5 +78,3 @@ $app->container->FeatureSetCsv = function() use ($app) {
 $app->container->FeatureSetCsvDoc = function() use ($app) {
     return MgCsvRestAdapter::GetDocumentor();
 };
-
-?>

@@ -1612,5 +1612,3 @@ class MgUtils
     }
     */
 }
-
-?>

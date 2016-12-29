@@ -37,5 +37,3 @@ abstract class MgDateTimeOutputFormatter
         return $output;
     }
 };
-
-?>

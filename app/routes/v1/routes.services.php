@@ -196,5 +196,3 @@ $app->post("/services/createmap.:format", function($format) use ($app) {
     $ctrl = new MgMappingServiceController($app);
     $ctrl->CreateRuntimeMap($format);
 });
-
-?>

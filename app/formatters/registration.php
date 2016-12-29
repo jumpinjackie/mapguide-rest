@@ -73,6 +73,4 @@ $app->container->DateISO9601Full = function() {
 };
 $app->container->DateAtom = function() {
     return new MgAtomDateTimeFormatter();
-}
-
-?>
+};

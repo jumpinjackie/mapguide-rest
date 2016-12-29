@@ -82,5 +82,3 @@ class AclTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(MgUtils::ValidateAcl("Anonymous", $site, $conf2));
     }
 }
-
-?>

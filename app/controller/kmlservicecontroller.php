@@ -491,5 +491,3 @@ class MgKmlServiceController extends MgBaseController {
         }, true, $agentUri, $sessionId);
     }
 }
-
-?>

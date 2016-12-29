@@ -263,5 +263,3 @@ class MgGeoJsonWriter
         return $str;
     }
 }
-
-?>

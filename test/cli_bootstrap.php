@@ -183,5 +183,3 @@ try {
     echo $ex->getTraceAsString();
     echo "WARNING: An exception was thrown while setting up the test data. If any tests fail, this may be the cause\n\n";
 }
-
-?>

@@ -394,5 +394,3 @@ class UpdateOperation
      */
     public $UpdateProperties;
 }
-
-?>

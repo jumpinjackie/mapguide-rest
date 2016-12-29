@@ -684,5 +684,3 @@ class MgXmlSchemaInfo
         return $result;
     }
 }
-
-?>

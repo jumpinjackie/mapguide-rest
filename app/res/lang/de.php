@@ -108,5 +108,3 @@ return array(
     "E_PROPERTY_NOT_FOUND_IN_CLASS" => "Immobilien (%s) nicht in der Klasse gefunden: %s",
     "E_MULTIPLE_IDENTITY_PROPS_NOT_SUPPORTED" => "Multiple Identität Eigenschaften nicht unterstützt"
 );
-
-?>

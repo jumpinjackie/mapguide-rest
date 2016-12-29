@@ -606,5 +606,3 @@ class MgReaderChunkedResult
         }
     }
 }
-
-?>

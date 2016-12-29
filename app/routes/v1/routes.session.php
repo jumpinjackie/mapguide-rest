@@ -1266,5 +1266,3 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/kmlfeatures", function($
     $ctrl = new MgKmlServiceController($app);
     $ctrl->GetFeaturesKml($resId, "kml");
 });
-
-?>

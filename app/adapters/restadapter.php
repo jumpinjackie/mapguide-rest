@@ -474,5 +474,3 @@ abstract class MgFeatureRestAdapterDocumentor extends MgRestAdapterDocumentor {
         return $params;
     }
 }
-
-?>

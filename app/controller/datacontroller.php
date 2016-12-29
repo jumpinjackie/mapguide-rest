@@ -592,5 +592,3 @@ class MgDataController extends MgBaseController {
         }
     }
 }
-
-?>

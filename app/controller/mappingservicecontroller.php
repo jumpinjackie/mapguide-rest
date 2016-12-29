@@ -808,5 +808,3 @@ class MgMappingServiceController extends MgBaseController {
         }
     }
 }
-
-?>

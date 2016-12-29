@@ -238,5 +238,3 @@ class MgRenderingServiceController extends MgBaseController {
         $this->ExecuteHttpRequest($req);
     }
 }
-
-?>

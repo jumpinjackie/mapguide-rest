@@ -95,5 +95,3 @@ $app->get("/providers/:providerName/connectvalues.:format/:propName", function($
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->GetConnectPropertyValues($providerName, $propName, $format);
 });
-
-?>

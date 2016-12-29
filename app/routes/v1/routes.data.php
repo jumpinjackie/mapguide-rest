@@ -205,5 +205,3 @@ $app->delete("/data/:args+/:filename", function($args, $filename) use ($app) {
         $ctrl->HandleDelete($args, substr($filename, 1));
     }
 });
-
-?>

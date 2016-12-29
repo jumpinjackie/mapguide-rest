@@ -192,5 +192,3 @@ class MgPaginatedFeatureReader
         return $this->innerReader->IsNull($propNameOrIndex);
     }
 }
-
-?>

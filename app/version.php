@@ -19,5 +19,3 @@
 
 define("MG_REST_API_VERSION", "1.0");
 define("SWAGGER_API_VERSION", "2.0");
-
-?>

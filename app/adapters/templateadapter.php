@@ -794,5 +794,3 @@ class MgTemplateRestAdapter extends MgRestAdapter
         return new MgTemplateRestAdapterDocumentor();
     }
 }
-
-?>

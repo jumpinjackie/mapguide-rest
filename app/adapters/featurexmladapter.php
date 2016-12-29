@@ -397,5 +397,3 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
         return new MgFeatureXmlRestAdapterDocumentor();
     }
 }
-
-?>

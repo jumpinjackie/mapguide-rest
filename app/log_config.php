@@ -29,5 +29,3 @@ return array(
     "log.level" => \Slim\Log::DEBUG,
     "log.writer" => new LogWriter(dirname(__FILE__)."/../cache/debug.log")
 );
-
-?>

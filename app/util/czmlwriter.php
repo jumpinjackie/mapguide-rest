@@ -277,5 +277,3 @@ class MgCzmlWriter
         return $str;
     }
 }
-
-?>

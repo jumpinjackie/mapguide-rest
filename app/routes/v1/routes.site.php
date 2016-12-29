@@ -135,5 +135,3 @@ $app->get("/site/user/:userName/roles.:format", function($userName, $format) use
     $ctrl = new MgSiteAdminController($app);
     $ctrl->EnumerateRolesForUser($userName, $format);
 });
-
-?>

@@ -48,4 +48,3 @@ class TestUtils
         return $stub;
     }
 }
-?>

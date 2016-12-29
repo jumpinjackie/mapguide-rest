@@ -1592,5 +1592,3 @@ class MgFeatureServiceController extends MgBaseController {
         }
     }
 }
-
-?>

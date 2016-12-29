@@ -107,5 +107,3 @@ $app->get("/apidoc/:file", function($file) use ($app) {
     $app->response->header("Content-Type", "application/json");
     $app->response->setBody(json_encode($doc));
 });
-
-?>

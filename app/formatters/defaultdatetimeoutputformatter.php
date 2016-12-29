@@ -98,5 +98,3 @@ class MgAtomDateTimeFormatter extends MgDateTimeOutputFormatter {
         return sprintf("%d-%02d-%02dT%02d:%02d:%02dZ", $dt->GetYear(), $dt->GetMonth(), $dt->GetDay(), $dt->GetHour(), $dt->GetMinute(), $dt->GetSecond());
     }
 }
-
-?>

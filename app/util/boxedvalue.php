@@ -57,5 +57,3 @@ class MgBoxedValue
         return self::BoxValue($value, "String", $fmt);
     }
 }
-
-?>

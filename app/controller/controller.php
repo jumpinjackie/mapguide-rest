@@ -218,5 +218,3 @@ class MgBaseController extends MgResponseHandler
         }
     }
 }
-
-?>

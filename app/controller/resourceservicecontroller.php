@@ -701,5 +701,3 @@ class MgResourceServiceController extends MgBaseController {
         });
     }
 }
-
-?>

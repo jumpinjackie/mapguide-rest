@@ -44,6 +44,4 @@ abstract class MgGeometryOutputFormatter
         }
         return $output;
     }
-};
-
-?>
+}

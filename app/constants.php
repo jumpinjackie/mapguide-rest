@@ -26,5 +26,3 @@ class MgRestConstants
     const PROP_Z_EXTRUSION = "MG_Z_EXTRUSION";
     const PROP_Z_UNITS = "MG_Z_UNITS";
 }
-
-?>

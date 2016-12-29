@@ -48,5 +48,3 @@
  * @SWG\Tag(name="session", description="Session Repository")
  * @SWG\Tag(name="site", description="Site Service")
  */
-
-?>

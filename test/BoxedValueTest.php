@@ -102,5 +102,3 @@ class BoxedValueTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("bar", $val->PrimitiveValue->Value);
     }
 }
-
-?>

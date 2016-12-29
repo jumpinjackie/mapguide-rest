@@ -288,5 +288,3 @@ class MgMapImageRestAdapter extends MgRestAdapter {
         return new MgMapImageRestAdapterDocumentor();
     }
 }
-
-?>

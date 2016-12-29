@@ -413,5 +413,3 @@ class MgCzmlResult
         $this->writer->EndChunking();
     }
 }
-
-?>

@@ -136,5 +136,3 @@ class MgGmlGeometryOutputFormatter extends MgGeometryOutputFormatter
         return $output;
     }
 }
-
-?>

@@ -214,5 +214,3 @@ $app->post("/coordsys/toepsg/:wkt+", function($wkt) use ($app) {
     $ctrl->ConvertWktToEpsg($wktStr);
 });
 */
-
-?>

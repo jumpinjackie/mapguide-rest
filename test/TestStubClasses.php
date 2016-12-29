@@ -73,5 +73,3 @@ if (!class_exists("MgFeaturePropertyType")) {
         const RasterProperty = 104 ; 
     }
 }
-
-?>

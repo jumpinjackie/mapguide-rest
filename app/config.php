@@ -392,5 +392,3 @@ return array(
         "Legal" => array(216.0, 356.0)      // (216x356 mm ; 8.50x14.00 In)
     )
 );
-
-?>

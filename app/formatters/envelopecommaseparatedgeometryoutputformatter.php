@@ -32,5 +32,3 @@ class MgEnvelopeCommaSeparatedGeometryOutputFormatter extends MgGeometryOutputFo
         return $ll->GetX().",".$ll->GetY().",".$ur->GetX().",".$ur->GetY();
     }
 }
-
-?>

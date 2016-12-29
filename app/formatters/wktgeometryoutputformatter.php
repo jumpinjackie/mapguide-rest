@@ -32,5 +32,3 @@ class MgWktGeometryOutputFormatter extends MgGeometryOutputFormatter
         return $this->wktRw->Write($geom);
     }
 }
-
-?>

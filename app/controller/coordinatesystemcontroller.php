@@ -298,5 +298,3 @@ class MgCoordinateSystemController extends MgBaseController {
         }
     }
 }
-
-?>

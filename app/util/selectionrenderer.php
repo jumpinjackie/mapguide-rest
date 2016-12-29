@@ -221,5 +221,3 @@ class MgSelectionUpdater extends MgSelectionUpdaterBase {
         }
     }
 }
-
-?>

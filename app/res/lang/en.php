@@ -108,5 +108,3 @@ return array(
     "E_PROPERTY_NOT_FOUND_IN_CLASS" => "Property (%s) not found in class: %s",
     "E_MULTIPLE_IDENTITY_PROPS_NOT_SUPPORTED" => "Multiple identity properties not supported"
 );
-
-?>

@@ -701,5 +701,3 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($bExpect, $bForbidden, "Expected (".($bExpect?"true":"false").") on ($action, $resp) for $userName. Got: ".($bForbidden?"true":"false"));
     }
 }
-
-?>

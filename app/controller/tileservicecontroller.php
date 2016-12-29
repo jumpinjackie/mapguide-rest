@@ -431,5 +431,3 @@ class MgTileServiceController extends MgBaseController {
         return $siteConn;
     }
 }
-
-?>

@@ -810,6 +810,3 @@ class MgPdfPlotter
         $this->pdf->Output($name, $mode);
     }
 }
-
-
-?>

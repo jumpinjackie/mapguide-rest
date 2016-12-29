@@ -147,5 +147,3 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
         return new MgCsvRestAdapterDocumentor();
     }
 }
-
-?>

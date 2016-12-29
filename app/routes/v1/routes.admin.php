@@ -23,5 +23,3 @@ $app->get("/admin/:args+", function($args) use ($app) {
     var_dump($app->request->get());
 });
 */
-
-?>
