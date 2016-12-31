@@ -1,3 +1,13 @@
+Next
+====
+ - #137: Verify PHP 5.6 (bundled with MGOS 3.1) compatibility
+ - #132: Ensure scale ranges are outputted for raster/drawing layers
+ - #145: Fix typo in utils.php
+ - #144: Ensure newlines are escaped when converting XML to JSON
+ - #135: Use OSM/Stamen instead of Bing Maps in all Cesium examples
+ - #142, #146: Use a more roundtrip-friendly date format when serializing MgDateTime instances to GeoJSON
+ - #140: Add DPI parameter for DWF/PDF plotting (though this has no effect for DWF plots, TBD which side (MapGuide or mapguide-rest) this bug is on)
+
 1.0 RC4
 =======
  - username/password as POST parameters supported for:
