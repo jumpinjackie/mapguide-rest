@@ -131,7 +131,7 @@ class CrudLibraryTest extends ServiceTest {
         }
         throw new Exception("Unknown kind: $kind");
     }
-    private function getHeaderUrl($kind) {
+    private function getLibraryHeaderUrl($kind) {
         if ($kind === "xml") {
             return "/library/RestUnitTests/RedlineLayer.FeatureSource/header.$kind";
         } else if ($kind === "json") {
@@ -147,49 +147,70 @@ class CrudLibraryTest extends ServiceTest {
         }
         throw new Exception("Unknown kind: $kind");
     }
-    private function __testOperation($kind, $extension, $mimeType) {
+    protected function setUp() {
+        parent::setUp();
+        $resp = $this->apiTest("/services/copyresource", "POST", array(
+            "session" => $this->anonymousSessionId,
+            "source" => "Library://RestUnitTests/RedlineLayer.FeatureSource",
+            "destination" => "Session:" . $this->anonymousSessionId . "//RedlineLayer.FeatureSource",
+            "overwrite" => 1
+        ));
+        $this->assertStatusCodeIs(200, $resp);
+    }
+    protected function tearDown() {
+        parent::tearDown();
+    }
+    private function getSessionFsPart() {
+        return "/session/" . $this->anonymousSessionId . "/RedlineLayer.FeatureSource";
+    }
+    private function getLibraryFsPart() {
+        return "/library/RestUnitTests/RedlineLayer.FeatureSource";
+    }
+    private function __testOperation($resPart, $kind, $extension, $mimeType, $bLibrary) {
         //Disable everything
-        $resp = $this->apiTestAnon($this->getHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, false, false, false, false));
-        $this->assertStatusCodeIs(401, $resp);
+        if ($bLibrary) {
+            $resp = $this->apiTestAnon($this->getLibraryHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, false, false, false, false));
+            $this->assertStatusCodeIs(401, $resp);
 
-        $resp = $this->apiTestAdmin($this->getHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, false, false, false, false));
-        $this->assertStatusCodeIs($this->getHeaderSuccessCode($kind), $resp);
+            $resp = $this->apiTestAdmin($this->getLibraryHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, false, false, false, false));
+            $this->assertStatusCodeIs($this->getHeaderSuccessCode($kind), $resp);
+            
+            $resp = $this->apiTestAnon("$resPart/features.$kind/MarkupSchema/Markup", "POST", $this->createInsertPayload($kind, "anon credential insert", "POINT (0 0)"));
+            $this->assertStatusCodeIs(403, $resp);
 
-        $resp = $this->apiTestAnon("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "POST", $this->createInsertPayload($kind, "anon credential insert", "POINT (0 0)"));
-        $this->assertStatusCodeIs(403, $resp);
+            $resp = $this->apiTestAdmin("$resPart/features.$kind/MarkupSchema/Markup", "POST", $this->createInsertPayload($kind, "admin credential insert", "POINT (1 1)"));
+            $this->assertStatusCodeIs(403, $resp);
 
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "POST", $this->createInsertPayload($kind, "admin credential insert", "POINT (1 1)"));
-        $this->assertStatusCodeIs(403, $resp);
+            //Enable insert
+            $resp = $this->apiTestAnon($this->getLibraryHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, false, false, false));
+            $this->assertStatusCodeIs(401, $resp);
 
-        //Enable insert
-        $resp = $this->apiTestAnon($this->getHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, false, false, false));
-        $this->assertStatusCodeIs(401, $resp);
+            //Enable insert/transactions
+            $resp = $this->apiTestAdmin($this->getLibraryHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, false, false, true));
+            $this->assertStatusCodeIs($this->getHeaderSuccessCode($kind), $resp);
 
-        //Enable insert/transactions
-        $resp = $this->apiTestAdmin($this->getHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, false, false, true));
-        $this->assertStatusCodeIs($this->getHeaderSuccessCode($kind), $resp);
+            $resp = $this->apiTestAnon("$resPart/features.$kind/MarkupSchema/Markup", "POST", $this->createInsertPayload($kind, "anon credential insert", "POINT (0 0)"));
+            $this->assertStatusCodeIs(500, $resp);
 
-        $resp = $this->apiTestAnon("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "POST", $this->createInsertPayload($kind, "anon credential insert", "POINT (0 0)"));
-        $this->assertStatusCodeIs(500, $resp);
+            $resp = $this->apiTestAdmin("$resPart/features.$kind/MarkupSchema/Markup", "POST", $this->createInsertPayload($kind, "admin credential insert", "POINT (1 1)"));
+            $this->assertStatusCodeIs(500, $resp);
 
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "POST", $this->createInsertPayload($kind, "admin credential insert", "POINT (1 1)"));
-        $this->assertStatusCodeIs(500, $resp);
+            //Enable insert, disable transactions
+            $resp = $this->apiTestAdmin($this->getLibraryHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, false, false, false));
+            $this->assertStatusCodeIs($this->getHeaderSuccessCode($kind), $resp);
+        }
 
-        //Enable insert, disable transactions
-        $resp = $this->apiTestAdmin($this->getHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, false, false, false));
-        $this->assertStatusCodeIs($this->getHeaderSuccessCode($kind), $resp);
-
-        $resp = $this->apiTestAnon("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "POST", $this->createInsertPayload($kind, "anon credential insert", "POINT (0 0)"));
+        $resp = $this->apiTestAnon("$resPart/features.$kind/MarkupSchema/Markup", "POST", $this->createInsertPayload($kind, "anon credential insert", "POINT (0 0)"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType($mimeType, $resp);
         $this->assertContentKind($resp, $kind);
 
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "POST", $this->createInsertPayload($kind, "admin credential insert", "POINT (1 1)"));
+        $resp = $this->apiTestAdmin("$resPart/features.$kind/MarkupSchema/Markup", "POST", $this->createInsertPayload($kind, "admin credential insert", "POINT (1 1)"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType($mimeType, $resp);
         $this->assertContentKind($resp, $kind);
 
-        $resp = $this->apiTest("/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "transformto" => "WGS84.PseudoMercator"));
+        $resp = $this->apiTest("$resPart/features.geojson/MarkupSchema/Markup", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "transformto" => "WGS84.PseudoMercator"));
         $this->assertStatusCodeIs(200, $resp);
         $json = json_decode($resp->getContent());
         $this->assertNotNull($json, $resp->dump());
@@ -203,50 +224,52 @@ class CrudLibraryTest extends ServiceTest {
             }
         }
 
-        //Try update
-        $resp = $this->apiTestAnon("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "PUT", $this->createUpdatePayload($kind, "ID = 1", "anon credential update", "POINT (2 2)"));
-        $this->assertStatusCodeIs(403, $resp);
-        $this->assertMimeType($mimeType, $resp);
-        $this->assertContentKind($resp, $kind);
+        if ($bLibrary) {
+            //Try update
+            $resp = $this->apiTestAnon("$resPart/features.$kind/MarkupSchema/Markup", "PUT", $this->createUpdatePayload($kind, "ID = 1", "anon credential update", "POINT (2 2)"));
+            $this->assertStatusCodeIs(403, $resp);
+            $this->assertMimeType($mimeType, $resp);
+            $this->assertContentKind($resp, $kind);
 
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "PUT", $this->createUpdatePayload($kind, "ID = 2", "admin credential update", "POINT (3 3)"));
-        $this->assertStatusCodeIs(403, $resp);
-        $this->assertMimeType($mimeType, $resp);
-        $this->assertContentKind($resp, $kind);
+            $resp = $this->apiTestAdmin("$resPart/features.$kind/MarkupSchema/Markup", "PUT", $this->createUpdatePayload($kind, "ID = 2", "admin credential update", "POINT (3 3)"));
+            $this->assertStatusCodeIs(403, $resp);
+            $this->assertMimeType($mimeType, $resp);
+            $this->assertContentKind($resp, $kind);
 
-        //Enable update
-        $resp = $this->apiTestAnon($this->getHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, true, false, false));
-        $this->assertStatusCodeIs(401, $resp);
+            //Enable update
+            $resp = $this->apiTestAnon($this->getLibraryHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, true, false, false));
+            $this->assertStatusCodeIs(401, $resp);
 
-        //Enable insert/update/transactions
-        $resp = $this->apiTestAdmin($this->getHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, true, false, true));
-        $this->assertStatusCodeIs($this->getHeaderSuccessCode($kind), $resp);
+            //Enable insert/update/transactions
+            $resp = $this->apiTestAdmin($this->getLibraryHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, true, false, true));
+            $this->assertStatusCodeIs($this->getHeaderSuccessCode($kind), $resp);
 
-        $resp = $this->apiTestAnon("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "PUT", $this->createUpdatePayload($kind, "ID = 1", "anon credential update", "POINT (2 2)"));
-        $this->assertStatusCodeIs(500, $resp);
-        $this->assertMimeType($mimeType, $resp);
-        $this->assertContentKind($resp, $kind);
+            $resp = $this->apiTestAnon("$resPart/features.$kind/MarkupSchema/Markup", "PUT", $this->createUpdatePayload($kind, "ID = 1", "anon credential update", "POINT (2 2)"));
+            $this->assertStatusCodeIs(500, $resp);
+            $this->assertMimeType($mimeType, $resp);
+            $this->assertContentKind($resp, $kind);
 
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "PUT", $this->createUpdatePayload($kind, "ID = 2", "admin credential update", "POINT (3 3)"));
-        $this->assertStatusCodeIs(500, $resp);
-        $this->assertMimeType($mimeType, $resp);
-        $this->assertContentKind($resp, $kind);
+            $resp = $this->apiTestAdmin("$resPart/features.$kind/MarkupSchema/Markup", "PUT", $this->createUpdatePayload($kind, "ID = 2", "admin credential update", "POINT (3 3)"));
+            $this->assertStatusCodeIs(500, $resp);
+            $this->assertMimeType($mimeType, $resp);
+            $this->assertContentKind($resp, $kind);
 
-        //Enable insert/update. Disable transactions
-        $resp = $this->apiTestAdmin($this->getHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, true, false, false));
-        $this->assertStatusCodeIs($this->getHeaderSuccessCode($kind), $resp);
+            //Enable insert/update. Disable transactions
+            $resp = $this->apiTestAdmin($this->getLibraryHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, true, false, false));
+            $this->assertStatusCodeIs($this->getHeaderSuccessCode($kind), $resp);
+        }
 
-        $resp = $this->apiTestAnon("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "PUT", $this->createUpdatePayload($kind, "ID = 1", "anon credential update", "POINT (2 2)"));
+        $resp = $this->apiTestAnon("$resPart/features.$kind/MarkupSchema/Markup", "PUT", $this->createUpdatePayload($kind, "ID = 1", "anon credential update", "POINT (2 2)"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType($mimeType, $resp);
         $this->assertContentKind($resp, $kind);
 
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "PUT", $this->createUpdatePayload($kind, "ID = 2", "admin credential update", "POINT (3 3)"));
+        $resp = $this->apiTestAdmin("$resPart/features.$kind/MarkupSchema/Markup", "PUT", $this->createUpdatePayload($kind, "ID = 2", "admin credential update", "POINT (3 3)"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType($mimeType, $resp);
         $this->assertContentKind($resp, $kind);
 
-        $resp = $this->apiTest("/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "transformto" => "WGS84.PseudoMercator"));
+        $resp = $this->apiTest("$resPart/features.geojson/MarkupSchema/Markup", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "transformto" => "WGS84.PseudoMercator"));
         $this->assertStatusCodeIs(200, $resp);
         $json = json_decode($resp->getContent());
         $this->assertNotNull($json, $resp->dump());
@@ -260,66 +283,74 @@ class CrudLibraryTest extends ServiceTest {
             }
         }
 
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "DELETE", array("filter" => "ID = 2"));
-        $this->assertStatusCodeIs(403, $resp);
-        $this->assertMimeType($mimeType, $resp);
-        $this->assertContentKind($resp, $kind);
+        if ($bLibrary) {
+            $resp = $this->apiTestAdmin("$resPart/features.$kind/MarkupSchema/Markup", "DELETE", array("filter" => "ID = 2"));
+            $this->assertStatusCodeIs(403, $resp);
+            $this->assertMimeType($mimeType, $resp);
+            $this->assertContentKind($resp, $kind);
 
-        $resp = $this->apiTestAnon("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "DELETE", array("filter" => "ID = 1"));
-        $this->assertStatusCodeIs(403, $resp);
-        $this->assertMimeType($mimeType, $resp);
-        $this->assertContentKind($resp, $kind);
+            $resp = $this->apiTestAnon("$resPart/features.$kind/MarkupSchema/Markup", "DELETE", array("filter" => "ID = 1"));
+            $this->assertStatusCodeIs(403, $resp);
+            $this->assertMimeType($mimeType, $resp);
+            $this->assertContentKind($resp, $kind);
 
-        //Enable everything
-        $resp = $this->apiTestAnon($this->getHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, true, true, false));
-        $this->assertStatusCodeIs(401, $resp);
+            //Enable everything
+            $resp = $this->apiTestAnon($this->getLibraryHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, true, true, false));
+            $this->assertStatusCodeIs(401, $resp);
 
-        $resp = $this->apiTestAdmin($this->getHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, true, true, true));
-        $this->assertStatusCodeIs($this->getHeaderSuccessCode($kind), $resp);
+            $resp = $this->apiTestAdmin($this->getLibraryHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, true, true, true));
+            $this->assertStatusCodeIs($this->getHeaderSuccessCode($kind), $resp);
 
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "DELETE", array("filter" => "ID = 2"));
-        $this->assertStatusCodeIs(500, $resp);
-        $this->assertMimeType($mimeType, $resp);
-        $this->assertContentKind($resp, $kind);
+            $resp = $this->apiTestAdmin("$resPart/features.$kind/MarkupSchema/Markup", "DELETE", array("filter" => "ID = 2"));
+            $this->assertStatusCodeIs(500, $resp);
+            $this->assertMimeType($mimeType, $resp);
+            $this->assertContentKind($resp, $kind);
 
-        $resp = $this->apiTestAnon("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "DELETE", array("filter" => "ID = 1"));
-        $this->assertStatusCodeIs(500, $resp);
-        $this->assertMimeType($mimeType, $resp);
-        $this->assertContentKind($resp, $kind);
+            $resp = $this->apiTestAnon("$resPart/features.$kind/MarkupSchema/Markup", "DELETE", array("filter" => "ID = 1"));
+            $this->assertStatusCodeIs(500, $resp);
+            $this->assertMimeType($mimeType, $resp);
+            $this->assertContentKind($resp, $kind);
 
-        //Enable everything but transactions
-        $resp = $this->apiTestAdmin($this->getHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, true, true, false));
-        $this->assertStatusCodeIs($this->getHeaderSuccessCode($kind), $resp);
+            //Enable everything but transactions
+            $resp = $this->apiTestAdmin($this->getLibraryHeaderUrl($kind), "POST", $this->createHeaderPayload($kind, true, true, true, false));
+            $this->assertStatusCodeIs($this->getHeaderSuccessCode($kind), $resp);
+        }
 
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "DELETE", array("filter" => "ID = 2"));
+        $resp = $this->apiTestAdmin("$resPart/features.$kind/MarkupSchema/Markup", "DELETE", array("filter" => "ID = 2"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType($mimeType, $resp);
         $this->assertContentKind($resp, $kind);
 
         //Check deletion
-        $resp = $this->apiTest("/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "transformto" => "WGS84.PseudoMercator"));
+        $resp = $this->apiTest("$resPart/features.geojson/MarkupSchema/Markup", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "transformto" => "WGS84.PseudoMercator"));
         $this->assertStatusCodeIs(200, $resp);
         $json = json_decode($resp->getContent());
         $this->assertNotNull($json, $resp->dump());
         $this->assertEquals(1, count($json->features), "Expected 1 feature");
         $this->assertEquals(1, $json->features[0]->id, "Expected feature ID 2 to be deleted");
 
-        $resp = $this->apiTestAnon("/library/RestUnitTests/RedlineLayer.FeatureSource/features.$kind/MarkupSchema/Markup", "DELETE", array("filter" => "ID = 1"));
+        $resp = $this->apiTestAnon("$resPart/features.$kind/MarkupSchema/Markup", "DELETE", array("filter" => "ID = 1"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType($mimeType, $resp);
         $this->assertContentKind($resp, $kind);
 
         //Check deletion
-        $resp = $this->apiTest("/library/RestUnitTests/RedlineLayer.FeatureSource/features.geojson/MarkupSchema/Markup", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "transformto" => "WGS84.PseudoMercator"));
+        $resp = $this->apiTest("$resPart/features.geojson/MarkupSchema/Markup", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "transformto" => "WGS84.PseudoMercator"));
         $this->assertStatusCodeIs(200, $resp);
         $json = json_decode($resp->getContent());
         $this->assertNotNull($json, $resp->dump());
         $this->assertEquals(0, count($json->features), "Expected no features");
     }
-    public function testOperationXml() {
-        $this->__testOperation("xml", "xml", Configuration::MIME_XML);
+    public function testLibraryOperationXml() {
+        $this->__testOperation($this->getLibraryFsPart(), "xml", "xml", Configuration::MIME_XML, true);
     }
-    public function testOperationGeoJson() {
-        $this->__testOperation("json", "geojson", Configuration::MIME_JSON);
+    public function testLibraryOperationGeoJson() {
+        $this->__testOperation($this->getLibraryFsPart(), "json", "geojson", Configuration::MIME_JSON, true);
+    }
+    public function testSessionOperationXml() {
+        $this->__testOperation($this->getSessionFsPart(), "xml", "xml", Configuration::MIME_XML, false);
+    }
+    public function testSessionOperationGeoJson() {
+        $this->__testOperation($this->getSessionFsPart(), "json", "geojson", Configuration::MIME_JSON, false);
     }
 }
