@@ -21,40 +21,66 @@ require_once dirname(__FILE__)."/../ServiceTest.php";
 require_once dirname(__FILE__)."/../Config.php";
 
 class GetMapKmlTest extends ServiceTest {
+    protected function setUp() {
+        parent::setUp();
+        $resp = $this->apiTest("/services/copyresource", "POST", array(
+            "session" => $this->anonymousSessionId,
+            "source" => "Library://Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition",
+            "destination" => "Session:" . $this->anonymousSessionId . "//Sheboygan.MapDefinition",
+            "overwrite" => 1
+        ));
+        $this->assertStatusCodeIs(200, $resp);
+    }
+    protected function tearDown() {
+        parent::tearDown();
+    }
+    private function getSessionMapDefPart() {
+        return "/session/" . $this->anonymousSessionId . "/Sheboygan.MapDefinition";
+    }
+    private function getLibraryMapDefPart() {
+        return "/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition";
+    }
+
     private function isCorsTesting() { return false; }
 
-    public function testLibrary() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", array());
+    private function __testBase($mdfPart) {
+        $resp = $this->apiTestAnon("$mdfPart/kml", "GET", array());
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType(Configuration::MIME_KML, $resp);
         $this->assertTrue(strpos($resp->getContent(), "mapagent/mapagent.fcgi") === FALSE, "Expected no mapagent callback urls in response");
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", array());
+        $resp = $this->apiTestAdmin("$mdfPart/kml", "GET", array());
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType(Configuration::MIME_KML, $resp);
         $this->assertTrue(strpos($resp->getContent(), "mapagent/mapagent.fcgi") === FALSE, "Expected no mapagent callback urls in response");
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", array());
+        $resp = $this->apiTest("$mdfPart/kml", "GET", array());
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType(Configuration::MIME_KML, $resp);
         $this->assertTrue(strpos($resp->getContent(), "mapagent/mapagent.fcgi") === FALSE, "Expected no mapagent callback urls in response");
 
         if (!$this->isCorsTesting()) {
             //Pass thru
-            $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", array("native" => 1));
+            $resp = $this->apiTestAnon("$mdfPart/kml", "GET", array("native" => 1));
             $this->assertStatusCodeIs(200, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
             $this->assertTrue(strpos($resp->getContent(), "mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
 
-            $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", array("native" => 1));
+            $resp = $this->apiTestAdmin("$mdfPart/kml", "GET", array("native" => 1));
             $this->assertStatusCodeIs(200, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
             $this->assertTrue(strpos($resp->getContent(), "mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
 
-            $resp = $this->apiTest("/library/Samples/Sheboygan/Maps/Sheboygan.MapDefinition/kml", "GET", array("native" => 1));
+            $resp = $this->apiTest("$mdfPart/kml", "GET", array("native" => 1));
             $this->assertStatusCodeIs(200, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
             $this->assertTrue(strpos($resp->getContent(), "mapagent/mapagent.fcgi") >= 0, "Expected mapagent callback urls in response");
         }
+    }
+    public function testLibrary() {
+        $this->__testBase($this->getLibraryMapDefPart());
+    }
+    public function testSession() {
+        $this->__testBase($this->getSessionMapDefPart());
     }
 }
