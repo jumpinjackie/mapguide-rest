@@ -40,7 +40,7 @@ class GetResourceContentApiTest extends ServiceTest {
     private function getLibraryResourceUrlPart() {
         return "/library/Samples/Sheboygan/Data/Parcels.FeatureSource";
     }
-    public function __testCommon($resPart) {
+    private function __testCommon($resPart) {
         $resp = $this->apiTestAnon("$resPart/content.bar", "GET", null);
         $this->assertStatusCodeIs(400, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);

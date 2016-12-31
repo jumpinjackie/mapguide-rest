@@ -21,6 +21,24 @@ require_once dirname(__FILE__)."/../Config.php";
 require_once dirname(__FILE__)."/../ServiceTest.php";
 
 class SetGetDeleteResourceApiTest extends ServiceTest {
+    protected function setUp() {
+        parent::setUp();
+    }
+    protected function tearDown() {
+        parent::tearDown();
+    }
+    private function getSessionResourceUrlPart() {
+        return "/session/" . $this->anonymousSessionId . "/Empty.FeatureSource";
+    }
+    private function getLibraryResourceUrlPart() {
+        return "/library/RestUnitTests/Empty.FeatureSource";
+    }
+    private function getSessionResourceUrlPart2() {
+        return "/session/" . $this->anonymousSessionId . "/Empty.FeatureSource";
+    }
+    private function getLibraryResourceUrlPart2() {
+        return "/library/RestUnitTests/Empty.FeatureSource";
+    }
     private function createHeaderXml() {
         $xml = '<ResourceDocumentHeader xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="ResourceDocumentHeader-1.0.0.xsd">';
         $xml .= '<Security><Inherited>true</Inherited></Security>';
@@ -30,53 +48,74 @@ class SetGetDeleteResourceApiTest extends ServiceTest {
         $xml .= '</ResourceDocumentHeader>';
         return $xml;
     }
-    public function testOperation() {
+    private function __testOperation($resPart, $bTestUnauth) {
         $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FeatureSource-1.0.0.xsd"><Provider>OSGeo.SDF</Provider><Parameter><Name>File</Name><Value>%MG_DATA_FILE_PATH%Empty.sdf</Value></Parameter></FeatureSource>';
+        if ($bTestUnauth) {
+            $resp = $this->apiTestWithCredentials("$resPart/content.xml", "POST", array(), "Foo", "Bar");
+            $this->assertStatusCodeIs(401, $resp);
 
-        $resp = $this->apiTestWithCredentials("/library/RestUnitTests/Empty.FeatureSource/content.xml", "POST", array(), "Foo", "Bar");
-        $this->assertStatusCodeIs(401, $resp);
+            $resp = $this->apiTestAnon("$resPart/content.xml", "POST", $emptyFeatureSourceXml);
+            $this->assertStatusCodeIs(401, $resp);
+        }
 
-        $resp = $this->apiTestAnon("/library/RestUnitTests/Empty.FeatureSource/content.xml", "POST", $emptyFeatureSourceXml);
-        $this->assertStatusCodeIs(401, $resp);
-
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/Empty.FeatureSource/content.xml", "POST", $emptyFeatureSourceXml);
+        $resp = $this->apiTestAdmin("$resPart/content.xml", "POST", $emptyFeatureSourceXml);
         $this->assertStatusCodeIs(201, $resp);
 
-        $resp = $this->apiTestAnon("/library/RestUnitTests/Empty.FeatureSource", "DELETE", null);
-        $this->assertStatusCodeIs(401, $resp);
+        if ($bTestUnauth) {
+            $resp = $this->apiTestAnon("$resPart", "DELETE", null);
+            $this->assertStatusCodeIs(401, $resp);
+        }
 
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/Empty.FeatureSource", "DELETE", null);
+        $resp = $this->apiTestAdmin("$resPart", "DELETE", null);
         $this->assertStatusCodeIs(200, $resp);
     }
-    public function testOperationAltRoute() {
+    private function __testOperationAltRoute($resPart, $resPart2, $bTestUnauth, $bTestGetHeader) {
         $emptyFeatureSourceXml = '<?xml version="1.0" encoding="UTF-8"?><FeatureSource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FeatureSource-1.0.0.xsd"><Provider>OSGeo.SDF</Provider><Parameter><Name>File</Name><Value>%MG_DATA_FILE_PATH%Empty.sdf</Value></Parameter></FeatureSource>';
+        if ($bTestUnauth) {
+            $resp = $this->apiTestWithCredentials("$resPart2/contentorheader.xml", "POST", array(), "Foo", "Bar");
+            $this->assertStatusCodeIs(401, $resp);
 
-        $resp = $this->apiTestWithCredentials("/library/RestUnitTests/Empty2.FeatureSource/contentorheader.xml", "POST", array(), "Foo", "Bar");
-        $this->assertStatusCodeIs(401, $resp);
-
-        $resp = $this->apiTestAnon("/library/RestUnitTests/Empty2.FeatureSource/contentorheader.xml", "POST", array("content" => $this->makeContentBlob($emptyFeatureSourceXml)));
-        $this->assertStatusCodeIs(401, $resp);
-
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/Empty2.FeatureSource/contentorheader.xml", "POST", array("content" => $this->makeContentBlob($emptyFeatureSourceXml)));
+            $resp = $this->apiTestAnon("$resPart2/contentorheader.xml", "POST", array("content" => $this->makeContentBlob($emptyFeatureSourceXml)));
+            $this->assertStatusCodeIs(401, $resp);
+        }
+        $resp = $this->apiTestAdmin("$resPart2/contentorheader.xml", "POST", array("content" => $this->makeContentBlob($emptyFeatureSourceXml)));
         $this->assertStatusCodeIs(201, $resp);
 
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/Empty2.FeatureSource/header.xml", "GET", null);
-        $this->assertStatusCodeIs(200, $resp);
-        $this->assertXmlContent($resp);
-        $this->assertTrue(strpos($resp->getContent(), "<Name>HelloWorld</Name>") === FALSE);
+        if ($bTestGetHeader) {
+            $resp = $this->apiTestAdmin("$resPart2/header.xml", "GET", null);
+            $this->assertStatusCodeIs(200, $resp);
+            $this->assertXmlContent($resp);
+            $this->assertTrue(strpos($resp->getContent(), "<Name>HelloWorld</Name>") === FALSE);
+        }
 
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/Empty2.FeatureSource/contentorheader.xml", "POST", array("content" => $this->makeContentBlob($emptyFeatureSourceXml), "header" => $this->makeContentBlob($this->createHeaderXml())));
+        $resp = $this->apiTestAdmin("$resPart2/contentorheader.xml", "POST", array("content" => $this->makeContentBlob($emptyFeatureSourceXml), "header" => $this->makeContentBlob($this->createHeaderXml())));
         $this->assertStatusCodeIs(201, $resp);
 
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/Empty2.FeatureSource/header.xml", "GET", null);
-        $this->assertStatusCodeIs(200, $resp);
-        $this->assertXmlContent($resp);
-        $this->assertTrue(strpos($resp->getContent(), "<Name>HelloWorld</Name>") !== FALSE);
+        if ($bTestGetHeader) {
+            $resp = $this->apiTestAdmin("$resPart2/header.xml", "GET", null);
+            $this->assertStatusCodeIs(200, $resp);
+            $this->assertXmlContent($resp);
+            $this->assertTrue(strpos($resp->getContent(), "<Name>HelloWorld</Name>") !== FALSE);
+        }
 
-        $resp = $this->apiTestAnon("/library/RestUnitTests/Empty2.FeatureSource", "DELETE", null);
-        $this->assertStatusCodeIs(401, $resp);
+        if ($bTestUnauth) {
+            $resp = $this->apiTestAnon("$resPart2", "DELETE", null);
+            $this->assertStatusCodeIs(401, $resp);
+        }
 
-        $resp = $this->apiTestAdmin("/library/RestUnitTests/Empty2.FeatureSource", "DELETE", null);
+        $resp = $this->apiTestAdmin("$resPart2", "DELETE", null);
         $this->assertStatusCodeIs(200, $resp);
+    }
+    public function testLibraryOperation() {
+        $this->__testOperation($this->getLibraryResourceUrlPart(), true);
+    }
+    public function testLibraryOperationAltRoute() {
+        $this->__testOperationAltRoute($this->getLibraryResourceUrlPart(), $this->getLibraryResourceUrlPart2(), true, true);
+    }
+    public function testSessionOperation() {
+        $this->__testOperation($this->getSessionResourceUrlPart(), false);
+    }
+    public function testSessionOperationAltRoute() {
+        $this->__testOperationAltRoute($this->getSessionResourceUrlPart(), $this->getSessionResourceUrlPart2(), false, false);
     }
 }

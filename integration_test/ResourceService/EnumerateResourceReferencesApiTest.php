@@ -21,133 +21,171 @@ require_once dirname(__FILE__)."/../Config.php";
 require_once dirname(__FILE__)."/../ServiceTest.php";
 
 class EnumerateResourceReferencesApiTest extends ServiceTest {
-    public function testBadRequest() {
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", null, "Foo", "Bar");
-        $this->assertStatusCodeIs(401, $resp);
-        $this->assertXmlContent($resp);
+    protected function setUp() {
+        parent::setUp();
+        $resp = $this->apiTest("/services/copyresource", "POST", array(
+            "session" => $this->anonymousSessionId,
+            "source" => "Library://Samples/Sheboygan/Data/Parcels.FeatureSource",
+            "destination" => "Session:" . $this->anonymousSessionId . "//Parcels.FeatureSource",
+            "overwrite" => 1
+        ));
+        $this->assertStatusCodeIs(200, $resp);
+    }
+    protected function tearDown() {
+        parent::tearDown();
+    }
+    private function getSessionResourceUrlPart() {
+        return "/session/" . $this->anonymousSessionId . "/Parcels.FeatureSource";
+    }
+    private function getLibraryResourceUrlPart() {
+        return "/library/Samples/Sheboygan/Data/Parcels.FeatureSource";
+    }
+    private function __testBadRequest($resPart, $bTestUnauth) {
+        if ($bTestUnauth) {
+            $resp = $this->apiTestWithCredentials("$resPart/references.xml", "GET", null, "Foo", "Bar");
+            $this->assertStatusCodeIs(401, $resp);
+            $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", array("depth" => -1, "type" => "FeatureSource"), "Foo", "Bar");
-        $this->assertStatusCodeIs(401, $resp);
-        $this->assertXmlContent($resp);
-
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.sdjf", "GET", null);
+            $resp = $this->apiTestWithCredentials("$resPart/references.xml", "GET", array("depth" => -1, "type" => "FeatureSource"), "Foo", "Bar");
+            $this->assertStatusCodeIs(401, $resp);
+            $this->assertXmlContent($resp);
+        }
+        $resp = $this->apiTestAnon("$resPart/references.sdjf", "GET", null);
         $this->assertStatusCodeIs(400, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
 
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.sdjf", "GET", array("depth" => -1, "type" => "LayerDefinition"));
+        $resp = $this->apiTestAnon("$resPart/references.sdjf", "GET", array("depth" => -1, "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(400, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.sdjf", "GET", null);
+        $resp = $this->apiTestAdmin("$resPart/references.sdjf", "GET", null);
         $this->assertStatusCodeIs(400, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.sdjf", "GET", array("depth" => -1, "type" => "LayerDefinition"));
+        $resp = $this->apiTestAdmin("$resPart/references.sdjf", "GET", array("depth" => -1, "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(400, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
     }
-    public function testRawCredentials() {
+    private function __testRawCredentials($resPart) {
         //XML
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", null);
+        $resp = $this->apiTestAnon("$resPart/references.xml", "GET", null);
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", array("depth" => -1, "type" => "LayerDefinition"));
+        $resp = $this->apiTestAnon("$resPart/references.xml", "GET", array("depth" => -1, "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", null);
+        $resp = $this->apiTestAdmin("$resPart/references.xml", "GET", null);
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", array("depth" => -1, "type" => "LayerDefinition"));
+        $resp = $this->apiTestAdmin("$resPart/references.xml", "GET", array("depth" => -1, "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
         //JSON
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.json", "GET", null);
+        $resp = $this->apiTestAnon("$resPart/references.json", "GET", null);
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.json", "GET", array("depth" => -1, "type" => "LayerDefinition"));
+        $resp = $this->apiTestAnon("$resPart/references.json", "GET", array("depth" => -1, "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.json", "GET", null);
+        $resp = $this->apiTestAdmin("$resPart/references.json", "GET", null);
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.json", "GET", array("depth" => -1, "type" => "LayerDefinition"));
+        $resp = $this->apiTestAdmin("$resPart/references.json", "GET", array("depth" => -1, "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
         //HTML
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.html", "GET", null);
+        $resp = $this->apiTestAnon("$resPart/references.html", "GET", null);
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
 
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.html", "GET", array("depth" => -1, "type" => "LayerDefinition"));
+        $resp = $this->apiTestAnon("$resPart/references.html", "GET", array("depth" => -1, "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.html", "GET", null);
+        $resp = $this->apiTestAdmin("$resPart/references.html", "GET", null);
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.html", "GET", array("depth" => -1, "type" => "LayerDefinition"));
+        $resp = $this->apiTestAdmin("$resPart/references.html", "GET", array("depth" => -1, "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
     }
-    public function testSessionId() {
+    private function __testSessionId($resPart) {
         //XML
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", array("session" => $this->anonymousSessionId));
+        $resp = $this->apiTest("$resPart/references.xml", "GET", array("session" => $this->anonymousSessionId));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", array("session" => $this->anonymousSessionId, "depth" => -1, "type" => "LayerDefinition"));
+        $resp = $this->apiTest("$resPart/references.xml", "GET", array("session" => $this->anonymousSessionId, "depth" => -1, "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", array("session" => $this->adminSessionId));
+        $resp = $this->apiTest("$resPart/references.xml", "GET", array("session" => $this->adminSessionId));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.xml", "GET", array("session" => $this->adminSessionId, "depth" => -1, "type" => "LayerDefinition"));
+        $resp = $this->apiTest("$resPart/references.xml", "GET", array("session" => $this->adminSessionId, "depth" => -1, "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
         //JSON
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.json", "GET", array("session" => $this->anonymousSessionId));
+        $resp = $this->apiTest("$resPart/references.json", "GET", array("session" => $this->anonymousSessionId));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.json", "GET", array("session" => $this->anonymousSessionId, "depth" => -1, "type" => "LayerDefinition"));
+        $resp = $this->apiTest("$resPart/references.json", "GET", array("session" => $this->anonymousSessionId, "depth" => -1, "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.json", "GET", array("session" => $this->adminSessionId));
+        $resp = $this->apiTest("$resPart/references.json", "GET", array("session" => $this->adminSessionId));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.json", "GET", array("session" => $this->adminSessionId, "depth" => -1, "type" => "LayerDefinition"));
+        $resp = $this->apiTest("$resPart/references.json", "GET", array("session" => $this->adminSessionId, "depth" => -1, "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
         
         //HTML
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.html", "GET", array("session" => $this->anonymousSessionId));
+        $resp = $this->apiTest("$resPart/references.html", "GET", array("session" => $this->anonymousSessionId));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.html", "GET", array("session" => $this->anonymousSessionId, "depth" => -1, "type" => "LayerDefinition"));
+        $resp = $this->apiTest("$resPart/references.html", "GET", array("session" => $this->anonymousSessionId, "depth" => -1, "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.html", "GET", array("session" => $this->adminSessionId));
+        $resp = $this->apiTest("$resPart/references.html", "GET", array("session" => $this->adminSessionId));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/references.html", "GET", array("session" => $this->adminSessionId, "depth" => -1, "type" => "LayerDefinition"));
+        $resp = $this->apiTest("$resPart/references.html", "GET", array("session" => $this->adminSessionId, "depth" => -1, "type" => "LayerDefinition"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
+    }
+    public function testLibraryBadRequest() {
+        $this->__testBadRequest($this->getLibraryResourceUrlPart(), true);
+    }
+    public function testLibraryRawCredentials() {
+        $this->__testRawCredentials($this->getLibraryResourceUrlPart());
+    }
+    public function testLibrarySessionId() {
+        $this->__testSessionId($this->getLibraryResourceUrlPart());
+    }
+    public function testSessionBadRequest() {
+        $this->__testBadRequest($this->getSessionResourceUrlPart(), false);
+    }
+    public function testSessionRawCredentials() {
+        $this->__testRawCredentials($this->getSessionResourceUrlPart());
+    }
+    public function testSessionSessionId() {
+        $this->__testSessionId($this->getSessionResourceUrlPart());
     }
 }
