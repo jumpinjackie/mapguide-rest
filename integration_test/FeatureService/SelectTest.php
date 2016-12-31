@@ -37,6 +37,13 @@ class SelectParcelsLibraryTest extends ServiceTest {
             "overwrite" => 1
         ));
         $this->assertStatusCodeIs(200, $resp);
+        $resp = $this->apiTest("/services/copyresource", "POST", array(
+            "session" => $this->anonymousSessionId,
+            "source" => "Library://Samples/Sheboygan/Data/VotingDistricts.FeatureSource",
+            "destination" => "Session:" . $this->anonymousSessionId . "//VotingDistricts.FeatureSource",
+            "overwrite" => 1
+        ));
+        $this->assertStatusCodeIs(200, $resp);
     }
     protected function tearDown() {
         parent::tearDown();
@@ -517,7 +524,6 @@ class SelectParcelsLibraryTest extends ServiceTest {
         $this->assertJsonContent($resp);
     }
 
-
     public function testLibrary_BadRequest() {
         $this->__testBadRequest($this->getLibraryFsResourceUrlPart());
     }
@@ -667,5 +673,126 @@ class SelectParcelsLibraryTest extends ServiceTest {
     }
     public function testLibrary_BBOXSelectWithoutXformGeoJsonSessionId() {
         $this->__testBBOXSelectWithoutXformGeoJsonSessionId($this->getLibraryVdFsResourceUrlPart());
+    }
+
+    public function testSession_XmlRawCredentials() {
+        $this->__testXmlRawCredentials($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_XmlSessionId() {
+        $this->__testXmlSessionId($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_GeoJsonRawCredentials() {
+        $this->__testGeoJsonRawCredentials($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_GeoJsonSessionId() {
+        $this->__testGeoJsonSessionId($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_ByLayerXmlRawCredentials() {
+        $this->__testByLayerXmlRawCredentials($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_ByLayerXmlSessionId() {
+        $this->__testByLayerXmlSessionId($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_ByLayerGeoJsonRawCredentials() {
+        $this->__testByLayerGeoJsonRawCredentials($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_ByLayerGeoJsonSessionId() {
+        $this->__testByLayerGeoJsonSessionId($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_XmlSchmittRawCredentials() {
+        $this->__testXmlSchmittRawCredentials($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_XmlSchmittSessionId() {
+        $this->__testXmlSchmittSessionId($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_GeoJsonSchmittRawCredentials() {
+        $this->__testGeoJsonSchmittRawCredentials($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_GeoJsonSchmittSessionId() {
+        $this->__testGeoJsonSchmittSessionId($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_ByLayerXmlSchmittRawCredentials() {
+        $this->__testByLayerXmlSchmittRawCredentials($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_ByLayerXmlSchmittSessionId() {
+        $this->__testByLayerXmlSchmittSessionId($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_ByLayerGeoJsonSchmittRawCredentials() {
+        $this->__testByLayerGeoJsonSchmittRawCredentials($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_ByLayerGeoJsonSchmittSessionId() {
+        $this->__testByLayerGeoJsonSchmittSessionId($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_ProjectedPropertyListXmlRawCredentials() {
+        $this->__testProjectedPropertyListXmlRawCredentials($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_ProjectedPropertyListXmlSessionId() {
+        $this->__testProjectedPropertyListXmlSessionId($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_ProjectedPropertyListGeoJsonRawCredentials() {
+        $this->__testProjectedPropertyListGeoJsonRawCredentials($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_ProjectedPropertyListGeoJsonSessionId() {
+        $this->__testProjectedPropertyListGeoJsonSessionId($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_ProjectedPropertyListByLayerXmlRawCredentials() {
+        $this->__testProjectedPropertyListByLayerXmlRawCredentials($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_ProjectedPropertyListByLayerXmlSessionId() {
+        $this->__testProjectedPropertyListByLayerXmlSessionId($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_ProjectedPropertyListByLayerGeoJsonRawCredentials() {
+        $this->__testProjectedPropertyListByLayerGeoJsonRawCredentials($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_ProjectedPropertyListByLayerGeoJsonSessionId() {
+        $this->__testProjectedPropertyListByLayerGeoJsonSessionId($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_XformXmlRawCredentials() {
+        $this->__testXformXmlRawCredentials($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_XformXmlSessionId() {
+        $this->__testXformXmlSessionId($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_XformGeoJsonRawCredentials() {
+        $this->__testXformGeoJsonRawCredentials($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_XformGeoJsonSessionId() {
+        $this->__testXformGeoJsonSessionId($this->getSessionFsResourceUrlPart());
+    }
+    public function testSession_XformByLayerXmlRawCredentials() {
+        $this->__testXformByLayerXmlRawCredentials($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_XformByLayerXmlSessionId() {
+        $this->__testXformByLayerXmlSessionId($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_XformByLayerGeoJsonRawCredentials() {
+        $this->__testXformByLayerGeoJsonRawCredentials($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_XformByLayerGeoJsonSessionId() {
+        $this->__testXformByLayerGeoJsonSessionId($this->getSessionLyrResourceUrlPart());
+    }
+    public function testSession_BBOXSelectWithXformXmlRawCredentials() {
+        $this->__testBBOXSelectWithXformXmlRawCredentials($this->getSessionVdFsResourceUrlPart());
+    }
+    public function testSession_BBOXSelectWithXformXmlSessionId() {
+        $this->__testBBOXSelectWithXformXmlSessionId($this->getSessionVdFsResourceUrlPart());
+    }
+    public function testSession_BBOXSelectWithXformGeoJsonRawCredentials() {
+        $this->__testBBOXSelectWithXformGeoJsonRawCredentials($this->getSessionVdFsResourceUrlPart());
+    }
+    public function testSession_BBOXSelectWithXformGeoJsonSessionId() {
+        $this->__testBBOXSelectWithXformGeoJsonSessionId($this->getSessionVdFsResourceUrlPart());
+    }
+    public function testSession_BBOXSelectWithoutXformXmlRawCredentials() {
+        $this->__testBBOXSelectWithoutXformXmlRawCredentials($this->getSessionVdFsResourceUrlPart());
+    }
+    public function testSession_BBOXSelectWithoutXformXmlSessionId() {
+        $this->__testBBOXSelectWithoutXformXmlSessionId($this->getSessionVdFsResourceUrlPart());
+    }
+    public function testSession_BBOXSelectWithoutXformGeoJsonRawCredentials() {
+        $this->__testBBOXSelectWithoutXformGeoJsonRawCredentials($this->getSessionVdFsResourceUrlPart());
+    }
+    public function testSession_BBOXSelectWithoutXformGeoJsonSessionId() {
+        $this->__testBBOXSelectWithoutXformGeoJsonSessionId($this->getSessionVdFsResourceUrlPart());
     }
 }
