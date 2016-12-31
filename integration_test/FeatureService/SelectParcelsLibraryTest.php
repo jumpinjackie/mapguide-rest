@@ -21,463 +21,651 @@ require_once dirname(__FILE__)."/../Config.php";
 require_once dirname(__FILE__)."/../ServiceTest.php";
 
 class SelectParcelsLibraryTest extends ServiceTest {
-    public function testBadRequest() {
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100), "Foo", "Bar");
+    protected function setUp() {
+        parent::setUp();
+        $resp = $this->apiTest("/services/copyresource", "POST", array(
+            "session" => $this->anonymousSessionId,
+            "source" => "Library://Samples/Sheboygan/Data/Parcels.FeatureSource",
+            "destination" => "Session:" . $this->anonymousSessionId . "//Parcels.FeatureSource",
+            "overwrite" => 1
+        ));
+        $this->assertStatusCodeIs(200, $resp);
+        $resp = $this->apiTest("/services/copyresource", "POST", array(
+            "session" => $this->anonymousSessionId,
+            "source" => "Library://Samples/Sheboygan/Layers/Parcels.LayerDefinition",
+            "destination" => "Session:" . $this->anonymousSessionId . "//Parcels.LayerDefinition",
+            "overwrite" => 1
+        ));
+        $this->assertStatusCodeIs(200, $resp);
+    }
+    protected function tearDown() {
+        parent::tearDown();
+    }
+    private function getSessionFsResourceUrlPart() {
+        return "/session/" . $this->anonymousSessionId . "/Parcels.FeatureSource";
+    }
+    private function getLibraryFsResourceUrlPart() {
+        return "/library/Samples/Sheboygan/Data/Parcels.FeatureSource";
+    }
+    private function getSessionLyrResourceUrlPart() {
+        return "/session/" . $this->anonymousSessionId . "/Parcels.LayerDefinition";
+    }
+    private function getLibraryLyrResourceUrlPart() {
+        return "/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition";
+    }
+    private function getSessionVdFsResourceUrlPart() {
+        return "/session/" . $this->anonymousSessionId . "/VotingDistricts.FeatureSource";
+    }
+    private function getLibraryVdFsResourceUrlPart() {
+        return "/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource";
+    }
+    private function __testBadRequest($fsResPart) {
+        $resp = $this->apiTestWithCredentials("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100), "Foo", "Bar");
+        $resp = $this->apiTestWithCredentials("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testXmlRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100));
+    private function __testXmlRawCredentials($fsResPart) {
+        $resp = $this->apiTestAnon("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100));
+        $resp = $this->apiTestAdmin("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testXmlSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100));
+    private function __testXmlSessionId($fsResPart) {
+        $resp = $this->apiTest("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100));
+        $resp = $this->apiTest("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testGeoJsonRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100));
+    private function __testGeoJsonRawCredentials($fsResPart) {
+        $resp = $this->apiTestAnon("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100));
+        $resp = $this->apiTestAdmin("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testGeoJsonSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100));
+    private function __testGeoJsonSessionId($fsResPart) {
+        $resp = $this->apiTest("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100));
+        $resp = $this->apiTest("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
-
-    public function testByLayerBadRequest() {
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("maxfeatures" => 100), "Foo", "Bar");
+    private function __testByLayerBadRequest($lyrResPart) {
+        $resp = $this->apiTestWithCredentials("$lyrResPart/features.xml", "GET", array("maxfeatures" => 100), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("maxfeatures" => 100), "Foo", "Bar");
+        $resp = $this->apiTestWithCredentials("$lyrResPart/features.geojson", "GET", array("maxfeatures" => 100), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testByLayerXmlRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("maxfeatures" => 100));
+    private function __testByLayerXmlRawCredentials($lyrResPart) {
+        $resp = $this->apiTestAnon("$lyrResPart/features.xml", "GET", array("maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("maxfeatures" => 100));
+        $resp = $this->apiTestAdmin("$lyrResPart/features.xml", "GET", array("maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testByLayerXmlSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100));
+    private function __testByLayerXmlSessionId($lyrResPart) {
+        $resp = $this->apiTest("$lyrResPart/features.xml", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100));
+        $resp = $this->apiTest("$lyrResPart/features.xml", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testByLayerGeoJsonRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("maxfeatures" => 100));
+    private function __testByLayerGeoJsonRawCredentials($lyrResPart) {
+        $resp = $this->apiTestAnon("$lyrResPart/features.geojson", "GET", array("maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("maxfeatures" => 100));
+        $resp = $this->apiTestAdmin("$lyrResPart/features.geojson", "GET", array("maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testByLayerGeoJsonSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100));
+    private function __testByLayerGeoJsonSessionId($lyrResPart) {
+        $resp = $this->apiTest("$lyrResPart/features.geojson", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100));
+        $resp = $this->apiTest("$lyrResPart/features.geojson", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
 
-    public function testSchmittBadRequest() {
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"), "Foo", "Bar");
+    private function __testSchmittBadRequest($fsResPart) {
+        $resp = $this->apiTestWithCredentials("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"), "Foo", "Bar");
+        $resp = $this->apiTestWithCredentials("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testXmlSchmittRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+    private function __testXmlSchmittRawCredentials($fsResPart) {
+        $resp = $this->apiTestAnon("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+        $resp = $this->apiTestAdmin("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testXmlSchmittSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+    private function __testXmlSchmittSessionId($fsResPart) {
+        $resp = $this->apiTest("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+        $resp = $this->apiTest("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testGeoJsonSchmittRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+    private function __testGeoJsonSchmittRawCredentials($fsResPart) {
+        $resp = $this->apiTestAnon("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+        $resp = $this->apiTestAdmin("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testGeoJsonSchmittSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+    private function __testGeoJsonSchmittSessionId($fsResPart) {
+        $resp = $this->apiTest("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+        $resp = $this->apiTest("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
 
-    public function testByLayerSchmittBadRequest() {
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"), "Foo", "Bar");
+    private function __testByLayerSchmittBadRequest($lyrResPart) {
+        $resp = $this->apiTestWithCredentials("$lyrResPart/features.xml", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"), "Foo", "Bar");
+        $resp = $this->apiTestWithCredentials("$lyrResPart/features.geojson", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testByLayerXmlSchmittRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+    private function __testByLayerXmlSchmittRawCredentials($lyrResPart) {
+        $resp = $this->apiTestAnon("$lyrResPart/features.xml", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+        $resp = $this->apiTestAdmin("$lyrResPart/features.xml", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testByLayerXmlSchmittSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+    private function __testByLayerXmlSchmittSessionId($lyrResPart) {
+        $resp = $this->apiTest("$lyrResPart/features.xml", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+        $resp = $this->apiTest("$lyrResPart/features.xml", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testByLayerGeoJsonSchmittRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+    private function __testByLayerGeoJsonSchmittRawCredentials($lyrResPart) {
+        $resp = $this->apiTestAnon("$lyrResPart/features.geojson", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+        $resp = $this->apiTestAdmin("$lyrResPart/features.geojson", "GET", array("maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testByLayerGeoJsonSchmittSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+    private function __testByLayerGeoJsonSchmittSessionId($lyrResPart) {
+        $resp = $this->apiTest("$lyrResPart/features.geojson", "GET", array("session" => $this->anonymousSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
+        $resp = $this->apiTest("$lyrResPart/features.geojson", "GET", array("session" => $this->adminSessionId, "maxfeatures" => 100, "filter" => "RNAME LIKE 'SCHMITT%'"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
 
-    public function testProjectedPropertyListBadRequest() {
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100), "Foo", "Bar");
+    private function __testProjectedPropertyListBadRequest($fsResPart) {
+        $resp = $this->apiTestWithCredentials("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100), "Foo", "Bar");
+        $resp = $this->apiTestWithCredentials("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testProjectedPropertyListXmlRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
+    private function __testProjectedPropertyListXmlRawCredentials($fsResPart) {
+        $resp = $this->apiTestAnon("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
+        $resp = $this->apiTestAdmin("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testProjectedPropertyListXmlSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
+    private function __testProjectedPropertyListXmlSessionId($fsResPart) {
+        $resp = $this->apiTest("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.xml/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->adminSessionId, "maxfeatures" => 100));
+        $resp = $this->apiTest("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->adminSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testProjectedPropertyListGeoJsonRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
+    private function __testProjectedPropertyListGeoJsonRawCredentials($fsResPart) {
+        $resp = $this->apiTestAnon("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
+        $resp = $this->apiTestAdmin("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testProjectedPropertyListGeoJsonSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
+    private function __testProjectedPropertyListGeoJsonSessionId($fsResPart) {
+        $resp = $this->apiTest("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/features.geojson/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->adminSessionId, "maxfeatures" => 100));
+        $resp = $this->apiTest("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->adminSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
 
-    public function testProjectedPropertyListByLayerBadRequest() {
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100), "Foo", "Bar");
+    private function __testProjectedPropertyListByLayerBadRequest($lyrResPart) {
+        $resp = $this->apiTestWithCredentials("$lyrResPart/features.xml", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100), "Foo", "Bar");
+        $resp = $this->apiTestWithCredentials("$lyrResPart/features.geojson", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testProjectedPropertyListByLayerXmlRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
+    private function __testProjectedPropertyListByLayerXmlRawCredentials($lyrResPart) {
+        $resp = $this->apiTestAnon("$lyrResPart/features.xml", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
+        $resp = $this->apiTestAdmin("$lyrResPart/features.xml", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testProjectedPropertyListByLayerXmlSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
+    private function __testProjectedPropertyListByLayerXmlSessionId($lyrResPart) {
+        $resp = $this->apiTest("$lyrResPart/features.xml", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->adminSessionId, "maxfeatures" => 100));
+        $resp = $this->apiTest("$lyrResPart/features.xml", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->adminSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testProjectedPropertyListByLayerGeoJsonRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
+    private function __testProjectedPropertyListByLayerGeoJsonRawCredentials($lyrResPart) {
+        $resp = $this->apiTestAnon("$lyrResPart/features.geojson", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
+        $resp = $this->apiTestAdmin("$lyrResPart/features.geojson", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testProjectedPropertyListByLayerGeoJsonSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
+    private function __testProjectedPropertyListByLayerGeoJsonSessionId($lyrResPart) {
+        $resp = $this->apiTest("$lyrResPart/features.geojson", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->adminSessionId, "maxfeatures" => 100));
+        $resp = $this->apiTest("$lyrResPart/features.geojson", "GET", array("properties" => "Autogenerated_SDF_ID,RNAME,SHPGEOM", "session" => $this->adminSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
 
-    public function testXformBadRequest() {
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100), "Foo", "Bar");
+    private function __testXformBadRequest($fsResPart) {
+        $resp = $this->apiTestWithCredentials("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100), "Foo", "Bar");
+        $resp = $this->apiTestWithCredentials("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testXformXmlRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
+    private function __testXformXmlRawCredentials($fsResPart) {
+        $resp = $this->apiTestAnon("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
+        $resp = $this->apiTestAdmin("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testXformXmlSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
+    private function __testXformXmlSessionId($fsResPart) {
+        $resp = $this->apiTest("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->adminSessionId, "maxfeatures" => 100));
+        $resp = $this->apiTest("$fsResPart/features.xml/SHP_Schema/Parcels", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->adminSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testXformGeoJsonRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
+    private function __testXformGeoJsonRawCredentials($fsResPart) {
+        $resp = $this->apiTestAnon("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
+        $resp = $this->apiTestAdmin("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testXformGeoJsonSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
+    private function __testXformGeoJsonSessionId($fsResPart) {
+        $resp = $this->apiTest("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->adminSessionId, "maxfeatures" => 100));
+        $resp = $this->apiTest("$fsResPart/features.geojson/SHP_Schema/Parcels", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->adminSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
 
-    public function testXformByLayerBadRequest() {
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100), "Foo", "Bar");
+    private function __testXformByLayerBadRequest($lyrResPart) {
+        $resp = $this->apiTestWithCredentials("$lyrResPart/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100), "Foo", "Bar");
+        $resp = $this->apiTestWithCredentials("$lyrResPart/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testXformByLayerXmlRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
+    private function __testXformByLayerXmlRawCredentials($lyrResPart) {
+        $resp = $this->apiTestAnon("$lyrResPart/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
+        $resp = $this->apiTestAdmin("$lyrResPart/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testXformByLayerXmlSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
+    private function __testXformByLayerXmlSessionId($lyrResPart) {
+        $resp = $this->apiTest("$lyrResPart/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->adminSessionId, "maxfeatures" => 100));
+        $resp = $this->apiTest("$lyrResPart/features.xml", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->adminSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testXformByLayerGeoJsonRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
+    private function __testXformByLayerGeoJsonRawCredentials($lyrResPart) {
+        $resp = $this->apiTestAnon("$lyrResPart/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
+        $resp = $this->apiTestAdmin("$lyrResPart/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testXformByLayerGeoJsonSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
+    private function __testXformByLayerGeoJsonSessionId($lyrResPart) {
+        $resp = $this->apiTest("$lyrResPart/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->anonymousSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Layers/Parcels.LayerDefinition/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->adminSessionId, "maxfeatures" => 100));
+        $resp = $this->apiTest("$lyrResPart/features.geojson", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->adminSessionId, "maxfeatures" => 100));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
 
-    public function testBBOXSelectWithXformBadRequest() {
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.xml/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"), "Foo", "Bar");
+    private function __testBBOXSelectWithXformBadRequest($vdFsResPart) {
+        $resp = $this->apiTestWithCredentials("$vdFsResPart/features.xml/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"), "Foo", "Bar");
+        $resp = $this->apiTestWithCredentials("$vdFsResPart/features.geojson/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testBBOXSelectWithXformXmlRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.xml/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+    private function __testBBOXSelectWithXformXmlRawCredentials($vdFsResPart) {
+        $resp = $this->apiTestAnon("$vdFsResPart/features.xml/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.xml/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+        $resp = $this->apiTestAdmin("$vdFsResPart/features.xml/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testBBOXSelectWithXformXmlSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.xml/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->anonymousSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+    private function __testBBOXSelectWithXformXmlSessionId($vdFsResPart) {
+        $resp = $this->apiTest("$vdFsResPart/features.xml/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->anonymousSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.xml/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->adminSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+        $resp = $this->apiTest("$vdFsResPart/features.xml/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->adminSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testBBOXSelectWithXformGeoJsonRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+    private function __testBBOXSelectWithXformGeoJsonRawCredentials($vdFsResPart) {
+        $resp = $this->apiTestAnon("$vdFsResPart/features.geojson/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+        $resp = $this->apiTestAdmin("$vdFsResPart/features.geojson/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testBBOXSelectWithXformGeoJsonSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->anonymousSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+    private function __testBBOXSelectWithXformGeoJsonSessionId($vdFsResPart) {
+        $resp = $this->apiTest("$vdFsResPart/features.geojson/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->anonymousSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->adminSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+        $resp = $this->apiTest("$vdFsResPart/features.geojson/Default/VotingDistricts", "GET", array("transformto" => "WGS84.PseudoMercator", "session" => $this->adminSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
-
-    public function testBBOXSelectWithoutXformBadRequest() {
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.xml/Default/VotingDistricts", "GET", array("bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"), "Foo", "Bar");
+    private function __testBBOXSelectWithoutXformBadRequest($vdFsResPart) {
+        $resp = $this->apiTestWithCredentials("$vdFsResPart/features.xml/Default/VotingDistricts", "GET", array("bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", array("bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"), "Foo", "Bar");
+        $resp = $this->apiTestWithCredentials("$vdFsResPart/features.geojson/Default/VotingDistricts", "GET", array("bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"), "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testBBOXSelectWithoutXformXmlRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.xml/Default/VotingDistricts", "GET", array("bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+    private function __testBBOXSelectWithoutXformXmlRawCredentials($vdFsResPart) {
+        $resp = $this->apiTestAnon("$vdFsResPart/features.xml/Default/VotingDistricts", "GET", array("bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.xml/Default/VotingDistricts", "GET", array("bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
-        $this->assertStatusCodeIs(200, $resp);
-        $this->assertXmlContent($resp);
-    }
-    public function testBBOXSelectWithoutXformXmlSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.xml/Default/VotingDistricts", "GET", array("session" => $this->anonymousSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
-        $this->assertStatusCodeIs(200, $resp);
-        $this->assertXmlContent($resp);
-
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.xml/Default/VotingDistricts", "GET", array("session" => $this->adminSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+        $resp = $this->apiTestAdmin("$vdFsResPart/features.xml/Default/VotingDistricts", "GET", array("bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertXmlContent($resp);
     }
-    public function testBBOXSelectWithoutXformGeoJsonRawCredentials() {
-        $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", array("bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+    private function __testBBOXSelectWithoutXformXmlSessionId($vdFsResPart) {
+        $resp = $this->apiTest("$vdFsResPart/features.xml/Default/VotingDistricts", "GET", array("session" => $this->anonymousSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertXmlContent($resp);
+
+        $resp = $this->apiTest("$vdFsResPart/features.xml/Default/VotingDistricts", "GET", array("session" => $this->adminSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertXmlContent($resp);
+    }
+    private function __testBBOXSelectWithoutXformGeoJsonRawCredentials($vdFsResPart) {
+        $resp = $this->apiTestAnon("$vdFsResPart/features.geojson/Default/VotingDistricts", "GET", array("bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTestAdmin("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", array("bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+        $resp = $this->apiTestAdmin("$vdFsResPart/features.geojson/Default/VotingDistricts", "GET", array("bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
     }
-    public function testBBOXSelectWithoutXformGeoJsonSessionId() {
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", array("session" => $this->anonymousSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+    private function __testBBOXSelectWithoutXformGeoJsonSessionId($vdFsResPart) {
+        $resp = $this->apiTest("$vdFsResPart/features.geojson/Default/VotingDistricts", "GET", array("session" => $this->anonymousSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
 
-        $resp = $this->apiTest("/library/Samples/Sheboygan/Data/VotingDistricts.FeatureSource/features.geojson/Default/VotingDistricts", "GET", array("session" => $this->adminSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
+        $resp = $this->apiTest("$vdFsResPart/features.geojson/Default/VotingDistricts", "GET", array("session" => $this->adminSessionId, "bbox" => "-87.71342839441816,43.74687173218348,-87.70806397638839,43.7499718637344"));
         $this->assertStatusCodeIs(200, $resp);
         $this->assertJsonContent($resp);
+    }
+
+
+    public function testLibrary_BadRequest() {
+        $this->__testBadRequest($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_XmlRawCredentials() {
+        $this->__testXmlRawCredentials($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_XmlSessionId() {
+        $this->__testXmlSessionId($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_GeoJsonRawCredentials() {
+        $this->__testGeoJsonRawCredentials($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_GeoJsonSessionId() {
+        $this->__testGeoJsonSessionId($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_ByLayerBadRequest() {
+        $this->__testByLayerBadRequest($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_ByLayerXmlRawCredentials() {
+        $this->__testByLayerXmlRawCredentials($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_ByLayerXmlSessionId() {
+        $this->__testByLayerXmlSessionId($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_ByLayerGeoJsonRawCredentials() {
+        $this->__testByLayerGeoJsonRawCredentials($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_ByLayerGeoJsonSessionId() {
+        $this->__testByLayerGeoJsonSessionId($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_SchmittBadRequest() {
+        $this->__testSchmittBadRequest($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_XmlSchmittRawCredentials() {
+        $this->__testXmlSchmittRawCredentials($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_XmlSchmittSessionId() {
+        $this->__testXmlSchmittSessionId($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_GeoJsonSchmittRawCredentials() {
+        $this->__testGeoJsonSchmittRawCredentials($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_GeoJsonSchmittSessionId() {
+        $this->__testGeoJsonSchmittSessionId($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_ByLayerSchmittBadRequest() {
+        $this->__testByLayerSchmittBadRequest($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_ByLayerXmlSchmittRawCredentials() {
+        $this->__testByLayerXmlSchmittRawCredentials($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_ByLayerXmlSchmittSessionId() {
+        $this->__testByLayerXmlSchmittSessionId($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_ByLayerGeoJsonSchmittRawCredentials() {
+        $this->__testByLayerGeoJsonSchmittRawCredentials($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_ByLayerGeoJsonSchmittSessionId() {
+        $this->__testByLayerGeoJsonSchmittSessionId($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_ProjectedPropertyListBadRequest() {
+        $this->__testProjectedPropertyListBadRequest($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_ProjectedPropertyListXmlRawCredentials() {
+        $this->__testProjectedPropertyListXmlRawCredentials($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_ProjectedPropertyListXmlSessionId() {
+        $this->__testProjectedPropertyListXmlSessionId($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_ProjectedPropertyListGeoJsonRawCredentials() {
+        $this->__testProjectedPropertyListGeoJsonRawCredentials($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_ProjectedPropertyListGeoJsonSessionId() {
+        $this->__testProjectedPropertyListGeoJsonSessionId($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_ProjectedPropertyListByLayerBadRequest() {
+        $this->__testProjectedPropertyListByLayerBadRequest($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_ProjectedPropertyListByLayerXmlRawCredentials() {
+        $this->__testProjectedPropertyListByLayerXmlRawCredentials($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_ProjectedPropertyListByLayerXmlSessionId() {
+        $this->__testProjectedPropertyListByLayerXmlSessionId($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_ProjectedPropertyListByLayerGeoJsonRawCredentials() {
+        $this->__testProjectedPropertyListByLayerGeoJsonRawCredentials($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_ProjectedPropertyListByLayerGeoJsonSessionId() {
+        $this->__testProjectedPropertyListByLayerGeoJsonSessionId($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_XformBadRequest() {
+        $this->__testXformBadRequest($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_XformXmlRawCredentials() {
+        $this->__testXformXmlRawCredentials($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_XformXmlSessionId() {
+        $this->__testXformXmlSessionId($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_XformGeoJsonRawCredentials() {
+        $this->__testXformGeoJsonRawCredentials($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_XformGeoJsonSessionId() {
+        $this->__testXformGeoJsonSessionId($this->getLibraryFsResourceUrlPart());
+    }
+    public function testLibrary_XformByLayerBadRequest() {
+        $this->__testXformByLayerBadRequest($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_XformByLayerXmlRawCredentials() {
+        $this->__testXformByLayerXmlRawCredentials($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_XformByLayerXmlSessionId() {
+        $this->__testXformByLayerXmlSessionId($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_XformByLayerGeoJsonRawCredentials() {
+        $this->__testXformByLayerGeoJsonRawCredentials($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_XformByLayerGeoJsonSessionId() {
+        $this->__testXformByLayerGeoJsonSessionId($this->getLibraryLyrResourceUrlPart());
+    }
+    public function testLibrary_BBOXSelectWithXformBadRequest() {
+        $this->__testBBOXSelectWithXformBadRequest($this->getLibraryVdFsResourceUrlPart());
+    }
+    public function testLibrary_BBOXSelectWithXformXmlRawCredentials() {
+        $this->__testBBOXSelectWithXformXmlRawCredentials($this->getLibraryVdFsResourceUrlPart());
+    }
+    public function testLibrary_BBOXSelectWithXformXmlSessionId() {
+        $this->__testBBOXSelectWithXformXmlSessionId($this->getLibraryVdFsResourceUrlPart());
+    }
+    public function testLibrary_BBOXSelectWithXformGeoJsonRawCredentials() {
+        $this->__testBBOXSelectWithXformGeoJsonRawCredentials($this->getLibraryVdFsResourceUrlPart());
+    }
+    public function testLibrary_BBOXSelectWithXformGeoJsonSessionId() {
+        $this->__testBBOXSelectWithXformGeoJsonSessionId($this->getLibraryVdFsResourceUrlPart());
+    }
+    public function testLibrary_BBOXSelectWithoutXformBadRequest() {
+        $this->__testBBOXSelectWithoutXformBadRequest($this->getLibraryVdFsResourceUrlPart());
+    }
+    public function testLibrary_BBOXSelectWithoutXformXmlRawCredentials() {
+        $this->__testBBOXSelectWithoutXformXmlRawCredentials($this->getLibraryVdFsResourceUrlPart());
+    }
+    public function testLibrary_BBOXSelectWithoutXformXmlSessionId() {
+        $this->__testBBOXSelectWithoutXformXmlSessionId($this->getLibraryVdFsResourceUrlPart());
+    }
+    public function testLibrary_BBOXSelectWithoutXformGeoJsonRawCredentials() {
+        $this->__testBBOXSelectWithoutXformGeoJsonRawCredentials($this->getLibraryVdFsResourceUrlPart());
+    }
+    public function testLibrary_BBOXSelectWithoutXformGeoJsonSessionId() {
+        $this->__testBBOXSelectWithoutXformGeoJsonSessionId($this->getLibraryVdFsResourceUrlPart());
     }
 }
