@@ -20,7 +20,7 @@
 require_once dirname(__FILE__)."/../Config.php";
 require_once dirname(__FILE__)."/../ServiceTest.php";
 
-class EnumerateResourceReferencesApiTest extends ServiceTest {
+class CreateFeatureSourceApiTest extends ServiceTest {
     private function getCreateXml() {
         $fsXml = "<FeatureSourceParams>";
             $fsXml .= "<File>";
