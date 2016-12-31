@@ -32,5 +32,3 @@ class RestAclGroupTest extends RestPublishingTest {
         $this->__testACL(array(46, 346, 2316), "json", "user2", Configuration::MIME_JSON);
     }
 }
-
-?>

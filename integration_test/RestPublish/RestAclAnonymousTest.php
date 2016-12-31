@@ -27,5 +27,3 @@ class RestAclAnonymousTest extends RestPublishingTest {
         $this->__testACL(array(47, 48, 2345), "json", "anonymous", Configuration::MIME_JSON);
     }
 }
-
-?>

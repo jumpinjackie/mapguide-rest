@@ -36,5 +36,3 @@ class MoveResourceTest extends ServiceTest {
         $this->assertMimeType(Configuration::MIME_XML, $resp);
     }
 }
-
-?>

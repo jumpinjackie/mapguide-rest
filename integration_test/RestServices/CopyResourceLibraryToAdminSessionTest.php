@@ -34,5 +34,3 @@ class CopyResourceLibraryToAdminSessionTest extends ServiceTest {
         $this->assertMimeType(Configuration::MIME_XML, $resp);
     }
 }
-
-?>

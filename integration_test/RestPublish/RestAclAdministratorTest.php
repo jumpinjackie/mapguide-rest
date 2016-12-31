@@ -27,5 +27,3 @@ class RestAclAdministratorTest extends RestPublishingTest {
         $this->__testACL(array(76, 244, 1833), "json", "Administrator", Configuration::MIME_JSON);
     }
 }
-
-?>

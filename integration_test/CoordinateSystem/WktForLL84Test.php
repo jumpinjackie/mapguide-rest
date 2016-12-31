@@ -73,5 +73,3 @@ class WktForLL84Test extends ServiceTest {
         $this->__testOperation("json", Configuration::MIME_JSON);
     }
 }
-
-?>

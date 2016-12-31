@@ -91,5 +91,3 @@ class GetLayerKmlTest extends ServiceTest {
         $this->assertTrue(strpos($resp->getContent(), "mapagent/mapagent.fcgi") === FALSE, "Expected no mapagent callback urls in response");
     }
 }
-
-?>

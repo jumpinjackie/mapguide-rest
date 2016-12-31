@@ -76,5 +76,3 @@ class CreateSessionTest extends IntegrationTest {
         $this->assertXmlContent($resp);
     }
 }
-
-?>

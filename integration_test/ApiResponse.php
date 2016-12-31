@@ -62,5 +62,3 @@ class ApiResponse {
         return "Action: ".$this->getRequestMethod().($this->ovMethod != null ? " (Ov: ".$this->ovMethod.")" : "")." ".$this->url."\nRequest: ".var_export($this->reqData, true)."\nContent Type: ".$this->contentType."\nResponse was:\n".$this->dumpContent();
     }
 }
-
-?>

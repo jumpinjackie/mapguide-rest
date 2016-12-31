@@ -21,7 +21,7 @@ require_once dirname(__FILE__)."/../Config.php";
 require_once dirname(__FILE__)."/../ServiceTest.php";
 
 class GetResourceContentApiTest extends ServiceTest {
-    public function testCommon() {
+    public function testLibraryCommon() {
         $resp = $this->apiTestAnon("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.bar", "GET", null);
         $this->assertStatusCodeIs(400, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
@@ -38,7 +38,7 @@ class GetResourceContentApiTest extends ServiceTest {
         $this->assertStatusCodeIs(400, $resp);
         $this->assertMimeType(Configuration::MIME_HTML, $resp);
     }
-    private function __testBase($extension, $mimeType) {
+    private function __testLibraryBase($extension, $mimeType) {
         //Bad Credentials
         $resp = $this->apiTestWithCredentials("/library/Samples/Sheboygan/Data/Parcels.FeatureSource/content.$extension", "GET", NULL, "Foo", "Bar");
         $this->assertStatusCodeIs(401, $resp);
@@ -90,12 +90,10 @@ class GetResourceContentApiTest extends ServiceTest {
         $this->assertMimeType($mimeType, $resp);
         $this->assertContentKind($resp, $extension);
     }
-    public function testXml() {
-        $this->__testBase("xml", Configuration::MIME_XML);
+    public function testLibraryXml() {
+        $this->__testLibraryBase("xml", Configuration::MIME_XML);
     }
-    public function testJson() {
-        $this->__testBase("json", Configuration::MIME_JSON);
+    public function testLibraryJson() {
+        $this->__testLibraryBase("json", Configuration::MIME_JSON);
     }
 }
-
-?>

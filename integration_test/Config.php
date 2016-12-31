@@ -77,5 +77,3 @@ class Configuration {
         return $resp;
     }
 }
-
-?>

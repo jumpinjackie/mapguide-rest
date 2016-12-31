@@ -729,5 +729,3 @@ abstract class RestPublishingTest extends IntegrationTest {
     //    $this->__testACL(array(22, 23, 234), "xml", "administrator", Configuration::MIME_XML);
     //}
 }
-
-?>

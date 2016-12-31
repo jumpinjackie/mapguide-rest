@@ -145,5 +145,3 @@ class ListGroupsTest extends ServiceTest {
         $this->assertJsonContent($resp);
     }
 }
-
-?>

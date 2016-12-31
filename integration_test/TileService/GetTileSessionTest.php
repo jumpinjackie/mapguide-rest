@@ -33,5 +33,3 @@ class GetTileSessionTest extends ServiceTest {
         $this->assertStatusCodeIs(200, $resp);
     }
 }
-
-?>

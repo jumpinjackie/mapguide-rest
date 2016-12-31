@@ -30,5 +30,3 @@ class JSONRoundtripTest extends ServiceTest {
         $this->assertStatusCodeIs(201, $resp);
     }
 }
-
-?>

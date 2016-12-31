@@ -146,5 +146,3 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
         return new CURLFile($tmp, $mimeType);
     }
 }
-
-?>

@@ -79,5 +79,3 @@ class PlotTest extends ServiceTest {
         $this->__testBase(Configuration::MIME_DWF, "dwf");
     }
 }
-
-?>

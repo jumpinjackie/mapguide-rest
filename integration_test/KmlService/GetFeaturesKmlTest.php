@@ -93,5 +93,3 @@ class GetFeaturesKmlTest extends ServiceTest {
         }
     }
 }
-
-?>

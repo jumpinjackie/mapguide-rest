@@ -292,5 +292,3 @@ class JsonRuntimeMapTest extends ServiceTest {
         $this->assertTrue($bFoundTrees, "Expected 'Trees' layer to be re-added");
     }
 }
-
-?>

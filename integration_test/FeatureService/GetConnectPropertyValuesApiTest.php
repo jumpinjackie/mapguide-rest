@@ -68,5 +68,3 @@ class GetConnectPropertyValuesApiTest extends ServiceTest {
     //    $this->__testBase("html", Configuration::MIME_HTML);
     //}
 }
-
-?>

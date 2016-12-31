@@ -60,5 +60,3 @@ class AggregatesApiTest extends ServiceTest {
         $this->__testAggregate("json", Configuration::MIME_JSON, "distinctvalues", array("property" => "RTYPE"));
     }
 }
-
-?>

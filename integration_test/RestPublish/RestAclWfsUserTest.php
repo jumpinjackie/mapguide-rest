@@ -27,5 +27,3 @@ class RestAclWfsUserTest extends RestPublishingTest {
         $this->__testACL(array(67, 68, 2645), "json", "wfsuser", Configuration::MIME_JSON);
     }
 }
-
-?>

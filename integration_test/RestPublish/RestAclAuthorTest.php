@@ -27,5 +27,3 @@ class RestAclAuthorTest extends RestPublishingTest {
         $this->__testACL(array(37, 38, 1345), "json", "author", Configuration::MIME_JSON);
     }
 }
-
-?>

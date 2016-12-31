@@ -97,5 +97,3 @@ class GetResourceHeaderApiTest extends ServiceTest {
         $this->__testBase("json", Configuration::MIME_JSON);
     }
 }
-
-?>

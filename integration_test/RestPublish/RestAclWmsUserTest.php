@@ -27,5 +27,3 @@ class RestAclWmsUserTest extends RestPublishingTest {
         $this->__testACL(array(87, 88, 2385), "json", "wmsuser", Configuration::MIME_JSON);
     }
 }
-
-?>

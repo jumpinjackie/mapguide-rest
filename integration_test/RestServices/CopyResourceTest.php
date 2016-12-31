@@ -31,5 +31,3 @@ class CopyResourceTest extends ServiceTest {
         $this->assertMimeType(Configuration::MIME_XML, $resp);
     }
 }
-
-?>

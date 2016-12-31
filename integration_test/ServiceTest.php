@@ -46,5 +46,3 @@ abstract class ServiceTest extends IntegrationTest {
         $this->adminSessionId = null;
     }
 }
-
-?>

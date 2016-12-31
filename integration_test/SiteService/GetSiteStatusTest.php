@@ -57,5 +57,3 @@ class GetSiteStatusTest extends ServiceTest {
         $this->__testBase("json", Configuration::MIME_JSON);
     }
 }
-
-?>

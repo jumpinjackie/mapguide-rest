@@ -58,5 +58,3 @@ class GetMapKmlTest extends ServiceTest {
         }
     }
 }
-
-?>

@@ -71,5 +71,3 @@ class RenderMapTest extends ServiceTest {
         $this->__testBase(Configuration::MIME_GIF, "gif");
     }
 }
-
-?>

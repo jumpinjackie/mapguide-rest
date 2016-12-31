@@ -96,5 +96,3 @@ class WktToEpsgTest extends ServiceTest {
         $this->__testOperation("json", Configuration::MIME_JSON);
     }
 }
-
-?>
