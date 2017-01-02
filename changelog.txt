@@ -8,6 +8,7 @@
  - #142, #146: Use a more roundtrip-friendly date format when serializing MgDateTime instances to GeoJSON
  - #140: Add DPI parameter for DWF/PDF plotting (though this has no effect for DWF plots, TBD which side (MapGuide or mapguide-rest) this bug is on)
  - #102: Fix boolean feature property serialization for GeoJSON
+ - Updated swagger UI to v2.2.2
  - Updated ol3-cesium in sample apps to 1.21
     - Cesium 1.27
     - OpenLayers 3.19.1
