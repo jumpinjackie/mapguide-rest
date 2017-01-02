@@ -146,7 +146,7 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
             if (!$reader->IsNull($i)) {
                 switch($propType) {
                     case MgPropertyType::Boolean:
-                        array_push($propVals, '"'.$name.'": '.$reader->GetBoolean($i));
+                        array_push($propVals, '"'.$name.'": '.($reader->GetBoolean($i) ? "true" : "false"));
                         break;
                     case MgPropertyType::Byte:
                         array_push($propVals, '"'.$name.'": '.$reader->GetByte($i));
