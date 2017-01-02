@@ -1,5 +1,5 @@
-Next
-====
+1.0 RC5
+=======
  - #137: Verify PHP 5.6 (bundled with MGOS 3.1) compatibility
  - #132: Ensure scale ranges are outputted for raster/drawing layers
  - #145: Fix typo in utils.php
