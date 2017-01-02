@@ -3179,7 +3179,7 @@
                     {
                         "name": "dpi",
                         "in": "query",
-                        "description": "The map display DPI to plot at. Defaults to 96 if not specified",
+                        "description": "The map display DPI to plot at. Defaults to 96 if not specified. Only applicable for PDF plots",
                         "required": false,
                         "type": "integer"
                     },
