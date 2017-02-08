@@ -5618,14 +5618,21 @@
                     },
                     {
                         "name": "mappedonly",
-                        "in": "path",
+                        "in": "query",
                         "description": "Only return properties mapped in the Layer Definition",
                         "required": false,
                         "type": "boolean"
                     },
                     {
+                        "name": "includegeom",
+                        "in": "query",
+                        "description": "Include the geometry, only applicable when mappedonly=1",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
                         "name": "transformto",
-                        "in": "path",
+                        "in": "query",
                         "description": "The CS-Map coordinate system code to transform these features to",
                         "required": false,
                         "type": "string"

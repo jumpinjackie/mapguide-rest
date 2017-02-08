@@ -333,8 +333,9 @@ $app->get("/session/:sessionId/:mapName.Selection/overview.:format", function($s
  *          @SWG\Parameter(name="mapName", in="path", required=true, type="string", description="The name of the runtime map"),
  *          @SWG\Parameter(name="layerName", in="path", required=true, type="string", description="The name of the layer in the selection set"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml, geojson or html", enum={"xml", "geojson", "html"}),
- *          @SWG\Parameter(name="mappedonly", in="path", required=false, type="boolean", description="Only return properties mapped in the Layer Definition"),
- *          @SWG\Parameter(name="transformto", in="path", required=false, type="string", description="The CS-Map coordinate system code to transform these features to"),
+ *          @SWG\Parameter(name="mappedonly", in="query", required=false, type="boolean", description="Only return properties mapped in the Layer Definition"),
+ *          @SWG\Parameter(name="includegeom", in="query", required=false, type="boolean", description="Include the geometry, only applicable when mappedonly=1"),
+ *          @SWG\Parameter(name="transformto", in="query", required=false, type="string", description="The CS-Map coordinate system code to transform these features to"),
  *          @SWG\Parameter(name="pagesize", in="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the number of results for the page."),
  *          @SWG\Parameter(name="page", in="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply."),
  *          @SWG\Parameter(name="orientation", in="query", required=false, type="string", description="The display orientation of feature attribuutes. Only applies if type is html. h=horizontal, v=vertical", enum={"h", "v"}),
@@ -958,7 +959,7 @@ $app->get("/session/:sessionId/:resName/references.:format", function($sessionId
 $app->delete("/session/:sessionId/:resName", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->DeleteResource($resId); 
+    $ctrl->DeleteResource($resId);
 });
 //================================== Tile Service APIs =======================================
 
