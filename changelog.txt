@@ -1,3 +1,11 @@
+Next
+====
+ - #154: Support getting geometry from selected features when (mappedonly=1)
+ - #153: Support for select features on layer definition (for HTML/GeoJSON formats):
+    - Using only properties mapped to display values
+       - Specifying geometry to be included as well
+    - Using display names from property mappings
+
 1.0 RC5
 =======
  - #137: Verify PHP 5.6 (bundled with MGOS 3.1) compatibility
@@ -21,7 +29,7 @@
  - #115: Added Layer/Group/Selection mutation APIs with new sample app demonstrating these APIs
  - #118: Disable anon access to CreateRuntimeMap
  - #119: Added selection overview route
- - #123: Updated Swagger UI and API spec file. Where possible, input and output model schemas are included. 
+ - #123: Updated Swagger UI and API spec file. Where possible, input and output model schemas are included.
  - #124: Add missing JSON support for various /coordsys APIs
  - #125: Added CORS support
  - #122: Implicit XML routes have been removed
