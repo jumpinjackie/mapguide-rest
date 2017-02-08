@@ -1782,7 +1782,7 @@
                     {
                         "name": "properties",
                         "in": "query",
-                        "description": "A comma-separated list of proprety names",
+                        "description": "A comma-separated list of property names. Has no effect if format is CZML",
                         "required": false,
                         "type": "string"
                     },
@@ -1806,6 +1806,27 @@
                         "description": "The CS-Map coordinate system code to transform the resulting features into",
                         "required": false,
                         "type": "string"
+                    },
+                    {
+                        "name": "mappedonly",
+                        "in": "query",
+                        "description": "If true, will use only the properties specified in the display mappings in the Layer Definition. Takes precedence over the properties parameter if both specified. Has no effect if format is CZML",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "displayproperties",
+                        "in": "query",
+                        "description": "If true, will use any display mappings specified in the Layer Definition, only applicable when mappedonly=1 and format is HTML/GeoJSON",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "includegeom",
+                        "in": "query",
+                        "description": "Include the geometry, only applicable when mappedonly=1. Has no effect if format is CZML",
+                        "required": false,
+                        "type": "boolean"
                     },
                     {
                         "name": "bbox",
@@ -5631,6 +5652,13 @@
                         "type": "boolean"
                     },
                     {
+                        "name": "displayproperties",
+                        "in": "query",
+                        "description": "Use the display name of mapped properties, only applicable when mappedonly=1 and format is HTML/GeoJSON",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
                         "name": "transformto",
                         "in": "query",
                         "description": "The CS-Map coordinate system code to transform these features to",
@@ -6700,7 +6728,7 @@
                     {
                         "name": "properties",
                         "in": "query",
-                        "description": "A comma-separated list of proprety names",
+                        "description": "A comma-separated list of property names",
                         "required": false,
                         "type": "string"
                     },
@@ -6717,6 +6745,27 @@
                         "description": "The CS-Map coordinate system code to transform the resulting features into",
                         "required": false,
                         "type": "string"
+                    },
+                    {
+                        "name": "mappedonly",
+                        "in": "query",
+                        "description": "If true, will use only the properties specified in the display mappings in the Layer Definition. Takes precedence over the properties parameter if both specified",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "displayproperties",
+                        "in": "query",
+                        "description": "If true, will use any display mappings specified in the Layer Definition, only applicable when mappedonly=1 and format is HTML/GeoJSON",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "includegeom",
+                        "in": "query",
+                        "description": "Include the geometry, only applicable when mappedonly=1",
+                        "required": false,
+                        "type": "boolean"
                     },
                     {
                         "name": "bbox",

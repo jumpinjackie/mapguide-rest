@@ -103,13 +103,15 @@ class MgHtmlBodyModel
     private $transform;
 
     public $propertyCount;
+    private $displayMap;
 
-    public function __construct($reader, $transform = null) {
+    public function __construct($reader, $transform = null, $limit = -1, $displayMap = null) {
         $this->reader = $reader;
         $this->propertyCount = $this->reader->GetPropertyCount();
         $this->agfRw = new MgAgfReaderWriter();
         $this->wktRw = new MgWktReaderWriter();
         $this->transform = $transform;
+        $this->displayMap = $displayMap;
     }
 
     public function read() {
@@ -124,7 +126,11 @@ class MgHtmlBodyModel
     }
 
     public function propertyName($index) {
-        return $this->reader->GetPropertyName($index);
+        $name = $this->reader->GetPropertyName($index);
+        if (isset($this->displayMap) && array_key_exists($name, $this->displayMap)) {
+            $name = $this->displayMap[$name];
+        }
+        return $name;
     }
 
     public function getValue($i) {
@@ -211,7 +217,7 @@ class MgHttpChunkWriter extends MgChunkWriter
         if(!ini_get('safe_mode')) {
             @set_time_limit(0);
         }
-        
+
         $this->headers["Transfer-Encoding"] = "chunked";
         foreach ($this->headers as $name => $value) {
             header("$name: $value");
@@ -239,6 +245,8 @@ class MgReaderChunkedResult
     private $transform;
     private $writer;
 
+    private $displayMap;
+
     //For HTML output
     private $baseUrl;
     private $thisUrl;
@@ -261,6 +269,10 @@ class MgReaderChunkedResult
             $this->writer = $writer;
         else
             $this->writer = new MgHttpChunkWriter();
+    }
+
+    public function SetDisplayMappings($displayMap) {
+        $this->displayMap = $displayMap;
     }
 
     public function CheckAndSetDownloadHeaders($app, $format) {
@@ -317,7 +329,7 @@ class MgReaderChunkedResult
             if (!$firstFeature) {
                 $output .= ",";
             }
-            $output .= MgGeoJsonWriter::FeatureToGeoJson($this->reader, $agfRw, $this->transform, ($idProp != NULL ? $idProp->GetName() : NULL));
+            $output .= MgGeoJsonWriter::FeatureToGeoJson($this->reader, $agfRw, $this->transform, ($idProp != NULL ? $idProp->GetName() : NULL), $this->displayMap);
             $this->writer->WriteChunk($output);
             $output = "";
 
@@ -400,7 +412,7 @@ class MgReaderChunkedResult
 
         $clsDef = $this->reader->GetClassDefinition();
         $hfModel = new MgHtmlHeaderFooterModel($clsDef->GetName());
-        $bodyModel = new MgHtmlBodyModel($this->reader, $this->transform, $this->limit);
+        $bodyModel = new MgHtmlBodyModel($this->reader, $this->transform, $this->limit, $this->displayMap);
 
         $hfModel->baseUrl = $this->baseUrl;
 
@@ -577,7 +589,7 @@ class MgReaderChunkedResult
         }
 
         if ($writeXmlFooter) {
-            $output .= "</Features>";    
+            $output .= "</Features>";
         }
         $output .= "</FeatureSet>";
         $this->writer->WriteChunk($output);

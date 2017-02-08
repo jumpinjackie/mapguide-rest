@@ -869,6 +869,7 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                     $layer = $layers->GetItem($lidx);
                     $bMapped = ($this->GetBooleanRequestParameter("mappedonly", "0") == "1");
                     $bIncludeGeom = ($this->GetBooleanRequestParameter("includegeom", "0") == "1");
+                    $bDisplayProperties = ($this->GetBooleanRequestParameter("displayproperties", "0") == "1");
                     $transformto = $this->GetRequestParameter("transformto", "");
                     $transform = null;
                     if ($transformto !== "") {
@@ -883,6 +884,8 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                     else
                         $owriter = new MgHttpChunkWriter();
 
+                    $displayMap = array();
+
                     //NOTE: This does not do a query to ascertain a total, this is already a pre-computed property of the selection set.
                     $total = $selection->GetSelectedFeaturesCount($layer, $layer->GetFeatureClassName());
                     if (strlen($propList) > 0) {
@@ -894,23 +897,23 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                         $reader = $selection->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), $propNames);
                     } else {
                         if ($bMapped) {
-                            if ($bIncludeGeom) {
-                                $ldfId = $layer->GetLayerDefinition();
-                                $ldfContent = $resSvc->GetResourceContent($ldfId);
-                                $ldfDoc = new DOMDocument();
-                                $ldfDoc->loadXML($ldfContent->ToString());
-                                $mappings = $ldfDoc->getElementsByTagName("PropertyMapping");
-                                $propNames = new MgStringCollection();
-                                foreach ($mappings as $mapping) {
-                                    $nameNode = $mapping->getElementsByTagName("Name")->item(0);
-                                    $propName = $nameNode->nodeValue;
-                                    $propNames->Add($propName);
-                                }
-                                $propNames->Add($layer->GetFeatureGeometryName());
-                                $reader = $selection->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), $propNames);
-                            } else {
-                                $reader = $selection->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), true);
+                            $ldfId = $layer->GetLayerDefinition();
+                            $ldfContent = $resSvc->GetResourceContent($ldfId);
+                            $ldfDoc = new DOMDocument();
+                            $ldfDoc->loadXML($ldfContent->ToString());
+                            $mappings = $ldfDoc->getElementsByTagName("PropertyMapping");
+                            $propNames = new MgStringCollection();
+                            foreach ($mappings as $mapping) {
+                                $nameNode = $mapping->getElementsByTagName("Name")->item(0);
+                                $valueNode = $mapping->getElementsByTagName("Value")->item(0);
+                                $propName = $nameNode->nodeValue;
+                                $propNames->Add($propName);
+                                $displayMap[$propName] = $valueNode->nodeValue;
                             }
+                            if ($bIncludeGeom) {
+                                $propNames->Add($layer->GetFeatureGeometryName());
+                            }
+                            $reader = $selection->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), $propNames);
                         } else {
                             $reader = $selection->GetSelectedFeatures($layer, $layer->GetFeatureClassName(), false);
                         }
@@ -920,6 +923,9 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                         $result = new MgReaderChunkedResult($featSvc, $pageReader, -1, $owriter, $this->app->localizer);
                     } else {
                         $result = new MgReaderChunkedResult($featSvc, $reader, -1, $owriter, $this->app->localizer);
+                    }
+                    if ($bDisplayProperties) {
+                        $result->SetDisplayMappings($displayMap);
                     }
                     $result->CheckAndSetDownloadHeaders($this->app, $format);
                     if ($transform != null)

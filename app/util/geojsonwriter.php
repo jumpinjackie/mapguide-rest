@@ -19,7 +19,7 @@
 
 class MgGeoJsonWriter
 {
-    public static function FeatureToGeoJson($reader, $agfRw, $transform, $idName = NULL) {
+    public static function FeatureToGeoJson($reader, $agfRw, $transform, $idName = NULL, $displayMap = NULL) {
         $idVal = NULL;
         $propVals = array();
         $geomJson = "";
@@ -30,6 +30,12 @@ class MgGeoJsonWriter
         $propCount = $reader->GetPropertyCount();
         for ($i = 0; $i < $propCount; $i++) {
             $name = $reader->GetPropertyName($i);
+
+            //Override with display name if specified
+            if (isset($displayMap) && array_key_exists($name, $displayMap)) {
+                $name = $displayMap[$name];
+            }
+
             $propType = $reader->GetPropertyType($i);
             if (!$reader->IsNull($i)) {
                 if ($idIndex == $i) {
@@ -125,7 +131,7 @@ class MgGeoJsonWriter
         $prefix = "";
         if ($bIncludePropertyName)
             $prefix = '"geometry": ';
-        
+
         switch ($geomType) {
             case MgGeometryType::Point:
                 {

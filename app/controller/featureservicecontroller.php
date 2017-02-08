@@ -45,7 +45,7 @@ class MgFeatureServiceController extends MgBaseController {
             $this->Forbidden($msg, $mt);
         }, $requiredAction, $requiredRepresentation, $site, $userName);
     }
-    
+
     private function VerifyGlobalWhitelist($mimeType, $requiredAction, $requiredRepresentation, $site, $userName) {
         $this->whitelist->VerifyGlobalWhitelist($mimeType, function($msg, $mt) {
             $this->Forbidden($msg, $mt);
@@ -64,7 +64,7 @@ class MgFeatureServiceController extends MgBaseController {
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyGlobalWhitelist($mimeType, "GETCONNECTIONPROPERTYVALUES", $fmt, $site, $this->userName);
 
         $that = $this;
@@ -90,13 +90,13 @@ class MgFeatureServiceController extends MgBaseController {
 
         $partialConnStr = $this->GetRequestParameter("connection", "");
         $sessionId = $this->app->request->params("session");
-        
+
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyGlobalWhitelist($mimeType, "ENUMERATEDATASTORES", $fmt, $site, $this->userName);
 
         $that = $this;
@@ -127,7 +127,7 @@ class MgFeatureServiceController extends MgBaseController {
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyGlobalWhitelist($mimeType, "GETPROVIDERCAPABILITIES", $fmt, $site, $this->userName);
 
         $that = $this;
@@ -150,13 +150,13 @@ class MgFeatureServiceController extends MgBaseController {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
         $sessionId = $this->app->request->params("session");
-        
+
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyGlobalWhitelist($mimeType, "GETFEATUREPROVIDERS", $fmt, $site, $this->userName);
 
         $that = $this;
@@ -182,13 +182,13 @@ class MgFeatureServiceController extends MgBaseController {
         $provider = $this->GetRequestParameter("provider", "");
         $connStr = $this->GetRequestParameter("connection", "");
         $sessionId = $this->app->request->params("session");
-        
+
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyGlobalWhitelist($mimeType, "GETSCHEMAMAPPING", $fmt, $site, $this->userName);
 
         $that = $this;
@@ -219,7 +219,7 @@ class MgFeatureServiceController extends MgBaseController {
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyWhitelist($resIdStr, $mimeType, "TESTCONNECTION", $fmt, $site, $this->userName);
 
         $that = $this;
@@ -250,7 +250,7 @@ class MgFeatureServiceController extends MgBaseController {
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyWhitelist($resIdStr, $mimeType, "GETSPATIALCONTEXTS", $fmt, $site, $this->userName);
 
         $that = $this;
@@ -282,7 +282,7 @@ class MgFeatureServiceController extends MgBaseController {
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyWhitelist($resIdStr, $mimeType, "GETLONGTRANSACTIONS", $fmt, $site, $this->userName);
         $active = $this->GetBooleanRequestParameter("active", false);
 
@@ -315,7 +315,7 @@ class MgFeatureServiceController extends MgBaseController {
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyWhitelist($resIdStr, $mimeType, "GETSCHEMANAMES", $fmt, $site, $this->userName);
 
         $resName = $resId->GetName().".".$resId->GetResourceType();
@@ -352,15 +352,15 @@ class MgFeatureServiceController extends MgBaseController {
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
         }
-        
+
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyWhitelist($resId->ToString(), $mimeType, "CREATEFEATURESOURCE", $fmt, $site, $this->userName);
-        
+
         $this->EnsureAuthenticationForSite($sessionId);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
@@ -508,7 +508,7 @@ class MgFeatureServiceController extends MgBaseController {
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyWhitelist($resIdStr, $mimeType, "DESCRIBESCHEMA", $fmt, $site, $this->userName);
 
         $resName = $resId->GetName().".".$resId->GetResourceType();
@@ -594,7 +594,7 @@ class MgFeatureServiceController extends MgBaseController {
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyWhitelist($resIdStr, $mimeType, "GETCLASSNAMES", $fmt, $site, $this->userName);
 
         $selfUrl = $this->app->config("SelfUrl");
@@ -633,7 +633,7 @@ class MgFeatureServiceController extends MgBaseController {
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyWhitelist($resIdStr, $mimeType, "GETCLASSDEFINITION", $fmt, $site, $this->userName);
 
         if ($fmt == "json") {
@@ -673,13 +673,13 @@ class MgFeatureServiceController extends MgBaseController {
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
         }
-        
+
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyWhitelist($resId->ToString(), $mimeType, "GETEDITCAPABILITIES", $fmt, $site, $this->userName);
 
         $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
@@ -713,14 +713,14 @@ class MgFeatureServiceController extends MgBaseController {
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $this->BadRequest($this->app->localizer->getText("E_NOT_SUPPORTED_FOR_SESSION_RESOURCES"), $mimeType);
         }
-        
+
         $this->EnsureAuthenticationForSite($sessionId);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
         $site = $siteConn->GetSite();
-        
+
         $this->VerifyWhitelist($resId->ToString(), $mimeType, "SETEDITCAPABILITIES", $fmt, $site, $this->userName);
-        
+
         $this->EnsureAuthenticationForSite($sessionId);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
@@ -732,17 +732,17 @@ class MgFeatureServiceController extends MgBaseController {
         $perms->AllowUpdate = false;
         $perms->AllowDelete = false;
         $perms->UseTransaction = false;
-        
+
         if ($fmt == "json") {
             $body = $this->app->request->getBody();
             $json = json_decode($body);
             if ($json == NULL)
                 throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
-            
+
             if (isset($json->RestCapabilities)) {
                 if (isset($json->RestCapabilities->AllowInsert)) {
                     $perms->AllowInsert = $json->RestCapabilities->AllowInsert;
-                } 
+                }
                 if (isset($json->RestCapabilities->AllowUpdate)) {
                     $perms->AllowUpdate = $json->RestCapabilities->AllowUpdate;
                 }
@@ -763,7 +763,7 @@ class MgFeatureServiceController extends MgBaseController {
             if (isset($json->RestCapabilities)) {
                 if (isset($json->RestCapabilities->AllowInsert)) {
                     $perms->AllowInsert = $json->RestCapabilities->AllowInsert;
-                } 
+                }
                 if (isset($json->RestCapabilities->AllowUpdate)) {
                     $perms->AllowUpdate = $json->RestCapabilities->AllowUpdate;
                 }
@@ -907,12 +907,12 @@ class MgFeatureServiceController extends MgBaseController {
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
                 $sessionId = $resId->GetRepositoryName();
             }
-            
+
             $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
             $site = $siteConn->GetSite();
-            
+
             $this->VerifyWhitelist($resId->ToString(), $mimeType, "INSERTFEATURES", $fmt, $site, $this->userName);
 
             $body = $this->app->request->getBody();
@@ -925,13 +925,13 @@ class MgFeatureServiceController extends MgBaseController {
 
             $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
             $perms = self::CheckPermissions($resSvc, $resId);
-            
+
             //Not a session-based resource, must check for appropriate flag in header before we continue
             if ($sessionId === "") {
                 if ($perms->AllowInsert === false) {
                     $e = new Exception();
                     $this->OutputException(
-                        "Forbidden", 
+                        "Forbidden",
                         $this->app->localizer->getText("E_OPERATION_NOT_ALLOWED"),
                         $this->app->localizer->getText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
                         $e->getTraceAsString(),
@@ -978,12 +978,12 @@ class MgFeatureServiceController extends MgBaseController {
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
                 $sessionId = $resId->GetRepositoryName();
             }
-            
+
             $this->EnsureAuthenticationForSite($sessionId);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
             $site = $siteConn->GetSite();
-            
+
             $this->VerifyWhitelist($resId->ToString(), $mimeType, "UPDATEFEATURES", $fmt, $site, $this->userName);
 
             $body = $this->app->request->getBody();
@@ -1002,7 +1002,7 @@ class MgFeatureServiceController extends MgBaseController {
                 if ($perms->AllowUpdate === false) {
                     $e = new Exception();
                     $this->OutputException(
-                        "Forbidden", 
+                        "Forbidden",
                         $this->app->localizer->getText("E_OPERATION_NOT_ALLOWED"),
                         $this->app->localizer->getText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
                         $e->getTraceAsString(),
@@ -1055,12 +1055,12 @@ class MgFeatureServiceController extends MgBaseController {
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
                 $sessionId = $resId->GetRepositoryName();
             }
-            
+
             $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
             $site = $siteConn->GetSite();
-            
+
             $this->VerifyWhitelist($resId->ToString(), $mimeType, "DELETEFEATURES", $fmt, $site, $this->userName);
 
             $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
@@ -1071,7 +1071,7 @@ class MgFeatureServiceController extends MgBaseController {
                 if ($perms->AllowDelete === false) {
                     $e = new Exception();
                     $this->OutputException(
-                        "Forbidden", 
+                        "Forbidden",
                         $this->app->localizer->getText("E_OPERATION_NOT_ALLOWED"),
                         $this->app->localizer->getText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
                         $e->getTraceAsString(),
@@ -1124,12 +1124,12 @@ class MgFeatureServiceController extends MgBaseController {
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
                 $sessionId = $resId->GetRepositoryName();
             }
-            
+
             $this->EnsureAuthenticationForSite($sessionId, true, $mimeType);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
             $site = $siteConn->GetSite();
-            
+
             $this->VerifyWhitelist($resId->ToString(), $mimeType, "SELECTAGGREGATES", $fmt, $site, $this->userName);
 
             $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
@@ -1247,12 +1247,12 @@ class MgFeatureServiceController extends MgBaseController {
         $fmt = $this->ValidateRepresentation($format, array("xml", "geojson", "html", "czml"));
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         try {
-            
+
             $sessionId = "";
             if ($ldfId->GetRepositoryType() == MgRepositoryType::Session) {
                 $sessionId = $ldfId->GetRepositoryName();
             }
-            
+
             $this->EnsureAuthenticationForSite($sessionId, true, $mimeType);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
@@ -1270,6 +1270,10 @@ class MgFeatureServiceController extends MgBaseController {
 
             $pageSize = $this->GetRequestParameter("pagesize", -1);
             $pageNo = $this->GetRequestParameter("page", -1);
+
+            $bIncludeGeom = ($this->GetBooleanRequestParameter("includegeom", "0") == "1");
+            $bDisplayProperties = ($this->GetBooleanRequestParameter("displayproperties", "0") == "1");
+            $bMapped = ($this->GetBooleanRequestParameter("mappedonly", "0") == "1");
 
             //Internal debugging flag
             $chunk = $this->GetBooleanRequestParameter("chunk", true);
@@ -1299,16 +1303,18 @@ class MgFeatureServiceController extends MgBaseController {
                 $vlNode = $vl->item(0);
                 $fsId = $vlNode->getElementsByTagName("ResourceId");
                 $fc = $vlNode->getElementsByTagName("FeatureName");
+                $geomProp = $vlNode->getElementsByTagName("Geometry");
                 $hlink = $vlNode->getElementsByTagName("Url");
                 $tt = $vlNode->getElementsByTagName("ToolTip");
                 $flt = $vlNode->getElementsByTagName("Filter");
                 $elev = $vlNode->getElementsByTagName("ElevationSettings");
+                $mappings = $vlNode->getElementsByTagName("PropertyMapping");
                 if ($fsId->length == 1) {
                     $fsId = new MgResourceIdentifier($fsId->item(0)->nodeValue);
 
                     $site = $siteConn->GetSite();
-                    
-                    $this->VerifyWhitelist($fsId->ToString(), $this->GetMimeTypeForFormat($fmt), "SELECTFEATURES", $fmt, $site, $this->userName);                    
+
+                    $this->VerifyWhitelist($fsId->ToString(), $this->GetMimeTypeForFormat($fmt), "SELECTFEATURES", $fmt, $site, $this->userName);
 
                     if ($fc->length == 1) {
                         //Add hyperlink, tooltip and elevation as special computed properties
@@ -1363,13 +1369,30 @@ class MgFeatureServiceController extends MgBaseController {
                             }
                         }
 
+                        if ($bDisplayProperties || $bMapped) {
+                            foreach ($mappings as $mapping) {
+                                $nameNode = $mapping->getElementsByTagName("Name")->item(0);
+                                $valueNode = $mapping->getElementsByTagName("Value")->item(0);
+                                $displayMap[$nameNode->nodeValue] = $valueNode->nodeValue;
+                            }
+                        }
+
                         $tokens = explode(":", $fc->item(0)->nodeValue);
                         $schemaName = $tokens[0];
                         $className = $tokens[1];
                         $clsDef = NULL;
-                        //Unless an explicit property list has been specified, we're explicitly adding all properties
-                        //from the class definition
-                        if ($propList !== "") {
+                        //Unless an explicit property list has been specified (or mappedonly=1), we're explicitly adding all properties
+                        //from the class definition. Mapped setting has precedence over explicit property list
+                        //
+                        //Mapped only and explicit property lists have no effect for CZML where we need everything
+                        if ($bMapped && $fmt != "czml") {
+                            foreach ($displayMap as $name => $display) {
+                                $query->AddFeatureProperty($name);
+                            }
+                            if ($bIncludeGeom) {
+                                $query->AddFeatureProperty($geomProp->item(0)->nodeValue);
+                            }
+                        } else if ($propList !== "" && $fmt != "czml") {
                             $propNames = explode(",", $propList); //If you have a comma in your property names, it's your own fault :)
                             foreach ($propNames as $propName) {
                                 $query->AddFeatureProperty($propName);
@@ -1413,7 +1436,7 @@ class MgFeatureServiceController extends MgBaseController {
                                 if ($clsDef == NULL)
                                     $clsDef = $featSvc->GetClassDefinition($fsId, $schemaName, $className);
                                 $geom = $wktRw->Read(MgUtils::MakeWktPolygon($parts[0], $parts[1], $parts[2], $parts[3]));
-                                
+
                                 //Transform bbox to target cs if flag specified
                                 $bboxIsTargetCs = $this->GetBooleanRequestParameter("bboxistargetcs", false);
                                 if ($bboxIsTargetCs) {
@@ -1455,6 +1478,9 @@ class MgFeatureServiceController extends MgBaseController {
                                 $result = new MgReaderChunkedResult($featSvc, $reader, $limit, $owriter, $this->app->localizer);
                             }
                             $result->CheckAndSetDownloadHeaders($this->app, $format);
+                            if ($bDisplayProperties) {
+                                $result->SetDisplayMappings($displayMap);
+                            }
                             if ($transform != null)
                                 $result->SetTransform($transform);
                             if ($fmt === "html") {
@@ -1483,12 +1509,12 @@ class MgFeatureServiceController extends MgBaseController {
             if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
                 $sessionId = $resId->GetRepositoryName();
             }
-            
+
             $this->EnsureAuthenticationForSite($sessionId, true, $mimeType);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
             $site = $siteConn->GetSite();
-            
+
             $this->VerifyWhitelist($resId->ToString(), $mimeType, "SELECTFEATURES", $fmt, $site, $this->userName);
 
             $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
@@ -1536,18 +1562,18 @@ class MgFeatureServiceController extends MgBaseController {
                     $orderOpt = MgOrderingOption::Descending;
                 $query->SetOrderingFilter($orderProps, $orderOpt);
             }
-            
+
             $transform = null;
             if ($transformto !== "") {
                 $transform = MgUtils::GetTransform($featSvc, $resId, $schemaName, $className, $transformto);
             }
-            
+
             if ($bbox !== "") {
                 $parts = explode(",", $bbox);
                 if (count($parts) == 4) {
                     $wktRw = new MgWktReaderWriter();
                     $geom = $wktRw->Read(MgUtils::MakeWktPolygon($parts[0], $parts[1], $parts[2], $parts[3]));
-                    
+
                     //Transform the bbox if we have the flag indicating so
                     $bboxIsTargetCs = $this->GetBooleanRequestParameter("bboxistargetcs", false);
                     if ($bboxIsTargetCs) {
@@ -1556,7 +1582,7 @@ class MgFeatureServiceController extends MgBaseController {
                         $invTx = MgUtils::GetTransform($featSvc, $resId, $schemaName, $className, $transformto, true /* invert */);
                         $geom = $geom->Transform($invTx);
                     }
-                    
+
                     $clsDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
                     $query->SetSpatialFilter($clsDef->GetDefaultGeometryPropertyName(), $geom, MgFeatureSpatialOperations::EnvelopeIntersects);
                 }
