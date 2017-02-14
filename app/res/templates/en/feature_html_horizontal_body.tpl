@@ -21,7 +21,7 @@ Parameters:
             {while $model->read()}
             <tr>
                 {for $i = 0 to $model->propertyCount - 1}
-                <td>{$model->getValue($i)}</td>
+                <td>{$model->getValue($i)|unescape:"html"}</td>
                 {/for}
             </tr>
             {/while}

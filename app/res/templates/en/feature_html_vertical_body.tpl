@@ -17,7 +17,7 @@ Parameters:
             {for $i = 0 to $model->propertyCount - 1}
             <tr>
                 <td><strong>{$model->propertyName($i)}</strong></td>
-                <td>{$model->getValue($i)}</td>
+                <td>{$model->getValue($i)|unescape:"html"}</td>
             </tr>
             {/for}
         </table>
