@@ -63,6 +63,9 @@ class MgGeoJsonWriter
                             $idVal = '"'.MgUtils::EscapeJsonString($reader->GetString($i)).'"';
                             break;
                     }
+                    if ($idVal != null) {
+                        array_push($propVals, '"'.$name.'": '.$idVal);
+                    }
                 } else {
                     switch($propType) {
                         case MgPropertyType::Boolean:
