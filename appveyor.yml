@@ -52,11 +52,12 @@ install:
     - IF "%APPVEYOR_REPO_TAG%" == "true" SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_REPO_TAG_NAME%
     - cd c:\projects\mapguide-rest
     - composer install --prefer-source --no-progress --ansi
-    - vendor\bin\phing -f build.phing.xml docgen
-    - vendor\bin\phing -Dapp.version=%ARTIFACT_RELEASE_LABEL% -f build.phing.xml dist
 test_script:
     - vendor\bin\parallel-lint.bat -s -e php,phpt --exclude vendor .
     - vendor\bin\phpunit test
+
+after_test:
+    - vendor\bin\phing -Dapp.version=%ARTIFACT_RELEASE_LABEL% -f build.phing.xml dist
 
 artifacts:
   - path: .\dist\mapguide-rest-$(ARTIFACT_RELEASE_LABEL).zip
