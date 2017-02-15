@@ -1,3 +1,4 @@
+version: 1.0.0.{build}
 build: false
 shallow_clone: true
 platform:
@@ -6,10 +7,24 @@ platform:
 clone_folder: c:\projects\mapguide-rest
 cache:
   - '%LOCALAPPDATA%\Composer\files'
-  
+
 branches:
     only:
       - master
+
+before_build:
+    - echo APPVEYOR_PROJECT_NAME          %APPVEYOR_PROJECT_NAME%
+    - echo APPVEYOR_PROJECT_SLUG          %APPVEYOR_PROJECT_SLUG%
+    - echo APPVEYOR_BUILD_FOLDER          %APPVEYOR_BUILD_FOLDER%
+    - echo APPVEYOR_BUILD_ID              %APPVEYOR_BUILD_ID%
+    - echo APPVEYOR_BUILD_NUMBER          %APPVEYOR_BUILD_NUMBER%
+    - echo APPVEYOR_BUILD_VERSION         %APPVEYOR_BUILD_VERSION%
+    - echo APPVEYOR_REPO_NAME             %APPVEYOR_REPO_NAME%
+    - echo APPVEYOR_REPO_BRANCH           %APPVEYOR_REPO_BRANCH%
+    - echo APPVEYOR_REPO_TAG              %APPVEYOR_REPO_TAG%
+    - echo APPVEYOR_REPO_TAG_NAME         %APPVEYOR_REPO_TAG_NAME%
+    - echo APPVEYOR_REPO_COMMIT           %APPVEYOR_REPO_COMMIT%
+    - echo APPVEYOR_REPO_COMMIT_TIMESTAMP %APPVEYOR_REPO_COMMIT_TIMESTAMP%
 
 init:
     - SET PATH=c:\php_%PLATFORM%;%PATH%
@@ -33,8 +48,30 @@ install:
     - IF %PHP%==1 echo extension=php_gd2.dll >> php.ini
     - IF %PHP%==1 echo extension=php_xsl.dll >> php.ini
     - appveyor DownloadFile https://getcomposer.org/composer.phar
+    - SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_BUILD_VERSION%
+    - IF "%APPVEYOR_REPO_TAG%" == "true" SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_REPO_TAG_NAME%
     - cd c:\projects\mapguide-rest
     - composer install --prefer-source --no-progress --ansi
+    - vendor\bin\phing -f build.phing.xml docgen
+    - vendor\bin\phing -Dapp.version=%ARTIFACT_RELEASE_LABEL% -f build.phing.xml dist
 test_script:
     - vendor\bin\parallel-lint.bat -s -e php,phpt --exclude vendor .
     - vendor\bin\phpunit test
+
+artifacts:
+  - path: .\dist\mapguide-rest-$(ARTIFACT_RELEASE_LABEL).zip
+    name: dist
+    type: zip
+
+deploy:
+  release: $(appveyor_repo_tag_name)
+  description: 'Release $(appveyor_repo_tag_name) ($(appveyor_build_version))'
+  provider: GitHub
+  auth_token:
+    secure: d+aY+YJPCp6KzWE2XcGKdp5XFXoh66H7le3SJiqxtAHDZ1P2+kw/PgIF5Unj3kxG
+  artifact: sdk
+  draft: true
+  prerelease: true
+  on:
+    branch: master                 # release from master branch only
+    appveyor_repo_tag: true        # deploy on tag push only
