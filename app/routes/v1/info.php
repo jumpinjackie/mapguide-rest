@@ -25,7 +25,7 @@
  *         version="1.0.0",
  *         title="mapguide-rest",
  *         description="mapguide-rest provides a REST API for MapGuide Open Source and Autodesk Infrastructure Map Server
- 
+
  **NOTE:** Basic HTTP authentication credentials will generally be cached by the web browser for a short period should you choose to use this method instead of passing in session ids",
  *         @SWG\License(
  *             name="LGPL 2.1",
@@ -38,7 +38,7 @@
  *     )
  * )
  */
- 
+
 /**
  * @SWG\Tag(name="coordsys", description="Coordinate System Catalog")
  * @SWG\Tag(name="data", description="Data Publishing Framework")
@@ -47,4 +47,5 @@
  * @SWG\Tag(name="services", description="Additional Services")
  * @SWG\Tag(name="session", description="Session Repository")
  * @SWG\Tag(name="site", description="Site Service")
+ * @SWG\Tag(name="processing", description="Geo-Processing Service")
  */

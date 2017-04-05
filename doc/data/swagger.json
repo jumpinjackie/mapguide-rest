@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "title": "mapguide-rest",
-        "description": "mapguide-rest provides a REST API for MapGuide Open Source and Autodesk Infrastructure Map Server\r\n \r\n **NOTE:** Basic HTTP authentication credentials will generally be cached by the web browser for a short period should you choose to use this method instead of passing in session ids",
+        "description": "mapguide-rest provides a REST API for MapGuide Open Source and Autodesk Infrastructure Map Server\r\n\r\n **NOTE:** Basic HTTP authentication credentials will generally be cached by the web browser for a short period should you choose to use this method instead of passing in session ids",
         "license": {
             "name": "LGPL 2.1",
             "url": "http://www.gnu.org/licenses/lgpl-2.1.txt"
@@ -3836,6 +3836,83 @@
                         "in": "query",
                         "description": "The draw order of this layer",
                         "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
+            }
+        },
+        "/processing/buffer": {
+            "post": {
+                "tags": [
+                    "processing"
+                ],
+                "summary": "Performs a buffer operation",
+                "operationId": "Buffer",
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "geometry",
+                        "in": "formData",
+                        "description": "The geometry WKT",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "coordsys",
+                        "in": "formData",
+                        "description": "The coordinate system code of the input geometry",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "distance",
+                        "in": "formData",
+                        "description": "The distance to buffer",
+                        "required": true,
+                        "type": "number"
+                    },
+                    {
+                        "name": "format",
+                        "in": "formData",
+                        "description": "The desired output format of the buffered geometry. wkt or geojson",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "wkt",
+                            "geojson"
+                        ]
+                    },
+                    {
+                        "name": "units",
+                        "in": "formData",
+                        "description": "The distance units. If not specified it will be assumed to be meters",
+                        "required": false,
+                        "type": "integer",
+                        "enum": [
+                            "m",
+                            "km",
+                            "mi",
+                            "ft"
+                        ]
+                    },
+                    {
+                        "name": "transformto",
+                        "in": "formData",
+                        "description": "The coordinate system code to transform the buffered geometry to",
+                        "required": false,
                         "type": "integer"
                     }
                 ],
@@ -8404,6 +8481,37 @@
                 "name": "PrimitiveValue"
             }
         },
+        "BufferOperation": {
+            "properties": {
+                "Geometry": {
+                    "description": "The geometry WKT",
+                    "type": "string"
+                },
+                "CoordSys": {
+                    "description": "The coordinate system code of the input geometry",
+                    "type": "string"
+                },
+                "Distance": {
+                    "description": "The distance to buffer",
+                    "type": "number"
+                },
+                "Format": {
+                    "description": "The desired output format of the buffered geometry. wkt or geojson",
+                    "type": "string"
+                },
+                "Units": {
+                    "description": "The distance units. If not specified it will be assumed to be meters",
+                    "type": "string"
+                },
+                "TransformTo": {
+                    "description": "The coordinate system code to transform the buffered geometry to",
+                    "type": "string"
+                }
+            },
+            "xml": {
+                "name": "BufferOperation"
+            }
+        },
         "CreateFeatureSourceEnvelope": {
             "properties": {
                 "FeatureSourceParams": {
@@ -8733,6 +8841,10 @@
         {
             "name": "site",
             "description": "Site Service"
+        },
+        {
+            "name": "processing",
+            "description": "Geo-Processing Service"
         }
     ],
     "externalDocs": {

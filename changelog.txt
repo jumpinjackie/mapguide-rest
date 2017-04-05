@@ -5,6 +5,9 @@ Next
     - Using only properties mapped to display values
        - Specifying geometry to be included as well
     - Using display names from property mappings
+ - New geo-processing services available under /processing
+    - Buffer
+ - GeoJSON coordinate precision now defaults to 7 decimal places
 
 1.0 RC5
 =======

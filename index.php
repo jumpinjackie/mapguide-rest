@@ -127,6 +127,7 @@ include "app/routes/v1/routes.providers.php";
 include "app/routes/v1/routes.site.php";
 include "app/routes/v1/routes.admin.php";
 include "app/routes/v1/routes.services.php";
+include "app/routes/v1/routes.processing.php";
 include "app/routes/v1/routes.doc.php";
 //Now scope the same routes under the v1 namespace. While the above includes may change, the includes
 //here cannot. We have effectively set these routes "in stone". Once set, this cannot be changed
@@ -140,6 +141,7 @@ $app->group("/v1", function() use ($app) {
     include "app/routes/v1/routes.site.php";
     include "app/routes/v1/routes.admin.php";
     include "app/routes/v1/routes.services.php";
+    include "app/routes/v1/routes.processing.php";
     include "app/routes/v1/routes.doc.php";
 });
 /*
