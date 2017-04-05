@@ -1,6 +1,6 @@
 {
     "require-dev": {
-        "brianium/paratest": "dev-master",
+        "brianium/paratest": "0.14.0",
         "zircote/swagger-php": "2.0.*",
         "doctrine/annotations": "1.2.*",
         "phpunit/phpunit": "4.8.*",
