@@ -3929,6 +3929,290 @@
                 }
             }
         },
+        "/processing/difference": {
+            "post": {
+                "tags": [
+                    "processing"
+                ],
+                "summary": "Performs a difference operation and returns a geometry that represents a point set difference between this geometric entity and another. Both geometries must be in the same coordinate system",
+                "operationId": "Difference",
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "geometry_a",
+                        "in": "formData",
+                        "description": "The geometry WKT",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "geometry_b",
+                        "in": "formData",
+                        "description": "The geometry WKT",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "format",
+                        "in": "formData",
+                        "description": "The desired output format of the buffered geometry. wkt or geojson",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "wkt",
+                            "geojson"
+                        ]
+                    },
+                    {
+                        "name": "transformto",
+                        "in": "formData",
+                        "description": "The coordinate system code to transform the buffered geometry to",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
+            }
+        },
+        "/processing/intersection": {
+            "post": {
+                "tags": [
+                    "processing"
+                ],
+                "summary": "Performs a intersection operation and returns a geometry that represents the point set intersection of this geometry and another. Both geometries must be in the same coordinate system",
+                "operationId": "Intersection",
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "geometry_a",
+                        "in": "formData",
+                        "description": "The geometry WKT",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "geometry_b",
+                        "in": "formData",
+                        "description": "The geometry WKT",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "format",
+                        "in": "formData",
+                        "description": "The desired output format of the buffered geometry. wkt or geojson",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "wkt",
+                            "geojson"
+                        ]
+                    },
+                    {
+                        "name": "transformto",
+                        "in": "formData",
+                        "description": "The coordinate system code to transform the buffered geometry to",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
+            }
+        },
+        "/processing/symmetricdifference": {
+            "post": {
+                "tags": [
+                    "processing"
+                ],
+                "summary": "Performs a symmetric difference operation and returns a geometry that represents the point set symmetric difference of this geometry with another. Both geometries must be in the same coordinate system",
+                "operationId": "SymmetricDifference",
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "geometry_a",
+                        "in": "formData",
+                        "description": "The geometry WKT",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "geometry_b",
+                        "in": "formData",
+                        "description": "The geometry WKT",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "format",
+                        "in": "formData",
+                        "description": "The desired output format of the buffered geometry. wkt or geojson",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "wkt",
+                            "geojson"
+                        ]
+                    },
+                    {
+                        "name": "transformto",
+                        "in": "formData",
+                        "description": "The coordinate system code to transform the buffered geometry to",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
+            }
+        },
+        "/processing/union": {
+            "post": {
+                "tags": [
+                    "processing"
+                ],
+                "summary": "Performs a union operation and returns a geometry that represents the point set union of this geometry with another. Both geometries must be in the same coordinate system",
+                "operationId": "Union",
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "geometry_a",
+                        "in": "formData",
+                        "description": "The geometry WKT",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "geometry_b",
+                        "in": "formData",
+                        "description": "The geometry WKT",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "format",
+                        "in": "formData",
+                        "description": "The desired output format of the buffered geometry. wkt or geojson",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "wkt",
+                            "geojson"
+                        ]
+                    },
+                    {
+                        "name": "transformto",
+                        "in": "formData",
+                        "description": "The coordinate system code to transform the buffered geometry to",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
+            }
+        },
+        "/processing/spatialpredicate": {
+            "post": {
+                "tags": [
+                    "processing"
+                ],
+                "summary": "Performs a spatial predicate test between the two specified geometries. Both geometries must be in the same coordinate system",
+                "operationId": "SpatialPredicate",
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "geometry_a",
+                        "in": "formData",
+                        "description": "The geometry WKT",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "geometry_b",
+                        "in": "formData",
+                        "description": "The geometry WKT",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "operator",
+                        "in": "formData",
+                        "description": "The spatial operator to test",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "contains",
+                            "crosses",
+                            "disjoint",
+                            "equals",
+                            "intersects",
+                            "overlaps",
+                            "touches",
+                            "within"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
+            }
+        },
         "/providers.{type}": {
             "get": {
                 "tags": [
