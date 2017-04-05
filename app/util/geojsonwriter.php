@@ -129,7 +129,7 @@ class MgGeoJsonWriter
         return $output;
     }
 
-    public static function ToGeoJson($geom, $bIncludePropertyName = true) {
+    public static function ToGeoJson($geom, $bIncludePropertyName = true, $coord_precision = 7) {
         $geomType = $geom->GetGeometryType();
         $prefix = "";
         if ($bIncludePropertyName)
@@ -139,16 +139,16 @@ class MgGeoJsonWriter
             case MgGeometryType::Point:
                 {
                     $coord = $geom->GetCoordinate();
-                    return $prefix.'{ "type": "Point", "coordinates": '.self::CoordToGeoJson($coord)." }";
+                    return $prefix.'{ "type": "Point", "coordinates": '.self::CoordToGeoJson($coord, $coord_precision)." }";
                 }
             case MgGeometryType::LineString:
                 {
                     $coords = $geom->GetCoordinates();
-                    return $prefix.'{ "type": "LineString", "coordinates": '.self::CoordsToGeoJson($coords)." }";
+                    return $prefix.'{ "type": "LineString", "coordinates": '.self::CoordsToGeoJson($coords, $coord_precision)." }";
                 }
             case MgGeometryType::Polygon:
                 {
-                    return $prefix.'{ "type": "Polygon", "coordinates": '.self::PolygonToGeoJson($geom)." }";
+                    return $prefix.'{ "type": "Polygon", "coordinates": '.self::PolygonToGeoJson($geom, $coord_precision)." }";
                 }
             case MgGeometryType::MultiPoint:
                 {
@@ -160,14 +160,14 @@ class MgGeoJsonWriter
                             $strCoords .= ",";
                         $pt = $geom->GetPoint($i);
                         $coord = $pt->GetCoordinate();
-                        $strCoords .= self::CoordToGeoJson($coord);
+                        $strCoords .= self::CoordToGeoJson($coord, $coord_precision);
                         $bFirst = false;
                     }
                     return $prefix.'{ "type": "MultiPoint", "coordinates": ['.$strCoords.'] }';
                 }
             case MgGeometryType::MultiLineString:
                 {
-                    return $prefix.'{ "type": "MultiLineString", "coordinates": '.self::MultiLineStringToGeoJson($geom)." }";
+                    return $prefix.'{ "type": "MultiLineString", "coordinates": '.self::MultiLineStringToGeoJson($geom, $coord_precision)." }";
                 }
             case MgGeometryType::MultiPolygon:
                 {
@@ -178,7 +178,7 @@ class MgGeoJsonWriter
                         if (!$bFirst)
                             $str .= ",";
                         $poly = $geom->GetPolygon($i);
-                        $str .= self::PolygonToGeoJson($poly);
+                        $str .= self::PolygonToGeoJson($poly, $coord_precision);
                         $bFirst = false;
                     }
                     $str .= ']';
@@ -194,7 +194,7 @@ class MgGeoJsonWriter
                         if (!$bFirst)
                             $str .= ",";
                         $g = $geom->GetGeometry($i);
-                        $str .= self::ToGeoJson($g, false);
+                        $str .= self::ToGeoJson($g, false, $coord_precision);
                         $bFirst = false;
                     }
                     $str .= ']';
@@ -206,13 +206,13 @@ class MgGeoJsonWriter
         }
     }
 
-    public static function CoordToGeoJson($coord) {
+    public static function CoordToGeoJson($coord, $coord_precision = 7) {
         $x = $coord->GetX();
         $y = $coord->GetY();
-        return "[$x, $y]";
+        return "[".number_format($x, $coord_precision, '.', '').", ".number_format($y, $coord_precision, '.', '')."]";
     }
 
-    public static function CoordsToGeoJson($coords) {
+    public static function CoordsToGeoJson($coords, $coord_precision = 7) {
         $str = '[';
         $first = true;
         while ($coords->MoveNext()) {
@@ -221,14 +221,14 @@ class MgGeoJsonWriter
             $coord = $coords->GetCurrent();
             $x = $coord->GetX();
             $y = $coord->GetY();
-            $str .= "[$x, $y]";
+            $str .= "[".number_format($x, $coord_precision, '.', '').", ".number_format($y, $coord_precision, '.', '')."]";
             $first = false;
         }
         $str .= ']';
         return $str;
     }
 
-    public static function MultiLineStringToGeoJson($multiLineStr) {
+    public static function MultiLineStringToGeoJson($multiLineStr, $coord_precision = 7) {
         $str = '[';
 
         $count = $multiLineStr->GetCount();
@@ -238,7 +238,7 @@ class MgGeoJsonWriter
                 $str .= ",";
             $line = $multiLineStr->GetLineString($i);
             $coords = $line->GetCoordinates();
-            $str .= MgGeoJsonWriter::CoordsToGeoJson($coords);
+            $str .= self::CoordsToGeoJson($coords, $coord_precision);
             $firstLineStr = false;
         }
 
@@ -246,13 +246,13 @@ class MgGeoJsonWriter
         return $str;
     }
 
-    public static function PolygonToGeoJson($poly) {
+    public static function PolygonToGeoJson($poly, $coord_precision = 7) {
         $str = '[';
 
         $extRing = $poly->GetExteriorRing();
         if ($extRing != null) {
             $coords = $extRing->GetCoordinates();
-            $str .= MgGeoJsonWriter::CoordsToGeoJson($coords);
+            $str .= self::CoordsToGeoJson($coords, $coord_precision);
         }
         $count = $poly->GetInteriorRingCount();
         if ($count > 0) {
@@ -262,7 +262,7 @@ class MgGeoJsonWriter
             for ($i = 0; $i < $count; $i++) {
                 $ring = $poly->GetInteriorRing($i);
                 $coords = $ring->GetCoordinates();
-                $str .= MgGeoJsonWriter::CoordsToGeoJson($coords);
+                $str .= self::CoordsToGeoJson($coords, $coord_precision);
                 if ($i < $count - 1) {
                     $str .= ",";
                 }
