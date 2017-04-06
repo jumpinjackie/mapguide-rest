@@ -74,6 +74,11 @@ class MgProcessingController extends MgBaseController {
 
         $this->app->response->header("Content-Type", MgMimeType::Json);
         $body = MgBoxedValue::Boolean($result, "json");
+        /*
+        $o = json_decode($body);
+        $o->op = $op;
+        $body = json_encode($o);
+        */
         $this->app->response->write($body);
     }
 
@@ -204,6 +209,6 @@ class MgProcessingController extends MgBaseController {
         $wktB = $this->GetRequestParameter("geometry_b");
         $op = $this->ValidateValueInDomain($this->GetRequestParameter("operator"), array("contains", "crosses", "disjoint", "equals", "intersects", "overlaps", "touches", "within"));
 
-        $this->GeometryPredicate($wktA, $wktB, self::P_CONTAINS);
+        $this->GeometryPredicate($wktA, $wktB, $op);
     }
 }

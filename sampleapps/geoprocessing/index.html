@@ -1,0 +1,769 @@
+<html>
+    <head>
+        <title>Geo-Processing Example (OpenLayers 3)</title>
+        <link rel="stylesheet" href="../../assets/common/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="../../assets/ol3-cesium/ol3/css/ol.css" />
+        <style type="text/css">
+            #error { color: red; }
+            #wrap { width: 1100; }
+            #map { width: 600; height: 500; float: right; }
+            #layers { width: 250; height: 500; overflow: auto; display: block-inline; float: left; }
+            #tools { width: 250; max-height: 500; overflow: auto; display: block-inline; float: right; }
+            #rootList { list-style-type: none; margin-left: -20px; }
+            #rootList li { list-style-type: none; }
+            #main { margin-top: 50px; padding-top: 20px; }
+        </style>
+        <script type="text/javascript" src="../../assets/common/js/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="../../assets/ol3-cesium/ol3cesium.js"></script>
+        <script type="text/javascript" src="../../assets/common/js/legend_ol3.js"></script>
+        <script type="text/javascript">
+
+        //This sample is assumed to be hosted at http://servername/mapguide/rest/sampleapps/tiled/index.html
+        var restUrl = "../../../rest";
+
+        //Various features you can include in the CREATERUNTIMEMAP response.
+        var REQ_NONE = 0;                   //Nothing. This the default.
+        var REQ_LAYER_STRUCTURE = 1;        //Information about layers and groups (required for the mask values below to have any effect)
+        var REQ_LAYER_ICONS = 2;            //Icons for each layer (has no effect if REQ_LAYER_STRUCTURE is not in the bitmask)
+        var REQ_LAYER_FEATURE_SOURCE = 4;   //Feature Source information for each layer (has no effect if REQ_LAYER_STRUCTURE is not in the bitmask)
+
+        var gMimeType = null;
+        var map = null;
+        var layers = [];
+
+        var mapName = null;
+        var sessionId = null;
+        var legend = null;
+        var inputSource = null;
+        var resultsLayer = null;
+        var geoJSON = null;
+        var wktFormat = null;
+
+        var bSelectMode = false;
+
+        $(document).ready(function() {
+            //Have a play with the bitmask values to see the differences in JSON payload size
+            //and to see how our legend control gracefully handles such situations
+            //createMap(REQ_NONE);
+            //createMap(REQ_LAYER_STRUCTURE);
+            createMap(REQ_LAYER_STRUCTURE | REQ_LAYER_FEATURE_SOURCE | REQ_LAYER_ICONS);
+        });
+
+        function createMap(reqFeatures) {
+            $.ajax({
+                url: restUrl + "/services/createmap.json",
+                method: "post",
+                data: {
+                    "username": "Anonymous",
+                    "mapdefinition": "Library://Samples/Sheboygan/Maps/SheboyganMixed.MapDefinition",
+                    "requestedfeatures": reqFeatures,
+                    //Optional parameters you can specify and/or experiment with
+                    //"iconformat": "GIF",    //Uncomment to override desired image format (default: PNG)
+                    //"iconwidth": 32,         //Uncomment to override desired icon width (default: 16)
+                    //"iconheight": 32,        //Uncomment to override desired icon height (default: 16)
+                    //"iconsperscalerange": 3, //Uncomment to observe theme compression for themes exceeding this number of rules (default: 25)
+                    //"targetmapname": "MyRuntimeMapForOpenLayers", //Uncomment if you require a specific map name be given (default: inferred from Map Definition)
+                    "format": "json"
+                },
+                success: function(data, textStatus, jqXHR) {
+                    $("#jsonSize").html(jqXHR.responseText.length);
+                    loadMap(data);
+                }
+            }).error(function(jqXHR, textStatus, errorThrown) {
+                $("#error").html(jqXHR.responseText);
+            });
+        }
+
+        function getTileUrlFunctionForGroup(resourceId, groupName, zOrigin) {
+            var urlTemplate = restUrl
+                    + resourceId.replace("Library:/", "/library")
+                    + "/tile.img/" + groupName + "/{z}/{y}/{x}";
+            return function(tileCoord) {
+                return urlTemplate
+                    .replace('{z}', (zOrigin - tileCoord[0]).toString())
+                    .replace('{x}', tileCoord[1].toString())
+                    .replace('{y}', (-tileCoord[2] - 1).toString());
+            };
+        }
+
+        function updateScale(scale) {
+            $("#scale").text(scale);
+        }
+
+        var inputCollection;
+
+        function loadMap(rtMapInfo) {
+            if (rtMapInfo.RuntimeMap.IconMimeType) {
+                gMimeType = rtMapInfo.RuntimeMap.IconMimeType;
+                $("#iconFormat").html(gMimeType);
+            }
+            var extent = [
+                rtMapInfo.RuntimeMap.Extents.LowerLeftCoordinate.X,
+                rtMapInfo.RuntimeMap.Extents.LowerLeftCoordinate.Y,
+                rtMapInfo.RuntimeMap.Extents.UpperRightCoordinate.X,
+                rtMapInfo.RuntimeMap.Extents.UpperRightCoordinate.Y
+            ];
+            var finiteScales = [];
+            if (rtMapInfo.RuntimeMap.FiniteDisplayScale) {
+                for (var i = rtMapInfo.RuntimeMap.FiniteDisplayScale.length - 1; i >= 0; i--) {
+                    finiteScales.push(rtMapInfo.RuntimeMap.FiniteDisplayScale[i]);
+                }
+            }
+
+            //If a tile set definition is defined it takes precedence over the map definition, this enables
+            //this example to work with older releases of MapGuide where no such resource type exists.
+            var resourceId = rtMapInfo.RuntimeMap.TileSetDefinition || rtMapInfo.RuntimeMap.MapDefinition;
+            //On MGOS 2.6 or older, tile width/height is never returned, so default to 300x300
+            var tileWidth = rtMapInfo.RuntimeMap.TileWidth || 300;
+            var tileHeight = rtMapInfo.RuntimeMap.TileHeight || 300;
+            var metersPerUnit = rtMapInfo.RuntimeMap.CoordinateSystem.MetersPerUnit;
+            var dpi = rtMapInfo.RuntimeMap.DisplayDpi;
+            var projection = null;
+            var zOrigin = finiteScales.length - 1;
+            var inPerUnit = 39.37 * metersPerUnit;
+            var resolutions = new Array(finiteScales.length);
+            for (var i = 0; i < finiteScales.length; ++i) {
+                resolutions[i] = finiteScales[i] / inPerUnit / dpi;
+            }
+
+            if (rtMapInfo.RuntimeMap.CoordinateSystem.EpsgCode.length > 0) {
+                projection = "EPSG:" + rtMapInfo.RuntimeMap.CoordinateSystem.EpsgCode;
+            }
+
+            var tileGrid = new ol.tilegrid.TileGrid({
+                origin: ol.extent.getTopLeft(extent),
+                resolutions: resolutions,
+                tileSize: [tileWidth, tileHeight]
+            });
+
+            var groupLayers = [];
+            for (var i = 0; i < rtMapInfo.RuntimeMap.Group.length; i++) {
+                var group = rtMapInfo.RuntimeMap.Group[i];
+                if (group.Type != 2 && group.Type != 3) { //BaseMap or LinkedTileSet
+                    continue;
+                }
+                groupLayers.push(
+                    new ol.layer.Tile({
+                        name: group.Name,
+                        source: new ol.source.TileImage({
+                            tileGrid: tileGrid,
+                            projection: projection,
+                            tileUrlFunction: getTileUrlFunctionForGroup(resourceId, group.Name, zOrigin),
+                            wrapX: false
+                        })
+                    })
+                );
+            }
+
+            /*
+            if (groupLayers.length > 0) {
+                groupLayers.push(
+                    new ol.layer.Tile({
+                        source: new ol.source.TileDebug({
+                            tileGrid: tileGrid,
+                            projection: projection,
+                            tileUrlFunction: function(tileCoord) {
+                                return urlTemplate.replace('{z}', (zOrigin - tileCoord[0]).toString())
+                                    .replace('{x}', tileCoord[1].toString())
+                                    .replace('{y}', (-tileCoord[2] - 1).toString());
+                            },
+                            wrapX: false
+                        })
+                    })
+                );
+            }
+            */
+
+            mapName = rtMapInfo.RuntimeMap.Name;
+            sessionId = rtMapInfo.RuntimeMap.SessionId;
+
+            var agentUrl = '../../../mapagent/mapagent.fcgi';
+            var overlay = new ol.layer.Image({
+                name: "MapGuide Dynamic Overlay",
+                extent: extent,
+                source: new ol.source.ImageMapGuide({
+                    projection: projection,
+                    url: agentUrl,
+                    useOverlay: true,
+                    metersPerUnit: metersPerUnit,
+                    params: {
+                        MAPNAME: mapName,
+                        FORMAT: 'PNG',
+                        SESSION: sessionId,
+                        BEHAVIOR: 2
+                    },
+                    ratio: 2
+                })
+            });
+
+            for (var i = groupLayers.length - 1; i >= 0; i--) {
+                layers.push(groupLayers[i]);
+            }
+            layers.push(overlay);
+            resultsLayer = new ol.layer.Vector({
+                source: new ol.source.Vector()
+            });
+            layers.push(resultsLayer);
+
+            /*
+            console.log("Draw Order:");
+            for (var i = 0; i < layers.length; i++) {
+                console.log(" " + layers[i].get("name"));
+            }
+            */
+            var view = null;
+            if (resolutions.length == 0) {
+                view = new ol.View({
+                    projection: projection
+                });
+            } else {
+                view = new ol.View({
+                    projection: projection,
+                    resolutions: resolutions
+                });
+            }
+            map = new ol.Map({
+                target: "map",
+                layers: layers,
+                view: view
+            });
+
+            //Selection overlay
+            inputCollection = new ol.Collection();
+            inputCollection.on("add", onInputAdded);
+            var featureOverlay = new ol.layer.Vector({
+                map: map,
+                source: new ol.source.Vector({
+                    features: inputCollection,
+                    useSpatialIndex: false // optional, might improve performance
+                }),
+                updateWhileAnimating: true, // optional, for instant visual feedback
+                updateWhileInteracting: true // optional, for instant visual feedback
+            });
+            inputSource = featureOverlay.getSource();
+            geoJSON = new ol.format.GeoJSON();
+            wktFormat = new ol.format.WKT();
+
+            //Zoom to initial extent
+            view.fit(extent, map.getSize());
+            view.on("change:resolution", function(e) {
+                updateScale(view.getResolution() * dpi * inPerUnit);
+            });
+            updateScale(view.getResolution() * dpi * inPerUnit);
+
+            //Legend setup
+            var mgTiledLayers = {};
+            for (var i = 0; i < groupLayers.length; i++) {
+                var grp = groupLayers[i];
+                mgTiledLayers[grp.get("name")] = grp;
+            }
+            legend = new Legend({
+                legendSelector: "#rootList",
+                stdIconRoot: "../../../stdicons",
+                runtimeMap: rtMapInfo,
+                map: map,
+                mgLayerOL: overlay,
+                mgTiledLayers: mgTiledLayers
+            });
+            legend.update();
+        }
+
+        function createLayerDefJson(fsId, className, geom, color) {
+            return {
+                "LayerDefinition": {
+                    "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                    "@version": "1.0.0",
+                    "@xsi:noNamespaceSchemaLocation": "LayerDefinition-1.0.0.xsd",
+                    "VectorLayerDefinition": {
+                        "ResourceId": fsId,
+                        "FeatureName": className,
+                        "FeatureNameType": "FeatureClass",
+                        "Geometry": geom,
+                        "VectorScaleRange": [
+                            {
+                                "PointTypeStyle": {
+                                    "DisplayAsText": false,
+                                    "AllowOverpost": false,
+                                    "PointRule": [
+                                        {
+                                            "LegendLabel": null,
+                                            "PointSymbolization2D": {
+                                                "Mark": {
+                                                    "Unit": "Points",
+                                                    "SizeContext": "DeviceUnits",
+                                                    "SizeX": "10",
+                                                    "SizeY": "10",
+                                                    "Rotation": "0",
+                                                    "Shape": "Square",
+                                                    "Fill": {
+                                                        "FillPattern": "Solid",
+                                                        "ForegroundColor": "ffffffff",
+                                                        "BackgroundColor": "ffffffff"
+                                                    },
+                                                    "Edge": {
+                                                        "LineStyle": "Solid",
+                                                        "Thickness": "1",
+                                                        "Color": "ff" + color,
+                                                        "Unit": "Points"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "LineTypeStyle": {
+                                    "LineRule": [
+                                        {
+                                            "LegendLabel": null,
+                                            "LineSymbolization2D": [
+                                                {
+                                                    "LineStyle": "Solid",
+                                                    "Thickness": "1",
+                                                    "Color": "ff" + color,
+                                                    "Unit": "Points"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "AreaTypeStyle": {
+                                    "AreaRule": [
+                                        {
+                                            "LegendLabel": null,
+                                            "AreaSymbolization2D": {
+                                                "Fill": {
+                                                    "FillPattern": "Solid",
+                                                    "ForegroundColor": "ffffffff",
+                                                    "BackgroundColor": "ffffffff"
+                                                },
+                                                "Stroke": {
+                                                    "LineStyle": "Solid",
+                                                    "Thickness": "1",
+                                                    "Color": "ff" + color,
+                                                    "Unit": "Points"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            };
+        }
+
+        function createFeatureSourceJson() {
+            return {
+                FeatureSourceParams: {
+                    File: {
+                        Provider: "OSGeo.SDF",
+                        FileName: "GeoProcessingResults.sdf"
+                    },
+                    SpatialContext: {
+                        Name: "Default",
+                        Description: "Default Spatial Context",
+                        CoordinateSystem: "GEOGCS[\"LL84\",DATUM[\"WGS84\",SPHEROID[\"WGS84\",6378137.000,298.25722293]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.01745329251994]]",
+                        XYTolerance: 0.00001,
+                        ZTolerance: 0.00001
+                    },
+                    FeatureSchema: {
+                        Name: "Default",
+                        Description: "Default Schema",
+                        ClassDefinition: [
+                            {
+                                Name: "GeoProcessingResults",
+                                Description: "Geo-Processing Results",
+                                PropertyDefinition: [
+                                    {
+                                        IsIdentity: true,
+                                        Name: "ID",
+                                        PropertyType: 100, //MgFeaturePropertyType.DataProperty
+                                        DataType: 7, //MgPropertyType.Int32
+                                        Nullable: false,
+                                        IsAutoGenerated: true
+                                    },
+                                    {
+                                        Name: "Geometry",
+                                        PropertyType: 102, //MgFeaturePropertyType.GeometricProperty
+                                        GeometryTypes: (1 | 2 | 4), //MgFeatureGeometricType.Point|Curve|Surface
+                                        SpatialContextAssociation: "Default"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+
+        function addLayerJson(layerDefId, name) {
+            return {
+                UpdateMap: {
+                    Operation: [
+                        {
+                            Type: "UpdateGroup",
+                            Name: "Geo-Processing Results",
+                            SetLegendLabel: "Geo-Processing results",
+                            AddIfNotExists: true,
+                            InsertAt: 0,
+                            SetVisible: true,
+                            SetDisplayInLegend: true
+                        },
+                        {
+                            Type: "AddLayer",
+                            ResourceId: layerDefId,
+                            Name: name,
+                            SetLegendLabel: name,
+                            SetDisplayInLegend: true,
+                            SetVisible: true,
+                            SetSelectable: false,
+                            SetGroup: "Geo-Processing Results",
+                            InsertAt: 0
+                        }
+                    ]
+                }
+            }
+        }
+
+        function createInsertJson(geoms) {
+            var features = [];
+            for (var i = 0; i < geoms.length; i++) {
+                features.push({
+                    Property: [
+                        { Name: "Geometry", Value: geoms[i] }
+                    ]
+                });
+            }
+            var json = {
+                FeatureSet: {
+                    Features: {
+                        Feature: features
+                    }
+                }
+            };
+            return json;
+        }
+
+        var counter = 0;
+
+        function saveToLayer() {
+            counter++;
+
+            //Collect WKTs of turf result layer
+            var geoms = [];
+            var features = resultsLayer.getSource().getFeatures();
+            for (var i = 0; i < features.length; i++) {
+                var feat = features[i];
+                geoms.push(wktFormat.writeFeature(feat));
+            }
+
+            var layerName = "GeoProcessingResult" + counter;
+            var url = restUrl + "/session/" + sessionId + "/" + mapName + ".Map/layersandgroups.json";
+
+            var makeFeatureSource = function() {
+                return $.ajax({
+                    url: restUrl + "/session/" + sessionId + "/" + layerName + ".FeatureSource/json",
+                    type: "POST",
+                    data: JSON.stringify(createFeatureSourceJson())
+                })
+            };
+            var createLayerDef = function(data, textStatus, jqXHR) {
+                return $.ajax({
+                    url: restUrl + "/session/" + sessionId + "/" + layerName + ".LayerDefinition/content.json",
+                    type: "POST",
+                    data: JSON.stringify(createLayerDefJson("Session:" + sessionId + "//" + layerName + ".FeatureSource", "Default:GeoProcessingResults", "Geometry", "FF00000"))
+                });
+            };
+            var insertGeoProcessingResult = function(data, textStatus, jqXHR) {
+                return $.ajax({
+                    url: restUrl + "/session/" + sessionId + "/" + layerName + ".FeatureSource/features.json/Default/GeoProcessingResults",
+                    type: "POST",
+                    processData: false,
+                    data: JSON.stringify(createInsertJson(geoms))
+                })
+            };
+            var addLayerToMap = function(data, textStatus, jqXHR) {
+                return $.ajax({
+                    url: restUrl + "/session/" + sessionId + "/" + mapName + ".Map/layersandgroups.json",
+                    type: "POST",
+                    data: JSON.stringify(addLayerJson("Session:" + sessionId + "//" + layerName + ".LayerDefinition", layerName)),
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader("X-HTTP-Method-Override", "PUT");
+                    }
+                });
+            };
+
+            makeFeatureSource()
+                .then(createLayerDef)
+                .then(insertGeoProcessingResult)
+                .then(addLayerToMap)
+                .then(function() {
+                    alert("Layer saved");
+                    clearResults();
+                    var reqFeatures = (1|2|4);
+                    //Re-query layer structure from server
+                    $.getJSON(restUrl + "/session/" + sessionId + "/" + mapName + ".Map/description.json?requestedfeatures=" + reqFeatures).then(function(res) {
+                        legend.updateLayersAndGroups(res);
+                        legend.refreshLayer();
+                    });
+                });
+        }
+
+        var draw;
+
+        function onInputAdded(e) {
+            if (draw) {
+                map.removeInteraction(draw);
+                draw = null;
+            }
+        }
+
+        function drawGeometry(type) {
+            if (draw) {
+                map.removeInteraction(draw);
+            }
+            draw = new ol.interaction.Draw({
+                features: inputCollection,
+                type: type
+            });
+            map.addInteraction(draw);
+        }
+
+        function drawPoint() {
+            drawGeometry("Point");
+        }
+
+        function drawLineString() {
+            drawGeometry("LineString");
+        }
+
+        function drawPolygon() {
+            drawGeometry("Polygon");
+        }
+
+        function clearResults() {
+            resultsLayer.getSource().clear();
+        }
+
+        function clearInput() {
+            inputSource.clear();
+        }
+
+        function op_buffer() {
+            var features = inputSource.getFeatures();
+            if (features.length == 0) {
+                alert("Draw a feature first");
+                return;
+            }
+            if (features.length > 1) {
+                alert("You must have only one feature drawn to buffer");
+                return;
+            }
+
+            var res = prompt("Enter the buffer distance (meters):");
+            if (res != null) {
+                var geometry = wktFormat.writeFeature(features[0]);
+
+                var args = {
+                    geometry: geometry,
+                    coordsys: "LL84",
+                    distance: res,
+                    units: "m",
+                    format: "geojson"
+                };
+
+                $.ajax({
+                    url: restUrl + "/processing/buffer",
+                    type: "POST",
+                    data: args
+                }).then(function(res) {
+                    var feat = geoJSON.readFeature(res.result);
+                    resultsLayer.getSource().addFeature(feat);
+                });
+            }
+        }
+
+        function test_spatial_predicate(op) {
+            var features = inputSource.getFeatures();
+            if (features.length != 2) {
+                alert("You must have 2 features drawn to run this operation: " + op);
+            } else {
+                var geom_a = wktFormat.writeFeature(features[0]);
+                var geom_b = wktFormat.writeFeature(features[1]);
+
+                var args = {
+                    geometry_a: geom_a,
+                    geometry_b: geom_b,
+                    operator: op
+                };
+
+                $.ajax({
+                    url: restUrl + "/processing/spatialpredicate",
+                    type: "POST",
+                    data: args
+                }).then(function(res) {
+                    alert(op + ": " + res.PrimitiveValue.Value);
+                });
+            }
+        }
+
+        function binary_spatial_operation(op) {
+            var features = inputSource.getFeatures();
+            if (features.length != 2) {
+                alert("You must have 2 features drawn to run this operation: " + op);
+            } else {
+                var geom_a = wktFormat.writeFeature(features[0]);
+                var geom_b = wktFormat.writeFeature(features[1]);
+
+                var args = {
+                    geometry_a: geom_a,
+                    geometry_b: geom_b,
+                    format: "geojson"
+                };
+
+                $.ajax({
+                    url: restUrl + "/processing/" + op,
+                    type: "POST",
+                    data: args
+                }).then(function(res) {
+                    var feat = geoJSON.readFeature(res.result);
+                    resultsLayer.getSource().addFeature(feat);
+                });
+            }
+        }
+
+        function op_union() {
+            binary_spatial_operation("union");
+        }
+
+        function op_intersection() {
+            binary_spatial_operation("intersection");
+        }
+
+        function op_difference() {
+            binary_spatial_operation("difference");
+        }
+
+        function op_symdifference() {
+            binary_spatial_operation("symmetricdifference");
+        }
+
+        function op_contains() {
+            test_spatial_predicate("contains");
+        }
+
+        function op_crosses() {
+            test_spatial_predicate("crosses");
+        }
+
+        function op_disjoint() {
+            test_spatial_predicate("disjoint");
+        }
+
+        function op_equals() {
+            test_spatial_predicate("equals");
+        }
+
+        function op_intersects() {
+            test_spatial_predicate("intersects");
+        }
+
+        function op_overlaps() {
+            test_spatial_predicate("overlaps");
+        }
+
+        function op_touches() {
+            test_spatial_predicate("touches");
+        }
+
+        function op_within() {
+            test_spatial_predicate("within");
+        }
+
+        </script>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="../index.php">MapGuide REST Samples</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse"></div>
+                <!--/.navbar-collapse -->
+            </div>
+        </nav>
+        <div id="main">
+            <div class="container">
+                <div class="alert alert-info">
+                    <p>This example demonstrates geo-processing APIs of mapguide-rest</p>
+                </div>
+                <div id="error">
+                </div>
+                <div id="wrap">
+                    <div id="layers">
+                        <div id="legend">
+                            <ul id="rootList">
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="tools">
+                        <div class="alert alert-info">
+                            <p>Draw one or two geometries and choose any option below</p>
+                        </div>
+                        <fieldset>
+                            <legend>Draw</legend>
+                            <div class="btn-group-vertical">
+                                <button class="btn btn-sm btn-default" onclick="drawPoint()">Point</button>
+                                <button class="btn btn-sm btn-default" onclick="drawLineString()">Line String</button>
+                                <button class="btn btn-sm btn-default" onclick="drawPolygon()">Polygon</button>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Layers</legend>
+                            <div class="btn-group-vertical">
+                                <button class="btn btn-sm btn-danger" onclick="clearResults()">Clear Results</button>
+                                <button class="btn btn-sm btn-danger" onclick="clearInput()">Clear Input</button>
+                                <button class="btn btn-sm btn-primary" onclick="saveToLayer()">Save Result to Layer</button>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Operations</legend>
+                            <div class="btn-group-vertical">
+                                <button class="btn btn-sm btn-default" onclick="op_buffer()">Buffer</button>
+                                <button class="btn btn-sm btn-default" onclick="op_union()">Union</button>
+                                <button class="btn btn-sm btn-default" onclick="op_intersection()">Intersection</button>
+                                <button class="btn btn-sm btn-default" onclick="op_difference()">Difference</button>
+                                <button class="btn btn-sm btn-default" onclick="op_symdifference()">Symmetric Difference</button>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Predicates</legend>
+                            <p>Test Spatial Predicate of 2 inputs</p>
+                            <div class="btn-group-vertical">
+                                <button class="btn btn-sm btn-default" onclick="op_contains()">Contains</button>
+                                <button class="btn btn-sm btn-default" onclick="op_crosses()">Crosses</button>
+                                <button class="btn btn-sm btn-default" onclick="op_disjoint()">Disjoint</button>
+                                <button class="btn btn-sm btn-default" onclick="op_equals()">Equals</button>
+                                <button class="btn btn-sm btn-default" onclick="op_intersects()">Intersects</button>
+                                <button class="btn btn-sm btn-default" onclick="op_overlaps()">Overlaps</button>
+                                <button class="btn btn-sm btn-default" onclick="op_touches()">Touches</button>
+                                <button class="btn btn-sm btn-default" onclick="op_within()">Within</button>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div id="map">
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="alert alert-info">
+                    <p>Scale: 1:<span id="scale"></span></p>
+                    <p>JSON payload for CREATERUNTIMEMAP is: <span id="jsonSize"></span> characters</p>
+                    <p>Icon format is: <span id="iconFormat"></span></p>
+                    <p id="mapName"></p>
+                    <p id="mgSession"></p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

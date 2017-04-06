@@ -136,6 +136,7 @@ function is_installed($feature)
                                 <li class="list-group-item"><a href="restsources/index.html">OpenLayers map consuming published data</a></li>
                                 <li class="list-group-item"><a href="kitchensink/index.html">Sheboygan map with every possible map/selection RESTful URL available</a></li>
                                 <li class="list-group-item"><a href="turf/ol3_clientgeom.html">Basic Sheboygan mixed map (tiled and untiled) example (OpenLayers 3) with turf.js</a></li>
+                                <li class="list-group-item"><a href="geoprocessing/index.html">Geo-Processing example (OpenLayers 3)</a></li>
                             </ul>
                         </div>
                     </div>
