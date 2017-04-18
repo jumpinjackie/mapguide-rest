@@ -1250,12 +1250,13 @@ $app->get("/library/:resourcePath+.LayerDefinition/kml", function($resourcePath)
 
 /**
  *     @SWG\Get(
- *        path="/library/{resourcePath}.LayerDefinition/kmlfeatures",
+ *        path="/library/{resourcePath}.LayerDefinition/kmlfeatures.{type}",
  *        operationId="GetFeaturesKml",
  *        summary="Gets the features KML for the specified layer definition",
  *        tags={"library"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resourcePath", in="path", required=true, type="string", description="The path of the Layer Definition"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="kml or kmz", enum={"kml", "kmz"}),
  *          @SWG\Parameter(name="bbox", in="query", required=true, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry. Coordinates must be LL84 coordinates"),
  *          @SWG\Parameter(name="dpi", in="query", required=true, type="integer", description="Display DPI. Default is 96"),
  *          @SWG\Parameter(name="width", in="query", required=true, type="integer", description="The display width of the KML viewport"),
@@ -1266,12 +1267,12 @@ $app->get("/library/:resourcePath+.LayerDefinition/kml", function($resourcePath)
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.LayerDefinition/kmlfeatures", function($resourcePath) use ($app) {
+$app->get("/library/:resourcePath+.LayerDefinition/kmlfeatures.:format", function($resourcePath, $format) use ($app) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $ctrl = new MgKmlServiceController($app);
-    $ctrl->GetFeaturesKml($resId, "kml");
+    $ctrl->GetFeaturesKml($resId, $format);
 });

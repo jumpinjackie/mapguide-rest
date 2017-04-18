@@ -3781,7 +3781,7 @@
                 }
             }
         },
-        "/library/{resourcePath}.LayerDefinition/kmlfeatures": {
+        "/library/{resourcePath}.LayerDefinition/kmlfeatures.{type}": {
             "get": {
                 "tags": [
                     "library"
@@ -3802,6 +3802,17 @@
                         "description": "The path of the Layer Definition",
                         "required": true,
                         "type": "string"
+                    },
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "description": "kml or kmz",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "kml",
+                            "kmz"
+                        ]
                     },
                     {
                         "name": "bbox",
@@ -8346,7 +8357,7 @@
                 }
             }
         },
-        "/session/{session}/{resName}.LayerDefinition/kmlfeatures": {
+        "/session/{session}/{resName}.LayerDefinition/kmlfeatures.{type}": {
             "get": {
                 "tags": [
                     "session"
@@ -8364,9 +8375,20 @@
                     {
                         "name": "resName",
                         "in": "path",
-                        "description": "The feature source name",
+                        "description": "The layer definition name",
                         "required": true,
                         "type": "string"
+                    },
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "description": "kml or kmz",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "kml",
+                            "kmz"
+                        ]
                     },
                     {
                         "name": "bbox",

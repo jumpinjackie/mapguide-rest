@@ -48,7 +48,7 @@ abstract class MgResponseHandler
         $param = $req->GetRequestParam();
         $origMimeType = $param->GetParameterValue("FORMAT");
         try {
-            //If JSON format specified, replace it with XML response and use our 
+            //If JSON format specified, replace it with XML response and use our
             //own XML to JSON converter. This is to allow for "cleaner" JSON output
             //that only our converter can do
             if ($origMimeType == MgMimeType::Json)
@@ -278,7 +278,7 @@ abstract class MgResponseHandler
                             $propCount = $idProps->GetCount();
                             while ($reader->ReadNext()) {
                                 $output .= "<Feature>";
-                                //HACK: There is a bug that prevents us from inferring the structure of the MgFeatureReader 
+                                //HACK: There is a bug that prevents us from inferring the structure of the MgFeatureReader
                                 //that's put into the UpdateFeatures result, so we workaround this by using the already fetched
                                 //MgClassDefinition to extract the relevant identity property values
                                 for ($i = 0; $i < $propCount; $i++) {
@@ -613,7 +613,7 @@ abstract class MgResponseHandler
         $title = $this->app->localizer->getText("E_UNAUTHORIZED");
         $message = $this->app->localizer->getText("E_UNAUTHORIZED_DESC");
         $errResponse = $this->FormatException("Unauthorized", $title, $message, $e->getTraceAsString(), 401, $mimeType);
-        
+
         $this->app->response->header("Content-Type", $mimeType);
         $this->app->halt(401, $errResponse);
     }

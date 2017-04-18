@@ -1231,7 +1231,6 @@ $app->get("/session/:sessionId/:resName.MapDefinition/kml", function($sessionId,
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The feature source name"),
- *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="bbox", in="query", required=true, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry. Coordinates must be LL84 coordinates"),
  *          @SWG\Parameter(name="dpi", in="query", required=true, type="integer", description="Display DPI. Default is 96"),
  *          @SWG\Parameter(name="width", in="query", required=true, type="integer", description="The display width of the KML viewport"),
@@ -1250,12 +1249,13 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/kml", function($sessionI
 
 /**
  *     @SWG\Get(
- *        path="/session/{session}/{resName}.LayerDefinition/kmlfeatures",
+ *        path="/session/{session}/{resName}.LayerDefinition/kmlfeatures.{type}",
  *        operationId="GetFeaturesKml",
  *        summary="Gets the features KML for the specified layer definition",
  *        tags={"session"},
  *          @SWG\Parameter(name="session", in="path", required=true, type="string", description="Your MapGuide Session ID"),
- *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The feature source name"),
+ *          @SWG\Parameter(name="resName", in="path", required=true, type="string", description="The layer definition name"),
+ *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="kml or kmz", enum={"kml", "kmz"}),
  *          @SWG\Parameter(name="bbox", in="query", required=true, type="string", description="A comma-separated quartet (x1,y1,x2,y2) defining the spatial filter geometry. Coordinates must be LL84 coordinates"),
  *          @SWG\Parameter(name="dpi", in="query", required=true, type="integer", description="Display DPI. Default is 96"),
  *          @SWG\Parameter(name="width", in="query", required=true, type="integer", description="The display width of the KML viewport"),
@@ -1266,8 +1266,8 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/kml", function($sessionI
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.LayerDefinition/kmlfeatures", function($sessionId, $resName) use ($app) {
+$app->get("/session/:sessionId/:resName.LayerDefinition/kmlfeatures.:format", function($sessionId, $resName, $format) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
     $ctrl = new MgKmlServiceController($app);
-    $ctrl->GetFeaturesKml($resId, "kml");
+    $ctrl->GetFeaturesKml($resId, $format);
 });

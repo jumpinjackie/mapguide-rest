@@ -157,7 +157,7 @@ class MgKmlServiceController extends MgBaseController {
                 $mapCs = $csFactory->Create($wkt);
                 $llCs = $csFactory->CreateFromCode("LL84");
                 $trans = $csFactory->GetTransform($mapCs, $llCs);
-                
+
                 $trans->IgnoreDatumShiftWarning(true);
                 $trans->IgnoreOutsideDomainWarning(true);
 
@@ -486,7 +486,22 @@ class MgKmlServiceController extends MgBaseController {
             $param->AddParameter("DRAWORDER", $drawOrder);
             $param->AddParameter("DPI", $dpi);
             $param->AddParameter("FORMAT", strtoupper($fmt));
-            $param->AddParameter("X-CHUNK-RESPONSE", "true");
+
+            $bChunk = true;
+            //Apply file download parameters if specified
+            if ($this->app->request->params("download") === "1" || $this->app->request->params("download") === "true") {
+                $param->AddParameter("X-DOWNLOAD-ATTACHMENT", "true");
+                if ($this->app->request->params("downloadname")) {
+                    $param->AddParameter("X-DOWNLOAD-ATTACHMENT-NAME", $this->app->request->params("downloadname"));
+                    $bChunk = false;
+                }
+            }
+
+            //Can't chunk if custom download attachment name specified, otherwise flick the switch
+            if ($bChunk) {
+                $param->AddParameter("X-CHUNK-RESPONSE", "true");
+            }
+
             $that->ExecuteHttpRequest($req);
         }, true, $agentUri, $sessionId);
     }
