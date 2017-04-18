@@ -8,7 +8,7 @@ class MgPdfPlotMetrics
     public $y;
     public $w;
     public $h;
-    
+
     public function __construct($x, $y, $w, $h)
     {
         $this->x = $x;
@@ -22,7 +22,7 @@ class MgPlotSize
 {
     public $width;
     public $height;
-    
+
     public function __construct($width, $height)
     {
         $this->width  = $width;
@@ -75,7 +75,7 @@ class MgPdfPlotter
         $this->SetDisclaimer("");
         $this->SetOrientation($orientation);
         $this->scaleDenominator = $this->map->GetViewScale();
-        
+
         $this->ShowLegend($showLegend);
         $this->ShowCoordinates($showCoordinates);
         $this->ShowDisclaimer($showDisclaimer);
@@ -127,9 +127,9 @@ class MgPdfPlotter
 
     public function SetMargins($marginTIn, $marginBIn, $marginLIn, $marginRIn) {
         $this->margin = array(
-            MgUtils::InToMM($marginTIn), 
+            MgUtils::InToMM($marginTIn),
             MgUtils::InToMM($marginBIn),
-            MgUtils::InToMM($marginLIn), 
+            MgUtils::InToMM($marginLIn),
             MgUtils::InToMM($marginRIn));
     }
 
@@ -160,18 +160,18 @@ class MgPdfPlotter
     public function ShowNorthArrow($bShow) {
         $this->drawNorthArrow = $bShow;
     }
-    
+
     private function DrawScale($ovScale = NULL) {
         $pageHeight = $this->pdf->getPageHeight();
-        $paddingBottom = 7; $textPadding = 5; $fontSize = 6;             
+        $paddingBottom = 7; $textPadding = 5; $fontSize = 6;
         $style = array("width" => 0.4, "cap" => "butt", "join" => "miter", "dash" => 0, "color" => array(0, 0, 0));
-        
+
         $start_x = MgUtils::ParseLocaleDouble($this->margin[2]);
         $start_y = $pageHeight - $paddingBottom;
-        
+
         $lineMark_h = 3;
         $textMarkPadding = 1.0;
-        
+
         //<editor-fold defaultstate="collapsed" desc="print the scale bar with meter">
         $unit = "m";
         $imageSpan = 20;            // the 20 is a suggested scale bar length
@@ -180,7 +180,7 @@ class MgPdfPlotter
             $scale = $ovScale;
 
         $realSpan = $scale * 0.02;  // $imageSpan / 1000
-        
+
         if($realSpan >= 1000)
         {
             $unit = "km";
@@ -188,16 +188,16 @@ class MgPdfPlotter
             $realSpan = MgUtils::GetRoundNumber($realSpan);
             $imageSpan = ($realSpan * 1000000)/$scale;
         }
-        else 
+        else
         {
             $realSpan = MgUtils::GetRoundNumber($realSpan);
             $imageSpan = ($realSpan * 1000) / $scale;
         }
-        
+
         $end_x = $start_x + $imageSpan;
-        $end_y = $start_y;       
+        $end_y = $start_y;
         $meterTextMark = $realSpan." ".$unit;
-        
+
         $this->pdf->SetFont($this->font, "", $fontSize, "", true);
         $this->pdf->Line($start_x, $start_y, $end_x, $end_y, $style);
         $this->pdf->Line($start_x, $start_y, $start_x, $start_y - $lineMark_h, $style);
@@ -205,15 +205,15 @@ class MgPdfPlotter
         $fontSize = 7; $textHeight = 4;
         $this->pdf->SetFont($this->font, "", $fontSize, "", true);
         $this->pdf->Text($start_x + $textMarkPadding, $start_y - $textHeight, $meterTextMark);
-  
-        $textStart_x = $end_x; 
+
+        $textStart_x = $end_x;
         //</editor-fold>
-        
+
         //<editor-fold defaultstate="collapsed" desc="print the scale bar with feet">
         $unit ="ft"; $aFeetPerMeter = 3.2808; $aFeetPerMile = 5280; $aMeterPerFeet = 0.3048;
         $imageSpan = 20; // the 20 is a suggested scale bar length, in "mm"
         $realSpan = ( ($scale * $imageSpan) / 1000 ) * $aFeetPerMeter;
-        
+
         if($realSpan > $aFeetPerMile)
         {
             $unit = "mi";
@@ -221,33 +221,33 @@ class MgPdfPlotter
             $realSpan = MgUtils::GetRoundNumber($realSpan);
             $imageSpan = ( $realSpan * $aFeetPerMile * $aMeterPerFeet * 1000 ) / $scale;
         }
-        else 
+        else
         {
             $realSpan = MgUtils::GetRoundNumber($realSpan);
             $imageSpan = ( $realSpan * $aMeterPerFeet * 1000 ) / $scale;
         }
-        
+
         $end_x = $start_x + $imageSpan;
         $end_y = $start_y;
-        
+
         $feetTextMark = $realSpan.' '.$unit;
-        
+
         $this->pdf->Line($start_x, $start_y, $end_x, $end_y, $style);
         $this->pdf->Line($start_x, $start_y, $start_x, $start_y + $lineMark_h, $style);
         $this->pdf->Line($end_x, $end_y, $end_x, $end_y + $lineMark_h, $style);
-        
+
         $this->pdf->SetFont($this->font, "", $fontSize, "", true);
         $this->pdf->Text($start_x + $textMarkPadding, $start_y + 1, $feetTextMark);
         //</editor-fold>
-        
+
         //determine where to begin to print the absolute scale and date info
         if($end_x > $textStart_x)
         {
             $textStart_x = $end_x;
         }
-        
+
         $textStart_x += $textPadding;
-        
+
         //write the scale
         $fontSize = 8;
         $this->pdf->SetFont($this->font, "", $fontSize, "", true);
@@ -256,7 +256,7 @@ class MgPdfPlotter
         //write the date
         $date = date("M/d/Y");
         $this->pdf->Text($textStart_x + 0.3, $end_y - 3.8, $date);
-        
+
         return new MgPdfPlotMetrics($this->margin[2],
                                     $start_y,
                                     $textStart_x,
@@ -265,23 +265,23 @@ class MgPdfPlotter
 
     private function DrawDeclaration($offX, $legendWidthIn) {
         $declaration = $this->disclaimer;
-        
+
         //$declaration_w = $this->pdf->GetStringWidth($declaration,$this->font,9);
         $this->pdf->SetFont($this->font, "", 9, "", true);
-        
+
         $bottomPadding = 2.5;
-        
+
         //Sometimes the declaration is too short, less than 100 unit, we could set the cell width as the string length
         //so it will align to the right
         $SingleLineDeclarationWidth  = $this->pdf->GetStringWidth($declaration, $this->font, "", 9, false) + $legendWidthIn;
         $tolerance = 3;
         $w = $this->pdf->getPageWidth() - $this->margin[0] - $this->margin[1] - $offX;
-        
+
         if( $SingleLineDeclarationWidth + $tolerance < $w )
         {
             $w = $SingleLineDeclarationWidth + $tolerance;
         }
-        
+
         $h = 5;
         $border = 0; //no border
         $align = "L";//align left
@@ -293,31 +293,31 @@ class MgPdfPlotter
         if (strlen($declaration) == 0)
             return new MgPdfPlotMetrics($x, $y, 0, 0);
 
-        $this->pdf->MultiCell($w, 
+        $this->pdf->MultiCell($w,
                               $h,
                               $declaration,
                               $border,
                               $align,
-                              false, 
+                              false,
                               0,
-                              $x, 
-                              $y, 
+                              $x,
+                              $y,
                               true);
         return new MgPdfPlotMetrics($x, $y, $w, $this->pdf->getStringHeight($w, $declaration));
     }
-    
+
     private function DrawExtentCS($legendWidthIn) {
         if ($this->normalizedBox && trim($this->normalizedBox) != "") {
             $fontSize = 9;
             $decimals = 6;
             $padding = 5;
             $textHeight = 5;
-            
+
             $extent_cs = explode(",",$this->normalizedBox);//2,3 ; 6,7
             $lefttop_cs_label = " x:".number_format($extent_cs[6], $decimals).", y:".number_format($extent_cs[7], $decimals)."   ";
             $rightbottom_cs_label = " x:".number_format($extent_cs[2], $decimals).", y:".number_format($extent_cs[3], $decimals)."   ";
-            $this->pdf->SetFont($this->font, 
-                                "", 
+            $this->pdf->SetFont($this->font,
+                                "",
                                 $fontSize);
 
             //cell width
@@ -330,38 +330,38 @@ class MgPdfPlotter
             $this->pdf->SetFillColor(255, 255, 255);
 
             $this->pdf->SetXY($lefttop[0] + $legendWidthIn, $lefttop[1], false);
-            $this->pdf->Cell($lt_cellwidth, 
-                             0, 
-                             $lefttop_cs_label, 
-                             1, 
-                             0, 
-                             '', 
-                             true, 
-                             '', 
-                             0, 
-                             false, 
-                             self::CALIGN_CELL_TOP, 
+            $this->pdf->Cell($lt_cellwidth,
+                             0,
+                             $lefttop_cs_label,
+                             1,
+                             0,
+                             '',
+                             true,
+                             '',
+                             0,
+                             false,
+                             self::CALIGN_CELL_TOP,
                              self::VALIGN_CENTER);
 
             $this->pdf->SetXY($rightbottom[0] + $legendWidthIn, $rightbottom[1], false);
-            $this->pdf->Cell($rb_cellwidth, 
-                             0, 
-                             $rightbottom_cs_label, 
-                             1, 
-                             0, 
-                             '', 
-                             true, 
-                             '', 
-                             0, 
-                             false, 
-                             self::CALIGN_CELL_TOP, 
+            $this->pdf->Cell($rb_cellwidth,
+                             0,
+                             $rightbottom_cs_label,
+                             1,
+                             0,
+                             '',
+                             true,
+                             '',
+                             0,
+                             false,
+                             self::CALIGN_CELL_TOP,
                              self::VALIGN_CENTER);
         }
     }
-    
+
     private function DrawTitle() {
         $html = '<div style="text-align:left"><span style="font-weight: bold; font-size: 18pt;">'.$this->title.'</span><br/><span>'.$this->subTitle.'</span></div>';
-        
+
         //print title left position
         $titleWidth = $this->pdf->GetStringWidth($this->title, $this->font, "B", 18, false);
         $x = ($this->pdf->getPageWidth() - $titleWidth) / 2;
@@ -369,14 +369,14 @@ class MgPdfPlotter
         {
             $x = 0;
         }
-        
+
         //print title top position
         $y = 5;
         if( $this->margin[0] > 0.0 )
         {
             $y = $this->margin[0] / 4;
         }
-        
+
         // Print text using writeHTMLCell()
         $this->pdf->writeHTMLCell(0, 0, $x, $y, $html, 0, 1, false, true, "C", true);
         return new MgPdfPlotMetrics($x, $y, $titleWidth, $this->pdf->getStringHeight(0, $this->title));
@@ -385,21 +385,21 @@ class MgPdfPlotter
     private function DrawNorthArrow($imgMap) {
         // Load the north arrow image which has a 300 dpi resolution
         $na         = imagecreatefrompng(dirname(__FILE__)."/../res/north_arrow.png");
-        
+
         $transparent= imagecolortransparent($na);
-        // PHP 5.5 broke image rotation (or maybe we did it completely wrong before PHP 5.5). 
+        // PHP 5.5 broke image rotation (or maybe we did it completely wrong before PHP 5.5).
         // Either way, here's how we fix it. Assign an explicit color if imagecolortransparent() returns -1
         if ($transparent < 0) {
             $transparent = imagecolorallocatealpha($na, 0, 0, 0, 127);
             $bReleaseTrans = true;
         }
-        
+
         // Rotate the north arrow according to the capture rotation
         $rotatedNa  = imagerotate($na, -$this->rotation, $transparent);
         // Free the transparent color if we allocated it
         if ($bReleaseTrans)
             imagecolordeallocate($na, $transparent);
-            
+
         // Free the north arrow image
         imagedestroy($na);
         // Get the size of north arrow image
@@ -421,25 +421,25 @@ class MgPdfPlotter
         // Draw the north arrow on the map picture
         imagecopyresized($imgMap, $rotatedNa, $imgMapWidth - $drawWidth - $margin, $imgMapHeight - $drawHeight - $margin, 0, 0, $drawWidth, $drawHeight, $naWidth, $naHeight);
         // Free the north arrow image
-        imagedestroy($rotatedNa); 
+        imagedestroy($rotatedNa);
     }
 
     private static function CreatePolygon($coordinates) {
         $geometryFactory      = new MgGeometryFactory();
         $coordinateCollection = new MgCoordinateCollection();
         $linearRingCollection = new MgLinearRingCollection();
-        
+
         for ($index = 0; $index < count($coordinates); ++$index)
         {
             $coordinate = $geometryFactory->CreateCoordinateXY(MgUtils::ParseLocaleDouble($coordinates[$index]), MgUtils::ParseLocaleDouble($coordinates[++$index]));
             $coordinateCollection->Add($coordinate);
         }
-        
+
         $coordinateCollection->Add($geometryFactory->CreateCoordinateXY(MgUtils::ParseLocaleDouble($coordinates[0]), MgUtils::ParseLocaleDouble($coordinates[1])));
-        
+
         $linearRingCollection = $geometryFactory->CreateLinearRing($coordinateCollection);
         $captureBox           = $geometryFactory->CreatePolygon($linearRingCollection, null);
-        
+
         return $captureBox;
     }
 
@@ -469,17 +469,17 @@ class MgPdfPlotter
         $size2            = new MgPlotSize($normalizedE->getWidth(), $normalizedE->getHeight());
         $toSize           = new MgPlotSize($size1->width / $size2->width * $size->width, $size1->height / $size2->height * $size->height);
         $centroid         = $captureBox->GetCentroid();
-        
+
         if ($ovCenter != null)
             $center = $ovCenter;
         else
             $center = $centroid->GetCoordinate();
-        
+
         if ($ovScale != null)
             $scale = $ovScale;
         else
             $scale = $this->scaleDenominator;
-  
+
         $this->map->SetDisplayDpi($this->dpi);
         if ($ovColor != NULL) {
             $color = $ovColor;
@@ -490,11 +490,11 @@ class MgPdfPlotter
             $color = new MgColor($colorString);
         }
 
-        $mgReader = $this->renderingService->RenderMap($this->map, 
-                                                       $selection, 
+        $mgReader = $this->renderingService->RenderMap($this->map,
+                                                       $selection,
                                                        $center,
-                                                       $scale, 
-                                                       $toSize->width, 
+                                                       $scale,
+                                                       $toSize->width,
                                                        $toSize->height,
                                                        $color,
                                                        MgImageFormats::Png,
@@ -503,9 +503,17 @@ class MgPdfPlotter
 
         $mgReader->ToFile($tempImage);
 
+        // Draw north arrow if specified
+        if ($this->drawNorthArrow) {
+            $imgMap = imagecreatefrompng($tempImage);
+            $this->DrawNorthArrow($imgMap);
+            imagepng($imgMap, $tempImage);
+            imagedestroy($imgMap);
+        }
+
         //TODO: Rotation support (not included from Fusion QuickPlot code). If included, we need to solve
         //the transparency issue when outputting a layered PDF
-        
+
         return $tempImage;
     }
 
@@ -515,17 +523,17 @@ class MgPdfPlotter
         if ($this->showLegend) {
             $legendWidthIn = MgUtils::PxToIn($legendWidthPx, $this->legendDpi);
         }
-        
+
         // Create new PDF document, the default "PDF_UNIT" value is "mm"
         $this->pdf = new TCPDF($this->orientation, PDF_UNIT, $this->paperType, true, "UTF-8", false);
         $this->font = "dejavusans";
         $this->pdf->AddFont($this->font);
-        // Set margins  
+        // Set margins
         $this->pdf->SetMargins(0, 0, 0);
         $this->pdf->SetHeaderMargin(0);
         $this->pdf->SetFooterMargin(0);
         // Prevent adding page automatically
-        $this->pdf->SetAutoPageBreak(false); 
+        $this->pdf->SetAutoPageBreak(false);
 
         // Remove default header/footer
         $this->pdf->setPrintHeader(false);
@@ -535,7 +543,7 @@ class MgPdfPlotter
 
         // Add a page
         $this->pdf->AddPage();
-        
+
         // The print size determines the size of the PDF, not the size of the map and legend images
         // we want to request back to put into this PDF.
         //
@@ -545,10 +553,10 @@ class MgPdfPlotter
         //
         // Title, scale and disclaimer rendering will all return Metrics objects that will give us the information
         // needed for the size adjustments
-        
+
         // Draw Title
         $mTitle = $this->DrawTitle();
-        
+
         $mScale = NULL;
         if ($this->showScaleBar) {
             // Draw Scale
@@ -562,9 +570,9 @@ class MgPdfPlotter
         } else {
             $mDec = new MgPdfPlotMetrics(0, 0, 0, 0);
         }
-        
+
         // Adjust width and height of the images we want to request to compensate for surrounding print elements that have been rendered
-        
+
         // Check the size of the disclaimer and adjust height
         $idealHeight = $this->pdf->getPageHeight() - ($mDec->h - ($mScale != NULL ? $mScale->h : 0)) - $this->margin[0] - $this->margin[1];
         //var_dump($idealHeight);
@@ -572,14 +580,14 @@ class MgPdfPlotter
         //die;
         if ($idealHeight < $this->printSize->height);
             $this->printSize->height = $idealHeight;
-            
+
         $idealWidth = $this->pdf->getPageWidth() - $this->margin[2] - $this->margin[3];
         if ($this->showLegend) {
             $idealWidth -= $legendWidthIn;
         }
         if ($idealWidth < $this->printSize->width);
             $this->printSize->width = $idealWidth;
-        
+
 
         $link = "";
         $align = "";
@@ -596,21 +604,21 @@ class MgPdfPlotter
         if ($this->showLegend) {
             $legendfilelocation = $this->RenderLegend(MgUtils::InToPx($legendWidthIn, $this->legendDpi), MgUtils::InToPx($this->printSize->height, $this->legendDpi));
             $this->pdf->Image($legendfilelocation,
-                              $this->margin[2], 
-                              $this->margin[0], 
-                              $legendWidthIn, 
-                              $this->printSize->height, 
-                              MgImageFormats::Png, 
-                              $link, 
-                              $align, 
-                              $resize, 
-                              $this->dpi, 
-                              $palign, 
-                              $ismask, 
-                              $imgmask, 
-                              $border, 
-                              $fitbox, 
-                              $hidden, 
+                              $this->margin[2],
+                              $this->margin[0],
+                              $legendWidthIn,
+                              $this->printSize->height,
+                              MgImageFormats::Png,
+                              $link,
+                              $align,
+                              $resize,
+                              $this->dpi,
+                              $palign,
+                              $ismask,
+                              $imgmask,
+                              $border,
+                              $fitbox,
+                              $hidden,
                               $fitonpage);
             @unlink($legendfilelocation);
         }
@@ -652,12 +660,12 @@ class MgPdfPlotter
                                                  MgUtils::InToPx($this->printSize->height, $this->dpi),
                                                  $center,
                                                  $scale);
-            
+
             // Draw Map background
-            $this->pdf->Image($filelocation, 
-                              ($this->showLegend ? ($this->margin[2] + $legendWidthIn) : $this->margin[2]), 
-                              $this->margin[0], 
-                              $this->printSize->width, 
+            $this->pdf->Image($filelocation,
+                              ($this->showLegend ? ($this->margin[2] + $legendWidthIn) : $this->margin[2]),
+                              $this->margin[0],
+                              $this->printSize->width,
                               $this->printSize->height,
                               MgImageFormats::Png,
                               $link,
@@ -691,12 +699,12 @@ class MgPdfPlotter
                                                  $center,
                                                  $scale,
                                                  $bgColor);
-            
+
                 // Draw Map
-                $this->pdf->Image($filelocation, 
-                                  ($this->showLegend ? ($this->margin[2] + $legendWidthIn) : $this->margin[2]), 
-                                  $this->margin[0], 
-                                  $this->printSize->width, 
+                $this->pdf->Image($filelocation,
+                                  ($this->showLegend ? ($this->margin[2] + $legendWidthIn) : $this->margin[2]),
+                                  $this->margin[0],
+                                  $this->printSize->width,
                                   $this->printSize->height,
                                   MgImageFormats::Png,
                                   $link,
@@ -721,7 +729,7 @@ class MgPdfPlotter
                     $mapLayers->GetItem($prevLayerName)->SetVisible(false);
                 }
                 $mapLayers->GetItem($layerName)->SetVisible(true);
-                
+
                 $print = true;
                 $view = true;
                 $lock = false;
@@ -732,12 +740,12 @@ class MgPdfPlotter
                                                  $center,
                                                  $scale,
                                                  $bgColor);
-            
+
                 // Draw Map
-                $this->pdf->Image($filelocation, 
-                                  ($this->showLegend ? ($this->margin[2] + $legendWidthIn) : $this->margin[2]), 
-                                  $this->margin[0], 
-                                  $this->printSize->width, 
+                $this->pdf->Image($filelocation,
+                                  ($this->showLegend ? ($this->margin[2] + $legendWidthIn) : $this->margin[2]),
+                                  $this->margin[0],
+                                  $this->printSize->width,
                                   $this->printSize->height,
                                   MgImageFormats::Png,
                                   $link,
@@ -761,12 +769,12 @@ class MgPdfPlotter
                                              MgUtils::InToPx($this->printSize->height, $this->dpi),
                                              $center,
                                              $scale);
-            
+
             // Draw Map
-            $this->pdf->Image($filelocation, 
-                              ($this->showLegend ? ($this->margin[2] + $legendWidthIn) : $this->margin[2]), 
-                              $this->margin[0], 
-                              $this->printSize->width, 
+            $this->pdf->Image($filelocation,
+                              ($this->showLegend ? ($this->margin[2] + $legendWidthIn) : $this->margin[2]),
+                              $this->margin[0],
+                              $this->printSize->width,
                               $this->printSize->height,
                               MgImageFormats::Png,
                               $link,
@@ -789,12 +797,12 @@ class MgPdfPlotter
             // Draw Extent coordinates
             $mExt = $this->DrawExtentCS($legendWidthIn);
         }
-        
+
         //NOTE: TCPDF will output the Content-Type header, but for some reason
         //chrome will refuse to display the PDF inline despite a Content-Type
         //header sent. Doing this will most likely double up the mime type, but
         //will ensure we can view pdfs inline in chrome. I've erred on letting
-        //the mime type double up 
+        //the mime type double up
         $this->app->response->header("Content-Type", "application/pdf");
         $mode = 'I';
         $name = 'Map.pdf';

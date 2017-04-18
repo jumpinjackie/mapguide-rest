@@ -31,6 +31,12 @@ return array(
     "Error.OutputStackTrace" => false,
 
     //
+    //PDF.PlotDisclaimer
+    //
+    //The disclaimer text to show for any PDF plot produced by mapguide-rest, if plot is configured to show the disclaimer
+    "PDF.PlotDisclaimer" => "This disclaimer text can be configured through the PDF.PlotDisclaimer property in the mapguide-rest configuration (app/config.php)",
+
+    //
     //MapGuide.MapAgentUrl
     //
     //The mapagent endpoint relative to the root of mapguide-rest
@@ -43,7 +49,7 @@ return array(
     //
     //NOTE: CORS will not be enabled for KML service operations when native=1 is passed, and such cross-domain
     //requests on these service operations will fail
-    /* 
+    /*
     "MapGuide.Cors" => array(
         "origin" => "*",
         //"exposeHeaders" => array("X-My-Custom-Header", "X-Another-Custom-Header"),
@@ -65,8 +71,8 @@ return array(
     //If this property is defined, access to the given feature source through the REST API will be governed
     //by the configuration within
     //
-    //This property also doubles as a whitelist when defined. When active, APIs that operate on feature sources 
-    //will only be allowed if the given feature source id is defined in this list. If this property is omitted 
+    //This property also doubles as a whitelist when defined. When active, APIs that operate on feature sources
+    //will only be allowed if the given feature source id is defined in this list. If this property is omitted
     //or the property is an empty array, the whitelist is not active
     //
     //Security resolution rules:
@@ -87,7 +93,7 @@ return array(
     /*
     "MapGuide.FeatureSourceConfiguration" => array(
         //
-        // The "Globals" configuration specifies ACLs for operations that do not 
+        // The "Globals" configuration specifies ACLs for operations that do not
         // operate on a specific feature source
         //
         "Globals" => array(
@@ -110,7 +116,7 @@ return array(
             )
         ),
         //
-        // This Sheboygan Parcels example demonstrates a possible approach to locking down access 
+        // This Sheboygan Parcels example demonstrates a possible approach to locking down access
         // to a given feature source
         //
         //  - The following operations are only allowed by authors and administrators:
@@ -118,7 +124,7 @@ return array(
         //     - Operations that insert/update/delete data
         //     - Operations that describe the feature service configuration and capabilities of the MapGuide Server
         //
-        //  - Anonymous users can only query data and only access a single class definition 
+        //  - Anonymous users can only query data and only access a single class definition
         //    (and not the ability to walk the entire structure of the data store). An application
         //    will presumably hand down the necessary schema/class name.
         //
@@ -185,8 +191,8 @@ return array(
     //If this property is defined, access to the given resource/folder through the REST API will be governed
     //by the configuration within
     //
-    //This property also doubles as a whitelist when defined. When active, APIs that operate on resources/folders 
-    //will only be allowed if the given resource id is defined in this list. If this property is omitted 
+    //This property also doubles as a whitelist when defined. When active, APIs that operate on resources/folders
+    //will only be allowed if the given resource id is defined in this list. If this property is omitted
     //or the property is an empty array, the whitelist is not active.
     //
     //It follows the same security resolution rules as MapGuide.FeatureSourceConfiguration
@@ -195,7 +201,7 @@ return array(
     /*
     "MapGuide.ResourceConfiguration" => array(
         //
-        // The "Globals" configuration specifies ACLs for operations that do not 
+        // The "Globals" configuration specifies ACLs for operations that do not
         // operate on a specific feature source
         //
         "Globals" => array(
@@ -248,7 +254,7 @@ return array(
             )
         ),
         //
-        // This Sheboygan Parcels example demonstrates a possible approach to locking down access 
+        // This Sheboygan Parcels example demonstrates a possible approach to locking down access
         // to a given feature source
         //
         //  - The following operations are only allowed by authors and administrators:
@@ -256,7 +262,7 @@ return array(
         //     - Operations that insert/update/delete data
         //     - Operations that describe the feature service configuration and capabilities of the MapGuide Server
         //
-        //  - Anonymous users can only query data and only access a single class definition 
+        //  - Anonymous users can only query data and only access a single class definition
         //    (and not the ability to walk the entire structure of the data store). An application
         //    will presumably hand down the necessary schema/class name.
         //

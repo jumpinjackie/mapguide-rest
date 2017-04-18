@@ -153,7 +153,7 @@ class MgMappingServiceController extends MgBaseController {
                                     continue;   // This typestyle does not need to be shown in the legend
 
                             $rules = $typeStyle->item($st)->getElementsByTagName($ruleNames[$ts]);
-                            $iconCount += $rules->length;                            
+                            $iconCount += $rules->length;
                         }
                     }
                     $bCompress = ($iconCount > $iconsPerScaleRange);
@@ -331,7 +331,7 @@ class MgMappingServiceController extends MgBaseController {
         $maxX = $ur->GetX();
         $maxY = $ur->GetY();
         $xml .= "<Extents>\n<LowerLeftCoordinate><X>$minX</X><Y>$minY</Y></LowerLeftCoordinate>\n<UpperRightCoordinate><X>$maxX</X><Y>$maxY</Y></UpperRightCoordinate></Extents>\n";
-        
+
         $layerDefinitionMap = array();
 
         // ---------------------- Optional things if requested --------------------------- //
@@ -437,7 +437,7 @@ class MgMappingServiceController extends MgBaseController {
             $this->userInfo = new MgUserInformation($session);
             $siteConn->Open($this->userInfo);
         }
-        
+
         $mdfId = new MgResourceIdentifier($mapDefIdStr);
         if ($mapName == null) {
             $mapName = $mdfId->GetName();
@@ -494,7 +494,7 @@ class MgMappingServiceController extends MgBaseController {
             $param = $req->GetRequestParam();
 
             $param->AddParameter("OPERATION", "CREATERUNTIMEMAP");
-            //Hmmm, this may violate REST API design, but if we're on MGOS 3.0 or newer, we must return linked tile set 
+            //Hmmm, this may violate REST API design, but if we're on MGOS 3.0 or newer, we must return linked tile set
             //information to the client if applicable. Meaning this API could return 2 different results depending on the
             //underlying MGOS version.
             if (intval($version[0]) >= 3)
@@ -546,7 +546,7 @@ class MgMappingServiceController extends MgBaseController {
         $this->EnsureAuthenticationForSite($sessionId, false);
         $siteConn = new MgSiteConnection();
         $siteConn->Open($this->userInfo);
-        
+
         //Assign default values or coerce existing ones to their expected types
         if ($reqFeatures != null) {
             $reqFeatures = intval($reqFeatures);
@@ -633,6 +633,12 @@ class MgMappingServiceController extends MgBaseController {
         $scale = $this->GetRequestParameter("scale", "");
         $dpi = intval($this->GetRequestParameter("dpi", "96"));
 
+        $showPdfCoords = $this->GetBooleanRequestParameter("pdf_coords", false);
+        $showPdfNorthArrow = $this->GetBooleanRequestParameter("pdf_north_arrow", false);
+        $showPdfScaleBar = $this->GetBooleanRequestParameter("pdf_scale_bar", false);
+        $showPdfDisclaimer = $this->GetBooleanRequestParameter("pdf_disclaimer", false);
+        $showPdfLegend = $this->GetBooleanRequestParameter("pdf_legend", false);
+
         if ($x == "")
             $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "x"), MgMimeType::Html);
         if ($y == "")
@@ -704,12 +710,15 @@ class MgMappingServiceController extends MgBaseController {
             $plotter->SetTitle($title);
             $plotter->SetPaperType($paperSize);
             $plotter->SetOrientation($orientation);
-            $plotter->ShowCoordinates(true);
-            $plotter->ShowNorthArrow(true);
-            $plotter->ShowScaleBar(true);
-            $plotter->ShowDisclaimer(true);
+            $plotter->ShowCoordinates($showPdfCoords);
+            $plotter->ShowNorthArrow($showPdfNorthArrow);
+            $plotter->ShowScaleBar($showPdfScaleBar);
+            $plotter->ShowDisclaimer($showPdfDisclaimer);
+            $plotter->ShowLegend($showPdfLegend);
+            $plotter->SetDisclaimer($this->app->config("PDF.PlotDisclaimer"));
             //$plotter->SetLayered($bLayered);
             $plotter->SetMargins($marginTop, $marginBottom, $marginLeft, $marginRight);
+
             //Apply download headers
             $downloadFlag = $this->app->request->params("download");
             if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
@@ -750,7 +759,7 @@ class MgMappingServiceController extends MgBaseController {
             $width = ($orientation == 'L') ? MgUtils::MMToIn($size[1]) : MgUtils::MMToIn($size[0]);
             $height = ($orientation == 'L') ? MgUtils::MMToIn($size[0]) : MgUtils::MMToIn($size[1]);
             $printLayoutStr = $this->GetRequestParameter("printlayout", null);
-            
+
             $dwfVersion = new MgDwfVersion("6.01", "1.2");
             $plotSpec = new MgPlotSpecification($width, $height, MgPageUnitsType::Inches);
             $plotSpec->SetMargins($marginLeft, $marginTop, $marginRight, $marginBottom);

@@ -3272,6 +3272,41 @@
                         "type": "string"
                     },
                     {
+                        "name": "pdf_coords",
+                        "in": "query",
+                        "description": "Show coordinates in plot. PDF only",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "pdf_north_arrow",
+                        "in": "query",
+                        "description": "Show north arrow in plot. PDF only",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "pdf_scale_bar",
+                        "in": "query",
+                        "description": "Show scale bar in plot. PDF only",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "pdf_disclaimer",
+                        "in": "query",
+                        "description": "Show disclaimer in plot. PDF only",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "pdf_legend",
+                        "in": "query",
+                        "description": "Show legend in plot. PDF only",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
                         "name": "type",
                         "in": "path",
                         "description": "The plot type",
@@ -5624,9 +5659,37 @@
                         "type": "string"
                     },
                     {
-                        "name": "layeredpdf",
+                        "name": "pdf_coords",
                         "in": "query",
-                        "description": "Indicates whether to produce a layered PDF. Only applies if plotting PDFs. This is slower than regular PDF plot, but produces a PDF with the same layer structure as the map",
+                        "description": "Show coordinates in plot. PDF only",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "pdf_north_arrow",
+                        "in": "query",
+                        "description": "Show north arrow in plot. PDF only",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "pdf_scale_bar",
+                        "in": "query",
+                        "description": "Show scale bar in plot. PDF only",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "pdf_disclaimer",
+                        "in": "query",
+                        "description": "Show disclaimer in plot. PDF only",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "pdf_legend",
+                        "in": "query",
+                        "description": "Show legend in plot. PDF only",
                         "required": false,
                         "type": "boolean"
                     },
@@ -8299,13 +8362,6 @@
                         "in": "path",
                         "description": "The feature source name",
                         "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "session",
-                        "in": "query",
-                        "description": "Your MapGuide Session ID",
-                        "required": false,
                         "type": "string"
                     },
                     {
