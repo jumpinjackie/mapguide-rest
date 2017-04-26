@@ -476,7 +476,8 @@ class MgKmlServiceController extends MgBaseController {
         $agentUri = MgUtils::GetSelfUrlRoot($this->app->config("SelfUrl"))."/../mapagent/mapagent.fcgi";
 
         $that = $this;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resId, $bbox, $width, $height, $drawOrder, $dpi) {
+        $app = $this->app;
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $app, $fmt, $resId, $bbox, $width, $height, $drawOrder, $dpi) {
             $param->AddParameter("OPERATION", "GETFEATURESKML");
             $param->AddParameter("VERSION", "1.0.0");
             $param->AddParameter("LAYERDEFINITION", $resId->ToString());
@@ -489,10 +490,10 @@ class MgKmlServiceController extends MgBaseController {
 
             $bChunk = true;
             //Apply file download parameters if specified
-            if ($this->app->request->params("download") === "1" || $this->app->request->params("download") === "true") {
+            if ($app->request->params("download") === "1" || $app->request->params("download") === "true") {
                 $param->AddParameter("X-DOWNLOAD-ATTACHMENT", "true");
-                if ($this->app->request->params("downloadname")) {
-                    $param->AddParameter("X-DOWNLOAD-ATTACHMENT-NAME", $this->app->request->params("downloadname"));
+                if ($app->request->params("downloadname")) {
+                    $param->AddParameter("X-DOWNLOAD-ATTACHMENT-NAME", $app->request->params("downloadname"));
                     $bChunk = false;
                 }
             }
