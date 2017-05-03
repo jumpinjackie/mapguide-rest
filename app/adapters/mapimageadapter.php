@@ -51,10 +51,18 @@ class MgMapImageRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
             $pScale->required = false;
             $pScale->description = "The scale of the image";
 
+            $pSelection = new stdClass();
+            $pSelection->in = "query";
+            $pSelection->name = "selection";
+            $pSelection->type = "boolean";
+            $pSelection->required = false;
+            $pSelection->description = "Show selection (default: true)";
+
             array_push($params, $pWidth);
             array_push($params, $pHeight);
             array_push($params, $pDpi);
             array_push($params, $pScale);
+            array_push($params, $pSelection);
         }
         return $params;
     }
@@ -113,7 +121,7 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             throw new Exception($this->app->localizer->getText("E_MISSING_REQUIRED_ADAPTER_PROPERTY", "MapDefinition"));
         if (!array_key_exists("SelectionLayer", $config))
             throw new Exception($this->app->localizer->getText("E_MISSING_REQUIRED_ADAPTER_PROPERTY", "SelectionLayer"));
-        
+
         $this->mapDefId = new MgResourceIdentifier($config["MapDefinition"]);
         $this->selLayerName = $config["SelectionLayer"];
         if (array_key_exists("ZoomFactor", $config))
@@ -143,26 +151,17 @@ class MgMapImageRestAdapter extends MgRestAdapter {
                 $this->dpi = $ovDpi;
             if ($ovScale != null)
                 $this->viewScale = intval($ovScale);
-        
-            $site = $this->siteConn->GetSite();
-            $this->sessionId = $site->GetCurrentSession();
-            $bCreatedSession = false;
-            if ($this->sessionId === "") {
-                $this->sessionId = $site->CreateSession();
-                $bCreatedSession = true;
-            }
-            $userInfo = new MgUserInformation($this->sessionId);
-            $siteConn = new MgSiteConnection();
-            $siteConn->Open($userInfo);
-            $this->resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-            $this->featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
+            $bSelection = true;
+            if ($this->app->request->get("selection") === "0" || $this->app->request->get("selection") === "false")
+                $bSelection = false;
+
+            $this->featSvc = $this->siteConn->CreateService(MgServiceType::FeatureService);
+            $renderSvc = $this->siteConn->CreateService(MgServiceType::RenderingService);
 
             $mapName = "MapImageAdapter";
-            $this->map = new MgMap($siteConn);
+            $this->map = new MgMap($this->siteConn);
             $this->map->Create($this->mapDefId, $mapName);
             $this->sel = new MgSelection($this->map);
-            $mapId = new MgResourceIdentifier("Session:".$this->sessionId."//$mapName.Map");
-            $this->map->Save($this->resSvc, $mapId);
 
             $layers = $this->map->GetLayers();
             $idx = $layers->IndexOf($this->selLayerName);
@@ -176,7 +175,7 @@ class MgMapImageRestAdapter extends MgRestAdapter {
 
             $query = $this->CreateQueryOptions($single);
             $reader = $this->featSvc->SelectFeatures($this->featureSourceId, $this->className, $query);
-           
+
             $start = -1;
             $end = -1;
             $read = 0;
@@ -211,8 +210,7 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             //die;
             $this->sel->AddFeatures($this->selLayer, $reader, $limit);
             $reader->Close();
-            $this->sel->Save($this->resSvc, $mapName);
-            
+
             $extents = $this->sel->GetExtents($this->featSvc);
             $extLL = $extents->GetLowerLeftCoordinate();
             $extUR = $extents->GetUpperRightCoordinate();
@@ -226,10 +224,10 @@ class MgMapImageRestAdapter extends MgRestAdapter {
 
                 $mcsH = $extUR->GetY() - $extLL->GetY();
                 $mcsW = $extUR->GetX() - $extLL->GetX();
-                
+
                 $mcsH = $mcsH * $this->zoomFactor;
                 $mcsW = $mcsW * $this->zoomFactor;
-                     
+
                 $metersPerPixel  = 0.0254 / $this->dpi;
 
                 if ($this->imgHeight * $mcsW > $this->imgWidth * $mcsH)
@@ -238,44 +236,33 @@ class MgMapImageRestAdapter extends MgRestAdapter {
                     $this->viewScale = $mcsH * $metersPerUnit / ($this->imgHeight * $metersPerPixel); // height-limited
             }
 
-            $req = new MgHttpRequest("");
-            $param = $req->GetRequestParam();
+            $colorString = $this->map->GetBackgroundColor();
+            // The returned color string is in AARRGGBB format. But the constructor of MgColor needs a string in RRGGBBAA format
+            $colorString = substr($colorString, 2, 6) . substr($colorString, 0, 2);
+            $bgColor = new MgColor($colorString);
+            $bKeepSelection = true;
+            $geomFactory = new MgGeometryFactory();
+            $center = $geomFactory->CreateCoordinateXY($x, $y);
+            $image = $renderSvc->RenderMap($this->map,
+                                           ($bSelection ? $this->sel : NULL),
+                                           $center,
+                                           $this->viewScale,
+                                           $this->imgWidth,
+                                           $this->imgHeight,
+                                           $bgColor,
+                                           $this->imgFormat,
+                                           $bKeepSelection);
 
-            $param->AddParameter("OPERATION", "GETMAPIMAGE");
-            $param->AddParameter("VERSION", "1.0.0");
-            $param->AddParameter("SESSION", $this->sessionId);
-            $param->AddParameter("LOCALE", $this->app->config("Locale"));
-            $param->AddParameter("CLIENTAGENT", "MapGuide REST Extension");
-            $param->AddParameter("CLIENTIP", $this->GetClientIp());
-
-            $param->AddParameter("FORMAT", $this->imgFormat);
-            $param->AddParameter("MAPNAME", $mapName);
-            $param->AddParameter("KEEPSELECTION", "1");
-            $param->AddParameter("SETDISPLAYWIDTH", $this->imgWidth);
-            $param->AddParameter("SETDISPLAYHEIGHT", $this->imgHeight);
-            $param->AddParameter("SETDISPLAYDPI", $this->dpi);
-            $param->AddParameter("SETVIEWCENTERX", $x);
-            $param->AddParameter("SETVIEWCENTERY", $y);
-            $param->AddParameter("SETVIEWSCALE", $this->viewScale);
-            $param->AddParameter("BEHAVIOR", 3); //Layers + Selection
-
-            //Apply file download parameters if specified
+            //Set download response headers if specified
             if ($this->app->request->params("download") === "1" || $this->app->request->params("download") === "true") {
-                $param->AddParameter("X-DOWNLOAD-ATTACHMENT", "true");
+                $filebasename = "download";
                 if ($this->app->request->params("downloadname")) {
-                    $param->AddParameter("X-DOWNLOAD-ATTACHMENT-NAME", $this->app->request->params("downloadname"));
+                    $filebasename = $this->app->request->params("downloadname");
                 }
+                $this->app->response->headers->set("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($filebasename, $image->GetMimeType()));
             }
 
-            $this->ExecuteHttpRequest($req);
-            
-            if ($bCreatedSession === true) {
-                $conn2 = new MgSiteConnection();
-                $user2 = new MgUserInformation($this->sessionId);
-                $conn2->Open($user2);
-                $site2 = $conn2->GetSite();
-                $site2->DestroySession($this->sessionId);
-            }
+            $this->OutputByteReader($image);
         } catch (MgException $ex) {
             $this->OnException($ex);
         }
