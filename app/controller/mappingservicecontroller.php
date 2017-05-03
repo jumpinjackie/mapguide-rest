@@ -752,6 +752,12 @@ class MgMappingServiceController extends MgBaseController {
         $marginRight = floatval($this->GetRequestParameter("marginright", 0.5));
         $marginTop = floatval($this->GetRequestParameter("margintop", ($title == "") ? 0.5: 1.0));
         $marginBottom = floatval($this->GetRequestParameter("marginbottom", 0.5));
+        
+        $showPdfCoords = $this->GetBooleanRequestParameter("pdf_coords", false);
+        $showPdfNorthArrow = $this->GetBooleanRequestParameter("pdf_north_arrow", false);
+        $showPdfScaleBar = $this->GetBooleanRequestParameter("pdf_scale_bar", false);
+        $showPdfDisclaimer = $this->GetBooleanRequestParameter("pdf_disclaimer", false);
+        $showPdfLegend = $this->GetBooleanRequestParameter("pdf_legend", false);
 
         if ($fmt == "dwf") {
             $size = MgUtils::GetPaperSize($this->app, $paperSize);
@@ -794,10 +800,12 @@ class MgMappingServiceController extends MgBaseController {
             $plotter->SetTitle($title);
             $plotter->SetPaperType($paperSize);
             $plotter->SetOrientation($orientation);
-            $plotter->ShowCoordinates(true);
-            $plotter->ShowNorthArrow(true);
-            $plotter->ShowScaleBar(true);
-            $plotter->ShowDisclaimer(true);
+            $plotter->ShowCoordinates($showPdfCoords);
+            $plotter->ShowNorthArrow($showPdfNorthArrow);
+            $plotter->ShowScaleBar($showPdfScaleBar);
+            $plotter->ShowDisclaimer($showPdfDisclaimer);
+            $plotter->ShowLegend($showPdfLegend);
+            $plotter->SetDisclaimer($this->app->config("PDF.PlotDisclaimer"));
             $plotter->SetLayered($bLayered);
             $plotter->SetMargins($marginTop, $marginBottom, $marginLeft, $marginRight);
 
