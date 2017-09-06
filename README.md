@@ -16,7 +16,7 @@ mapguide-rest is written in PHP and uses the following libraries:
  - [Slim Framework](http://www.slimframework.com/)
  - [Smarty Template Engine](http://www.smarty.net)
 
-**WARNING: mapguide-rest is currently experimental and should only be used for testing/development purposes. Use at your own risk on production data**
+This project is not affiliated with Autodesk or OSGeo.
 
 Requirements
 ============
