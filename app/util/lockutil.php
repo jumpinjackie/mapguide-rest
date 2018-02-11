@@ -211,7 +211,8 @@ class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
     private $y;
     private $z;
     private $layerNames;
-    
+    private $retinaScale;
+
     public function __construct($ctrl, $resId, $groupName, $x, $y, $z, $layerNames, $format) {
         parent::__construct();
         $this->ctrl = $ctrl;
@@ -222,6 +223,11 @@ class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
         $this->z = $z;
         $this->layerNames = $layerNames;
         $this->format = $format;
+        $this->retinaScale = 1;
+    }
+
+    public function SetRetinaScale($scale) {
+        $this->retinaScale = $scale;
     }
     
     public function PostProcess($requestId, $app, $lock, $path) {
@@ -285,7 +291,9 @@ class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
             //
             //The given tile set is assumed to be using the XYZ provider, the case where the Tile Set Definition is using the default provider
             //is not handled
-            if ($app->MG_VERSION[0] >= 3 && $this->resId->GetResourceType() == "TileSetDefinition") {
+            //
+            //Retina XYZ tile requests are not supported in MapGuide, so they must go through the old path
+            if ($this->retinaScale > 1 && $app->MG_VERSION[0] >= 3 && $this->resId->GetResourceType() == "TileSetDefinition") {
                 $bOldPath = false;
                 $sessionId = "";
                 if ($this->resId->GetRepositoryType() === MgRepositoryType::Session && $app->request->get("session") == null) {
@@ -401,7 +409,7 @@ class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
             } else {
                 $format = strtoupper($this->format);
                 //error_log("($requestId) Render image tile");
-                $this->ctrl->PutTileImageXYZ($map, $groupName, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames, $requestId);
+                $this->ctrl->PutTileImageXYZ($map, $groupName, $this->retinaScale, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames, $requestId);
             }
         }
     }

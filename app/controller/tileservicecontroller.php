@@ -158,15 +158,19 @@ class MgTileServiceController extends MgBaseController {
         return false;
     }
 
-    private static function GetTilePath($app, $resId, $groupName, $z, $x, $y, $type, $layerNames) {
+    private static function GetTilePath($app, $resId, $groupName, $z, $x, $y, $type, $layerNames, $scale = 1) {
         $ext = $type;
         if (strtolower($type) == "png8")
             $ext = substr($type, 0, 3); //png8 -> png
+        $gn = $groupName;
+        if ($scale > 1) {
+            $gn .= "@".$scale."x";
+        }
         if ($layerNames != NULL && count($layerNames) == 1) {
             $layerName = $layerNames[0];
-            $relPath = "/".$resId->GetPath()."/".$resId->GetName()."/$groupName/$layerName/$z/$x/$y.$ext";
+            $relPath = "/".$resId->GetPath()."/".$resId->GetName()."/$gn/$layerName/$z/$x/$y.$ext";
         } else {
-            $relPath = "/".$resId->GetPath()."/".$resId->GetName()."/$groupName/$z/$x/$y.$ext";
+            $relPath = "/".$resId->GetPath()."/".$resId->GetName()."/$gn/$z/$x/$y.$ext";
         }
         $customRoot = $app->config("Cache.XYZTileRoot");
         if ($customRoot != null)
@@ -291,10 +295,12 @@ class MgTileServiceController extends MgBaseController {
         return $path;
     }
 
-    public function PutTileImageXYZ($map, $groupName, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames, $requestId) {
+    public function PutTileImageXYZ($map, $groupName, $retinaScale, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames, $requestId) {
         //We don't use RenderTile (as it uses key parameters that are locked to serverconfig.ini), we use RenderMap instead
-        $bufferPx = $this->app->config("MapGuide.XYZTileBuffer");
-        $ratio = $bufferPx / self::XYZ_TILE_WIDTH;
+        $bufferPx = $this->app->config("MapGuide.XYZTileBuffer") * $retinaScale;
+        $tileWidth = self::XYZ_TILE_WIDTH * $retinaScale;
+        $tileHeight = self::XYZ_TILE_HEIGHT * $retinaScale;
+        $ratio = $bufferPx / $tileWidth;
         $dx = $boundsMaxX - $boundsMinX;
         $dy = $boundsMaxY - $boundsMinY;
         //If we have a buffer, we have to inflate the bounds by the given ratio
@@ -323,7 +329,7 @@ class MgTileServiceController extends MgBaseController {
             }
         }
         $bgColor = new MgColor($strColor);
-        $tileImg = $renderSvc->RenderMap($map, null, $env, self::XYZ_TILE_WIDTH + (2 * $bufferPx), self::XYZ_TILE_HEIGHT + (2 * $bufferPx), $bgColor, $format, false);
+        $tileImg = $renderSvc->RenderMap($map, null, $env, $tileWidth + (2 * $bufferPx), $tileHeight + (2 * $bufferPx), $bgColor, $format, false);
         $sink = new MgByteSink($tileImg);
         
         if ($bufferPx > 0)
@@ -350,7 +356,7 @@ class MgTileServiceController extends MgBaseController {
             if ($im == null)
                 throw new Exception("Image format not supported for cropping: $format");
 
-            $tile = imagecreatetruecolor(self::XYZ_TILE_WIDTH, self::XYZ_TILE_HEIGHT);
+            $tile = imagecreatetruecolor($tileWidth, $tileHeight);
             imagesavealpha($tile, true);
             
             $trans_color = imagecolorallocatealpha($tile, 0, 0, 0, 127);
@@ -361,7 +367,7 @@ class MgTileServiceController extends MgBaseController {
                 //Crop by using imagecopy(). imagecrop() exists in PHP 5.5 and if you're using PHP 5.5, chances
                 //are you're using MGOS 3.0 that has native XYZ tile support in which case: Why are you even
                 //here?
-                imagecopy($tile, $im, 0, 0, $bufferPx, $bufferPx, self::XYZ_TILE_WIDTH, self::XYZ_TILE_HEIGHT);
+                imagecopy($tile, $im, 0, 0, $bufferPx, $bufferPx, $tileWidth, $tileHeight);
                 $this->app->log->debug("($requestId): Cropped image. Saving to $path");
                 
                 switch ($format)
@@ -421,6 +427,20 @@ class MgTileServiceController extends MgBaseController {
         $lock = $lockUtil->Acquire($y);
         
         $section = new MgGetTileXYZCriticalSection($this, $resId, $groupName, $x, $y, $z, $layerNames, $type);
+        $lock->EnterCriticalSection($this->app, $section);
+    }
+
+    public function GetTileXYZRetina($resId, $groupName, $x, $y, $z, $type, $scale, $layerNames = NULL) {
+        $fmt = $this->ValidateRepresentation($type, array("png", "png8", "jpg", "gif"));
+        $path = self::GetTilePath($this->app, $resId, $groupName, $z, $x, $y, $type, $layerNames, $scale);
+        
+        $requestId = rand();
+        $lockUtil = new MgFileLockUtil($this->app, $path, $requestId, self::MAX_RETRY_ATTEMPTS);
+        
+        $lock = $lockUtil->Acquire($y);
+        
+        $section = new MgGetTileXYZCriticalSection($this, $resId, $groupName, $x, $y, $z, $layerNames, $type);
+        $section->SetRetinaScale($scale);
         $lock->EnterCriticalSection($this->app, $section);
     }
     
