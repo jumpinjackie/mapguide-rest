@@ -309,7 +309,12 @@ class MgTileServiceController extends MgBaseController {
         $maxx = $boundsMaxX + ($dx * $ratio);
         $maxy = $boundsMaxY + ($dx * $ratio);
         $env = new MgEnvelope($minx, $miny, $maxx, $maxy);
-        
+
+        if ($retinaScale > 1) {
+            $dpi = $map->GetDisplayDpi();
+            $map->SetDisplayDpi($dpi * $retinaScale);
+        }
+
         $strColor = $map->GetBackgroundColor();
         //Make sure the alpha component is transparent
         if (strlen($strColor) == 8) {
