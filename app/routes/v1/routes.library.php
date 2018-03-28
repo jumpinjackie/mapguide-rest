@@ -874,6 +874,37 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:layerName/:z/:x
 });
 /**
  *     @SWG\Get(
+ *        path="/library/{resourcePath}.MapDefinition/xyz@{scale}/{groupName}/{z}/{x}/{y}/tile.{format}",
+ *        operationId="GetTileXYZRetina",
+ *        summary="Gets the specified retina tile for the given map definition",
+ *        tags={"library"},
+ *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
+ *          @SWG\Parameter(name="resourcePath", in="path", required=true, type="string", description="The path of the Map Definition"),
+ *          @SWG\Parameter(name="scale", in="path", required=true, type="integer", description="The scale factor"),
+ *          @SWG\Parameter(name="groupName", in="path", required=true, type="string", description="The tiled group of the Map Definition"),
+ *          @SWG\Parameter(name="z", in="path", required=true, type="integer", description="The finite scale index"),
+ *          @SWG\Parameter(name="x", in="path", required=true, type="integer", description="The column of the tile to fetch"),
+ *          @SWG\Parameter(name="y", in="path", required=true, type="integer", description="The row of the tile to fetch"),
+ *          @SWG\Parameter(name="format", in="path", required=true, type="string", description="The tile type", enum={"png", "jpg", "png8", "gif"}),
+ *        @SWG\Response(response=304, description="This tile has not been modified. Your previously fetched tile is still the current one"),
+ *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
+ *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
+ *        @SWG\Response(response=500, description="An error occurred during the operation")
+ *     )
+ */
+$app->get("/library/:resourcePath+.MapDefinition/xyz@:scale/:groupName/:z/:x/:y/tile.:format", function($resourcePath, $scale, $groupName, $z, $x, $y, $format) use ($app) {
+    $count = count($resourcePath);
+    if ($count > 0) {
+        $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
+    }
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    //echo "ResId: ".$resId->ToString()."<br/>Group: $groupName<br/>X: $x<br/>Y: $y<br/>Z: $z<br/>Format: $format";
+    //die;
+    $ctrl = new MgTileServiceController($app);
+    $ctrl->GetTileXYZRetina($resId, $groupName, $x, $y, $z, $format, $scale);
+});
+/**
+ *     @SWG\Get(
  *        path="/library/{resourcePath}.MapDefinition/tile.{type}/{groupName}/{scaleIndex}/{col}/{row}",
  *        operationId="GetTile",
  *        summary="Gets the specified tile for the given map definition",

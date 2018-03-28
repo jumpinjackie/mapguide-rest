@@ -2916,6 +2916,93 @@
                 }
             }
         },
+        "/library/{resourcePath}.MapDefinition/xyz@{scale}/{groupName}/{z}/{x}/{y}/tile.{format}": {
+            "get": {
+                "tags": [
+                    "library"
+                ],
+                "summary": "Gets the specified retina tile for the given map definition",
+                "operationId": "GetTileXYZRetina",
+                "parameters": [
+                    {
+                        "name": "session",
+                        "in": "query",
+                        "description": "Your MapGuide Session ID",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "resourcePath",
+                        "in": "path",
+                        "description": "The path of the Map Definition",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "scale",
+                        "in": "path",
+                        "description": "The scale factor",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "groupName",
+                        "in": "path",
+                        "description": "The tiled group of the Map Definition",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "z",
+                        "in": "path",
+                        "description": "The finite scale index",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "x",
+                        "in": "path",
+                        "description": "The column of the tile to fetch",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "y",
+                        "in": "path",
+                        "description": "The row of the tile to fetch",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "format",
+                        "in": "path",
+                        "description": "The tile type",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "png",
+                            "jpg",
+                            "png8",
+                            "gif"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "304": {
+                        "description": "This tile has not been modified. Your previously fetched tile is still the current one"
+                    },
+                    "400": {
+                        "description": "You supplied a bad request due to one or more missing or invalid parameters"
+                    },
+                    "401": {
+                        "description": "Session ID or MapGuide credentials not specified"
+                    },
+                    "500": {
+                        "description": "An error occurred during the operation"
+                    }
+                }
+            }
+        },
         "/library/{resourcePath}.MapDefinition/tile.{type}/{groupName}/{scaleIndex}/{col}/{row}": {
             "get": {
                 "tags": [
