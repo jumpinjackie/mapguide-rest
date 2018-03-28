@@ -385,7 +385,7 @@ $app->put("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:c
 });
 /**
  *     @SWG\Delete(
- *        path="/library/{resourcePath}.FeatureSource/features/{schemaName}/{className}",
+ *        path="/library/{resourcePath}.FeatureSource/features.{type}/{schemaName}/{className}",
  *        method="DELETE",
  *        operationId="DeleteFeatures",
  *        summary="Deletes one or more features from the given feature class for the specified feature source. The Feature Source in question must have _MgRestAllowDelete=1 in its resource header otherwise deletes will be forbidden. If _MgRestUseTransaction=1 in the resource header, transactions will be used.",
