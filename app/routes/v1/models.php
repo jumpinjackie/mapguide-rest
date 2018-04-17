@@ -320,7 +320,7 @@ class PropertyDefinition extends SchemaElement
      * @SWG\Property()
      * @var int
      */
-    public $GeometryType;
+    public $GeometryTypes;
 
     /**
      * @SWG\Property()
