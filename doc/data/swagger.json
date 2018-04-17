@@ -1680,9 +1680,7 @@
                         "description": "An error occurred during the operation"
                     }
                 }
-            }
-        },
-        "/library/{resourcePath}.FeatureSource/features/{schemaName}/{className}": {
+            },
             "delete": {
                 "tags": [
                     "library"
@@ -9141,7 +9139,7 @@
                     "description": "",
                     "type": "integer"
                 },
-                "GeometryType": {
+                "GeometryTypes": {
                     "description": "",
                     "type": "integer"
                 },
