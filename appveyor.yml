@@ -30,6 +30,7 @@ init:
     - SET PATH=c:\php_%PLATFORM%;%PATH%
     - SET COMPOSER_NO_INTERACTION=1
     - SET PHP=1
+    - echo PLATFORM %PLATFORM%
 
 install:
     - IF EXIST c:\php_%PLATFORM% (SET PHP=0) ELSE (mkdir c:\php_%PLATFORM%)
