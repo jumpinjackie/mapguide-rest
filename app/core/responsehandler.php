@@ -165,7 +165,7 @@ abstract class MgResponseHandler
         }
     }
 
-    protected function GetMimeTypeForFormat($format) {
+    public function GetMimeTypeForFormat($format) {
         return MgUtils::GetMimeTypeForFormat($format);
     }
 
@@ -560,14 +560,14 @@ abstract class MgResponseHandler
         $this->app->halt($status, $errResponse);
     }
 
-    protected function BadRequest($msg, $mimeType = MgMimeType::Html) {
+    public function BadRequest($msg, $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("BadRequest", $this->app->localizer->getText("E_BAD_REQUEST"), $msg, $e->getTraceAsString(), 400, $mimeType);
         $this->app->response->header("Content-Type", $mimeType);
         $this->app->halt(400, $errResponse);
     }
 
-    protected function MethodNotSupported($method, $mimeType = MgMimeType::Html) {
+    public function MethodNotSupported($method, $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $msg = $this->app->localizer->getText("E_METHOD_NOT_SUPPORTED_DESC", $method);
         $errResponse = $this->FormatException("MethodNotSupported", $this->app->localizer->getText("E_METHOD_NOT_SUPPORTED"), $msg, $e->getTraceAsString(), 405, $mimeType);
@@ -575,35 +575,35 @@ abstract class MgResponseHandler
         $this->app->halt(405, $errResponse);
     }
 
-    protected function NotFound($msg, $mimeType = MgMimeType::Html) {
+    public function NotFound($msg, $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("NotFound", $this->app->localizer->getText("E_NOT_FOUND"), $msg, $e->getTraceAsString(), 404, $mimeType);
         $this->app->response->header("Content-Type", $mimeType);
         $this->app->halt(404, $errResponse);
     }
 
-    protected function Forbidden($msg, $mimeType = MgMimeType::Html) {
+    public function Forbidden($msg, $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("Forbidden", $this->app->localizer->getText("E_FORBIDDEN"), $msg, $e->getTraceAsString(), 403, $mimeType);
         $this->app->response->header("Content-Type", $mimeType);
         $this->app->halt(403, $errResponse);
     }
 
-    protected function ServerError($msg, $mimeType = MgMimeType::Html) {
+    public function ServerError($msg, $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("ServerError", $this->app->localizer->getText("E_SERVER_ERROR"), $msg, $e->getTraceAsString(), 500, $mimeType);
         $this->app->response->header("Content-Type", $mimeType);
         $this->app->halt(500, $errResponse);
     }
 
-    protected function ServiceUnavailable($msg, $mimeType = MgMimeType::Html) {
+    public function ServiceUnavailable($msg, $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("ServiceUnavailable", $this->app->localizer->getText("E_SERVICE_UNAVAILABLE"), $msg, $e->getTraceAsString(), 503, $mimeType);
         $this->app->response->header("Content-Type", $mimeType);
         $this->app->halt(503, $errResponse);
     }
 
-    protected function Unauthorized($mimeType = MgMimeType::Html) {
+    public function Unauthorized($mimeType = MgMimeType::Html) {
         //Send back 401
         //HACK: But don't put the WWW-Authenticate header so the test harness doesn't trip up
         $fromTestHarness = $this->app->request->headers->get("x-mapguide-test-harness");
