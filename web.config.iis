@@ -4,6 +4,7 @@ IIS configuration to enable URL rewriting. Requires the Application Request Rout
 -->
 <configuration>
     <system.webServer>
+        <directoryBrowse enabled="false" />
         <staticContent>
             <remove fileExtension=".woff" />
             <remove fileExtension=".svg" />
