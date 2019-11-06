@@ -278,7 +278,7 @@ class MgTileServiceController extends MgBaseController {
                             fwrite($fp, ",");
                         }
                         try {
-                            $output = MgGeoJsonWriter::FeatureToGeoJson($reader, $agfRw, $xform, $idName);
+                            $output = MgReaderToGeoJsonWriter::FeatureToGeoJson($reader, $agfRw, $xform, $idName);
                             fwrite($fp, $output);
                             $firstFeature = false;
                         } catch (MgException $ex) {

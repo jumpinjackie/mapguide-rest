@@ -164,7 +164,7 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
                             try {
                                 $agf = $reader->GetGeometry($i);
                                 $geom = ($this->transform != null) ? $this->agfRw->Read($agf, $this->transform) : $this->agfRw->Read($agf);
-                                $geomJson = MgGeoJsonWriter::ToGeoJson($geom);
+                                $geomJson = MgReaderToGeoJsonWriter::ToGeoJson($geom);
                             } catch (MgException $ex) {
                                 $geomJson = '"geometry": null';
                             }

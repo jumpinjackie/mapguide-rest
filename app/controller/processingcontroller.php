@@ -124,7 +124,7 @@ class MgProcessingController extends MgBaseController {
                 $this->app->response->write($resp);
                 break;
             case "geojson":
-                $resp = '{"type": "geojson", "result": { "type": "Feature", "id": "'.uniqid().'", '.MgGeoJsonWriter::ToGeoJson($oGeom).'} }';
+                $resp = '{"type": "geojson", "result": { "type": "Feature", "id": "'.uniqid().'", '.MgReaderToGeoJsonWriter::ToGeoJson($oGeom).'} }';
                 $this->app->response->write($resp);
                 break;
         }

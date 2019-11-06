@@ -329,7 +329,7 @@ class MgReaderChunkedResult
             if (!$firstFeature) {
                 $output .= ",";
             }
-            $output .= MgGeoJsonWriter::FeatureToGeoJson($this->reader, $agfRw, $this->transform, ($idProp != NULL ? $idProp->GetName() : NULL), $this->displayMap);
+            $output .= MgReaderToGeoJsonWriter::FeatureToGeoJson($this->reader, $agfRw, $this->transform, ($idProp != NULL ? $idProp->GetName() : NULL), $this->displayMap);
             $this->writer->WriteChunk($output);
             $output = "";
 

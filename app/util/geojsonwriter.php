@@ -17,7 +17,7 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-class MgGeoJsonWriter
+class MgReaderToGeoJsonWriter
 {
     public static function FeatureToGeoJson($reader, $agfRw, $transform, $idName = NULL, $displayMap = NULL) {
         $idVal = NULL;
