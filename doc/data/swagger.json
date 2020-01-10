@@ -871,13 +871,6 @@
                 ],
                 "parameters": [
                     {
-                        "name": "session",
-                        "in": "query",
-                        "description": "Your MapGuide Session ID",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
                         "name": "resourcePath",
                         "in": "path",
                         "description": "The path of the resource ID",
@@ -903,6 +896,12 @@
                         "schema": {
                             "$ref": "#/definitions/RestEditCapabilities"
                         },
+                        "type": "string"
+                    },
+                    {
+                        "name": "X-MG-SESSION-ID",
+                        "in": "header",
+                        "description": "MapGuide Session ID, use this when there is no other means to pass a session id",
                         "type": "string"
                     }
                 ],
@@ -934,13 +933,6 @@
                 ],
                 "parameters": [
                     {
-                        "name": "session",
-                        "in": "query",
-                        "description": "Your MapGuide Session ID",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
                         "name": "resourcePath",
                         "in": "path",
                         "description": "The path of the resource ID",
@@ -952,6 +944,12 @@
                         "in": "body",
                         "description": "The XML that describes the Feature Source to create",
                         "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "X-MG-SESSION-ID",
+                        "in": "header",
+                        "description": "MapGuide Session ID, use this when there is no other means to pass a session id",
                         "type": "string"
                     }
                 ],
@@ -980,13 +978,6 @@
                 ],
                 "parameters": [
                     {
-                        "name": "session",
-                        "in": "query",
-                        "description": "Your MapGuide Session ID",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
                         "name": "resourcePath",
                         "in": "path",
                         "description": "The path of the resource ID",
@@ -1001,6 +992,12 @@
                         "schema": {
                             "$ref": "#/definitions/CreateFeatureSourceEnvelope"
                         },
+                        "type": "string"
+                    },
+                    {
+                        "name": "X-MG-SESSION-ID",
+                        "in": "header",
+                        "description": "MapGuide Session ID, use this when there is no other means to pass a session id",
                         "type": "string"
                     }
                 ],
@@ -1617,13 +1614,6 @@
                 ],
                 "parameters": [
                     {
-                        "name": "session",
-                        "in": "formData",
-                        "description": "Your MapGuide Session ID",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
                         "name": "resourcePath",
                         "in": "path",
                         "description": "The path of the resource ID",
@@ -1663,6 +1653,12 @@
                         "schema": {
                             "$ref": "#/definitions/InsertFeaturesEnvelope"
                         },
+                        "type": "string"
+                    },
+                    {
+                        "name": "X-MG-SESSION-ID",
+                        "in": "header",
+                        "description": "MapGuide Session ID, use this when there is no other means to pass a session id",
                         "type": "string"
                     }
                 ],
@@ -1992,6 +1988,12 @@
                         "description": "The package file to load",
                         "required": true,
                         "type": "file"
+                    },
+                    {
+                        "name": "X-MG-SESSION-ID",
+                        "in": "header",
+                        "description": "MapGuide Session ID, use this when there is no other means to pass a session id",
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -2299,6 +2301,12 @@
                         "description": "The resource data file to load",
                         "required": true,
                         "type": "file"
+                    },
+                    {
+                        "name": "X-MG-SESSION-ID",
+                        "in": "header",
+                        "description": "MapGuide Session ID, use this when there is no other means to pass a session id",
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -2447,6 +2455,12 @@
                         "description": "The resource XML header",
                         "required": true,
                         "type": "string"
+                    },
+                    {
+                        "name": "X-MG-SESSION-ID",
+                        "in": "header",
+                        "description": "MapGuide Session ID, use this when there is no other means to pass a session id",
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -2512,6 +2526,12 @@
                             "json",
                             "xml"
                         ]
+                    },
+                    {
+                        "name": "X-MG-SESSION-ID",
+                        "in": "header",
+                        "description": "MapGuide Session ID, use this when there is no other means to pass a session id",
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -2614,6 +2634,12 @@
                         "in": "body",
                         "description": "The resource XML content",
                         "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "X-MG-SESSION-ID",
+                        "in": "header",
+                        "description": "MapGuide Session ID, use this when there is no other means to pass a session id",
                         "type": "string"
                     }
                 ],

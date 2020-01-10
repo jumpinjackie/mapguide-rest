@@ -160,57 +160,64 @@ class MgBaseController extends MgResponseHandler
                     $this->userInfo->SetMgSessionId($nominatedSessionId);
                     $this->sessionId = $nominatedSessionId;
                 } else {
-                    $this->userName = null;
-                    $password = "";
-
-                    // Username/password extraction logic ripped from PHP implementation of the MapGuide AJAX viewer
-
-                    //TODO: Ripped from AJAX viewer. Use the abstractions provided by Slim
-
-                    // No session, no credentials explicitely passed. Check for HTTP Auth user/passwd.  Under Apache CGI, the
-                    // PHP_AUTH_USER and PHP_AUTH_PW are not set.  However, the Apache admin may
-                    // have rewritten the authentication information to REMOTE_USER.  This is a
-                    // suggested approach from the Php.net website.
-
-                    // Has REMOTE_USER been rewritten?
-                    if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['REMOTE_USER']) &&
-                    preg_match('/Basic +(.*)$/i', $_SERVER['REMOTE_USER'], $matches))
-                    {
-                        list($name, $password) = explode(':', base64_decode($matches[1]));
-                        $_SERVER['PHP_AUTH_USER'] = strip_tags($name);
-                        $_SERVER['PHP_AUTH_PW']    = strip_tags($password);
-                    }
-
-
-                    // REMOTE_USER may also appear as REDIRECT_REMOTE_USER depending on CGI setup.
-                    //  Check for this as well.
-                    if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['REDIRECT_REMOTE_USER']) &&
-                    preg_match('/Basic (.*)$/i', $_SERVER['REDIRECT_REMOTE_USER'], $matches))
-                    {
-                        list($name, $password) = explode(':', base64_decode($matches[1]));
-                        $_SERVER['PHP_AUTH_USER'] = strip_tags($name);
-                        $_SERVER['PHP_AUTH_PW'] = strip_tags($password);
-                    }
-
-                    // Finally, PHP_AUTH_USER may actually be defined correctly.  If it is set, or
-                    // has been pulled from REMOTE_USER rewriting then set our USERNAME and PASSWORD
-                    // parameters.
-                    if (isset($_SERVER['PHP_AUTH_USER']) && strlen($_SERVER['PHP_AUTH_USER']) > 0)
-                    {
-                        $this->userName = $_SERVER['PHP_AUTH_USER'];
-                        if (isset($_SERVER['PHP_AUTH_PW']) && strlen($_SERVER['PHP_AUTH_PW']) > 0)
-                            $password = $_SERVER['PHP_AUTH_PW'];
-                    }
-
-                    //If we have everything we need, put it into the MgUserInformation
-                    if ($this->userName != null) {
-                        $this->userInfo->SetMgUsernamePassword($this->userName, $password);
+                    //One last fallback, check request header from session id
+                    $session = $this->app->request->headers->get("X-MG-SESSION-ID");
+                    if ($session != null && $session !== "") {
+                        $this->userInfo->SetMgSessionId($session);
+                        $this->sessionId = $session;
                     } else {
-                        if ($allowAnonymous === true) {
-                            $this->userInfo->SetMgUsernamePassword("Anonymous", "");
-                            $this->userName = "Anonymous";
+                        $this->userName = null;
+                        $password = "";
+
+                        // Username/password extraction logic ripped from PHP implementation of the MapGuide AJAX viewer
+
+                        //TODO: Ripped from AJAX viewer. Use the abstractions provided by Slim
+
+                        // No session, no credentials explicitely passed. Check for HTTP Auth user/passwd.  Under Apache CGI, the
+                        // PHP_AUTH_USER and PHP_AUTH_PW are not set.  However, the Apache admin may
+                        // have rewritten the authentication information to REMOTE_USER.  This is a
+                        // suggested approach from the Php.net website.
+
+                        // Has REMOTE_USER been rewritten?
+                        if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['REMOTE_USER']) &&
+                        preg_match('/Basic +(.*)$/i', $_SERVER['REMOTE_USER'], $matches))
+                        {
+                            list($name, $password) = explode(':', base64_decode($matches[1]));
+                            $_SERVER['PHP_AUTH_USER'] = strip_tags($name);
+                            $_SERVER['PHP_AUTH_PW']    = strip_tags($password);
+                        }
+
+
+                        // REMOTE_USER may also appear as REDIRECT_REMOTE_USER depending on CGI setup.
+                        //  Check for this as well.
+                        if (!isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['REDIRECT_REMOTE_USER']) &&
+                        preg_match('/Basic (.*)$/i', $_SERVER['REDIRECT_REMOTE_USER'], $matches))
+                        {
+                            list($name, $password) = explode(':', base64_decode($matches[1]));
+                            $_SERVER['PHP_AUTH_USER'] = strip_tags($name);
+                            $_SERVER['PHP_AUTH_PW'] = strip_tags($password);
+                        }
+
+                        // Finally, PHP_AUTH_USER may actually be defined correctly.  If it is set, or
+                        // has been pulled from REMOTE_USER rewriting then set our USERNAME and PASSWORD
+                        // parameters.
+                        if (isset($_SERVER['PHP_AUTH_USER']) && strlen($_SERVER['PHP_AUTH_USER']) > 0)
+                        {
+                            $this->userName = $_SERVER['PHP_AUTH_USER'];
+                            if (isset($_SERVER['PHP_AUTH_PW']) && strlen($_SERVER['PHP_AUTH_PW']) > 0)
+                                $password = $_SERVER['PHP_AUTH_PW'];
+                        }
+
+                        //If we have everything we need, put it into the MgUserInformation
+                        if ($this->userName != null) {
+                            $this->userInfo->SetMgUsernamePassword($this->userName, $password);
                         } else {
-                            $this->Unauthorized($mimeType);
+                            if ($allowAnonymous === true) {
+                                $this->userInfo->SetMgUsernamePassword("Anonymous", "");
+                                $this->userName = "Anonymous";
+                            } else {
+                                $this->Unauthorized($mimeType);
+                            }
                         }
                     }
                 }
