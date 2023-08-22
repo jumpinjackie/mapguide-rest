@@ -28,7 +28,7 @@ class MgRenderingServiceController extends MgBaseController {
         $req = new MgHttpRequest("");
         $param = $req->GetRequestParam();
         $param->AddParameter("SESSION", $sessionId);
-        $param->AddParameter("LOCALE", $this->app->config("Locale"));
+        $param->AddParameter("LOCALE", $this->GetConfig("Locale"));
         $param->AddParameter("CLIENTAGENT", "MapGuide REST Extension");
         $param->AddParameter("CLIENTIP", $this->GetClientIp());
         $param->AddParameter("OPERATION", "GETDYNAMICMAPOVERLAYIMAGE");
@@ -96,15 +96,15 @@ class MgRenderingServiceController extends MgBaseController {
         $height = $this->GetRequestParameter("height", null);
 
         if ($x == null)
-            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "x"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "x"), $this->GetMimeTypeForFormat($format));
         if ($y == null)
-            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "y"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "y"), $this->GetMimeTypeForFormat($format));
         if ($scale == null)
-            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "scale"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "scale"), $this->GetMimeTypeForFormat($format));
         if ($width == null)
-            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "width"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "width"), $this->GetMimeTypeForFormat($format));
         if ($height == null)
-            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "height"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "height"), $this->GetMimeTypeForFormat($format));
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr, $format, $x, $y, $scale, $width, $height) {
@@ -156,7 +156,7 @@ class MgRenderingServiceController extends MgBaseController {
         $req = new MgHttpRequest("");
         $param = $req->GetRequestParam();
         $param->AddParameter("SESSION", $sessionId);
-        $param->AddParameter("LOCALE", $this->app->config("Locale"));
+        $param->AddParameter("LOCALE", $this->GetConfig("Locale"));
         $param->AddParameter("CLIENTAGENT", "MapGuide REST Extension");
         $param->AddParameter("CLIENTIP", $this->GetClientIp());
         $param->AddParameter("OPERATION", "GETMAPIMAGE");
@@ -219,7 +219,7 @@ class MgRenderingServiceController extends MgBaseController {
         $req = new MgHttpRequest("");
         $param = $req->GetRequestParam();
         $param->AddParameter("SESSION", $sessionId);
-        $param->AddParameter("LOCALE", $this->app->config("Locale"));
+        $param->AddParameter("LOCALE", $this->GetConfig("Locale"));
         $param->AddParameter("CLIENTAGENT", "MapGuide REST Extension");
         $param->AddParameter("CLIENTIP", $this->GetClientIp());
         $param->AddParameter("OPERATION", "GETMAPLEGENDIMAGE");

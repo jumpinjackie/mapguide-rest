@@ -31,7 +31,7 @@ class MgViewerController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
             $sessionPart = "&SESSION=$sessionId";
         }
-        $selfUrl = MgUtils::GetSelfUrlRoot($this->app->config("SelfUrl"));
+        $selfUrl = MgUtils::GetSelfUrlRoot($this->GetConfig("SelfUrl"));
         $this->app->redirect("$selfUrl/../mapviewerajax/?WEBLAYOUT=".$resId->ToString().$sessionPart);
     }
 
@@ -41,7 +41,7 @@ class MgViewerController extends MgBaseController {
             $sessionId = $resId->GetRepositoryName();
             $sessionPart = "&session=$sessionId";
         }
-        $selfUrl = MgUtils::GetSelfUrlRoot($this->app->config("SelfUrl"));
+        $selfUrl = MgUtils::GetSelfUrlRoot($this->GetConfig("SelfUrl"));
         $this->app->redirect("$selfUrl/../fusion/templates/mapguide/$template/index.html?ApplicationDefinition=".$resId->ToString().$sessionPart);
     }
 
@@ -203,7 +203,7 @@ class MgViewerController extends MgBaseController {
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
         } else {
-            $sessionId = $this->app->request->params("session");
+            $sessionId = $this->GetRequestParameter("session");
         }
         $this->EnsureAuthenticationForSite($sessionId, true);
         $siteConn = new MgSiteConnection();
@@ -214,7 +214,7 @@ class MgViewerController extends MgBaseController {
             $userInfo = new MgUserInformation($sessionId);
             $siteConn->Open($userInfo);
         }
-        $selfUrl = MgUtils::GetSelfUrlRoot($this->app->config("SelfUrl"));
+        $selfUrl = MgUtils::GetSelfUrlRoot($this->GetConfig("SelfUrl"));
         switch ($resId->GetResourceType()) {
             case MgResourceType::FeatureSource:
                 {
@@ -302,7 +302,7 @@ class MgViewerController extends MgBaseController {
                 }
                 break;
             default:
-                $this->BadRequest($this->app->localizer->getText("E_UNPREVIEWABLE_RESOURCE_TYPE"), MgMimeType::Html);
+                $this->BadRequest($this->GetLocalizedText("E_UNPREVIEWABLE_RESOURCE_TYPE"), MgMimeType::Html);
                 break;
         }
     }

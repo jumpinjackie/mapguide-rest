@@ -53,7 +53,7 @@ class MgTileServiceController extends MgBaseController {
         $tileCacheName = str_replace(".MapDefinition", "", $tileCacheName);
         $tileCacheName = str_replace("/", "_", $tileCacheName);
         $path = sprintf("%s/%s/S%s/%s/%s/%s/%s_%s.%s",
-                        $this->app->config("MapGuide.PhysicalTilePath"),
+                        $this->GetConfig("MapGuide.PhysicalTilePath"),
                         $tileCacheName,
                         $scaleIndex,
                         $groupName,
@@ -61,14 +61,14 @@ class MgTileServiceController extends MgBaseController {
                         MgTileServiceController::GetFolderName("C", $col),
                         MgTileServiceController::GetTileIndexString($row),
                         MgTileServiceController::GetTileIndexString($col),
-                        $this->app->config("MapGuide.TileImageFormat"));
+                        $this->GetConfig("MapGuide.TileImageFormat"));
         //var_dump($path);
         //die;
         $path = str_replace("/", DIRECTORY_SEPARATOR, $path);
         if (file_exists($path)) {
             return filemtime($path);
         } else {
-            //$this->app->response->header("X-Debug-Message", "Could not fetch mtime of $path. File does not exist");
+            //$this->SetResponseHeader("X-Debug-Message", "Could not fetch mtime of $path. File does not exist");
             return false;
         }
     }
@@ -78,7 +78,7 @@ class MgTileServiceController extends MgBaseController {
         $that = $this;
         $app = $this->app;
         $sessionId = "";
-        if ($resId->GetRepositoryType() === MgRepositoryType::Session && $this->app->request->get("session") == null) {
+        if ($resId->GetRepositoryType() === MgRepositoryType::Session && $this->GetRequestParameter("session") == null) {
             $sessionId = $resId->GetRepositoryName();
         }
 
@@ -297,7 +297,7 @@ class MgTileServiceController extends MgBaseController {
 
     public function PutTileImageXYZ($map, $groupName, $retinaScale, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames, $requestId) {
         //We don't use RenderTile (as it uses key parameters that are locked to serverconfig.ini), we use RenderMap instead
-        $bufferPx = $this->app->config("MapGuide.XYZTileBuffer") * $retinaScale;
+        $bufferPx = $this->GetConfig("MapGuide.XYZTileBuffer") * $retinaScale;
         $tileWidth = self::XYZ_TILE_WIDTH * $retinaScale;
         $tileHeight = self::XYZ_TILE_HEIGHT * $retinaScale;
         $ratio = $bufferPx / $tileWidth;

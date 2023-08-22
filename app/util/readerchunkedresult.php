@@ -55,18 +55,18 @@ abstract class MgChunkWriter
 
 class MgSlimChunkWriter extends MgChunkWriter
 {
-    private $app;
+    private $handler;
 
-    public function __construct($app) {
-        $this->app = $app;
+    public function __construct($handler) {
+        $this->handler = $handler;
     }
 
     public function SetHeader($name, $value) {
-        $this->app->response->header($name, $value);
+        $this->handler->SetResponseHeader($name, $value);
     }
 
     public function WriteChunk($chunk) {
-        $this->app->response->write($chunk);
+        $this->handler->WriteResponseContent($chunk);
     }
 
     public function StartChunking() { }
@@ -254,15 +254,12 @@ class MgReaderChunkedResult
     private $orientation;
     private $templateRootDir;
 
-    private $localizer;
-
-    public function __construct($featSvc, $reader, $limit, $writer, $localizer) {
+    public function __construct($featSvc, $reader, $limit, $writer) {
         $this->featSvc = $featSvc;
         $this->reader = $reader;
         $this->limit = $limit;
         $this->baseUrl = null;
         $this->transform = null;
-        $this->localizer = $localizer;
         $this->orientation = "h";
         $this->thisReqParams = array();
         if ($writer != null)
@@ -275,12 +272,12 @@ class MgReaderChunkedResult
         $this->displayMap = $displayMap;
     }
 
-    public function CheckAndSetDownloadHeaders($app, $format) {
-        $downloadFlag = $app->request->params("download");
+    public function CheckAndSetDownloadHeaders($handler, $format) {
+        $downloadFlag = $handler->GetRequestParameter("download");
         if ($downloadFlag === "1" || $downloadFlag === "true") {
             $fn = "download";
-            if ($app->request->params("downloadname"))
-                $fn = $app->request->params("downloadname");
+            if ($handler->GetRequestParameter("downloadname"))
+                $fn = $handler->GetRequestParameter("downloadname");
             $ext = $format;
             if ($format == "geojson")
                 $ext = "json";

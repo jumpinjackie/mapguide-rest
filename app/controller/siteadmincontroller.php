@@ -27,7 +27,7 @@ class MgSiteAdminController extends MgBaseController {
     public function GetSiteInformation($format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
-        $sessionId = $this->app->request->params("session");
+        $sessionId = $this->GetRequestParameter("session");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
@@ -50,7 +50,7 @@ class MgSiteAdminController extends MgBaseController {
     public function GetSiteStatus($format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
-        $sessionId = $this->app->request->params("session");
+        $sessionId = $this->GetRequestParameter("session");
         $mimeType = $this->GetMimeTypeForFormat($format);
         try {
             $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
@@ -80,8 +80,8 @@ class MgSiteAdminController extends MgBaseController {
             $admin = new MgServerAdmin();
             $admin->Open($this->userInfo);
             $body = MgBoxedValue::String($admin->GetSiteVersion(), $fmt);
-            $this->app->response->header("Content-Type", $mimeType);
-            $this->app->response->setBody($body);
+            $this->SetResponseHeader("Content-Type", $mimeType);
+            $this->SetResponseBody($body);
         } catch (MgException $ex) {
             $this->OnException($ex, $mimeType);
         }
@@ -90,7 +90,7 @@ class MgSiteAdminController extends MgBaseController {
     public function EnumerateGroups($format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
-        $sessionId = $this->app->request->params("session");
+        $sessionId = $this->GetRequestParameter("session");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
@@ -113,7 +113,7 @@ class MgSiteAdminController extends MgBaseController {
     public function EnumerateUsersForGroup($groupName, $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
-        $sessionId = $this->app->request->params("session");
+        $sessionId = $this->GetRequestParameter("session");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $groupName) {
@@ -129,7 +129,7 @@ class MgSiteAdminController extends MgBaseController {
     }
 
     public function EnumerateGroupsForUser($userName, $format) {
-        $sessionId = $this->app->request->params("session");
+        $sessionId = $this->GetRequestParameter("session");
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $mimeType = $this->GetMimeTypeForFormat($format);
@@ -161,7 +161,7 @@ class MgSiteAdminController extends MgBaseController {
     }
 
     public function EnumerateRolesForUser($userName, $format) {
-        $sessionId = $this->app->request->params("session");
+        $sessionId = $this->GetRequestParameter("session");
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $mimeType = $this->GetMimeTypeForFormat($format);
@@ -182,7 +182,7 @@ class MgSiteAdminController extends MgBaseController {
             }
 
             $content = $site->EnumerateRoles($userName);
-            $this->app->response->header("Content-Type", $mimeType);
+            $this->SetResponseHeader("Content-Type", $mimeType);
             $this->OutputMgStringCollection($content, $mimeType);
         } catch (MgException $ex) {
             $this->OnException($ex, $mimeType);

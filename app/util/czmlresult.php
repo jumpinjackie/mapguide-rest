@@ -60,12 +60,12 @@ class MgCzmlResult
             $this->writer = new MgHttpChunkWriter();
     }
 
-    public function CheckAndSetDownloadHeaders($app, $format) {
-        $downloadFlag = $app->request->params("download");
+    public function CheckAndSetDownloadHeaders($handler, $format) {
+        $downloadFlag = $handler->GetRequestParameter("download");
         if ($downloadFlag === "1" || $downloadFlag === "true") {
             $fn = "download";
-            if ($app->request->params("downloadname"))
-                $fn = $app->request->params("downloadname");
+            if ($handler->GetRequestParameter("downloadname"))
+                $fn = $handler->GetRequestParameter("downloadname");
             $ext = $format;
             if ($format == "geojson")
                 $ext = "json";

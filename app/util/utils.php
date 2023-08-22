@@ -263,8 +263,8 @@ class MgUtils
         return new MgResourceIdentifier($resIdStr);
     }
 
-    public static function GetPaperSize($app, $paperType) {
-        $sizes = $app->config("PDF.PaperSizes");
+    public static function GetPaperSize($handler, $paperType) {
+        $sizes = $handler->GetConfig("PDF.PaperSizes");
         if (!array_key_exists($paperType, $sizes))
             throw new Exception($app->localizer->getText("E_UNKNOWN_PAPER_SIZE", $paperType));
         return $sizes[$paperType];

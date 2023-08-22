@@ -50,7 +50,7 @@ class MgFileLockUtil
                 $attempts++;
                 //Bail after MAX_RETRY_ATTEMPTS
                 if ($attempts >= $this->maxCreateDirAttempts)
-                    throw new Exception($this->app->localizer->getText("E_FAILED_TO_CREATE_DIR_AFTER_N_ATTEMPTS", $attempts), $this->GetMimeTypeForFormat($type));
+                    throw new Exception($this->GetLocalizedText("E_FAILED_TO_CREATE_DIR_AFTER_N_ATTEMPTS", $attempts), $this->GetMimeTypeForFormat($type));
             }
         }
         

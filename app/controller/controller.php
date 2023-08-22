@@ -65,7 +65,7 @@ class MgBaseController extends MgResponseHandler
         $req = new MgHttpRequest($agentUri);
         $param = $req->GetRequestParam();
         //Try session id first
-        $session = $this->app->request->params("session");
+        $session = $this->GetRequestParameter("session");
         if ($session != null) {
             $param->AddParameter("SESSION", $session);
         } else {
@@ -131,15 +131,15 @@ class MgBaseController extends MgResponseHandler
             }
         }
         //All good if we get here. Set up common request parameters so upstream callers don't have to
-        $param->AddParameter("LOCALE", $this->app->config("Locale"));
+        $param->AddParameter("LOCALE", $this->GetConfig("Locale"));
         $param->AddParameter("CLIENTAGENT", "MapGuide REST Extension");
         $param->AddParameter("CLIENTIP", $this->GetClientIp());
 
         //Apply file download parameters if specified
-        if ($this->app->request->params("download") === "1" || $this->app->request->params("download") === "true") {
+        if ($this->GetRequestParameter("download") === "1" || $this->GetRequestParameter("download") === "true") {
             $param->AddParameter("X-DOWNLOAD-ATTACHMENT", "true");
-            if ($this->app->request->params("downloadname")) {
-                $param->AddParameter("X-DOWNLOAD-ATTACHMENT-NAME", $this->app->request->params("downloadname"));
+            if ($this->GetRequestParameter("downloadname")) {
+                $param->AddParameter("X-DOWNLOAD-ATTACHMENT-NAME", $this->GetRequestParameter("downloadname"));
             }
         }
         $callback($req, $param);
@@ -151,7 +151,7 @@ class MgBaseController extends MgResponseHandler
             $this->userInfo->SetClientAgent("MapGuide REST Extension");
             $this->userInfo->SetClientIp($this->GetClientIp());
             //Try session id first
-            $session = $this->app->request->params("session");
+            $session = $this->GetRequestParameter("session");
             if ($session != null) {
                 $this->userInfo->SetMgSessionId($session);
                 $this->sessionId = $session;
@@ -161,7 +161,7 @@ class MgBaseController extends MgResponseHandler
                     $this->sessionId = $nominatedSessionId;
                 } else {
                     //One last fallback, check request header from session id
-                    $session = $this->app->request->headers->get("X-MG-SESSION-ID");
+                    $session = $this->GetRequestHeader("X-MG-SESSION-ID");
                     if ($session != null && $session !== "") {
                         $this->userInfo->SetMgSessionId($session);
                         $this->sessionId = $session;

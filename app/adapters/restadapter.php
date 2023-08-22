@@ -113,15 +113,15 @@ abstract class MgRestAdapter extends MgResponseHandler
         $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $tokens[0], $tokens[1]);
         if ($single === true) {
             if ($this->featureId == null) {
-                throw new Exception($this->app->localizer->getText("E_NO_FEATURE_ID_SET"));
+                throw new Exception($this->GetLocalizedText("E_NO_FEATURE_ID_SET"));
             }
             $idType = MgPropertyType::String;
             if ($this->featureIdProp == null) {
                 $idProps = $clsDef->GetIdentityProperties();
                 if ($idProps->GetCount() == 0) {
-                    throw new Exception($this->app->localizer->getText("E_CANNOT_QUERY_NO_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
+                    throw new Exception($this->GetLocalizedText("E_CANNOT_QUERY_NO_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
                 } else if ($idProps->GetCount() > 1) {
-                    throw new Exception($this->app->localizer->getText("E_CANNOT_QUERY_MULTIPLE_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
+                    throw new Exception($this->GetLocalizedText("E_CANNOT_QUERY_MULTIPLE_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
                 } else {
                     $idProp = $idProps->GetItem(0);
                     $this->featureIdProp = $idProp->GetName();
@@ -133,9 +133,9 @@ abstract class MgRestAdapter extends MgResponseHandler
                 if ($iidx >= 0) {
                     $propDef = $props->GetItem($iidx);
                     if ($propDef->GetPropertyType() != MgFeaturePropertyType::DataProperty)
-                        throw new Exception($this->app->localizer->getText("E_ID_PROP_NOT_DATA", $this->featureIdProp));
+                        throw new Exception($this->GetLocalizedText("E_ID_PROP_NOT_DATA", $this->featureIdProp));
                 } else {
-                    throw new Exception($this->app->localizer->getText("E_ID_PROP_NOT_FOUND", $this->featureIdProp));
+                    throw new Exception($this->GetLocalizedText("E_ID_PROP_NOT_FOUND", $this->featureIdProp));
                 }
             }
             if ($idType == MgPropertyType::String)
@@ -143,10 +143,10 @@ abstract class MgRestAdapter extends MgResponseHandler
             else
                 $query->SetFilter($this->featureIdProp." = ".$this->featureId);
         } else {
-            $flt = $this->app->request->get("filter");
+            $flt = $this->GetRequestParameter("filter");
             if ($flt != null)
                 $query->SetFilter($flt);
-            $bbox = $this->app->request->get("bbox");
+            $bbox = $this->GetRequestParameter("bbox");
             if ($bbox != null) {
                 $parts = explode(",", $bbox);
                 if (count($parts) == 4) {
@@ -185,8 +185,8 @@ abstract class MgRestAdapter extends MgResponseHandler
             }
         }
 
-        $orderby = $this->app->request->get("orderby");
-        $orderOptions = $this->app->request->get("orderoption");
+        $orderby = $this->GetRequestParameter("orderby");
+        $orderOptions = $this->GetRequestParameter("orderoption");
         if ($orderby != null) {
             if ($orderOptions == null)
                 $orderOptions = "asc";
@@ -323,15 +323,15 @@ abstract class MgFeatureRestAdapter extends MgRestAdapter {
     public function HandleGet($single) {
         $reader = $this->CreateReader($single);
         //Apply download headers
-        $downloadFlag = $this->app->request->params("download");
+        $downloadFlag = $this->GetRequestParameter("download");
         if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
-            $name = $this->app->request->params("downloadname");
+            $name = $this->GetRequestParameter("downloadname");
             if (!$name) {
                 $name = "download";
             }
             $name .= ".";
             $name .= $this->GetFileExtension();
-            $this->app->response->header("Content-Disposition", "attachment; filename=".$name);
+            $this->SetResponseHeader("Content-Disposition", "attachment; filename=".$name);
         }
         $this->GetResponseBegin($reader);
 
@@ -339,7 +339,7 @@ abstract class MgFeatureRestAdapter extends MgRestAdapter {
         $end = -1;
         $read = 0;
 
-        $pageNo = $this->app->request->get("page");
+        $pageNo = $this->GetRequestParameter("page");
         if ($pageNo == null)
             $pageNo = 1;
         else

@@ -39,7 +39,7 @@ class MgFormatterSet
     public function GetFormatter($formatterName) {
         if (!array_key_exists($formatterName, $this->formatters)) {
             if (!$this->app->container->has($formatterName)) {
-                throw new Exception($this->app->localizer->getText("E_UNKNOWN_FORMATTER", $formatterName));
+                throw new Exception($this->GetLocalizedText("E_UNKNOWN_FORMATTER", $formatterName));
             }
             $this->formatters[$formatterName] = $this->app->container->$formatterName;
         }
@@ -197,7 +197,7 @@ class MgFeatureModel
         if (!array_key_exists($formatterName, $this->data[$name])) {
             $fmt = $this->formatters->GetFormatter($formatterName);
             if ($fmt == null)
-                throw new Exception($this->app->localizer->getText("E_UNKNOWN_DATETIME_FORMATTER", $formatterName));
+                throw new Exception($this->GetLocalizedText("E_UNKNOWN_DATETIME_FORMATTER", $formatterName));
             $this->data[$name][$formatterName] = $fmt->Output($this->reader, $name);
         }
         return $this->data[$name][$formatterName];
@@ -210,7 +210,7 @@ class MgFeatureModel
         if (!array_key_exists($formatterName, $this->data[$name])) {
             $fmt = $this->formatters->GetFormatter($formatterName);
             if ($fmt == null)
-                throw new Exception($this->app->localizer->getText("E_UNKNOWN_GEOMETRY_FORMATTER", $formatterName));
+                throw new Exception($this->GetLocalizedText("E_UNKNOWN_GEOMETRY_FORMATTER", $formatterName));
             $this->data[$name][$formatterName] = $fmt->Output($this->reader, $name, $this->transform);
         }
         return $this->data[$name][$formatterName];
@@ -511,22 +511,22 @@ class MgTemplateRestAdapter extends MgRestAdapter
      */
     protected function InitAdapterConfig($config) {
         if (!array_key_exists("Templates", $config))
-            throw new Exception($this->app->localizer->getText("E_MISSING_REQUIRED_ADAPTER_PROPERTY", "Templates"));
+            throw new Exception($this->GetLocalizedText("E_MISSING_REQUIRED_ADAPTER_PROPERTY", "Templates"));
 
         if (!array_key_exists("MimeType", $config))
-            throw new Exception($this->app->localizer->getText("E_MISSING_REQUIRED_ADAPTER_PROPERTY", "MimeType"));
+            throw new Exception($this->GetLocalizedText("E_MISSING_REQUIRED_ADAPTER_PROPERTY", "MimeType"));
 
         $this->mimeType = $config["MimeType"];
 
         $tplConfig = $config["Templates"];
         if (!array_key_exists("Single", $tplConfig))
-            throw new Exception($this->app->localizer->getText("E_TEMPLATE_MISSING_DEFINITION", "Single"));
+            throw new Exception($this->GetLocalizedText("E_TEMPLATE_MISSING_DEFINITION", "Single"));
         if (!array_key_exists("Many", $tplConfig))
-            throw new Exception($this->app->localizer->getText("E_TEMPLATE_MISSING_DEFINITION", "Many"));
+            throw new Exception($this->GetLocalizedText("E_TEMPLATE_MISSING_DEFINITION", "Many"));
         if (!array_key_exists("None", $tplConfig))
-            throw new Exception($this->app->localizer->getText("E_TEMPLATE_MISSING_DEFINITION", "None"));
+            throw new Exception($this->GetLocalizedText("E_TEMPLATE_MISSING_DEFINITION", "None"));
         if (!array_key_exists("Error", $tplConfig))
-            throw new Exception($this->app->localizer->getText("E_TEMPLATE_MISSING_DEFINITION", "Error"));
+            throw new Exception($this->GetLocalizedText("E_TEMPLATE_MISSING_DEFINITION", "Error"));
 
         $this->singleViewPath   = "file:".$this->configPath."/".$tplConfig["Single"];
         $this->manyViewPath     = "file:".$this->configPath."/".$tplConfig["Many"];
@@ -538,20 +538,20 @@ class MgTemplateRestAdapter extends MgRestAdapter
             foreach ($cfgRelations as $relName => $relCfg) {
                 //Make our lives easier, don't put spaces in relation names
                 if (strpos($relName, ' ') !== FALSE)
-                    throw new Exception($this->app->localizer->getText("E_RELATION_CANNOT_HAVE_SPACES", $relName));
+                    throw new Exception($this->GetLocalizedText("E_RELATION_CANNOT_HAVE_SPACES", $relName));
                 if (!array_key_exists("Source", $relCfg)) {
-                    throw new Exception($this->app->localizer->getText("E_RELATION_MISSING_PROPERTY", $relName, "Source"));
+                    throw new Exception($this->GetLocalizedText("E_RELATION_MISSING_PROPERTY", $relName, "Source"));
                 }
                 if (!array_key_exists("KeyMap", $relCfg)) {
-                    throw new Exception($this->app->localizer->getText("E_RELATION_MISSING_PROPERTY", $relName, "KeyMap"));
+                    throw new Exception($this->GetLocalizedText("E_RELATION_MISSING_PROPERTY", $relName, "KeyMap"));
                 }
                 $cfgSource = $relCfg["Source"];
                 $cfgKeyMap = $relCfg["KeyMap"];
                 if (!array_key_exists("FeatureSource", $cfgSource)) {
-                    throw new Exception($this->app->localizer->getText("E_RELATION_MISSING_SOURCE_PROPERTY", $relName, "FeatureSource"));
+                    throw new Exception($this->GetLocalizedText("E_RELATION_MISSING_SOURCE_PROPERTY", $relName, "FeatureSource"));
                 }
                 if (!array_key_exists("FeatureClass", $cfgSource)) {
-                    throw new Exception($this->app->localizer->getText("E_RELATION_MISSING_SOURCE_PROPERTY", $relName, "FeatureSource"));
+                    throw new Exception($this->GetLocalizedText("E_RELATION_MISSING_SOURCE_PROPERTY", $relName, "FeatureSource"));
                 }
                 $rel = new stdClass();
                 $rel->FeatureSource = new MgResourceIdentifier($cfgSource["FeatureSource"]);
@@ -590,19 +590,19 @@ class MgTemplateRestAdapter extends MgRestAdapter
     }
 
     protected function WriteOutput($output) {
-        $this->app->response->header("Content-Type", $this->GetMimeType());
+        $this->SetResponseHeader("Content-Type", $this->GetMimeType());
 
         //Apply download headers
-        $downloadFlag = $this->app->request->params("download");
+        $downloadFlag = $this->GetRequestParameter("download");
         if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
-            $name = $this->app->request->params("downloadname");
+            $name = $this->GetRequestParameter("downloadname");
             if (!$name) {
                 $name = "download";
             }
-            $this->app->response->header("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($name, $this->GetMimeType()));
+            $this->SetResponseHeader("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($name, $this->GetMimeType()));
         }
 
-        $this->app->response->write($output);
+        $this->WriteResponseContent($output);
     }
 
     private function LoadRelatedFeatures($reader, $related) {
@@ -642,7 +642,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
                 $relReader = $this->featSvc->SelectFeatures($rel->FeatureSource, $rel->FeatureClass, $relQuery);
                 $related->Add($relName, new MgFeatureReaderModel(new MgFormatterSet($this->app), $relReader, -1, 0, null));
             } catch (MgException $ex) {
-                throw new Exception($this->app->localizer->getText("E_QUERY_SETUP", $relFilter, $ex->GetDetails()));
+                throw new Exception($this->GetLocalizedText("E_QUERY_SETUP", $relFilter, $ex->GetDetails()));
             }
         }
     }
@@ -654,7 +654,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
         $reader = null;
         $related = new MgRelatedFeaturesSet();
         $smarty = new Smarty();
-        $smarty->setCompileDir($this->app->config("Cache.RootDir")."/templates_c");
+        $smarty->setCompileDir($this->GetConfig("Cache.RootDir")."/templates_c");
         //$smarty->setCaching(false);
         try {
             $output = "";
@@ -669,7 +669,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
                     $smarty->assign("helper", new MgTemplateHelper($this->app));
                     $output = $smarty->fetch($this->singleViewPath);
                 } else {
-                    $this->app->response->setStatus(404);
+                    $this->SetResponseStatus(404);
                     $smarty->assign("single", $single);
                     $smarty->assign("ID", $this->featureId);
                     $smarty->assign("helper", new MgTemplateHelper($this->app));
@@ -681,7 +681,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
                 $read = 0;
                 $limit = $this->limit;
 
-                $pageNo = $this->app->request->get("page");
+                $pageNo = $this->GetRequestParameter("page");
                 if ($pageNo == null)
                     $pageNo = 1;
                 else
@@ -733,7 +733,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
                     $output = $smarty->fetch($this->singleViewPath);
                 } else {
                     if ($bNoResults) { //Query produced 0 results
-                        $this->app->response->setStatus(404);
+                        $this->SetResponseStatus(404);
                         $smarty->assign("single", $single);
                         $smarty->assign("helper", new MgTemplateHelper($this->app));
                         $output = $smarty->fetch($this->noneViewPath);
@@ -772,7 +772,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
             $err->stack = sprintf("%s\n======== Native <-> PHP boundary ========\n\n%s", $ex->GetStackTrace(), $ex->getTraceAsString());
             $smarty->assign("error", $err);
             $smarty->assign("helper", new MgTemplateHelper($this->app));
-            $this->app->response->write($smarty->fetch($this->errorViewPath));
+            $this->WriteResponseContent($smarty->fetch($this->errorViewPath));
         } catch (Exception $e) {
             $err = new stdClass();
             $err->code = get_class($e);
@@ -780,7 +780,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
             $err->stack = $e->getTraceAsString();
             $smarty->assign("error", $err);
             $smarty->assign("helper", new MgTemplateHelper($this->app));
-            $this->app->response->write($smarty->fetch($this->errorViewPath));
+            $this->WriteResponseContent($smarty->fetch($this->errorViewPath));
         }
         $related->Cleanup();
         if ($reader != null)

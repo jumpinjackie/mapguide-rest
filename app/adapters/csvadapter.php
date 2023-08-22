@@ -55,14 +55,14 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
         $this->agfRw = new MgAgfReaderWriter();
         $this->wktRw = new MgWktReaderWriter();
 
-        $this->app->response->header("Content-Type", $this->GetMimeType());
+        $this->SetResponseHeader("Content-Type", $this->GetMimeType());
         $values = array();
         $propCount = $reader->GetPropertyCount();
         for ($i = 0; $i < $propCount; $i++) {
             $name = $reader->GetPropertyName($i);
             array_push($values, $this->CsvEscape($name));
         }
-        $this->app->response->write("\"".implode("\",\"", $values)."\"\n");
+        $this->WriteResponseContent("\"".implode("\",\"", $values)."\"\n");
     }
 
     /**
@@ -130,7 +130,7 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
                 array_push($values, "");    
             }
         }
-        $this->app->response->write("\"".implode("\",\"", $values)."\"\n");
+        $this->WriteResponseContent("\"".implode("\",\"", $values)."\"\n");
     }
 
     /**

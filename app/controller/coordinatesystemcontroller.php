@@ -29,7 +29,7 @@ class MgCoordinateSystemController extends MgBaseController {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $mimeType = $this->GetMimeTypeForFormat($format);
-        $sessionId = $this->app->request->params("session");
+        $sessionId = $this->GetRequestParameter("session");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $mimeType) {
@@ -47,8 +47,8 @@ class MgCoordinateSystemController extends MgBaseController {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $mimeType = $this->GetMimeTypeForFormat($format);
-        $sessionId = $this->app->request->params("session");
-        $wkt = $this->app->request->params("wkt");
+        $sessionId = $this->GetRequestParameter("session");
+        $wkt = $this->GetRequestParameter("wkt");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $wkt, $fmt, $mimeType) {
@@ -67,8 +67,8 @@ class MgCoordinateSystemController extends MgBaseController {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $mimeType = $this->GetMimeTypeForFormat($format);
-        $sessionId = $this->app->request->params("session");
-        $wkt = $this->app->request->params("wkt");
+        $sessionId = $this->GetRequestParameter("session");
+        $wkt = $this->GetRequestParameter("wkt");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $wkt, $fmt, $mimeType) {
@@ -87,8 +87,8 @@ class MgCoordinateSystemController extends MgBaseController {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $mimeType = $this->GetMimeTypeForFormat($format);
-        $sessionId = $this->app->request->params("session");
-        $wkt = $this->app->request->params("wkt");
+        $sessionId = $this->GetRequestParameter("session");
+        $wkt = $this->GetRequestParameter("wkt");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $wkt, $fmt, $mimeType) {
@@ -105,7 +105,7 @@ class MgCoordinateSystemController extends MgBaseController {
 
     public function EnumerateCategories($format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
-        $sessionId = $this->app->request->params("session");
+        $sessionId = $this->GetRequestParameter("session");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
@@ -126,7 +126,7 @@ class MgCoordinateSystemController extends MgBaseController {
 
     public function EnumerateCoordinateSystemsByCategory($category, $format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
-        $sessionId = $this->app->request->params("session");
+        $sessionId = $this->GetRequestParameter("session");
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $category) {
@@ -157,11 +157,11 @@ class MgCoordinateSystemController extends MgBaseController {
 
         $body = MgBoxedValue::Int32($cs->GetEpsgCode(), $fmt);
         if ($fmt == "xml") {
-            $this->app->response->header("Content-Type", MgMimeType::Xml);
+            $this->SetResponseHeader("Content-Type", MgMimeType::Xml);
         } else {
-            $this->app->response->header("Content-Type", MgMimeType::Json);
+            $this->SetResponseHeader("Content-Type", MgMimeType::Json);
         }
-        $this->app->response->setBody($body);
+        $this->SetResponseBody($body);
     }
 
     public function ConvertCsCodeToWkt($cscode, $format) {
@@ -173,11 +173,11 @@ class MgCoordinateSystemController extends MgBaseController {
 
         $body = MgBoxedValue::String($wkt, $fmt);
         if ($fmt == "xml") {
-            $this->app->response->header("Content-Type", MgMimeType::Xml);
+            $this->SetResponseHeader("Content-Type", MgMimeType::Xml);
         } else {
-            $this->app->response->header("Content-Type", MgMimeType::Json);
+            $this->SetResponseHeader("Content-Type", MgMimeType::Json);
         }
-        $this->app->response->setBody($body);
+        $this->SetResponseBody($body);
     }
 
     public function ConvertEpsgToCsCode($epsg, $format) {
@@ -190,11 +190,11 @@ class MgCoordinateSystemController extends MgBaseController {
 
         $body = MgBoxedValue::String($cs->GetCsCode(), $fmt);
         if ($fmt == "xml") {
-            $this->app->response->header("Content-Type", MgMimeType::Xml);
+            $this->SetResponseHeader("Content-Type", MgMimeType::Xml);
         } else {
-            $this->app->response->header("Content-Type", MgMimeType::Json);
+            $this->SetResponseHeader("Content-Type", MgMimeType::Json);
         }
-        $this->app->response->setBody($body);
+        $this->SetResponseBody($body);
     }
 
     public function ConvertEpsgToWkt($epsg, $format) {
@@ -206,11 +206,11 @@ class MgCoordinateSystemController extends MgBaseController {
 
         $body = MgBoxedValue::String($wkt, $fmt);
         if ($fmt == "xml") {
-            $this->app->response->header("Content-Type", MgMimeType::Xml);
+            $this->SetResponseHeader("Content-Type", MgMimeType::Xml);
         } else {
-            $this->app->response->header("Content-Type", MgMimeType::Json);
+            $this->SetResponseHeader("Content-Type", MgMimeType::Json);
         }
-        $this->app->response->setBody($body);
+        $this->SetResponseBody($body);
     }
 
     public function ConvertWktToCsCode($wkt, $format) {
@@ -222,11 +222,11 @@ class MgCoordinateSystemController extends MgBaseController {
 
         $body = MgBoxedValue::String($cs->GetCsCode(), $fmt);
         if ($fmt == "xml") {
-            $this->app->response->header("Content-Type", MgMimeType::Xml);
+            $this->SetResponseHeader("Content-Type", MgMimeType::Xml);
         } else {
-            $this->app->response->header("Content-Type", MgMimeType::Json);
+            $this->SetResponseHeader("Content-Type", MgMimeType::Json);
         }
-        $this->app->response->setBody($body);
+        $this->SetResponseBody($body);
     }
 
     public function ConvertWktToEpsg($wkt, $format) {
@@ -238,28 +238,28 @@ class MgCoordinateSystemController extends MgBaseController {
 
         $body = MgBoxedValue::Int32($cs->GetEpsgCode(), $fmt);
         if ($fmt == "xml") {
-            $this->app->response->header("Content-Type", MgMimeType::Xml);
+            $this->SetResponseHeader("Content-Type", MgMimeType::Xml);
         } else {
-            $this->app->response->header("Content-Type", MgMimeType::Json);
+            $this->SetResponseHeader("Content-Type", MgMimeType::Json);
         }
-        $this->app->response->setBody($body);
+        $this->SetResponseBody($body);
     }
 
     public function TransformCoordinates() {
-        $source = $this->app->request->post("from");
-        $target = $this->app->request->post("to");
-        $coordList = $this->app->request->post("coords");
-        $format = $this->app->request->post("format");
+        $source = $this->GetRequestParameter("from");
+        $target = $this->GetRequestParameter("to");
+        $coordList = $this->GetRequestParameter("coords");
+        $format = $this->GetRequestParameter("format");
         if ($format == null)
             $format = "xml";
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
         if ($source == null)
-            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "from"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "from"), $this->GetMimeTypeForFormat($format));
         if ($target == null)
-            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "to"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "to"), $this->GetMimeTypeForFormat($format));
         if ($coordList == null)
-            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "coords"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "coords"), $this->GetMimeTypeForFormat($format));
 
         try {
             $factory = new MgCoordinateSystemFactory();
@@ -279,18 +279,18 @@ class MgCoordinateSystemController extends MgBaseController {
                 } else {
                     //TODO: We should accept a partial response, but there's currently no way an empty <Coordinate/> tag survives the
                     //XML to JSON conversion, so we have to throw lest we return an inconsisten partial result
-                    $this->ServerError($this->app->localizer->getText("E_INVALID_COORDINATE_PAIR", $coordPair, $tokenCount), $this->GetMimeTypeForFormat($format));
+                    $this->ServerError($this->GetLocalizedText("E_INVALID_COORDINATE_PAIR", $coordPair, $tokenCount), $this->GetMimeTypeForFormat($format));
                 }
             }
             $output .= "</CoordinateCollection>";
 
             if ($fmt === "json") {
-                $this->app->response->header("Content-Type", MgMimeType::Json);
+                $this->SetResponseHeader("Content-Type", MgMimeType::Json);
                 $json = MgUtils::Xml2Json($output);
-                $this->app->response->write($json);
+                $this->WriteResponseContent($json);
             } else {
-                $this->app->response->header("Content-Type", MgMimeType::Xml);
-                $this->app->response->write($output);
+                $this->SetResponseHeader("Content-Type", MgMimeType::Xml);
+                $this->WriteResponseContent($output);
             }
         }
         catch (MgException $ex) {

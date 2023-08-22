@@ -74,14 +74,14 @@ class MgDataController extends MgBaseController {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $this->EnsureAuthenticationForSite();
         $this->ValidateAuthorPrivileges($fmt == "json" ? MgMimeType::Json : MgMimeType::Xml);
-        $configRoot = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath"));
+        $configRoot = realpath($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath"));
         
         $configDir = new RecursiveDirectoryIterator("$configRoot");
         $iterator = new RecursiveIteratorIterator($configDir);
         
         $resp = "<DataConfigurationList>";
-        $resp .= "<RootUri>" . $this->app->config("SelfUrl") . "</RootUri>";
-        $resp .= "<MapAgentUrl>".$this->app->config("MapGuide.MapAgentUrl")."</MapAgentUrl>";
+        $resp .= "<RootUri>" . $this->GetConfig("SelfUrl") . "</RootUri>";
+        $resp .= "<MapAgentUrl>".$this->GetConfig("MapGuide.MapAgentUrl")."</MapAgentUrl>";
         foreach ($iterator as $conf) {
             if ($conf->getFilename() != "restcfg.json")
                 continue;
@@ -98,11 +98,11 @@ class MgDataController extends MgBaseController {
         }
         $resp .= "</DataConfigurationList>";
         if ($fmt == "json") {
-            $this->app->response->header("Content-Type", MgMimeType::Json);
-            $this->app->response->setBody(MgUtils::Xml2Json($resp));
+            $this->SetResponseHeader("Content-Type", MgMimeType::Json);
+            $this->SetResponseBody(MgUtils::Xml2Json($resp));
         } else {
-            $this->app->response->header("Content-Type", MgMimeType::Xml);
-            $this->app->response->setBody($resp);
+            $this->SetResponseHeader("Content-Type", MgMimeType::Xml);
+            $this->SetResponseBody($resp);
         }
     }
 
@@ -113,9 +113,9 @@ class MgDataController extends MgBaseController {
         $this->EnsureAuthenticationForSite();
         $this->ValidateAuthorPrivileges($fmt == "json" ? MgMimeType::Json : MgMimeType::Xml);
 
-        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath");
+        $path = realpath($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath")."/$uriPath");
         if ($path === false) {
-            $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+            $this->NotFound($this->GetLocalizedText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
         } else {
             $resp = "<DataConfigurationFileList>";
             $files = scandir($path);
@@ -126,11 +126,11 @@ class MgDataController extends MgBaseController {
             }
             $resp .= "</DataConfigurationFileList>";
             if ($fmt == "json") {
-                $this->app->response->header("Content-Type", MgMimeType::Json);
-                $this->app->response->setBody(MgUtils::Xml2Json($resp));
+                $this->SetResponseHeader("Content-Type", MgMimeType::Json);
+                $this->SetResponseBody(MgUtils::Xml2Json($resp));
             } else {
-                $this->app->response->header("Content-Type", MgMimeType::Xml);
-                $this->app->response->setBody($resp);
+                $this->SetResponseHeader("Content-Type", MgMimeType::Xml);
+                $this->SetResponseBody($resp);
             }
         }
     }
@@ -139,26 +139,26 @@ class MgDataController extends MgBaseController {
         $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
         $this->EnsureAuthenticationForSite();
         $this->ValidateAuthorPrivileges(MgMimeType::Xml);
-        $fileName = self::SanitizeFileName($this->app->request->params("filename"));
+        $fileName = self::SanitizeFileName($this->GetRequestParameter("filename"));
 
         //Cannot replace restcfg.json
         if ($fileName == "restcfg.json")
-            $this->BadRequest($this->app->localizer->getText("E_DATA_FILE_NAME_NOT_ALLOWED", $fileName));
+            $this->BadRequest($this->GetLocalizedText("E_DATA_FILE_NAME_NOT_ALLOWED", $fileName));
 
-        $configPath = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
+        $configPath = realpath($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         
         //We must have a restcfg.json in this directory in order to put any other files in it
         if (!file_exists($configPath))
-            $this->ServerError($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+            $this->ServerError($this->GetLocalizedText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
 
-        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath")."/$fileName";
+        $path = realpath($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath")."/$uriPath")."/$fileName";
         
         $err = $_FILES["data"]["error"];
         if ($err == 0) {
             move_uploaded_file($_FILES["data"]["tmp_name"], $path);
         } else {
-            $this->app->response->setStatus(500);
-            $this->app->response->setBody($this->app->localizer->getText("E_PHP_FILE_UPLOAD_ERROR", $err));
+            $this->SetResponseStatus(500);
+            $this->SetResponseBody($this->GetLocalizedText("E_PHP_FILE_UPLOAD_ERROR", $err));
         }
     }
 
@@ -166,21 +166,21 @@ class MgDataController extends MgBaseController {
         $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
         $this->EnsureAuthenticationForSite();
         $this->ValidateAuthorPrivileges(MgMimeType::Xml);
-        $fileName = self::SanitizeFileName($this->app->request->params("filename"));
+        $fileName = self::SanitizeFileName($this->GetRequestParameter("filename"));
 
         //Can't delete restcfg.json
         if ($fileName == "restcfg.json")
-            $this->BadRequest($this->app->localizer->getText("E_DATA_FILE_NAME_NOT_ALLOWED", $fileName));
+            $this->BadRequest($this->GetLocalizedText("E_DATA_FILE_NAME_NOT_ALLOWED", $fileName));
 
-        $configPath = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
+        $configPath = realpath($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         
         //We must have a restcfg.json in this directory in order to delete any other files in it
         if ($configPath === false)
-            $this->ServerError($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+            $this->ServerError($this->GetLocalizedText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
 
-        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/$fileName");
+        $path = realpath($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath")."/$uriPath/$fileName");
         if ($path === false) {
-            $this->NotFound($this->app->localizer->getText("E_DATA_FILE_NOT_FOUND", $fileName));
+            $this->NotFound($this->GetLocalizedText("E_DATA_FILE_NOT_FOUND", $fileName));
         } else {
             unlink($path);
         }
@@ -190,11 +190,11 @@ class MgDataController extends MgBaseController {
         $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
         $this->EnsureAuthenticationForSite();
         $this->ValidateAuthorPrivileges(MgMimeType::Xml);
-        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
+        $path = realpath($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+            $this->NotFound($this->GetLocalizedText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
         } else {
-            $this->app->response->setBody(file_get_contents($path));
+            $this->SetResponseBody(file_get_contents($path));
         }
     }
 
@@ -203,9 +203,9 @@ class MgDataController extends MgBaseController {
         $this->EnsureAuthenticationForSite();
         $this->ValidateAuthorPrivileges(MgMimeType::Xml);
 
-        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath");
+        $path = realpath($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath")."/$uriPath");
         if ($path === false) {
-            $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+            $this->NotFound($this->GetLocalizedText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
         } else {
             $this->rrmdir($path);
         }
@@ -221,31 +221,31 @@ class MgDataController extends MgBaseController {
             //Do some basic sanity checks. This file must parse as JSON
             $obj = json_decode(file_get_contents($_FILES["data"]["tmp_name"]));
             if ($obj == NULL) {
-                $this->ServerError($this->app->localizer->getText("E_DATA_CONFIGURATION_NOT_JSON"));
+                $this->ServerError($this->GetLocalizedText("E_DATA_CONFIGURATION_NOT_JSON"));
             }
 
-            $dir = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath");
+            $dir = realpath($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath")."/$uriPath");
             if ($dir === FALSE) {
-                mkdir($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath");
+                mkdir($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath")."/$uriPath");
             }
-            $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath")."/restcfg.json";
+            $path = realpath($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath")."/$uriPath")."/restcfg.json";
 
             move_uploaded_file($_FILES["data"]["tmp_name"], $path);
         } else {
-            $this->app->response->setStatus(500);
-            $this->app->response->setBody($this->app->localizer->getText("E_PHP_FILE_UPLOAD_ERROR", $err));
+            $this->SetResponseStatus(500);
+            $this->SetResponseBody($this->GetLocalizedText("E_PHP_FILE_UPLOAD_ERROR", $err));
         }
     }
 
     public function GetApiDocViewer($uriParts) {
         $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
-        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
+        $path = realpath($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
+            $this->NotFound($this->GetLocalizedText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath));
         } else {
             
             $verPrefix = MgUtils::GetApiVersionNamespace($this->app, "/data/$uriPath");
-            $selfUrlUnprefixed = $this->app->config("SelfUrl");
+            $selfUrlUnprefixed = $this->GetConfig("SelfUrl");
             $selfUrl = $selfUrlUnprefixed;
             if (strlen($verPrefix) > 0) {
                 $selfUrl = $selfUrlUnprefixed."/".$verPrefix;
@@ -253,32 +253,32 @@ class MgDataController extends MgBaseController {
             
             $docUrl = "$selfUrl/data/$uriPath/apidoc";
             $assetUrlRoot = "$selfUrlUnprefixed/doc";
-            $docTpl = $this->app->config("AppRootDir")."/assets/doc/viewer.tpl";
+            $docTpl = $this->GetConfig("AppRootDir")."/assets/doc/viewer.tpl";
 
             $smarty = new Smarty();
-            $smarty->setCompileDir($this->app->config("Cache.RootDir")."/templates_c");
-            $smarty->assign("title", $this->app->localizer->getText("L_PRODUCT_API_REFERENCE", $uriParts[count($uriParts)-1]));
+            $smarty->setCompileDir($this->GetConfig("Cache.RootDir")."/templates_c");
+            $smarty->assign("title", $this->GetLocalizedText("L_PRODUCT_API_REFERENCE", $uriParts[count($uriParts)-1]));
             $smarty->assign("docUrl", $docUrl);
             $smarty->assign("docAssetRoot", $assetUrlRoot);
 
             $output = $smarty->fetch($docTpl);
-            $this->app->response->header("Content-Type", "text/html");
-            $this->app->response->setBody($output);
+            $this->SetResponseHeader("Content-Type", "text/html");
+            $this->SetResponseBody($output);
         }
     }
 
     public function GetApiDoc($uriParts) {
         $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
-        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
+        $path = realpath($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath), MgMimeType::Json);
+            $this->NotFound($this->GetLocalizedText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath), MgMimeType::Json);
         } else {
             $config = json_decode(file_get_contents($path), true);
             
             $urlRoot = "/data/$uriPath";
             $hostPart = ((!array_key_exists("HTTPS", $_SERVER) || ($_SERVER['HTTPS'] === "off")) ? "http://" : "https://") . $_SERVER['HTTP_HOST'];
             $verPrefix = MgUtils::GetApiVersionNamespace($this->app, "/data/$uriPath");
-            $selfUrl = $this->app->config("SelfUrl");
+            $selfUrl = $this->GetConfig("SelfUrl");
             if (strlen($verPrefix) > 0) {
                 $selfUrl .= "/" . $verPrefix;
             }
@@ -316,7 +316,7 @@ class MgDataController extends MgBaseController {
                         $pId->name = "id";
                         $pId->type = "string";
                         $pId->required = true;
-                        $pId->description = $this->app->localizer->getText("L_REST_GET_ID_DESC");
+                        $pId->description = $this->GetLocalizedText("L_REST_GET_ID_DESC");
 
                         array_push($singleConf->extraParams, $pId);
 
@@ -337,27 +337,27 @@ class MgDataController extends MgBaseController {
                 }
             }
 
-            $this->app->response->header("Content-Type", "application/json");
-            $this->app->response->setBody(json_encode($apidoc));
+            $this->SetResponseHeader("Content-Type", "application/json");
+            $this->SetResponseBody(json_encode($apidoc));
         }
     }
 
     private function ValidateConfiguration($config, $extension, $method) {
         if (!array_key_exists("Source", $config))
-            throw new Exception($this->app->localizer->getText("E_MISSING_ROOT_PROPERTY", "Source"));
+            throw new Exception($this->GetLocalizedText("E_MISSING_ROOT_PROPERTY", "Source"));
 
         $result = new stdClass();
 
         $cfgSource = $config["Source"];
         if (!array_key_exists("Type", $cfgSource))
-            throw new Exception($this->app->localizer->getText("E_MISSING_PROPERTY_IN_SECTION", "Type", "Source"));
+            throw new Exception($this->GetLocalizedText("E_MISSING_PROPERTY_IN_SECTION", "Type", "Source"));
         if ($cfgSource["Type"] !== "MapGuide") 
-            throw new Exception($this->app->localizer->getText("E_UNSUPPORTED_SOURCE_TYPE", $cfgSource["Type"]));
+            throw new Exception($this->GetLocalizedText("E_UNSUPPORTED_SOURCE_TYPE", $cfgSource["Type"]));
         if (!array_key_exists("LayerDefinition", $cfgSource)) {
             if (!array_key_exists("FeatureSource", $cfgSource))
-                throw new Exception($this->app->localizer->getText("E_MISSING_PROPERTY_IN_SECTION", "FeatureSource", "Source"));
+                throw new Exception($this->GetLocalizedText("E_MISSING_PROPERTY_IN_SECTION", "FeatureSource", "Source"));
             if (!array_key_exists("FeatureClass", $cfgSource))
-                throw new Exception($this->app->localizer->getText("E_MISSING_PROPERTY_IN_SECTION", "FeatureClass", "Source"));
+                throw new Exception($this->GetLocalizedText("E_MISSING_PROPERTY_IN_SECTION", "FeatureClass", "Source"));
         }
         if (array_key_exists("IdentityProperty", $cfgSource))
             $result->IdentityProperty = $cfgSource["IdentityProperty"];
@@ -372,16 +372,16 @@ class MgDataController extends MgBaseController {
         }
 
         if (!array_key_exists("Representations", $config))
-            throw new Exception($this->app->localizer->getText("E_NO_REPRESENTATIONS_DEFINED_IN_CONFIGURATION"));
+            throw new Exception($this->GetLocalizedText("E_NO_REPRESENTATIONS_DEFINED_IN_CONFIGURATION"));
         $cfgRep = $config["Representations"];
         if (!array_key_exists($extension, $cfgRep))
-            throw new Exception($this->app->localizer->getText("E_REPRESENTATION_NOT_HANDLED_OR_SUPPORTED", $extension));
+            throw new Exception($this->GetLocalizedText("E_REPRESENTATION_NOT_HANDLED_OR_SUPPORTED", $extension));
         $cfgExtension = $cfgRep[$extension];
         if (!array_key_exists("Methods", $cfgExtension))
-            throw new Exception($this->app->localizer->getText("E_REPRESENTATION_CONFIGURATION_MISSING_PROPERTY", "Methods", $extension));
+            throw new Exception($this->GetLocalizedText("E_REPRESENTATION_CONFIGURATION_MISSING_PROPERTY", "Methods", $extension));
         $cfgMethods = $cfgExtension["Methods"];
         if (!array_key_exists($method, $cfgMethods))
-            throw new Exception($this->app->localizer->getText("E_METHOD_NOT_SUPPORTED_ON_REPRESENTATION", $extension, $method));
+            throw new Exception($this->GetLocalizedText("E_METHOD_NOT_SUPPORTED_ON_REPRESENTATION", $extension, $method));
 
         $result->config = $cfgMethods[$method];
         $result->adapterName = $cfgExtension["Adapter"];
@@ -493,14 +493,14 @@ class MgDataController extends MgBaseController {
 
     private function HandleMethod($uriParts, $extension, $method) {
         $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
-        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
+        $path = realpath($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath), MgMimeType::Json);
+            $this->NotFound($this->GetLocalizedText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath), MgMimeType::Json);
         } else {
             $config = json_decode(file_get_contents($path), true);
             $result = $this->ValidateConfiguration($config, $extension, $method);
             if (!$this->app->container->has($result->adapterName)) {
-                throw new Exception($this->app->localizer->getText("E_ADAPTER_NOT_REGISTERED", $result->adapterName));
+                throw new Exception($this->GetLocalizedText("E_ADAPTER_NOT_REGISTERED", $result->adapterName));
             }
             $bAllowAnonymous = false;
             if (array_key_exists("AllowAnonymous", $result->config) && $result->config["AllowAnonymous"] == true)
@@ -513,7 +513,7 @@ class MgDataController extends MgBaseController {
                     $session = $extractor->TryGetSessionId($this->app, $method);
                 }
                 if ($session == null)
-                    $session = $this->app->request->params("session");
+                    $session = $this->GetRequestParameter("session");
 
                 $this->EnsureAuthenticationForSite($session, $bAllowAnonymous);
                 $siteConn = new MgSiteConnection();
@@ -533,7 +533,7 @@ class MgDataController extends MgBaseController {
                     $adapter = $this->app->container[$result->adapterName];
                     $adapter->HandleMethod($method, false);
                 } else {
-                    $this->Forbidden($this->app->localizer->getText("E_FORBIDDEN_ACCESS"), $this->GetMimeTypeForFormat($extension));
+                    $this->Forbidden($this->GetLocalizedText("E_FORBIDDEN_ACCESS"), $this->GetMimeTypeForFormat($extension));
                 }
             } catch (MgException $ex) {
                 $this->OnException($ex, $this->GetMimeTypeForFormat($extension));
@@ -543,14 +543,14 @@ class MgDataController extends MgBaseController {
 
     private function HandleMethodSingle($uriParts, $id, $extension, $method) {
         $uriPath = self::SanitizeUriPath(implode("/", $uriParts));
-        $path = realpath($this->app->config("AppRootDir")."/".$this->app->config("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
+        $path = realpath($this->GetConfig("AppRootDir")."/".$this->GetConfig("GeoRest.ConfigPath")."/$uriPath/restcfg.json");
         if ($path === false) {
-            $this->NotFound($this->app->localizer->getText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath), MgMimeType::Json);
+            $this->NotFound($this->GetLocalizedText("E_NO_DATA_CONFIGURATION_FOR_URI", $uriPath), MgMimeType::Json);
         } else {
             $config = json_decode(file_get_contents($path), true);
             $result = $this->ValidateConfiguration($config, $extension, $method);
             if (!$this->app->container->has($result->adapterName)) {
-                throw new Exception($this->app->localizer->getText("E_ADAPTER_NOT_REGISTERED", $result->adapterName));
+                throw new Exception($this->GetLocalizedText("E_ADAPTER_NOT_REGISTERED", $result->adapterName));
             }
             $bAllowAnonymous = false;
             if (array_key_exists("AllowAnonymous", $result->config) && $result->config["AllowAnonymous"] == true)
@@ -563,7 +563,7 @@ class MgDataController extends MgBaseController {
                     $session = $extractor->TryGetSessionId($this->app, $method);
                 }
                 if ($session == null)
-                    $session = $this->app->request->params("session");
+                    $session = $this->GetRequestParameter("session");
 
                 $this->EnsureAuthenticationForSite($session, $bAllowAnonymous);
                 $siteConn = new MgSiteConnection();
@@ -584,7 +584,7 @@ class MgDataController extends MgBaseController {
                     $adapter->SetFeatureId($id);
                     $adapter->HandleMethod($method, true);
                 } else {
-                    $this->Forbidden($this->app->localizer->getText("E_FORBIDDEN_ACCESS"), $this->GetMimeTypeForFormat($extension));
+                    $this->Forbidden($this->GetLocalizedText("E_FORBIDDEN_ACCESS"), $this->GetMimeTypeForFormat($extension));
                 }
             } catch (MgException $ex) {
                 $this->OnException($ex, $this->GetMimeTypeForFormat($extension));

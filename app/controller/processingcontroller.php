@@ -72,14 +72,14 @@ class MgProcessingController extends MgBaseController {
                 break;
         }
 
-        $this->app->response->header("Content-Type", MgMimeType::Json);
+        $this->SetResponseHeader("Content-Type", MgMimeType::Json);
         $body = MgBoxedValue::Boolean($result, "json");
         /*
         $o = json_decode($body);
         $o->op = $op;
         $body = json_encode($o);
         */
-        $this->app->response->write($body);
+        $this->WriteResponseContent($body);
     }
 
     private function GeometryOperation($wktA, $wktB, $op, $transformto, $format) {
@@ -117,15 +117,15 @@ class MgProcessingController extends MgBaseController {
             $oGeom = $buffered->Transform($xform);
         }
 
-        $this->app->response->header("Content-Type", MgMimeType::Json);
+        $this->SetResponseHeader("Content-Type", MgMimeType::Json);
         switch ($format) {
             case "wkt":
                 $resp = '{"type": "wkt", "result": "'.$wktRw->Write($oGeom).'"}';
-                $this->app->response->write($resp);
+                $this->WriteResponseContent($resp);
                 break;
             case "geojson":
                 $resp = '{"type": "geojson", "result": { "type": "Feature", "id": "'.uniqid().'", '.MgReaderToGeoJsonWriter::ToGeoJson($oGeom).'} }';
-                $this->app->response->write($resp);
+                $this->WriteResponseContent($resp);
                 break;
         }
     }

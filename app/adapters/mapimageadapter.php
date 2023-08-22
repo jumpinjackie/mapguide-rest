@@ -118,9 +118,9 @@ class MgMapImageRestAdapter extends MgRestAdapter {
         if ($this->limit === -1)
             $this->limit = 0;
         if (!array_key_exists("MapDefinition", $config))
-            throw new Exception($this->app->localizer->getText("E_MISSING_REQUIRED_ADAPTER_PROPERTY", "MapDefinition"));
+            throw new Exception($this->GetLocalizedText("E_MISSING_REQUIRED_ADAPTER_PROPERTY", "MapDefinition"));
         if (!array_key_exists("SelectionLayer", $config))
-            throw new Exception($this->app->localizer->getText("E_MISSING_REQUIRED_ADAPTER_PROPERTY", "SelectionLayer"));
+            throw new Exception($this->GetLocalizedText("E_MISSING_REQUIRED_ADAPTER_PROPERTY", "SelectionLayer"));
 
         $this->mapDefId = new MgResourceIdentifier($config["MapDefinition"]);
         $this->selLayerName = $config["SelectionLayer"];
@@ -139,10 +139,10 @@ class MgMapImageRestAdapter extends MgRestAdapter {
     public function HandleGet($single) {
         try {
             //Apply any overrides from query string
-            $ovWidth = $this->app->request->get("width");
-            $ovHeight = $this->app->request->get("height");
-            $ovDpi = $this->app->request->get("dpi");
-            $ovScale = $this->app->request->get("scale");
+            $ovWidth = $this->GetRequestParameter("width");
+            $ovHeight = $this->GetRequestParameter("height");
+            $ovDpi = $this->GetRequestParameter("dpi");
+            $ovScale = $this->GetRequestParameter("scale");
             if ($ovWidth != null)
                 $this->imgWidth = $ovWidth;
             if ($ovHeight != null)
@@ -152,7 +152,7 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             if ($ovScale != null)
                 $this->viewScale = intval($ovScale);
             $bSelection = true;
-            if ($this->app->request->get("selection") === "0" || $this->app->request->get("selection") === "false")
+            if ($this->GetRequestParameter("selection") === "0" || $this->GetRequestParameter("selection") === "false")
                 $bSelection = false;
 
             $this->featSvc = $this->siteConn->CreateService(MgServiceType::FeatureService);
@@ -166,10 +166,10 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             $layers = $this->map->GetLayers();
             $idx = $layers->IndexOf($this->selLayerName);
             if ($idx < 0)
-                throw new Exception($this->app->localizer->getText("E_LAYER_NOT_FOUND_IN_MAP", $this->selLayerName));
+                throw new Exception($this->GetLocalizedText("E_LAYER_NOT_FOUND_IN_MAP", $this->selLayerName));
             $layer = $layers->GetItem($idx);
             if ($layer->GetFeatureSourceId() !== $this->featureSourceId->ToString())
-                throw new Exception($this->app->localizer->getText("E_LAYER_NOT_POINTING_TO_EXPECTED_FEATURE_SOURCE", $this->selLayerName, $this->featureSourceId->ToString(), $layer->GetFeatureSourceId()));
+                throw new Exception($this->GetLocalizedText("E_LAYER_NOT_POINTING_TO_EXPECTED_FEATURE_SOURCE", $this->selLayerName, $this->featureSourceId->ToString(), $layer->GetFeatureSourceId()));
 
             $this->selLayer = $layer;
 
@@ -181,7 +181,7 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             $read = 0;
             $limit = $this->limit;
 
-            $pageNo = $this->app->request->get("page");
+            $pageNo = $this->GetRequestParameter("page");
             if ($pageNo == null)
                 $pageNo = 1;
             else
@@ -254,12 +254,12 @@ class MgMapImageRestAdapter extends MgRestAdapter {
                                            $bKeepSelection);
 
             //Set download response headers if specified
-            if ($this->app->request->params("download") === "1" || $this->app->request->params("download") === "true") {
+            if ($this->GetRequestParameter("download") === "1" || $this->GetRequestParameter("download") === "true") {
                 $filebasename = "download";
-                if ($this->app->request->params("downloadname")) {
-                    $filebasename = $this->app->request->params("downloadname");
+                if ($this->GetRequestParameter("downloadname")) {
+                    $filebasename = $this->GetRequestParameter("downloadname");
                 }
-                $this->app->response->headers->set("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($filebasename, $image->GetMimeType()));
+                $this->SetResponseHeader("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($filebasename, $image->GetMimeType()));
             }
 
             $this->OutputByteReader($image);

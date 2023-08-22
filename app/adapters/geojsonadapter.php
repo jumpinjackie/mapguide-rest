@@ -115,8 +115,8 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
     protected function GetResponseBegin($reader) {
         $this->agfRw = new MgAgfReaderWriter();
 
-        $this->app->response->header("Content-Type", MgMimeType::Json);
-        $this->app->response->write('{ "type": "FeatureCollection", "features": ['."\n");
+        $this->SetResponseHeader("Content-Type", MgMimeType::Json);
+        $this->WriteResponseContent('{ "type": "FeatureCollection", "features": ['."\n");
         $this->firstFeature = true;
     }
 
@@ -196,7 +196,7 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
             $output .= '{ "type": "Feature", "properties": {'.implode(",", $propVals)."} }\n";;
         }
 
-        $this->app->response->write($output);
+        $this->WriteResponseContent($output);
         $output = "";
 
         $this->firstFeature = false;
@@ -206,7 +206,7 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
      * Writes the GET response ending based on content of the given MgReader
      */
     protected function GetResponseEnd($reader) {
-        $this->app->response->write("]}");
+        $this->WriteResponseContent("]}");
     }
 
     /**
@@ -224,7 +224,7 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
             if ($this->app->REQUEST_BODY_DOCUMENT != null) {
                 $batchProps = MgUtils::ParseMultiFeatureDocument($this->app, $classDef, $this->app->REQUEST_BODY_DOCUMENT);
             } else {
-                $json = json_decode($this->app->request->getBody());
+                $json = json_decode($this->GetRequestBody());
                 $body = MgUtils::Json2Xml($json);
                 $batchProps = MgUtils::ParseMultiFeatureXml($this->app, $classDef, $body);
             }
@@ -262,7 +262,7 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
             $className = $tokens[1];
 
             if ($this->app->REQUEST_BODY_DOCUMENT == null) {
-                $json = json_decode($this->app->request->getBody());
+                $json = json_decode($this->GetRequestBody());
                 $body = MgUtils::Json2Xml($json);
                 $doc = new DOMDocument();
                 $doc->loadXML($body);
@@ -278,7 +278,7 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
             if ($single === true) {
                 $idProps = $classDef->GetIdentityProperties();
                 if ($idProps->GetCount() != 1) {
-                    $app->halt(400, $this->app->localizer->getText("E_CANNOT_APPLY_UPDATE_CANNOT_UNIQUELY_IDENTIFY", $this->featureId, $idProps->GetCount()));
+                    $app->halt(400, $this->GetLocalizedText("E_CANNOT_APPLY_UPDATE_CANNOT_UNIQUELY_IDENTIFY", $this->featureId, $idProps->GetCount()));
                 } else {
                     $idProp = $idProps->GetItem(0);
                     if ($idProp->GetDataType() == MgPropertyType::String) {
@@ -331,7 +331,7 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
 
             if ($single === true) {
                 if ($this->featureId == null) {
-                    throw new Exception($this->app->localizer->getText("E_NO_FEATURE_ID_SET"));
+                    throw new Exception($this->GetLocalizedText("E_NO_FEATURE_ID_SET"));
                 }
                 $idType = MgPropertyType::String;
                 $tokens = explode(":", $this->className);
@@ -339,9 +339,9 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
                 if ($this->featureIdProp == null) {
                     $idProps = $clsDef->GetIdentityProperties();
                     if ($idProps->GetCount() == 0) {
-                        throw new Exception($this->app->localizer->getText("E_CANNOT_DELETE_NO_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
+                        throw new Exception($this->GetLocalizedText("E_CANNOT_DELETE_NO_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
                     } else if ($idProps->GetCount() > 1) {
-                        throw new Exception($this->app->localizer->getText("E_CANNOT_DELETE_MULTIPLE_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
+                        throw new Exception($this->GetLocalizedText("E_CANNOT_DELETE_MULTIPLE_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
                     } else {
                         $idProp = $idProps->GetItem(0);
                         $this->featureIdProp = $idProp->GetName();
@@ -353,9 +353,9 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
                     if ($iidx >= 0) {
                         $propDef = $props->GetItem($iidx);
                         if ($propDef->GetPropertyType() != MgFeaturePropertyType::DataProperty)
-                            throw new Exception($this->app->localizer->getText("E_ID_PROP_NOT_DATA", $this->featureIdProp));
+                            throw new Exception($this->GetLocalizedText("E_ID_PROP_NOT_DATA", $this->featureIdProp));
                     } else {
-                        throw new Exception($this->app->localizer->getText("E_ID_PROP_NOT_FOUND", $this->featureIdProp));
+                        throw new Exception($this->GetLocalizedText("E_ID_PROP_NOT_FOUND", $this->featureIdProp));
                     }
                 }
                 if ($idType == MgPropertyType::String)
@@ -363,7 +363,7 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
                 else
                     $filter = $this->featureIdProp." = ".$this->featureId;
             } else {
-                $filter = $this->app->request->params("filter");
+                $filter = $this->GetRequestParameter("filter");
                 if ($filter == null)
                     $filter = "";
             }
