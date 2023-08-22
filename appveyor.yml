@@ -48,7 +48,7 @@ install:
     - IF %PHP%==1 echo extension=php_curl.dll >> php.ini
     - IF %PHP%==1 echo extension=php_gd2.dll >> php.ini
     - IF %PHP%==1 echo extension=php_xsl.dll >> php.ini
-    - appveyor DownloadFile https://getcomposer.org/composer.phar
+    - appveyor DownloadFile https://getcomposer.org/download/2.2.21/composer.phar
     - SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_BUILD_VERSION%
     - IF "%APPVEYOR_REPO_TAG%" == "true" SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_REPO_TAG_NAME%
     - cd c:\projects\mapguide-rest
