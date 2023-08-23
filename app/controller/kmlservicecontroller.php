@@ -138,7 +138,7 @@ class MgKmlServiceController extends MgBaseController {
     }
 
     private function _GetKmlForMap($map, $sessionId, $format = "kml", $chunk = "1") {
-        MgUtils::ApplyCorsIfApplicable($this->app);
+        MgUtils::ApplyCorsIfApplicable($this);
         if ($chunk === "0")
             $writer = new MgSlimChunkWriter($this);
         else
@@ -305,7 +305,7 @@ class MgKmlServiceController extends MgBaseController {
         if ($native) {
             $mdfIdStr = $resId->ToString();
             $selfUrl = MgUtils::GetSelfUrlRoot($this->GetConfig("SelfUrl"));
-            $this->app->redirect("$selfUrl/../mapagent/mapagent.fcgi?OPERATION=GETMAPKML&VERSION=1.0.0&SESSION=$sessionId&MAPDEFINITION=$mdfIdStr&CLIENTAGENT=MapGuide REST Extension");
+            $this->Redirect("$selfUrl/../mapagent/mapagent.fcgi?OPERATION=GETMAPKML&VERSION=1.0.0&SESSION=$sessionId&MAPDEFINITION=$mdfIdStr&CLIENTAGENT=MapGuide REST Extension");
         } else {
             $map = new MgMap($siteConn);
             $map->Create($resId, $resId->GetName());
@@ -331,7 +331,7 @@ class MgKmlServiceController extends MgBaseController {
             $mdfId = $map->GetMapDefinition();
             $mdfIdStr = $mdfId->ToString();
             $selfUrl = MgUtils::GetSelfUrlRoot($this->GetConfig("SelfUrl"));
-            $this->app->redirect("$selfUrl/../mapagent/mapagent.fcgi?OPERATION=GETMAPKML&VERSION=1.0.0&SESSION=$sessionId&MAPDEFINITION=$mdfIdStr&CLIENTAGENT=MapGuide REST Extension");
+            $this->Redirect("$selfUrl/../mapagent/mapagent.fcgi?OPERATION=GETMAPKML&VERSION=1.0.0&SESSION=$sessionId&MAPDEFINITION=$mdfIdStr&CLIENTAGENT=MapGuide REST Extension");
         } else {
             $this->_GetKmlForMap($map, $sessionId, $format, $chunk);
         }
@@ -476,8 +476,7 @@ class MgKmlServiceController extends MgBaseController {
         $agentUri = MgUtils::GetSelfUrlRoot($this->GetConfig("SelfUrl"))."/../mapagent/mapagent.fcgi";
 
         $that = $this;
-        $app = $this->app;
-        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $app, $fmt, $resId, $bbox, $width, $height, $drawOrder, $dpi) {
+        $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resId, $bbox, $width, $height, $drawOrder, $dpi) {
             $param->AddParameter("OPERATION", "GETFEATURESKML");
             $param->AddParameter("VERSION", "1.0.0");
             $param->AddParameter("LAYERDEFINITION", $resId->ToString());
@@ -490,10 +489,10 @@ class MgKmlServiceController extends MgBaseController {
 
             $bChunk = true;
             //Apply file download parameters if specified
-            if ($app->request->params("download") === "1" || $app->request->params("download") === "true") {
+            if ($that->GetRequestParameter("download") === "1" || $that->GetRequestParameter("download") === "true") {
                 $param->AddParameter("X-DOWNLOAD-ATTACHMENT", "true");
-                if ($app->request->params("downloadname")) {
-                    $param->AddParameter("X-DOWNLOAD-ATTACHMENT-NAME", $app->request->params("downloadname"));
+                if ($that->GetRequestParameter("downloadname")) {
+                    $param->AddParameter("X-DOWNLOAD-ATTACHMENT-NAME", $that->GetRequestParameter("downloadname"));
                     $bChunk = false;
                 }
             }

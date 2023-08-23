@@ -67,12 +67,12 @@ class MgMapController extends MgBaseController {
         for ($i = 0; $i < $layerNodes->length; $i++) {
             $layerNode = $layerNodes->item($i);
             if ($layerNode->tagName == "Layer") {
-                //$this->app->log->debug("Found //SelectionUpdate/Layer");
+                //$this->LogDebug("Found //SelectionUpdate/Layer");
                 $featureNodes = $layerNode->childNodes;
                 for ($j = 0; $j < $featureNodes->length; $j++) {
                     $featureNode = $featureNodes->item($j);
                     if ($featureNode->tagName == "Name") {
-                        //$this->app->log->debug("Found //SelectionUpdate/Layer/Name");
+                        //$this->LogDebug("Found //SelectionUpdate/Layer/Name");
                         $layerName = $featureNode->nodeValue;
                         $lidx = $layers->IndexOf($layerName);
                         if ($lidx < 0)
@@ -87,22 +87,22 @@ class MgMapController extends MgBaseController {
                         $fr = $layer->SelectFeatures($query);
                         $sel->AddFeatures($layer, $fr, 0);
                     } else if ($featureNode->tagName == "Feature") {
-                        //$this->app->log->debug("Found //SelectionUpdate/Layer/Feature");
+                        //$this->LogDebug("Found //SelectionUpdate/Layer/Feature");
                         $idNodes = $featureNode->childNodes;
                         if ($idNodes->length == 1) {
                             $idNode = $idNodes->item(0);
                             if ($idNode->tagName == "ID") {
-                                //$this->app->log->debug("Found //SelectionUpdate/Layer/Feature/ID");
+                                //$this->LogDebug("Found //SelectionUpdate/Layer/Feature/ID");
                                 $nameNode = null;
                                 $valueNode = null;
                                 for ($nv = 0; $nv < $idNode->childNodes->length; $nv++) {
                                     $children = $idNode->childNodes;
                                     $child = $children->item($nv);
                                     if ($child->tagName == "Name") {
-                                        //$this->app->log->debug("Found //SelectionUpdate/Layer/Feature/ID/Name");
+                                        //$this->LogDebug("Found //SelectionUpdate/Layer/Feature/ID/Name");
                                         $nameNode = $child;
                                     } else if ($child->tagName == "Value") {
-                                        //$this->app->log->debug("Found //SelectionUpdate/Layer/Feature/ID/Value");
+                                        //$this->LogDebug("Found //SelectionUpdate/Layer/Feature/ID/Value");
                                         $valueNode = $child;
                                     }
                                 }
@@ -119,28 +119,28 @@ class MgMapController extends MgBaseController {
                                 $propDef = $clsIdProps->GetItem($pidx);
                                 $value = $valueNode->nodeValue;
                                 $propType = $propDef->GetDataType();
-                                //$this->app->log->debug("Value is: $value");
-                                //$this->app->log->debug("Property type: $propType");
+                                //$this->LogDebug("Value is: $value");
+                                //$this->LogDebug("Property type: $propType");
                                 switch ($propType) {
                                     case MgPropertyType::Int16:
-                                        //$this->app->log->debug("=== ADD INT16: $value ===");
+                                        //$this->LogDebug("=== ADD INT16: $value ===");
                                         $sel->AddFeatureIdInt16($layer, $layer->GetFeatureClassName(), intval($value));
                                         break;
                                     case MgPropertyType::Int32:
-                                        //$this->app->log->debug("=== ADD INT32: $value ===");
+                                        //$this->LogDebug("=== ADD INT32: $value ===");
                                         $sel->AddFeatureIdInt32($layer, $layer->GetFeatureClassName(), intval($value));
                                         break;
                                     case MgPropertyType::Int64:
-                                        //$this->app->log->debug("=== ADD INT64: $value ===");
+                                        //$this->LogDebug("=== ADD INT64: $value ===");
                                         $sel->AddFeatureIdInt64($layer, $layer->GetFeatureClassName(), intval($value));
                                         break;
                                     case MgPropertyType::String:
-                                        //$this->app->log->debug("=== ADD STRING: $value ===");
+                                        //$this->LogDebug("=== ADD STRING: $value ===");
                                         $sel->AddFeatureIdString($layer, $layer->GetFeatureClassName(), $value);
                                         break;
                                     case MgPropertyType::Single:
                                     case MgPropertyType::Double:
-                                        //$this->app->log->debug("=== ADD DOUBLE: $value ===");
+                                        //$this->LogDebug("=== ADD DOUBLE: $value ===");
                                         $sel->AddFeatureIdInt64($layer, $layer->GetFeatureClassName(), floatval($value));
                                         break;
                                     //case MgPropertyType::DateTime:
@@ -260,7 +260,7 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
         if ($selColor == null)
             $selColor = "0x0000FFFF";
 
-        $this->TrySetCredentialsFromRequest($this->app->request);
+        $this->TrySetCredentialsFromRequest();
         try {
             $this->EnsureAuthenticationForSite();
             $siteConn = new MgSiteConnection();
@@ -377,14 +377,14 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                 $bCanUseNative = !$bAppend;
             }
 
-            //$this->app->log->debug("APPEND: $bAppend");
-            //$this->app->log->debug("FILTER (Before): $featFilter");
+            //$this->LogDebug("APPEND: $bAppend");
+            //$this->LogDebug("FILTER (Before): $featFilter");
 
             if (!$bSelectionXml) {
                 //Append only works in the absence of geometry
                 if ($geometry == null && $featFilter != null) {
                     $featFilter = $this->TranslateToSelectionXml($siteConn, $mapName, $featFilter, $bAppend);
-                    //$this->app->log->debug("FeatFilter: $featFilter");
+                    //$this->LogDebug("FeatFilter: $featFilter");
                 }
             } else {
                 //Append only works in the absence of geometry
@@ -393,9 +393,9 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                 }
             }
 
-            //$this->app->log->debug("GEOMETRY: $geometry");
-            //$this->app->log->debug("FILTER: $featFilter");
-            //$this->app->log->debug("Can use native: $bCanUseNative");
+            //$this->LogDebug("GEOMETRY: $geometry");
+            //$this->LogDebug("FILTER: $featFilter");
+            //$this->LogDebug("Can use native: $bCanUseNative");
             if ($bCanUseNative) {
                 $req = new MgHttpRequest("");
                 $param = $req->GetRequestParam();
@@ -1023,7 +1023,7 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
             $updateStats->UpdatedGroups = 0;
             $updateStats->RemovedGroups = 0;
 
-            $this->app->log->debug("Operations found: ".count($um->Operation));
+            $this->LogDebug("Operations found: ".count($um->Operation));
 
             for ($i = 0; $i < count($um->Operation); $i++) {
                 $op = $um->Operation[$i];
@@ -1039,7 +1039,7 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                         } else {
                             $layers->Add($layer);
                         }
-                        $this->app->log->debug("Add Layer: ".$op->Name);
+                        $this->LogDebug("Add Layer: ".$op->Name);
                         $updateStats->AddedLayers++;
                     }
                     break;
@@ -1048,7 +1048,7 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                         $layer = $layers->GetItem($op->Name);
 
                         if (self::ApplyCommonLayerProperties($layer, $op, $groups)) {
-                            $this->app->log->debug("Updated Layer: ".$op->Name);
+                            $this->LogDebug("Updated Layer: ".$op->Name);
                             $updateStats->UpdatedLayers++;
                         }
                     }
@@ -1057,7 +1057,7 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                         $layer = $layers->GetItem($op->Name);
 
                         if ($layers->Remove($layer)) {
-                            $this->app->log->debug("Removed Layer: ".$op->Name);
+                            $this->LogDebug("Removed Layer: ".$op->Name);
                             $updateStats->RemovedLayers++;
                         }
                     }
@@ -1071,7 +1071,7 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                         } else {
                             $groups->Add($group);
                         }
-                        $this->app->log->debug("Add Group: ".$op->Name);
+                        $this->LogDebug("Add Group: ".$op->Name);
                         $updateStats->AddedGroups++;
                     }
                     break;
@@ -1087,7 +1087,7 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                                 } else {
                                     $groups->Add($group);
                                 }
-                                $this->app->log->debug("Add Group: ".$op->Name);
+                                $this->LogDebug("Add Group: ".$op->Name);
                                 $updateStats->AddedGroups++;
                             } else {
                                 throw new Exception($this->GetLocalizedText("E_GROUP_NOT_FOUND",$op->Name));
@@ -1095,7 +1095,7 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                         } else {
                             $group = $groups->GetItem($gidx);
                             if (self::ApplyCommonGroupProperties($group, $op, $groups)) {
-                                $this->app->log->debug("Updated Group: ".$op->Name);
+                                $this->LogDebug("Updated Group: ".$op->Name);
                                 $updateStats->UpdatedGroups++;
                             }
                         }
@@ -1106,7 +1106,7 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                         $group = $groups->GetItem($op->Name);
 
                         if ($groups->Remove($group)) {
-                            $this->app->log->debug("Removed Group: ".$op->Name);
+                            $this->LogDebug("Removed Group: ".$op->Name);
                             $updateStats->RemovedGroups++;
                         }
                     }

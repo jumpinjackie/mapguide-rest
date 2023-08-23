@@ -424,7 +424,7 @@ class MgMappingServiceController extends MgBaseController {
         $iconHeight = $this->GetRequestParameter("iconheight");
         $iconsPerScaleRange = $this->GetRequestParameter("iconsperscalerange");
 
-        $this->TrySetCredentialsFromRequest($this->app->request);
+        $this->TrySetCredentialsFromRequest();
 
         $this->EnsureAuthenticationForSite($session);
         $siteConn = new MgSiteConnection();
@@ -481,7 +481,7 @@ class MgMappingServiceController extends MgBaseController {
         $admin->Open($this->userInfo);
         $version = explode(".", $admin->GetSiteVersion());
         */
-        $version = $this->app->MG_VERSION;
+        $version = $this->GetMapGuideVersion();
         $bCanUseNative = false;
         if (intval($version[0]) > 2) { //3.0 or greater
             $bCanUseNative = true;

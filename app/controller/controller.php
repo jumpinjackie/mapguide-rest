@@ -42,14 +42,14 @@ class MgBaseController extends MgResponseHandler
         return $val;
     }
     
-    protected function TrySetCredentialsFromRequest($req) {
+    protected function TrySetCredentialsFromRequest() {
         //HACK-ish: We must allow username/password request parameters for this
         //operation instead of the normal base64 encoded Basic authentication header
         //
         //So if we find such parameters, stuff them in the PHP_AUTH_USER and PHP_AUTH_PW
         //$_SERVER vars before calling EnsureAuthenticationForSite()
-        $user = $req->params("username");
-        $pwd = $req->params("password");
+        $user = $this->GetRequestParameter("username");
+        $pwd = $this->GetRequestParameter("password");
         if ($user != null) {
             $_SERVER['PHP_AUTH_USER'] = $user;
             if ($pwd != null)

@@ -510,7 +510,7 @@ class MgDataController extends MgBaseController {
                 $extractorName = $result->adapterName."SessionID";
                 if ($this->app->container->has($extractorName)) {
                     $extractor = $this->app->container[$extractorName];
-                    $session = $extractor->TryGetSessionId($this->app, $method);
+                    $session = $extractor->TryGetSessionId($this, $method);
                 }
                 if ($session == null)
                     $session = $this->GetRequestParameter("session");
@@ -560,7 +560,7 @@ class MgDataController extends MgBaseController {
                 $extractorName = $result->adapterName."SessionID";
                 if ($this->app->container->has($extractorName)) {
                     $extractor = $this->app->container[$extractorName];
-                    $session = $extractor->TryGetSessionId($this->app, $method);
+                    $session = $extractor->TryGetSessionId($this, $method);
                 }
                 if ($session == null)
                     $session = $this->GetRequestParameter("session");

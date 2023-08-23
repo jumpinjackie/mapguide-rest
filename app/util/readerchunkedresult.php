@@ -293,12 +293,12 @@ class MgReaderChunkedResult
         $this->transform = $tx;
     }
 
-    public function SetHtmlParams($app) {
-        $this->baseUrl = $app->config("SelfUrl");
-        $this->thisUrl = $app->config("SelfUrl").$app->request->getPathInfo();
-        $this->thisReqParams = $app->request->params();
-        $this->templateRootDir = $app->config("Cache.RootDir")."/templates_c";
-        $this->locale = $app->config("Locale");
+    public function SetHtmlParams($handler) {
+        $this->baseUrl = $handler->GetConfig("SelfUrl");
+        $this->thisUrl = $handler->GetConfig("SelfUrl").$handler->GetRequestPathInfo();
+        $this->thisReqParams = $handler->GetAllRequestParams();
+        $this->templateRootDir = $handler->GetConfig("Cache.RootDir")."/templates_c";
+        $this->locale = $handler->GetConfig("Locale");
     }
 
     private function OutputGeoJson($schemas) {

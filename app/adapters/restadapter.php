@@ -381,7 +381,7 @@ abstract class MgFeatureRestAdapter extends MgRestAdapter {
 }
 
 interface IAdapterDocumentor {
-    public function DocumentOperation($app, $method, $extension, $bSingle);
+    public function DocumentOperation($handler, $method, $extension, $bSingle);
 }
 
 interface ISessionIDExtractor {
@@ -389,7 +389,7 @@ interface ISessionIDExtractor {
      * Tries to return the session id based on the given method. This is for methods that could accept a session id in places
      * other than the query string, url path or form parameter. If no session id is found, null is returned.
      */
-    public function TryGetSessionId($app, $method);
+    public function TryGetSessionId($handler, $method);
 }
 
 class MgSessionIDExtractor implements ISessionIDExtractor {
@@ -397,15 +397,15 @@ class MgSessionIDExtractor implements ISessionIDExtractor {
      * Tries to return the session id based on the given method. This is for methods that could accept a session id in places
      * other than the query string, url path or form parameter. If no session id is found, null is returned.
      */
-    public function TryGetSessionId($app, $method) {
+    public function TryGetSessionId($handler, $method) {
         return null;
     }
 }
 
 abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
 
-    private function DescribeMethodSummary($app, $method, $extension) {
-        return $app->localizer->getText("L_RETURNS_DATA_AS_TYPE", $extension);
+    private function DescribeMethodSummary($handler, $method, $extension) {
+        return $handler->GetLocalizedText("L_RETURNS_DATA_AS_TYPE", $extension);
     }
 
     private function GetMethodNickname($method, $extension) {
@@ -413,13 +413,13 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
         return implode("", explode(" ", $str));
     }
 
-    protected function GetAdditionalParameters($app, $bSingle, $method) {
+    protected function GetAdditionalParameters($handler, $bSingle, $method) {
         return array();
     }
 
-    public function DocumentOperation($app, $method, $extension, $bSingle) {
+    public function DocumentOperation($handler, $method, $extension, $bSingle) {
         $op = new stdClass();
-        $op->summary = $this->DescribeMethodSummary($app, $method, $extension);
+        $op->summary = $this->DescribeMethodSummary($handler, $method, $extension);
         $op->operationId = $this->GetMethodNickname($method, $extension);
         $op->parameters = array();
         if ($bSingle) {
@@ -432,7 +432,7 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
                 $pFilter->name = "filter";
                 $pFilter->type = "string";
                 $pFilter->required = false;
-                $pFilter->description = $app->localizer->getText("L_REST_GET_FILTER_DESC");
+                $pFilter->description = $handler->GetLocalizedText("L_REST_GET_FILTER_DESC");
                 
                 //bbox
                 $pbbox = new stdClass();
@@ -440,13 +440,13 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
                 $pbbox->name = "bbox";
                 $pbbox->type = "string";
                 $pbbox->required = false;
-                $pbbox->description = $app->localizer->getText("L_REST_GET_BBOX_DESC");
+                $pbbox->description = $handler->GetLocalizedText("L_REST_GET_BBOX_DESC");
 
                 array_push($op->parameters, $pFilter);
                 array_push($op->parameters, $pbbox);
             }
         }
-        $extraParams = $this->GetAdditionalParameters($app, $bSingle, $method);
+        $extraParams = $this->GetAdditionalParameters($handler, $bSingle, $method);
         foreach ($extraParams as $p) {
             array_push($op->parameters, $p);
         }
@@ -456,8 +456,8 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
 }
 
 abstract class MgFeatureRestAdapterDocumentor extends MgRestAdapterDocumentor {
-    protected function GetAdditionalParameters($app, $bSingle, $method) {
-        $params = parent::GetAdditionalParameters($app, $bSingle, $method);
+    protected function GetAdditionalParameters($handler, $bSingle, $method) {
+        $params = parent::GetAdditionalParameters($handler, $bSingle, $method);
         if (!$bSingle) {
             if ($method == "GET") {
                 //page
@@ -466,7 +466,7 @@ abstract class MgFeatureRestAdapterDocumentor extends MgRestAdapterDocumentor {
                 $pPage->name = "page";
                 $pPage->type = "integer";
                 $pPage->required = false;
-                $pPage->description = $app->localizer->getText("L_REST_PAGE_NO_DESC");
+                $pPage->description = $handler->GetLocalizedText("L_REST_PAGE_NO_DESC");
 
                 array_push($params, $pPage);
             }

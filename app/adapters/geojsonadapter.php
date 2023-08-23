@@ -22,15 +22,15 @@ require_once dirname(__FILE__)."/../util/geojsonwriter.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgGeoJsonRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
-    protected function GetAdditionalParameters($app, $bSingle, $method) {
-        $params = parent::GetAdditionalParameters($app, $bSingle, $method);
+    protected function GetAdditionalParameters($handler, $bSingle, $method) {
+        $params = parent::GetAdditionalParameters($handler, $bSingle, $method);
         if ($method == "POST") {
             $pPostBody = new stdClass();
             $pPostBody->in = "body";
             $pPostBody->name = "body";
             $pPostBody->type = "string";
             $pPostBody->required = true;
-            $pPostBody->description = $app->localizer->getText("L_REST_POST_BODY_DESC");
+            $pPostBody->description = $handler->GetLocalizedText("L_REST_POST_BODY_DESC");
 
             array_push($params, $pPostBody);
         } else if ($method == "PUT") {
@@ -39,7 +39,7 @@ class MgGeoJsonRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
             $pPutBody->name = "body";
             $pPutBody->type = "string";
             $pPutBody->required = true;
-            $pPutBody->description = $app->localizer->getText("L_REST_PUT_BODY_DESC");
+            $pPutBody->description = $handler->GetLocalizedText("L_REST_PUT_BODY_DESC");
 
             array_push($params, $pPutBody);
         } else if ($method == "DELETE") {
@@ -48,7 +48,7 @@ class MgGeoJsonRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
             $pFilter->name = "filter";
             $pFilter->type = "string";
             $pFilter->required = false;
-            $pFilter->description = $app->localizer->getText("L_REST_DELETE_FILTER_DESC");
+            $pFilter->description = $handler->GetLocalizedText("L_REST_DELETE_FILTER_DESC");
 
             array_push($params, $pFilter);
         }
@@ -61,15 +61,15 @@ class MgJsonSessionIDExtractor extends MgSessionIDExtractor {
      * Tries to return the session id based on the given method. This is for methods that could accept a session id in places
      * other than the query string, url path or form parameter. If no session id is found, null is returned.
      */
-    public function TryGetSessionId($app, $method) {
+    public function TryGetSessionId($handler, $method) {
         if ($method == "POST" || $method == "PUT") {
-            $json = json_decode($app->request->getBody());
+            $json = json_decode($handler->GetRequestBody());
             $body = MgUtils::Json2Xml($json);
             $doc = new DOMDocument();
             $doc->loadXML($body);
 
             //Stash for adapter to grab
-            $app->REQUEST_BODY_DOCUMENT = $doc;
+            $handler->SetContextVariable("REQUEST_BODY_DOCUMENT", $doc);
 
             $sesNodes = $doc->getElementsByTagName("SessionID");
             if ($sesNodes->length == 1)
@@ -221,12 +221,13 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
 
             $commands = new MgFeatureCommandCollection();
             $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
-            if ($this->app->REQUEST_BODY_DOCUMENT != null) {
-                $batchProps = MgUtils::ParseMultiFeatureDocument($this->app, $classDef, $this->app->REQUEST_BODY_DOCUMENT);
+            $rdoc = $this->GetContextVariable("REQUEST_BODY_DOCUMENT");
+            if ($rdoc != null) {
+                $batchProps = MgUtils::ParseMultiFeatureDocument($this, $classDef, $rdoc);
             } else {
                 $json = json_decode($this->GetRequestBody());
                 $body = MgUtils::Json2Xml($json);
-                $batchProps = MgUtils::ParseMultiFeatureXml($this->app, $classDef, $body);
+                $batchProps = MgUtils::ParseMultiFeatureXml($this, $classDef, $body);
             }
             $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
             $commands->Add($insertCmd);
@@ -260,14 +261,14 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
             $tokens = explode(":", $this->className);
             $schemaName = $tokens[0];
             $className = $tokens[1];
-
-            if ($this->app->REQUEST_BODY_DOCUMENT == null) {
+            $rdoc = $this->GetContextVariable("REQUEST_BODY_DOCUMENT");
+            if ($rdoc == null) {
                 $json = json_decode($this->GetRequestBody());
                 $body = MgUtils::Json2Xml($json);
                 $doc = new DOMDocument();
                 $doc->loadXML($body);
             } else {
-                $doc = $this->app->REQUEST_BODY_DOCUMENT;
+                $doc = $rdoc;
             }
 
             $commands = new MgFeatureCommandCollection();
@@ -278,7 +279,7 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
             if ($single === true) {
                 $idProps = $classDef->GetIdentityProperties();
                 if ($idProps->GetCount() != 1) {
-                    $app->halt(400, $this->GetLocalizedText("E_CANNOT_APPLY_UPDATE_CANNOT_UNIQUELY_IDENTIFY", $this->featureId, $idProps->GetCount()));
+                    $this->handler->Halt(400, $this->handler->GetLocalizedText("E_CANNOT_APPLY_UPDATE_CANNOT_UNIQUELY_IDENTIFY", $this->featureId, $idProps->GetCount()));
                 } else {
                     $idProp = $idProps->GetItem(0);
                     if ($idProp->GetDataType() == MgPropertyType::String) {

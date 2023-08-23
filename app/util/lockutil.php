@@ -25,10 +25,10 @@ class MgFileLockUtil
     private $lockFileFormat;
     private $maxCreateDirAttempts;
     private $requestId;
-    private $app;
+    private $handler;
     
-    public function __construct($app, $path, $requestId, $maxCreateDirAttempts = 5, $lockFileFormat = "lock_%s.lck") {
-        $this->app = $app;
+    public function __construct($handler, $path, $requestId, $maxCreateDirAttempts = 5, $lockFileFormat = "lock_%s.lck") {
+        $this->handler = $handler;
         $this->path = $path;
         $this->lockFileFormat = $lockFileFormat;
         $this->maxCreateDirAttempts = $maxCreateDirAttempts;
@@ -59,7 +59,7 @@ class MgFileLockUtil
             unlink($lockPath);
             
         $fpLockFile = fopen($lockPath, "a+");
-        return new MgFileLock($this->requestId, $this->path, $lockPath, $fpLockFile, $this->maxCreateDirAttempts, $this->app->log);
+        return new MgFileLock($this->requestId, $this->path, $lockPath, $fpLockFile, $this->maxCreateDirAttempts, $this->handler);
     }
 }
 
@@ -74,34 +74,34 @@ class MgFileLock
     private $fpLockFile;
     private $bLocked;
     private $maxCreateDirAttempts;
-    private $log;
+    private $handler;
     
-    public function __construct($requestId, $filePath, $lockPath, $fpLockFile, $maxCreateDirAttempts, $log) {
+    public function __construct($requestId, $filePath, $lockPath, $fpLockFile, $maxCreateDirAttempts, $handler) {
         $this->requestId = $requestId;
         $this->filePath = $filePath;
         $this->lockPath = $lockPath;
         $this->fpLockFile = $fpLockFile;
         $this->bLocked = false;
         $this->maxCreateDirAttempts = $maxCreateDirAttempts;
-        $this->log = $log;
+        $this->handler = $handler;
     }
     
-    public function EnterCriticalSection($app, $section) {
+    public function EnterCriticalSection($section) {
         //Message of any exception caught will be set to this variable
         $sectionError = null;
         
-        $app->log->debug("(".$this->requestId.") Checking if ".$this->filePath." exists");
+        $this->handler->LogDebug("(".$this->requestId.") Checking if ".$this->filePath." exists");
         
         $attempts = 0;
         while (!file_exists($this->filePath)) {
             //Bail after max attempts exceeded
             if ($attempts >= $this->maxCreateDirAttempts)
-                throw new Exception($app->localizer->getText("E_FAILED_TO_GENERATE_TILE_AFTER_N_ATTEMPTS", $attempts));
+                throw new Exception($handler->GetLocalizedText("E_FAILED_TO_GENERATE_TILE_AFTER_N_ATTEMPTS", $attempts));
             $attempts++;
             
-            $app->log->debug("(".$this->requestId.") ".$this->filePath." does not exist. Locking for writing");
+            $this->handler->LogDebug("(".$this->requestId.") ".$this->filePath." does not exist. Locking for writing");
             $this->LockExclusive();
-            $app->log->debug("(".$this->requestId.") Acquired lock for ".$this->filePath.". Checking if path exists again.");
+            $this->handler->LogDebug("(".$this->requestId.") Acquired lock for ".$this->filePath.". Checking if path exists again.");
             
             //check once more to see if the cache file was created while waiting for
             //the lock
@@ -109,14 +109,14 @@ class MgFileLock
             if (!file_exists($this->filePath)) {
                 try {
                     //Enter our critical section
-                    $section->Enter($this->requestId, $app, $this->filePath);
+                    $section->Enter($this->requestId, $this->handler, $this->filePath);
                 } catch (MgException $ex) {
                     $sectionError = $ex->GetExceptionMessage();
                     $this->UnlockExclusive();
                     $section->HandleMgException($ex);
                 } catch (Exception $ex) {
                     $sectionError = get_class($ex)." - ".$ex->getMessage();
-                    $app->log->debug("(".$this->requestId.") Exception caught ($sectionError). Releasing lock for ".$this->filePath);
+                    $this->handler->LogDebug("(".$this->requestId.") Exception caught ($sectionError). Releasing lock for ".$this->filePath);
                     $section->HandleException($ex);
                 }
             }
@@ -129,7 +129,7 @@ class MgFileLock
             throw new Exception($sectionError);
         }
         
-        $section->PostProcess($this->requestId, $app, $this, $this->filePath);
+        $section->PostProcess($this->requestId, $this->handler, $this, $this->filePath);
         // Release lock and cleanup 
         $this->Unlock();
         $this->Cleanup();
@@ -156,7 +156,7 @@ class MgFileLock
     
     public function UnlockExclusive() {
         if ($this->bLocked) {
-            $this->log->debug("(".$this->requestId.") Releasing lock for ".$this->lockPath);
+            $this->handler->LogDebug("(".$this->requestId.") Releasing lock for ".$this->lockPath);
             $this->Unlock();
             $this->bLocked = false;
         }
@@ -168,7 +168,7 @@ class MgFileLock
             fclose($this->fpLockFile);
             unlink($this->lockPath);
         } catch (Exception $ex) {
-            $this->log->debug("(".$this->requestId.") Failed to delete lock file. Perhaps another concurrent request to the same tile is happening?");
+            $this->handler->LogDebug("(".$this->requestId.") Failed to delete lock file. Perhaps another concurrent request to the same tile is happening?");
         }
     }
 }
@@ -184,7 +184,7 @@ abstract class MgFileLockCriticalSection
      * is required in the implementing method, but the implementing class may choose
      * to override various hooks in this class to handle various events that may happen
      */
-    public abstract function Enter($requestId, $app, $path);
+    public abstract function Enter($requestId, $handler, $path);
     
     /**
      * Handles any MgException caught when entering this critical section
@@ -199,7 +199,7 @@ abstract class MgFileLockCriticalSection
     /**
      * Performs any post-processing after leaving the critical section
      */
-    public function PostProcess($requestId, $app, $lock, $path) { }
+    public function PostProcess($requestId, $handler, $lock, $path) { }
 }
 
 class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
@@ -230,16 +230,16 @@ class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
         $this->retinaScale = $scale;
     }
     
-    public function PostProcess($requestId, $app, $lock, $path) {
+    public function PostProcess($requestId, $handler, $lock, $path) {
         $modTime = filemtime($path);
-        $app->lastModified($modTime);
+        $handler->SetResponseLastModified($modTime);
 
-        $app->log->debug("($requestId) Acquiring shared lock for $path");
+        $handler->LogDebug("($requestId) Acquiring shared lock for $path");
         //acquire shared lock for reading to prevent a problem that could occur
         //if a tile exists but is only partially generated.
         $lock->LockShared();
 
-        $app->log->debug("($requestId) Outputting $path");
+        $handler->LogDebug("($requestId) Outputting $path");
 
         $ext = strtoupper(pathinfo($path, PATHINFO_EXTENSION));
         $mimeType = "";
@@ -258,12 +258,12 @@ class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
                 break;
         }
 
-        $app->response->header("Content-Type", $mimeType);
-        $app->expires("+6 months");
-        $app->response->header("Cache-Control", "max-age=31536000, must-revalidate");
-        $app->response->setBody(file_get_contents($path));
+        $handler->SetResponseHeader("Content-Type", $mimeType);
+        $handler->SetResponseExpiry("+6 months");
+        $handler->SetResponseHeader("Cache-Control", "max-age=31536000, must-revalidate");
+        $handler->SetResponseBody(file_get_contents($path));
 
-        $app->log->debug("($requestId) Releasing shared lock for $path");
+        $handler->LogDebug("($requestId) Releasing shared lock for $path");
     }
     
     public function HandleMgException($ex) {
@@ -275,8 +275,8 @@ class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
         }
     }
     
-    public function Enter($requestId, $app, $path) {
-        $app->log->debug("($requestId) Rendering tile to $path");
+    public function Enter($requestId, $handler, $path) {
+        $handler->LogDebug("($requestId) Rendering tile to $path");
 
         $groupName = $this->groupName;
         $x = $this->x;
@@ -293,15 +293,16 @@ class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
             //is not handled
             //
             //Retina XYZ tile requests are not supported in MapGuide, so they must go through the old path
-            if ($this->retinaScale > 1 && $app->MG_VERSION[0] >= 3 && $this->resId->GetResourceType() == "TileSetDefinition") {
+            $mgVer = $handler->GetMapGuideVersion();
+            if ($this->retinaScale > 1 && $mgVer[0] >= 3 && $this->resId->GetResourceType() == "TileSetDefinition") {
                 $bOldPath = false;
                 $sessionId = "";
-                if ($this->resId->GetRepositoryType() === MgRepositoryType::Session && $app->request->get("session") == null) {
+                if ($this->resId->GetRepositoryType() === MgRepositoryType::Session && $handler->GetRequestParameter("session") == null) {
                     $sessionId = $this->resId->GetRepositoryName();
                 }
                 $resIdStr = $this->resId->ToString();
                 $that = $this;
-                $this->ctrl->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr, $groupName, $x, $y, $z, $requestId, $path) {
+                $this->ctrl->EnsureAuthenticationForHttp(function($req, $param) use ($that, $handler, $resIdStr, $groupName, $x, $y, $z, $requestId, $path) {
                     $param->AddParameter("OPERATION", "GETTILEIMAGE");
                     $param->AddParameter("VERSION", "1.2.0");
                     $param->AddParameter("MAPDEFINITION", $resIdStr);
@@ -309,7 +310,7 @@ class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
                     $param->AddParameter("SCALEINDEX", $z);
                     $param->AddParameter("TILEROW", $x);
                     $param->AddParameter("TILECOL", $y);
-                    $that->app->log->debug("($requestId) Executing GETTILEIMAGE");
+                    $handler->LogDebug("($requestId) Executing GETTILEIMAGE");
                     $that->ExecuteHttpRequest($req, function($result, $status) use ($path) {
                         if ($status == 200) {
                             //Need to dump the rendered tile to the specified path so the caching stuff below can still do its thing
@@ -324,7 +325,7 @@ class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
 
         //Pre MGOS 3.0 code path
         if ($bOldPath) {
-            $app->log->debug("($requestId) Going down old code path");
+            $handler->LogDebug("($requestId) Going down old code path");
             $siteConn = $this->ctrl->AcquireConnectionForGetTileXYZ();
 
             $map = new MgMap($siteConn);
@@ -345,7 +346,7 @@ class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
 
             $metersPerUnit = $mapCs->ConvertCoordinateSystemUnitsToMeters(1.0);
 
-            $app->log->debug("($requestId) Calc bounds from XYZ");
+            $handler->LogDebug("($requestId) Calc bounds from XYZ");
             //XYZ to lat/lon math. From this we can convert to the bounds in the map's CS
             //
             //Source: http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames

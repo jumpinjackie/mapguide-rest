@@ -21,15 +21,15 @@ require_once "restadapter.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
-    protected function GetAdditionalParameters($app, $bSingle, $method) {
-        $params = parent::GetAdditionalParameters($app, $bSingle, $method);
+    protected function GetAdditionalParameters($handler, $bSingle, $method) {
+        $params = parent::GetAdditionalParameters($handler, $bSingle, $method);
         if ($method == "POST") {
             $pPostBody = new stdClass();
             $pPostBody->in = "body";
             $pPostBody->name = "body";
             $pPostBody->type = "string";
             $pPostBody->required = true;
-            $pPostBody->description = $app->localizer->getText("L_REST_POST_BODY_DESC");
+            $pPostBody->description = $handler->GetLocalizedText("L_REST_POST_BODY_DESC");
 
             array_push($params, $pPostBody);
         } else if ($method == "PUT") {
@@ -38,7 +38,7 @@ class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
             $pPutBody->name = "body";
             $pPutBody->type = "string";
             $pPutBody->required = true;
-            $pPutBody->description = $app->localizer->getText("L_REST_PUT_BODY_DESC");
+            $pPutBody->description = $handler->GetLocalizedText("L_REST_PUT_BODY_DESC");
 
             array_push($params, $pPutBody);
         } else if ($method == "DELETE") {
@@ -47,7 +47,7 @@ class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
             $pFilter->name = "filter";
             $pFilter->type = "string";
             $pFilter->required = false;
-            $pFilter->description = $app->localizer->getText("L_REST_DELETE_FILTER_DESC");
+            $pFilter->description = $handler->GetLocalizedText("L_REST_DELETE_FILTER_DESC");
 
             array_push($params, $pFilter);
         }
@@ -60,13 +60,13 @@ class MgFeatureXmlSessionIDExtractor extends MgSessionIDExtractor {
      * Tries to return the session id based on the given method. This is for methods that could accept a session id in places
      * other than the query string, url path or form parameter. If no session id is found, null is returned.
      */
-    public function TryGetSessionId($app, $method) {
+    public function TryGetSessionId($handler, $method) {
         if ($method == "POST" || $method == "PUT") {
             $doc = new DOMDocument();
-            $doc->loadXML($app->request->getBody());
+            $doc->loadXML($handler->GetRequestBody());
 
             //Stash for adapter to grab
-            $app->REQUEST_BODY_DOCUMENT = $doc;
+            $handler->SetContextVariable("REQUEST_BODY_DOCUMENT", $doc);
 
             $sesNodes = $doc->getElementsByTagName("SessionID");
             if ($sesNodes->length == 1)
@@ -81,8 +81,8 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     private $wktRw;
     private $requestDoc;
 
-    public function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
-        parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
+    public function __construct($handler, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
+        parent::__construct($handler, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
         $this->requestDoc = null;
     }
 
@@ -225,10 +225,11 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
             $className = $tokens[1];
             $commands = new MgFeatureCommandCollection();
             $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
-            if ($this->app->REQUEST_BODY_DOCUMENT != null)
-                $batchProps = MgUtils::ParseMultiFeatureDocument($this->app, $classDef, $this->app->REQUEST_BODY_DOCUMENT);
+            $rdoc = $this->GetContextVariable("REQUEST_BODY_DOCUMENT");
+            if ($rdoc != null)
+                $batchProps = MgUtils::ParseMultiFeatureDocument($this, $classDef, $rdoc);
             else    
-                $batchProps = MgUtils::ParseMultiFeatureXml($this->app, $classDef, $this->GetRequestBody());
+                $batchProps = MgUtils::ParseMultiFeatureXml($this, $classDef, $this->GetRequestBody());
             $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
             $commands->Add($insertCmd);
 
@@ -262,11 +263,12 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
             $schemaName = $tokens[0];
             $className = $tokens[1];
 
-            if ($this->app->REQUEST_BODY_DOCUMENT == null) {
+            $rdoc = $this->GetContextVariable("REQUEST_BODY_DOCUMENT");
+            if ($rdoc == null) {
                 $doc = new DOMDocument();
                 $doc->loadXML($this->GetRequestBody());
             } else {
-                $doc = $this->app->REQUEST_BODY_DOCUMENT;
+                $doc = $rdoc;
             }
 
             $commands = new MgFeatureCommandCollection();

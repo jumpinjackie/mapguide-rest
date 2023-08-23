@@ -227,6 +227,10 @@ abstract class MgResponseHandler
         return $this->app->request->getBody();
     }
 
+    public /* internal */  function GetAllRequestParams() {
+        return $this->app->request->params();
+    }
+
     /**
      * Method: GetRequestParameter
      *
@@ -273,6 +277,38 @@ abstract class MgResponseHandler
 
     public /* internal */  function SetResponseStatus($statusCode) {
         $this->app->response->setStatus($statusCode);
+    }
+
+    public /* internal */  function LogDebug($message) {
+        $this->app->log->debug($message);
+    }
+
+    public /* internal */  function SetResponseExpiry($expires) {
+        $this->app->expires($expires);
+    }
+
+    public /* internal */  function GetMapGuideVersion() {
+        return $this->app->MG_VERSION;
+    }
+
+    public /* internal */  function SetResponseLastModified($mod) {
+        $this->app->lastModified($mod);
+    }
+
+    public /* internal */  function Redirect($url) {
+        $this->app->redirect($url);
+    }
+
+    public /* internal */  function Halt($statusCode, $body) {
+        $this->app->halt($statusCode, $body);
+    }
+
+    public /* internal */  function SetContextVariable($name, $value) {
+        $this->app->$name = $value;
+    }
+
+    public /* internal */  function GetContextVariable($name) {
+        return $this->app->$name;
     }
 
     protected function GetFileUploadPath($paramName) {
@@ -587,7 +623,7 @@ abstract class MgResponseHandler
     }
 
     protected function FormatException($type, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
-        return MgUtils::FormatException($this->app, $type, $errorMessage, $details, $phpTrace, $status, $mimeType);
+        return MgUtils::FormatException($this->GetConfig("Error.OutputStackTrace"), $type, $errorMessage, $details, $phpTrace, $status, $mimeType);
     }
 
     protected function OutputException($statusMessage, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {

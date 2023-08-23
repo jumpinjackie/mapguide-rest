@@ -86,7 +86,7 @@ class MgTileServiceController extends MgBaseController {
 
             $tmd = $that->GetTileModificationDate($resIdStr, $groupName, $scaleIndex, $row, $col);
             if ($tmd !== FALSE) {
-                $app->lastModified($tmd);
+                $that->SetResponseLastModified($tmd);
             }
 
             $param->AddParameter("OPERATION", "GETTILEIMAGE");
@@ -100,10 +100,10 @@ class MgTileServiceController extends MgBaseController {
 
             $tmd = $that->GetTileModificationDate($resIdStr, $groupName, $scaleIndex, $row, $col);
             if ($tmd !== FALSE) {
-                $app->lastModified($tmd);
+                $that->SetResponseLastModified($tmd);
             }
-            $app->expires("+6 months");
-            $app->response->header("Cache-Control", "max-age=31536000, must-revalidate");
+            $that->SetResponseExpiry("+6 months");
+            $that->SetResponseHeader("Cache-Control", "max-age=31536000, must-revalidate");
         }, true, "", $sessionId); //Tile access can be anonymous, so allow for it if credentials/session specified, but if this is a session-based Map Definition, use the session id as the nominated one
     }
 
@@ -158,7 +158,7 @@ class MgTileServiceController extends MgBaseController {
         return false;
     }
 
-    private static function GetTilePath($app, $resId, $groupName, $z, $x, $y, $type, $layerNames, $scale = 1) {
+    private static function GetTilePath($handler, $resId, $groupName, $z, $x, $y, $type, $layerNames, $scale = 1) {
         $ext = $type;
         if (strtolower($type) == "png8")
             $ext = substr($type, 0, 3); //png8 -> png
@@ -172,11 +172,11 @@ class MgTileServiceController extends MgBaseController {
         } else {
             $relPath = "/".$resId->GetPath()."/".$resId->GetName()."/$gn/$z/$x/$y.$ext";
         }
-        $customRoot = $app->config("Cache.XYZTileRoot");
+        $customRoot = $handler->GetConfig("Cache.XYZTileRoot");
         if ($customRoot != null)
             $path = "$customRoot/tile.$type".$relPath;
         else
-            $path = $app->config("AppRootDir")."/".$app->config("Cache.RootDir")."/tile.$type".$relPath;
+            $path = $handler->GetConfig("AppRootDir")."/".$handler->GetConfig("Cache.RootDir")."/tile.$type".$relPath;
         return $path;
     }
 
@@ -342,7 +342,7 @@ class MgTileServiceController extends MgBaseController {
             $tmpPath = tempnam(sys_get_temp_dir(), 'TempTile');
             $sink->ToFile($tmpPath);
             
-            $this->app->log->debug("($requestId): Saved image to $tmpPath for cropping");
+            $this->LogDebug("($requestId): Saved image to $tmpPath for cropping");
             
             $im = null;
             switch ($format)
@@ -373,7 +373,7 @@ class MgTileServiceController extends MgBaseController {
                 //are you're using MGOS 3.0 that has native XYZ tile support in which case: Why are you even
                 //here?
                 imagecopy($tile, $im, 0, 0, $bufferPx, $bufferPx, $tileWidth, $tileHeight);
-                $this->app->log->debug("($requestId): Cropped image. Saving to $path");
+                $this->LogDebug("($requestId): Cropped image. Saving to $path");
                 
                 switch ($format)
                 {

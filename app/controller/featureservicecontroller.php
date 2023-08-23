@@ -1461,7 +1461,7 @@ class MgFeatureServiceController extends MgBaseController {
                         else
                             $owriter = new MgHttpChunkWriter();
 
-                        MgUtils::ApplyCorsIfApplicable($this->app);
+                        MgUtils::ApplyCorsIfApplicable($this);
                         if ($fmt == "czml") {
                             $result = new MgCzmlResult($featSvc, $fsId, "$schemaName:$className", $query, $limit, $baseFilter, $vlNode, $owriter);
                             $result->CheckAndSetDownloadHeaders($this, $format);
@@ -1604,7 +1604,7 @@ class MgFeatureServiceController extends MgBaseController {
             } else {
                 $result = new MgReaderChunkedResult($featSvc, $reader, $limit, $owriter);
             }
-            MgUtils::ApplyCorsIfApplicable($this->app);
+            MgUtils::ApplyCorsIfApplicable($this);
             $result->CheckAndSetDownloadHeaders($this, $format);
             if ($transform != null)
                 $result->SetTransform($transform);

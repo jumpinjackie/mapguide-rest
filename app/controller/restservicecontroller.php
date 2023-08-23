@@ -93,7 +93,7 @@ class MgRestServiceController extends MgBaseController {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $mimeType = $this->GetMimeTypeForFormat($format);
         try {
-            $this->TrySetCredentialsFromRequest($this->app->request);
+            $this->TrySetCredentialsFromRequest();
             $this->EnsureAuthenticationForSite("", false, $mimeType);
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
