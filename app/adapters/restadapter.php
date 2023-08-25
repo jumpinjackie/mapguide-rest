@@ -381,7 +381,7 @@ abstract class MgFeatureRestAdapter extends MgRestAdapter {
 }
 
 interface IAdapterDocumentor {
-    public function DocumentOperation(IAppServices $handler, /*php_string*/ $method, /*php_string*/ $extension, /*php_bool*/ $bSingle);
+    public function DocumentOperation(IAppServices $app, /*php_string*/ $method, /*php_string*/ $extension, /*php_bool*/ $bSingle);
 }
 
 interface ISessionIDExtractor {
@@ -389,7 +389,7 @@ interface ISessionIDExtractor {
      * Tries to return the session id based on the given method. This is for methods that could accept a session id in places
      * other than the query string, url path or form parameter. If no session id is found, null is returned.
      */
-    public function TryGetSessionId(IAppServices $handler, /*php_string*/ $method);
+    public function TryGetSessionId(IAppServices $app, /*php_string*/ $method);
 }
 
 class MgSessionIDExtractor implements ISessionIDExtractor {
@@ -397,15 +397,15 @@ class MgSessionIDExtractor implements ISessionIDExtractor {
      * Tries to return the session id based on the given method. This is for methods that could accept a session id in places
      * other than the query string, url path or form parameter. If no session id is found, null is returned.
      */
-    public function TryGetSessionId(IAppServices $handler, /*php_string*/ $method) {
+    public function TryGetSessionId(IAppServices $app, /*php_string*/ $method) {
         return null;
     }
 }
 
 abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
 
-    private function DescribeMethodSummary(IAppServices $handler, /*php_string*/ $method, /*php_string*/ $extension) {
-        return $handler->GetLocalizedText("L_RETURNS_DATA_AS_TYPE", $extension);
+    private function DescribeMethodSummary(IAppServices $app, /*php_string*/ $method, /*php_string*/ $extension) {
+        return $app->GetLocalizedText("L_RETURNS_DATA_AS_TYPE", $extension);
     }
 
     private function GetMethodNickname(/*php_string*/ $method, /*php_string*/ $extension) {
@@ -413,13 +413,13 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
         return implode("", explode(" ", $str));
     }
 
-    protected function GetAdditionalParameters(IAppServices $handler, /*php_bool*/ $bSingle, /*php_string*/ $method) {
+    protected function GetAdditionalParameters(IAppServices $app, /*php_bool*/ $bSingle, /*php_string*/ $method) {
         return array();
     }
 
-    public function DocumentOperation(IAppServices $handler, /*php_string*/ $method, /*php_string*/ $extension, /*php_bool*/ $bSingle) {
+    public function DocumentOperation(IAppServices $app, /*php_string*/ $method, /*php_string*/ $extension, /*php_bool*/ $bSingle) {
         $op = new stdClass();
-        $op->summary = $this->DescribeMethodSummary($handler, $method, $extension);
+        $op->summary = $this->DescribeMethodSummary($app, $method, $extension);
         $op->operationId = $this->GetMethodNickname($method, $extension);
         $op->parameters = array();
         if ($bSingle) {
@@ -432,7 +432,7 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
                 $pFilter->name = "filter";
                 $pFilter->type = "string";
                 $pFilter->required = false;
-                $pFilter->description = $handler->GetLocalizedText("L_REST_GET_FILTER_DESC");
+                $pFilter->description = $app->GetLocalizedText("L_REST_GET_FILTER_DESC");
                 
                 //bbox
                 $pbbox = new stdClass();
@@ -440,13 +440,13 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
                 $pbbox->name = "bbox";
                 $pbbox->type = "string";
                 $pbbox->required = false;
-                $pbbox->description = $handler->GetLocalizedText("L_REST_GET_BBOX_DESC");
+                $pbbox->description = $app->GetLocalizedText("L_REST_GET_BBOX_DESC");
 
                 array_push($op->parameters, $pFilter);
                 array_push($op->parameters, $pbbox);
             }
         }
-        $extraParams = $this->GetAdditionalParameters($handler, $bSingle, $method);
+        $extraParams = $this->GetAdditionalParameters($app, $bSingle, $method);
         foreach ($extraParams as $p) {
             array_push($op->parameters, $p);
         }
@@ -456,8 +456,8 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
 }
 
 abstract class MgFeatureRestAdapterDocumentor extends MgRestAdapterDocumentor {
-    protected function GetAdditionalParameters(IAppServices $handler, /*php_bool*/ $bSingle, /*php_string*/ $method) {
-        $params = parent::GetAdditionalParameters($handler, $bSingle, $method);
+    protected function GetAdditionalParameters(IAppServices $app, /*php_bool*/ $bSingle, /*php_string*/ $method) {
+        $params = parent::GetAdditionalParameters($app, $bSingle, $method);
         if (!$bSingle) {
             if ($method == "GET") {
                 //page
@@ -466,7 +466,7 @@ abstract class MgFeatureRestAdapterDocumentor extends MgRestAdapterDocumentor {
                 $pPage->name = "page";
                 $pPage->type = "integer";
                 $pPage->required = false;
-                $pPage->description = $handler->GetLocalizedText("L_REST_PAGE_NO_DESC");
+                $pPage->description = $app->GetLocalizedText("L_REST_PAGE_NO_DESC");
 
                 array_push($params, $pPage);
             }

@@ -35,7 +35,7 @@ class MgUtils
         return $url;
     }
 
-    public static function FormatException(/*php_bool*/ $bOutputStackTrace, 
+    public static function FormatException(IAppServices $app, 
         /*php_string*/ $type,
         /*php_string*/ $errorMessage,
         /*php_string*/ $details,
@@ -43,7 +43,7 @@ class MgUtils
         /*php_int*/ $status = 500,
         /*php_string*/ $mimeType = MgMimeType::Html) {
         /*php_string*/ $errResponse = "";
-        if ($bOutputStackTrace === false) {
+        if ($app->GetConfig("Error.OutputStackTrace") === false) {
             if ($mimeType === MgMimeType::Xml || $mimeType == MgMimeType::Kml) {
                 $errResponse = sprintf(
                     "<?xml version=\"1.0\"?><Error><Type>%s</Type><Message>%s</Message><Details>%s</Details></Error>",
@@ -84,7 +84,7 @@ class MgUtils
                     $type,
                     $errorMessage,
                     $details,
-                    $handler->GetLocalizedText("L_STACK_TRACE"),
+                    $app->GetLocalizedText("L_STACK_TRACE"),
                     $phpTrace);
             }
         }
@@ -146,8 +146,8 @@ class MgUtils
         return false;
     }
     
-    public static function GetNamedRoute(IAppServices $handler, /*php_string*/ $servicePrefix, /*php_string*/ $routeName, array $params = array()) {
-        $apiNamespace = self::GetApiVersionNamespace($handler, $servicePrefix);
+    public static function GetNamedRoute(IAppServices $app, /*php_string*/ $servicePrefix, /*php_string*/ $routeName, array $params = array()) {
+        $apiNamespace = self::GetApiVersionNamespace($app, $servicePrefix);
         if ($apiNamespace == "") {
             $apiNamespace = "default";
         }
@@ -155,8 +155,8 @@ class MgUtils
         return $app->urlFor($routeName, $params);
     }
 
-    public static function GetApiVersionNamespace(IAppServices $handler, /*php_string*/ $prefix) {
-        $pi = $handler->GetRequestPathInfo();
+    public static function GetApiVersionNamespace(IAppServices $app, /*php_string*/ $prefix) {
+        $pi = $app->GetRequestPathInfo();
         if (strpos($pi, $prefix) > 0) {
             $tokens = explode("/", $pi);
             //This runs with a major assumption that we have the version in the url (ie: /rest/v1/*, and this method will return "v1")
@@ -269,10 +269,10 @@ class MgUtils
         return new MgResourceIdentifier($resIdStr);
     }
 
-    public static function GetPaperSize(IAppServices $handler, /*php_string*/ $paperType) {
-        $sizes = $handler->GetConfig("PDF.PaperSizes");
+    public static function GetPaperSize(IAppServices $app, /*php_string*/ $paperType) {
+        $sizes = $app->GetConfig("PDF.PaperSizes");
         if (!array_key_exists($paperType, $sizes))
-            throw new Exception($handler->GetLocalizedText("E_UNKNOWN_PAPER_SIZE", $paperType));
+            throw new Exception($app->GetLocalizedText("E_UNKNOWN_PAPER_SIZE", $paperType));
         return $sizes[$paperType];
     }
 
@@ -611,8 +611,8 @@ class MgUtils
         return '{"'.$root->tagName.'":'.MgUtils::DomElementToJson($root).'}'; 
     }
 
-    public static function XslTransformByteReader(IAppServices $handler, MgByteReader $byteReader, /*php_string*/ $xslStylesheet, array $xslParams) {
-        $locale = $handler->GetConfig("Locale");
+    public static function XslTransformByteReader(IAppServices $app, MgByteReader $byteReader, /*php_string*/ $xslStylesheet, array $xslParams) {
+        $locale = $app->GetConfig("Locale");
         $xslPath = dirname(__FILE__)."/../res/xsl/$locale/$xslStylesheet";
 
         $doc = new DOMDocument();
@@ -646,7 +646,7 @@ class MgUtils
         return filter_var($str, FILTER_VALIDATE_BOOLEAN);
     }
 
-    private static function ParseFeatureNode(IAppServices $handler, DOMNodeList $propNodes, MgAgfReaderWriter $agfRw, MgWktReaderWriter $wktRw, MgPropertyDefinitionCollection $classProps) {
+    private static function ParseFeatureNode(IAppServices $app, DOMNodeList $propNodes, MgAgfReaderWriter $agfRw, MgWktReaderWriter $wktRw, MgPropertyDefinitionCollection $classProps) {
         $props = new MgPropertyCollection();
         for ($j = 0; $j < $propNodes->length; $j++) {
             $propNode = $propNodes->item($j);
@@ -705,15 +705,15 @@ class MgUtils
                                     //We're expecting this: YYYY-MM-DD HH:mm:ss
                                     $dtMajorParts = explode(" ", $value);
                                     if (count($dtMajorParts) != 2) {
-                                        throw new Exception($handler->GetLocalizedText("E_INVALID_DATE_STRING", $value));
+                                        throw new Exception($app->GetLocalizedText("E_INVALID_DATE_STRING", $value));
                                     }
                                     $dateComponents = explode("-", $dtMajorParts[0]);
                                     $timeComponents = explode(":", $dtMajorParts[1]);
                                     if (count($dateComponents) != 3) {
-                                        throw new Exception($handler->GetLocalizedText("E_CANNOT_PARSE_DATE_STRING_INVALID_COMPONENT", $value, $dtMajorParts[0]));
+                                        throw new Exception($app->GetLocalizedText("E_CANNOT_PARSE_DATE_STRING_INVALID_COMPONENT", $value, $dtMajorParts[0]));
                                     }
                                     if (count($timeComponents) != 3) {
-                                        throw new Exception($handler->GetLocalizedText("E_CANNOT_PARSE_DATE_STRING_INVALID_COMPONENT", $value, $dtMajorParts[1]));
+                                        throw new Exception($app->GetLocalizedText("E_CANNOT_PARSE_DATE_STRING_INVALID_COMPONENT", $value, $dtMajorParts[1]));
                                     }
                                     
                                     $dt = new MgDateTime();
@@ -810,14 +810,14 @@ class MgUtils
         return $props;
     }
 
-    public static function ParseMultiFeatureXml(IAppServices $handler, MgClassDefinition $classDef, /*php_string*/ $xml, /*php_string*/ $featureNodeName = "Feature", /*php_string*/ $propertyNodeName = "Property") {
+    public static function ParseMultiFeatureXml(IAppServices $app, MgClassDefinition $classDef, /*php_string*/ $xml, /*php_string*/ $featureNodeName = "Feature", /*php_string*/ $propertyNodeName = "Property") {
         $doc = new DOMDocument();
         $doc->loadXML($xml);
 
-        return MgUtils::ParseMultiFeatureDocument($handler, $classDef, $doc, $featureNodeName, $propertyNodeName);
+        return MgUtils::ParseMultiFeatureDocument($app, $classDef, $doc, $featureNodeName, $propertyNodeName);
     }
 
-    public static function ParseMultiFeatureDocument(IAppServices $handler, MgClassDefinition $classDef, DOMDocument $doc, /*php_string*/ $featureNodeName = "Feature", /*php_string*/ $propertyNodeName = "Property") {
+    public static function ParseMultiFeatureDocument(IAppServices $app, MgClassDefinition $classDef, DOMDocument $doc, /*php_string*/ $featureNodeName = "Feature", /*php_string*/ $propertyNodeName = "Property") {
         $batchProps = new MgBatchPropertyCollection();
         $featureNodes = $doc->getElementsByTagName($featureNodeName);
 
@@ -827,14 +827,14 @@ class MgUtils
 
         for ($i = 0; $i < $featureNodes->length; $i++) {
             $propNodes = $featureNodes->item($i)->getElementsByTagName($propertyNodeName);
-            $props = MgUtils::ParseFeatureNode($handler, $propNodes, $agfRw, $wktRw, $classProps);
+            $props = MgUtils::ParseFeatureNode($app, $propNodes, $agfRw, $wktRw, $classProps);
             $batchProps->Add($props);
         }
 
         return $batchProps;
     }
 
-    public static function ParseSingleFeatureDocument(IAppServices $handler, MgClassDefinition $classDef, DOMDocument $doc, /*php_string*/ $featureNodeName = "Feature", /*php_string*/ $propertyNodeName = "Property") {
+    public static function ParseSingleFeatureDocument(IAppServices $app, MgClassDefinition $classDef, DOMDocument $doc, /*php_string*/ $featureNodeName = "Feature", /*php_string*/ $propertyNodeName = "Property") {
         $wktRw = new MgWktReaderWriter();
         $agfRw = new MgAgfReaderWriter();
         $classProps = $classDef->GetProperties();
@@ -843,15 +843,15 @@ class MgUtils
         $featureNodes = $doc->GetElementsByTagName($featureNodeName);
         $propNodes = $featureNodes->item(0)->getElementsByTagName($propertyNodeName);
 
-        $props = MgUtils::ParseFeatureNode($handler, $propNodes, $agfRw, $wktRw, $classProps);
+        $props = MgUtils::ParseFeatureNode($app, $propNodes, $agfRw, $wktRw, $classProps);
         return $props;
     }
 
-    public static function ParseSingleFeatureXml(IAppServices $handler, MgClassDefinition $classDef, /*php_string*/ $xml, /*php_string*/ $featureNodeName = "Feature", /*php_string*/ $propertyNodeName = "Property") {
+    public static function ParseSingleFeatureXml(IAppServices $app, MgClassDefinition $classDef, /*php_string*/ $xml, /*php_string*/ $featureNodeName = "Feature", /*php_string*/ $propertyNodeName = "Property") {
         $doc = new DOMDocument($xml);
         $doc->loadXML($xml);
 
-        return MgUtils::ParseSingleFeatureDocument($handler, $classDef, $doc, $featureNodeName, $propertyNodeName);
+        return MgUtils::ParseSingleFeatureDocument($app, $classDef, $doc, $featureNodeName, $propertyNodeName);
     }
 
     /**
@@ -903,7 +903,7 @@ class MgUtils
         return null;
     }
 
-    public static function GetFeatureClassMBR(IAppServices $handler, MgFeatureService $featureSrvc, MgResourceIdentifier $featuresId, /*php_string*/ $schemaName, /*php_string*/ $className, /*php_string*/ $geomName = null, /*php_string*/ $transformToCsCode = null)
+    public static function GetFeatureClassMBR(IAppServices $app, MgFeatureService $featureSrvc, MgResourceIdentifier $featuresId, /*php_string*/ $schemaName, /*php_string*/ $className, /*php_string*/ $geomName = null, /*php_string*/ $transformToCsCode = null)
     {
         $extentGeometryAgg = null;
         $extentGeometrySc = null;
@@ -919,7 +919,7 @@ class MgUtils
         }
         $geomProp = $props->GetItem($geomName);
         if ($geomProp->GetPropertyType() != MgFeaturePropertyType::GeometricProperty)
-            throw new Exception($handler->GetLocalizedText("E_NOT_GEOMETRY_PROPERTY", $geomName));
+            throw new Exception($app->GetLocalizedText("E_NOT_GEOMETRY_PROPERTY", $geomName));
 
         $spatialContext = $geomProp->GetSpatialContextAssociation();
 
@@ -1485,8 +1485,8 @@ class MgUtils
      * Call this for any controller action that does not use Slim (ie. Raw echo) to
      * output content
      */
-    public static function ApplyCorsIfApplicable(IAppServices $handler) {
-        $corsOptions = $handler->GetConfig("MapGuide.Cors");
+    public static function ApplyCorsIfApplicable(IAppServices $app) {
+        $corsOptions = $app->GetConfig("MapGuide.Cors");
         if ($corsOptions != null) {
             foreach ($corsOptions as $key => $value) {
                 switch ($key) {

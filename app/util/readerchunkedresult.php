@@ -55,18 +55,18 @@ abstract class MgChunkWriter
 
 class MgSlimChunkWriter extends MgChunkWriter
 {
-    private $handler;
+    private $app;
 
-    public function __construct(IAppServices $handler) {
-        $this->handler = $handler;
+    public function __construct(IAppServices $app) {
+        $this->app = $app;
     }
 
     public function SetHeader(/*php_string*/ $name, /*php_string*/ $value) {
-        $this->handler->SetResponseHeader($name, $value);
+        $this->app->SetResponseHeader($name, $value);
     }
 
     public function WriteChunk(/*php_string*/ $chunk) {
-        $this->handler->WriteResponseContent($chunk);
+        $this->app->WriteResponseContent($chunk);
     }
 
     public function StartChunking() { }
@@ -272,12 +272,12 @@ class MgReaderChunkedResult
         $this->displayMap = $displayMap;
     }
 
-    public function CheckAndSetDownloadHeaders(IAppServices $handler, $format) {
-        $downloadFlag = $handler->GetRequestParameter("download");
+    public function CheckAndSetDownloadHeaders(IAppServices $app, $format) {
+        $downloadFlag = $app->GetRequestParameter("download");
         if ($downloadFlag === "1" || $downloadFlag === "true") {
             $fn = "download";
-            if ($handler->GetRequestParameter("downloadname"))
-                $fn = $handler->GetRequestParameter("downloadname");
+            if ($app->GetRequestParameter("downloadname"))
+                $fn = $app->GetRequestParameter("downloadname");
             $ext = $format;
             if ($format == "geojson")
                 $ext = "json";
@@ -293,12 +293,12 @@ class MgReaderChunkedResult
         $this->transform = $tx;
     }
 
-    public function SetHtmlParams(IAppServices $handler) {
-        $this->baseUrl = $handler->GetConfig("SelfUrl");
-        $this->thisUrl = $handler->GetConfig("SelfUrl").$handler->GetRequestPathInfo();
-        $this->thisReqParams = $handler->GetAllRequestParams();
-        $this->templateRootDir = $handler->GetConfig("Cache.RootDir")."/templates_c";
-        $this->locale = $handler->GetConfig("Locale");
+    public function SetHtmlParams(IAppServices $app) {
+        $this->baseUrl = $app->GetConfig("SelfUrl");
+        $this->thisUrl = $app->GetConfig("SelfUrl").$app->GetRequestPathInfo();
+        $this->thisReqParams = $app->GetAllRequestParams();
+        $this->templateRootDir = $app->GetConfig("Cache.RootDir")."/templates_c";
+        $this->locale = $app->GetConfig("Locale");
     }
 
     private function OutputGeoJson(MgFeatureSchemaCollection $schemas) {

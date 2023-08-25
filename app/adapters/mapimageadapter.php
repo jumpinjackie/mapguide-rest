@@ -20,8 +20,8 @@
 require_once "restadapter.php";
 
 class MgMapImageRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
-    protected function GetAdditionalParameters(IAppServices $handler, /*php_bool*/ $bSingle, /*php_string*/ $method) {
-        $params = parent::GetAdditionalParameters($handler, $bSingle, $method);
+    protected function GetAdditionalParameters(IAppServices $app, /*php_bool*/ $bSingle, /*php_string*/ $method) {
+        $params = parent::GetAdditionalParameters($app, $bSingle, $method);
         if ($method == "GET") {
             $pWidth = new stdClass();
             $pWidth->in = "query";

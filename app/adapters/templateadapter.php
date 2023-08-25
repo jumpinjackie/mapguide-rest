@@ -29,20 +29,20 @@ class MgTemplateRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
  */
 class MgFormatterSet implements IFormatterSet
 {
-    private $handler;
+    private $app;
     private $formatters;
 
-    public function __construct(IAppServices $handler) {
-        $this->handler = $handler;
+    public function __construct(IAppServices $app) {
+        $this->handler = $app;
         $this->formatters = array();
     }
     
     public function GetFormatter(/*php_string*/ $formatterName) {
         if (!array_key_exists($formatterName, $this->formatters)) {
-            if (!$this->handler->HasDependency($formatterName)) {
+            if (!$this->app->HasDependency($formatterName)) {
                 throw new Exception($this->app->GetLocalizedText("E_UNKNOWN_FORMATTER", $formatterName));
             }
-            $this->formatters[$formatterName] = $this->handler->GetDependency($formatterName);
+            $this->formatters[$formatterName] = $this->app->GetDependency($formatterName);
         }
         return $this->formatters[$formatterName];
     }

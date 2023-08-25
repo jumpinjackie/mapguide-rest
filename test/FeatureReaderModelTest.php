@@ -124,6 +124,18 @@ class MockReader implements IReader
         return new MockClass();
     }
     
+    public function GetBoolean($indexOrProp) { throw new Exception("Not implemented"); }
+
+    public function GetByte($indexOrProp) { throw new Exception("Not implemented"); }
+
+    public function GetDateTime($indexOrProp) { throw new Exception("Not implemented"); }
+
+    public function GetDouble($indexOrProp) { throw new Exception("Not implemented"); }
+
+    public function GetGeometry($indexOrProp) { throw new Exception("Not implemented"); }
+
+    public function GetInt16($indexOrProp) { throw new Exception("Not implemented"); }
+
     public function GetInt32($indexOrProp) {
         if ($this->closed)
             throw new Exception("Reader already closed");
@@ -133,6 +145,12 @@ class MockReader implements IReader
         else
             throw new Exception("Invalid property index or name");
     }
+
+    public function GetInt64($indexOrProp) { throw new Exception("Not implemented"); }
+
+    public function GetSingle($indexOrProp) { throw new Exception("Not implemented"); }
+
+    public function GetString($indexOrProp) { throw new Exception("Not implemented"); }
     
     public function IsNull($indexOrProp) {
         if ($this->closed)

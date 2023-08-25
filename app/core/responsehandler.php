@@ -529,7 +529,7 @@ abstract class MgResponseHandler
     }
 
     protected function FormatException(/*php_string*/ $type, /*php_string*/ $errorMessage, /*php_string*/ $details, /*php_string*/ $phpTrace, /*php_int*/ $status = 500, /*php_string*/ $mimeType = MgMimeType::Html) {
-        return MgUtils::FormatException($this->app->GetConfig("Error.OutputStackTrace"), $type, $errorMessage, $details, $phpTrace, $status, $mimeType);
+        return MgUtils::FormatException($this->app, $type, $errorMessage, $details, $phpTrace, $status, $mimeType);
     }
 
     protected function OutputException(/*php_string*/ $statusMessage, /*php_string*/ $errorMessage, /*php_string*/ $details, /*php_string*/ $phpTrace, /*php_int*/ $status = 500, /*php_string*/ $mimeType = MgMimeType::Html) {

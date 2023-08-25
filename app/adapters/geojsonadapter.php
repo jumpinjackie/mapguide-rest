@@ -22,15 +22,15 @@ require_once dirname(__FILE__)."/../util/geojsonwriter.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgGeoJsonRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
-    protected function GetAdditionalParameters(IAppServices $handler, /*php_bool*/ $bSingle, /*php_string*/ $method) {
-        $params = parent::GetAdditionalParameters($handler, $bSingle, $method);
+    protected function GetAdditionalParameters(IAppServices $app, /*php_bool*/ $bSingle, /*php_string*/ $method) {
+        $params = parent::GetAdditionalParameters($app, $bSingle, $method);
         if ($method == "POST") {
             $pPostBody = new stdClass();
             $pPostBody->in = "body";
             $pPostBody->name = "body";
             $pPostBody->type = "string";
             $pPostBody->required = true;
-            $pPostBody->description = $handler->GetLocalizedText("L_REST_POST_BODY_DESC");
+            $pPostBody->description = $app->GetLocalizedText("L_REST_POST_BODY_DESC");
 
             array_push($params, $pPostBody);
         } else if ($method == "PUT") {
@@ -39,7 +39,7 @@ class MgGeoJsonRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
             $pPutBody->name = "body";
             $pPutBody->type = "string";
             $pPutBody->required = true;
-            $pPutBody->description = $handler->GetLocalizedText("L_REST_PUT_BODY_DESC");
+            $pPutBody->description = $app->GetLocalizedText("L_REST_PUT_BODY_DESC");
 
             array_push($params, $pPutBody);
         } else if ($method == "DELETE") {
@@ -48,7 +48,7 @@ class MgGeoJsonRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
             $pFilter->name = "filter";
             $pFilter->type = "string";
             $pFilter->required = false;
-            $pFilter->description = $handler->GetLocalizedText("L_REST_DELETE_FILTER_DESC");
+            $pFilter->description = $app->GetLocalizedText("L_REST_DELETE_FILTER_DESC");
 
             array_push($params, $pFilter);
         }
@@ -61,15 +61,15 @@ class MgJsonSessionIDExtractor extends MgSessionIDExtractor {
      * Tries to return the session id based on the given method. This is for methods that could accept a session id in places
      * other than the query string, url path or form parameter. If no session id is found, null is returned.
      */
-    public function TryGetSessionId(IAppServices $handler, /*php_string*/ $method) {
+    public function TryGetSessionId(IAppServices $app, /*php_string*/ $method) {
         if ($method == "POST" || $method == "PUT") {
-            $json = json_decode($handler->GetRequestBody());
+            $json = json_decode($app->GetRequestBody());
             $body = MgUtils::Json2Xml($json);
             $doc = new DOMDocument();
             $doc->loadXML($body);
 
             //Stash for adapter to grab
-            $handler->RegisterDependency("REQUEST_BODY_DOCUMENT", $doc);
+            $app->RegisterDependency("REQUEST_BODY_DOCUMENT", $doc);
 
             $sesNodes = $doc->getElementsByTagName("SessionID");
             if ($sesNodes->length == 1)

@@ -158,7 +158,7 @@ class MgTileServiceController extends MgBaseController {
         return false;
     }
 
-    private static function GetTilePath(IAppServices $handler, $resId, $groupName, $z, $x, $y, $type, $layerNames, $scale = 1) {
+    private static function GetTilePath(IAppServices $app, $resId, $groupName, $z, $x, $y, $type, $layerNames, $scale = 1) {
         $ext = $type;
         if (strtolower($type) == "png8")
             $ext = substr($type, 0, 3); //png8 -> png
@@ -172,11 +172,11 @@ class MgTileServiceController extends MgBaseController {
         } else {
             $relPath = "/".$resId->GetPath()."/".$resId->GetName()."/$gn/$z/$x/$y.$ext";
         }
-        $customRoot = $handler->GetConfig("Cache.XYZTileRoot");
+        $customRoot = $app->GetConfig("Cache.XYZTileRoot");
         if ($customRoot != null)
             $path = "$customRoot/tile.$type".$relPath;
         else
-            $path = $handler->GetConfig("AppRootDir")."/".$handler->GetConfig("Cache.RootDir")."/tile.$type".$relPath;
+            $path = $app->GetConfig("AppRootDir")."/".$app->GetConfig("Cache.RootDir")."/tile.$type".$relPath;
         return $path;
     }
 

@@ -45,7 +45,7 @@ class MgPdfPlotter
     private $dpi;
     private $legendDpi;
 
-    private $handler;
+    private $app;
     private $renderingService;
 
     private $bLayered;
@@ -66,8 +66,8 @@ class MgPdfPlotter
     const VALIGN_CENTER = 'M'; //Docs say 'C', usage says 'M' ???
     const VALIGN_BOTTOM = 'B';
 
-    public function __construct(IAppServices $handler, $renderingService, $map, $dpi = 96, $margin = NULL, $orientation = self::ORIENTATION_PORTRAIT, $paperType = 'A4', $showLegend = false, $showCoordinates = false, $showDisclaimer = false, $showScaleBar = false, $drawNorthArrow = false, $title = "", $subTitle = "") {
-        $this->handler = $handler;
+    public function __construct(IAppServices $app, $renderingService, $map, $dpi = 96, $margin = NULL, $orientation = self::ORIENTATION_PORTRAIT, $paperType = 'A4', $showLegend = false, $showCoordinates = false, $showDisclaimer = false, $showScaleBar = false, $drawNorthArrow = false, $title = "", $subTitle = "") {
+        $this->app = $app;
         $this->renderingService = $renderingService;
         $this->map = $map;
 
@@ -105,7 +105,7 @@ class MgPdfPlotter
 
     public function SetPaperType($paperType) {
         $this->paperType = $paperType;
-        $this->paperSize = MgUtils::GetPaperSize($this->handler, $paperType);
+        $this->paperSize = MgUtils::GetPaperSize($this->app, $paperType);
         $this->printSize = new MgPlotSize($this->paperSize[0], $this->paperSize[1]);
     }
 
@@ -803,7 +803,7 @@ class MgPdfPlotter
         //header sent. Doing this will most likely double up the mime type, but
         //will ensure we can view pdfs inline in chrome. I've erred on letting
         //the mime type double up
-        $this->handler->SetResponseHeader("Content-Type", "application/pdf");
+        $this->app->SetResponseHeader("Content-Type", "application/pdf");
         $mode = 'I';
         $name = 'Map.pdf';
         if (strlen($this->title) > 0)
