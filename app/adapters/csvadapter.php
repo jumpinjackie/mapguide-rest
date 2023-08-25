@@ -29,18 +29,18 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
     private $agfRw;
     private $wktRw;
 
-    public function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
+    public function __construct(IAppServices $app, MgSiteConnection $siteConn, MgResourceIdentifier $resId, /*php_string*/ $className, array $config, /*php_string*/ $configPath, /*php_string*/ $featureIdProp) {
         parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
     }
 
-    private function CsvEscape($str) {
+    private function CsvEscape(/*php_string*/ $str) {
         return str_replace("\"", '\\"', $str);
     }
 
     /**
      * Initializes the adapater with the given REST configuration
      */
-    protected function InitAdapterConfig($config) {
+    protected function InitAdapterConfig(array $config) {
         
     }
 
@@ -51,24 +51,24 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
     /**
      * Writes the GET response header based on content of the given MgReader
      */
-    protected function GetResponseBegin($reader) {
+    protected function GetResponseBegin(MgReader $reader) {
         $this->agfRw = new MgAgfReaderWriter();
         $this->wktRw = new MgWktReaderWriter();
 
-        $this->SetResponseHeader("Content-Type", $this->GetMimeType());
+        $this->app->SetResponseHeader("Content-Type", $this->GetMimeType());
         $values = array();
         $propCount = $reader->GetPropertyCount();
         for ($i = 0; $i < $propCount; $i++) {
             $name = $reader->GetPropertyName($i);
             array_push($values, $this->CsvEscape($name));
         }
-        $this->WriteResponseContent("\"".implode("\",\"", $values)."\"\n");
+        $this->app->WriteResponseContent("\"".implode("\",\"", $values)."\"\n");
     }
 
     /**
      * Returns true if the current reader iteration loop should continue, otherwise the loop is broken
      */
-    protected function GetResponseShouldContinue($reader) {
+    protected function GetResponseShouldContinue(MgReader $reader) {
         return true;
     }
 
@@ -76,7 +76,7 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
      * Writes the GET response body based on the current record of the given MgReader. The caller must not advance to the next record
      * in the reader while inside this method
      */
-    protected function GetResponseBodyRecord($reader) {
+    protected function GetResponseBodyRecord(MgReader $reader) {
         $values = array();
         $propCount = $reader->GetPropertyCount();
         for ($i = 0; $i < $propCount; $i++) {
@@ -130,13 +130,13 @@ class MgCsvRestAdapter extends MgFeatureRestAdapter
                 array_push($values, "");    
             }
         }
-        $this->WriteResponseContent("\"".implode("\",\"", $values)."\"\n");
+        $this->app->WriteResponseContent("\"".implode("\",\"", $values)."\"\n");
     }
 
     /**
      * Writes the GET response ending based on content of the given MgReader
      */
-    protected function GetResponseEnd($reader) {
+    protected function GetResponseEnd(MgReader $reader) {
 
     }
 

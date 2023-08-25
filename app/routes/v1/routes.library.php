@@ -25,6 +25,7 @@ require_once dirname(__FILE__)."/../../controller/mappingservicecontroller.php";
 require_once dirname(__FILE__)."/../../controller/renderingservicecontroller.php";
 require_once dirname(__FILE__)."/../../controller/viewercontroller.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
+require_once dirname(__FILE__)."/../../core/app.php";
 
 //======================== Feature Service APIs =======================================
 
@@ -48,7 +49,7 @@ $app->get("/library/:resourcePath+.FeatureSource/status.:format", function($reso
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->TestConnection($resId, $format);
 });
 /**
@@ -72,7 +73,7 @@ $app->get("/library/:resourcePath+.FeatureSource/editcapabilities.:format", func
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetEditCapabilities($resId, $format);
 });
 /**
@@ -96,7 +97,7 @@ $app->post("/library/:resourcePath+.FeatureSource/xml", function($resourcePath) 
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->CreateFeatureSource($resId, "xml");
 });
 /**
@@ -120,7 +121,7 @@ $app->post("/library/:resourcePath+.FeatureSource/json", function($resourcePath)
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->CreateFeatureSource($resId, "json");
 });
 /**
@@ -146,7 +147,7 @@ $app->post("/library/:resourcePath+.FeatureSource/editcapabilities.:format", fun
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->SetEditCapabilities($resId, $format);
 });
 /**
@@ -169,7 +170,7 @@ $app->get("/library/:resourcePath+.FeatureSource/spatialcontexts.:format", funct
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetSpatialContexts($resId, $format);
 });
 /**
@@ -193,7 +194,7 @@ $app->get("/library/:resourcePath+.FeatureSource/longtransactions.:format", func
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetLongTransactions($resId, $format);
 });
 /**
@@ -216,7 +217,7 @@ $app->get("/library/:resourcePath+.FeatureSource/schemas.:format", function($res
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetSchemaNames($resId, $format);
 });
 /**
@@ -241,7 +242,7 @@ $app->get("/library/:resourcePath+.FeatureSource/schema.:format/:schemaName", fu
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->DescribeSchema($resId, $schemaName, $format);
 });
 /**
@@ -265,7 +266,7 @@ $app->get("/library/:resourcePath+.FeatureSource/classes.:format/:schemaName", f
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetClassNames($resId, $schemaName, $format);
 });
 /**
@@ -290,7 +291,7 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:schemaName/:c
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetClassDefinition($resId, $schemaName, $className, $format);
 });
 /**
@@ -314,7 +315,7 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:qualifiedClas
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $tokens = explode(":", $qualifiedClassName);
     $schemaName = "";
     $className = "";
@@ -351,7 +352,7 @@ $app->post("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->InsertFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -380,7 +381,7 @@ $app->put("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:c
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->UpdateFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -409,7 +410,7 @@ $app->delete("/library/:resourcePath+.FeatureSource/features.:format/:schemaName
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->DeleteFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -444,7 +445,7 @@ $app->get("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:c
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->SelectFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -478,7 +479,7 @@ $app->get("/library/:resourcePath+.LayerDefinition/features.:format", function($
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->SelectLayerFeatures($resId, $format);
 });
 /**
@@ -505,7 +506,7 @@ $app->get("/library/:resourcePath+.FeatureSource/aggregates.:format/:type/:schem
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->SelectAggregates($resId, $schemaName, $className, $type, $format);
 });
 
@@ -528,7 +529,7 @@ $app->get("/library/:resourcePath+.FeatureSource/aggregates.:format/:type/:schem
  *     )
  */
 $app->post("/library", function() use ($app) {
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->ApplyResourcePackage();
 });
 /**
@@ -547,7 +548,7 @@ $app->post("/library", function() use ($app) {
  */
 $app->get("/library/:resourcePath+/datalist.:format", function($resourcePath, $format) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->EnumerateResourceData($resId, $format);
 });
 /**
@@ -568,7 +569,7 @@ $app->get("/library/:resourcePath+/datalist.:format", function($resourcePath, $f
  */
 $app->get("/library/list.:format", function($format) use ($app) {
     $resId = new MgResourceIdentifier("Library://");
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->EnumerateResources($resId, $format);
 });
 /**
@@ -590,7 +591,7 @@ $app->get("/library/list.:format", function($format) use ($app) {
  */
 $app->get("/library/:resourcePath+/list.:format", function($resourcePath, $format) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath, "list.".$format);
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->EnumerateResources($resId, $format);
 });
 /**
@@ -609,7 +610,7 @@ $app->get("/library/:resourcePath+/list.:format", function($resourcePath, $forma
  */
 $app->get("/library/:resourcePath+/data/:dataName", function($resourcePath, $dataName) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->GetResourceData($resId, $dataName);
 });
 /**
@@ -631,7 +632,7 @@ $app->get("/library/:resourcePath+/data/:dataName", function($resourcePath, $dat
  */
 $app->post("/library/:resourcePath+/data/:dataName", function($resourcePath, $dataName) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->SetResourceData($resId, $dataName);
 });
 /**
@@ -650,7 +651,7 @@ $app->post("/library/:resourcePath+/data/:dataName", function($resourcePath, $da
  */
 $app->delete("/library/:resourcePath+/data/:dataName", function($resourcePath, $dataName) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->DeleteResourceData($resId, $dataName);
 });
 /**
@@ -672,7 +673,7 @@ $app->delete("/library/:resourcePath+/data/:dataName", function($resourcePath, $
  */
 $app->post("/library/:resourcePath+/header.:format", function($resourcePath, $format) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->SetResourceHeader($resId, $format);
 });
 /**
@@ -692,7 +693,7 @@ $app->post("/library/:resourcePath+/header.:format", function($resourcePath, $fo
  */
 $app->get("/library/:resourcePath+/header.:format", function($resourcePath, $format) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->GetResourceHeader($resId, $format);
 });
 /**
@@ -715,7 +716,7 @@ $app->get("/library/:resourcePath+/header.:format", function($resourcePath, $for
  */
 $app->post("/library/:resourcePath+/contentorheader.:format", function($resourcePath, $format) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->SetResourceContentOrHeader($resId, $format);
 });
 /**
@@ -737,7 +738,7 @@ $app->post("/library/:resourcePath+/contentorheader.:format", function($resource
  */
 $app->post("/library/:resourcePath+/content.:format", function($resourcePath, $format) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->SetResourceContent($resId, $format);
 });
 /**
@@ -755,7 +756,7 @@ $app->post("/library/:resourcePath+/content.:format", function($resourcePath, $f
  */
 $app->get("/library/:resourcePath+/html", function($resourcePath) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->GetResourceInfo($resId, "html");
 });
 /**
@@ -774,7 +775,7 @@ $app->get("/library/:resourcePath+/html", function($resourcePath) use ($app) {
  */
 $app->get("/library/:resourcePath+/content.:format", function($resourcePath, $format) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->GetResourceContent($resId, $format);
 });
 /**
@@ -793,7 +794,7 @@ $app->get("/library/:resourcePath+/content.:format", function($resourcePath, $fo
  */
 $app->get("/library/:resourcePath+/references.:format", function($resourcePath, $format) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->EnumerateResourceReferences($resId, $format);
 });
 /**
@@ -811,7 +812,7 @@ $app->get("/library/:resourcePath+/references.:format", function($resourcePath, 
  */
 $app->delete("/library/:resourcePath+", function($resourcePath) use ($app) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->DeleteResource($resId);
 });
 //============================== Tile Service APIs ============================================
@@ -843,7 +844,7 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:z/:x/:y/tile.:f
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     //echo "ResId: ".$resId->ToString()."<br/>Group: $groupName<br/>X: $x<br/>Y: $y<br/>Z: $z<br/>Format: $format";
     //die;
-    $ctrl = new MgTileServiceController($app);
+    $ctrl = new MgTileServiceController(new AppServices($app));
     $ctrl->GetTileXYZ($resId, $groupName, $x, $y, $z, $format);
 });
 /**
@@ -874,7 +875,7 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:layerName/:z/:x
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     //echo "ResId: ".$resId->ToString()."<br/>Group: $groupName<br/>X: $x<br/>Y: $y<br/>Z: $z<br/>Format: $format";
     //die;
-    $ctrl = new MgTileServiceController($app);
+    $ctrl = new MgTileServiceController(new AppServices($app));
     $ctrl->GetTileXYZForLayer($resId, $groupName, $layerName, $x, $y, $z, $format);
 });
 /**
@@ -905,7 +906,7 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz@:scale/:groupName/:z/:x/:y/
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     //echo "ResId: ".$resId->ToString()."<br/>Group: $groupName<br/>X: $x<br/>Y: $y<br/>Z: $z<br/>Format: $format";
     //die;
-    $ctrl = new MgTileServiceController($app);
+    $ctrl = new MgTileServiceController(new AppServices($app));
     $ctrl->GetTileXYZRetina($resId, $groupName, $x, $y, $z, $format, $scale);
 });
 /**
@@ -933,7 +934,7 @@ $app->get("/library/:resourcePath+.MapDefinition/tile.:format/:groupName/:scaleI
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgTileServiceController($app);
+    $ctrl = new MgTileServiceController(new AppServices($app));
     $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $format);
 });
 
@@ -962,7 +963,7 @@ $app->get("/library/:resourcePath+.TileSetDefinition/tile.:format/:groupName/:sc
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".TileSetDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgTileServiceController($app);
+    $ctrl = new MgTileServiceController(new AppServices($app));
     $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $format);
 });
 
@@ -993,7 +994,7 @@ $app->get("/library/:resourcePath+.LayerDefinition/legend/:scale/:geomtype/:them
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgMappingServiceController($app);
+    $ctrl = new MgMappingServiceController(new AppServices($app));
     $ctrl->GenerateLegendImage($resId, $scale, $geomtype, $themecat, $format);
 });
 /**
@@ -1033,7 +1034,7 @@ $app->get("/library/:resourcePath+.MapDefinition/plot.:format", function($resour
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgMappingServiceController($app);
+    $ctrl = new MgMappingServiceController(new AppServices($app));
     $ctrl->GeneratePlotFromMapDefinition($resId, $format);
 });
 //================================= Rendering Service APIs ==================================
@@ -1066,7 +1067,7 @@ $app->get("/library/:resourcePath+.MapDefinition/image.:format", function($resou
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgRenderingServiceController($app);
+    $ctrl = new MgRenderingServiceController(new AppServices($app));
     $ctrl->RenderMapDefinition($resId, $format);
 });
 
@@ -1091,7 +1092,7 @@ $app->get("/library/:resourcePath+.WebLayout/viewer", function($resourcePath) us
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".WebLayout";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgViewerController($app);
+    $ctrl = new MgViewerController(new AppServices($app));
     $ctrl->LaunchAjaxViewer($resId);
 });
 
@@ -1115,7 +1116,7 @@ $app->get("/library/:resourcePath+.ApplicationDefinition/viewer/:template", func
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".ApplicationDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgViewerController($app);
+    $ctrl = new MgViewerController(new AppServices($app));
     $ctrl->LaunchFusionViewer($resId, $template);
 });
 
@@ -1138,7 +1139,7 @@ $app->get("/library/:resourcePath+.FeatureSource/preview", function($resourcePat
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgViewerController($app);
+    $ctrl = new MgViewerController(new AppServices($app));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1161,7 +1162,7 @@ $app->get("/library/:resourcePath+.LayerDefinition/preview", function($resourceP
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgViewerController($app);
+    $ctrl = new MgViewerController(new AppServices($app));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1184,7 +1185,7 @@ $app->get("/library/:resourcePath+.MapDefinition/preview", function($resourcePat
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgViewerController($app);
+    $ctrl = new MgViewerController(new AppServices($app));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1207,7 +1208,7 @@ $app->get("/library/:resourcePath+.SymbolDefinition/preview", function($resource
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".SymbolDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgViewerController($app);
+    $ctrl = new MgViewerController(new AppServices($app));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1230,7 +1231,7 @@ $app->get("/library/:resourcePath+.WatermarkDefinition/preview", function($resou
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".WatermarkDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgViewerController($app);
+    $ctrl = new MgViewerController(new AppServices($app));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1256,7 +1257,7 @@ $app->get("/library/:resourcePath+.MapDefinition/kml", function($resourcePath) u
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgKmlServiceController($app);
+    $ctrl = new MgKmlServiceController(new AppServices($app));
     $ctrl->GetMapKml($resId, "kml");
 });
 
@@ -1285,7 +1286,7 @@ $app->get("/library/:resourcePath+.LayerDefinition/kml", function($resourcePath)
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgKmlServiceController($app);
+    $ctrl = new MgKmlServiceController(new AppServices($app));
     $ctrl->GetLayerKml($resId, "kml");
 });
 
@@ -1314,6 +1315,6 @@ $app->get("/library/:resourcePath+.LayerDefinition/kmlfeatures.:format", functio
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgKmlServiceController($app);
+    $ctrl = new MgKmlServiceController(new AppServices($app));
     $ctrl->GetFeaturesKml($resId, $format);
 });

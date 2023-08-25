@@ -24,29 +24,29 @@ class MgResourceServiceController extends MgBaseController {
     private $whitelistConf;
     private $whitelist;
     
-    public function __construct($app) {
+    public function __construct(IAppServices $app) {
         parent::__construct($app);
-        $this->whitelistConf = $this->GetConfig("MapGuide.ResourceConfiguration");
+        $this->whitelistConf = $this->app->GetConfig("MapGuide.ResourceConfiguration");
         $this->whitelist = new MgWhitelist($this->whitelistConf);
     }
     
-    private function VerifyWhitelist($resIdStr, $mimeType, $requiredAction, $requiredRepresentation, $site, $userName) {
+    private function VerifyWhitelist(/*php_string*/ $resIdStr, /*php_string*/ $mimeType, /*php_string*/ $requiredAction, /*php_string*/ $requiredRepresentation, MgSite $site, /*php_string*/ $userName) {
         $this->whitelist->VerifyWhitelist($resIdStr, $mimeType, function($msg, $mt) {
             $this->Forbidden($msg, $mt);
         }, $requiredAction, $requiredRepresentation, $site, $userName);
     }
     
-    private function VerifyGlobalWhitelist($mimeType, $requiredAction, $requiredRepresentation, $site, $userName) {
+    private function VerifyGlobalWhitelist(/*php_string*/ $mimeType, /*php_callable*/ $requiredAction, /*php_string*/ $requiredRepresentation, MgSite $site, /*php_string*/ $userName) {
         $this->whitelist->VerifyGlobalWhitelist($mimeType, function($msg, $mt) {
             $this->Forbidden($msg, $mt);
         }, $requiredAction, $requiredRepresentation, $site, $userName);
     }
 
-    public function EnumerateUnmanagedData($format) {
+    public function EnumerateUnmanagedData(/*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         
-        $sessionId = $this->GetRequestParameter("session");
+        $sessionId = $this->app->GetRequestParameter("session");
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         try {
             $this->EnsureAuthenticationForSite($SessionId, false);
@@ -62,10 +62,10 @@ class MgResourceServiceController extends MgBaseController {
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
             $param->AddParameter("OPERATION", "ENUMERATEUNMANAGEDDATA");
             $param->AddParameter("VERSION", "1.0.0");
-            $param->AddParameter("TYPE", $that->GetRequestParameter("type"));
+            $param->AddParameter("TYPE", $that->app->GetRequestParameter("type"));
             $param->AddParameter("RECURSIVE", $that->GetBooleanRequestParameter("recursive", "0"));
-            $param->AddParameter("PATH", $that->GetRequestParameter("path"));
-            $param->AddParameter("FILTER", $that->GetRequestParameter("filter"));
+            $param->AddParameter("PATH", $that->app->GetRequestParameter("path"));
+            $param->AddParameter("FILTER", $that->app->GetRequestParameter("filter"));
             if ($fmt === "json") {
                 $param->AddParameter("FORMAT", MgMimeType::Json);
             } else if ($fmt === "xml") {
@@ -77,10 +77,10 @@ class MgResourceServiceController extends MgBaseController {
 
     public function ApplyResourcePackage() {
         if (!array_key_exists("package", $_FILES))
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "package"), MgMimeType::Html);
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "package"), MgMimeType::Html);
         
         try {
-            $sessionId = $this->GetRequestParameter("session");
+            $sessionId = $this->app->GetRequestParameter("session");
         
             $mimeType = MgMimeType::Json;
             $fmt = "json";
@@ -99,20 +99,20 @@ class MgResourceServiceController extends MgBaseController {
                 $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
                 $resSvc->ApplyResourcePackage($reader);
             } else {
-                $this->SetResponseStatus(500);
-                $this->SetResponseBody($this->GetLocalizedText("E_PHP_FILE_UPLOAD_ERROR", $err));
+                $this->app->SetResponseStatus(500);
+                $this->app->SetResponseBody($this->app->GetLocalizedText("E_PHP_FILE_UPLOAD_ERROR", $err));
             }
         } catch (MgException $ex) {
             $this->OnException($ex);
         }
     }
 
-    public function SetResourceData($resId, $dataName) {
+    public function SetResourceData(MgResourceIdentifier $resId, /*php_string*/ $dataName) {
         if (!array_key_exists("data", $_FILES))
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "data"), MgMimeType::Html);
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "data"), MgMimeType::Html);
 
-        $type = $this->GetRequestParameter("type", MgResourceDataType::File);
-        $sessionId = $this->GetRequestParameter("session", "");
+        $type = $this->app->GetRequestParameter("type", MgResourceDataType::File);
+        $sessionId = $this->app->GetRequestParameter("session", "");
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
         }
@@ -134,21 +134,21 @@ class MgResourceServiceController extends MgBaseController {
 
                 $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
                 if (!$resSvc->ResourceExists($resId))
-                    $this->NotFound($this->GetLocalizedText("E_RESOURCE_NOT_FOUND", $resId->ToString()));
+                    $this->NotFound($this->app->GetLocalizedText("E_RESOURCE_NOT_FOUND", $resId->ToString()));
 
                 $resSvc->SetResourceData($resId, $dataName, $type, $reader);
             } else {
-                $this->SetResponseStatus(500);
-                $this->SetResponseBody($this->GetLocalizedText("E_PHP_FILE_UPLOAD_ERROR", $err));
+                $this->app->SetResponseStatus(500);
+                $this->app->SetResponseBody($this->app->GetLocalizedText("E_PHP_FILE_UPLOAD_ERROR", $err));
             }
         } catch (MgException $ex) {
             $this->OnException($ex);
         }
     }
 
-    public function DeleteResourceData($resId, $dataName) {
+    public function DeleteResourceData(MgResourceIdentifier $resId, /*php_string*/ $dataName) {
         $resIdStr = $resId->ToString();
-        $sessionId = $this->GetRequestParameter("session", "");
+        $sessionId = $this->app->GetRequestParameter("session", "");
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
         }
@@ -175,7 +175,7 @@ class MgResourceServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function DeleteResource($resId) {
+    public function DeleteResource(MgResourceIdentifier $resId) {
         $resIdStr = $resId->ToString();
         $sessionId = "";
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
@@ -205,11 +205,11 @@ class MgResourceServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function GetResourceData($resId, $dataName) {
+    public function GetResourceData(MgResourceIdentifier $resId, /*php_string*/ $dataName) {
         $resIdStr = $resId->ToString();
         $that = $this;
         
-        $sessionId = $this->GetRequestParameter("session", "");
+        $sessionId = $this->app->GetRequestParameter("session", "");
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
         }
@@ -236,11 +236,11 @@ class MgResourceServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function EnumerateResourceData($resId, $format) {
+    public function EnumerateResourceData(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
-        $sessionId = $this->GetRequestParameter("session", "");
+        $sessionId = $this->app->GetRequestParameter("session", "");
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
         }
@@ -260,8 +260,8 @@ class MgResourceServiceController extends MgBaseController {
         $this->VerifyWhitelist($resIdStr, $mimeType, "ENUMERATERESOURCEDATA", $fmt, $site, $this->userName);
         
         $resName = $resId->GetName().".".$resId->GetResourceType();
-        $pathInfo = $this->GetRequestPathInfo();
-        $selfUrl = $this->GetConfig("SelfUrl");
+        $pathInfo = $this->app->GetRequestPathInfo();
+        $selfUrl = $this->app->GetConfig("SelfUrl");
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr, $resName, $selfUrl, $pathInfo) {
             $param->AddParameter("OPERATION", "ENUMERATERESOURCEDATA");
@@ -286,11 +286,11 @@ class MgResourceServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function EnumerateResourceReferences($resId, $format) {
+    public function EnumerateResourceReferences(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
-        $sessionId = $this->GetRequestParameter("session", "");
+        $sessionId = $this->app->GetRequestParameter("session", "");
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         try {
             $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
@@ -305,7 +305,7 @@ class MgResourceServiceController extends MgBaseController {
         $this->VerifyWhitelist($resIdStr, $mimeType, "ENUMERATERESOURCEREFERENCES", $fmt, $site, $this->userName);
 
         $resName = $resId->GetName().".".$resId->GetResourceType();
-        $selfUrl = $this->GetConfig("SelfUrl");
+        $selfUrl = $this->app->GetConfig("SelfUrl");
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr, $resName, $selfUrl) {
             $param->AddParameter("OPERATION", "ENUMERATERESOURCEREFERENCES");
@@ -326,11 +326,11 @@ class MgResourceServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function GetResourceHeader($resId, $format) {
+    public function GetResourceHeader(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
         
-        $sessionId = $this->GetRequestParameter("session", "");
+        $sessionId = $this->app->GetRequestParameter("session", "");
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         try {
             $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
@@ -364,7 +364,7 @@ class MgResourceServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function SetResourceHeader($resId, $format) {
+    public function SetResourceHeader(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         try {
@@ -379,31 +379,31 @@ class MgResourceServiceController extends MgBaseController {
             $this->VerifyWhitelist($resIdStr, $mimeType, "SETRESOURCEHEADER", $fmt, $site, $this->userName);
 
             $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-            $body = $this->GetRequestBody();
+            $body = $this->app->GetRequestBody();
             if ($fmt == "json") {
                 $json = json_decode($body);
                 if ($json == NULL)
-                    throw new Exception($this->GetLocalizedText("E_MALFORMED_JSON_BODY"));
+                    throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
                 $body = MgUtils::Json2Xml($json);
             }
             $bs = new MgByteSource($body, strlen($body));
             $header = $bs->GetReader();
             $resSvc->SetResource($resId, null, $header);
 
-            //$this->SetResponseStatus(201);
+            //$this->app->SetResponseStatus(201);
             $body = MgBoxedValue::String($resId->ToString(), $fmt);
             if ($fmt == "xml") {
-                $this->SetResponseHeader("Content-Type", MgMimeType::Xml);
+                $this->app->SetResponseHeader("Content-Type", MgMimeType::Xml);
             } else {
-                $this->SetResponseHeader("Content-Type", MgMimeType::Json);
+                $this->app->SetResponseHeader("Content-Type", MgMimeType::Json);
             }
-            $this->SetResponseBody($body);
+            $this->app->SetResponseBody($body);
         } catch (MgException $ex) {
             $this->OnException($ex, $this->GetMimeTypeForFormat($fmt));
         }
     }
 
-    public function SetResourceContent($resId, $format) {
+    public function SetResourceContent(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         try {
@@ -422,11 +422,11 @@ class MgResourceServiceController extends MgBaseController {
             $this->VerifyWhitelist($resIdStr, $mimeType, "SETRESOURCE", $fmt, $site, $this->userName);
 
             $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
-            $body = $this->GetRequestBody();
+            $body = $this->app->GetRequestBody();
             if ($fmt == "json") {
                 $json = json_decode($body);
                 if ($json == NULL)
-                    throw new Exception($this->GetLocalizedText("E_MALFORMED_JSON_BODY"));
+                    throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
                 $body = MgUtils::Json2Xml($json);
             }
             $bs = new MgByteSource($body, strlen($body));
@@ -434,20 +434,20 @@ class MgResourceServiceController extends MgBaseController {
 
             $resSvc->SetResource($resId, $content, null);
 
-            $this->SetResponseStatus(201);
+            $this->app->SetResponseStatus(201);
             $body = MgBoxedValue::String($resId->ToString(), $fmt);
             if ($fmt == "xml") {
-                $this->SetResponseHeader("Content-Type", MgMimeType::Xml);
+                $this->app->SetResponseHeader("Content-Type", MgMimeType::Xml);
             } else {
-                $this->SetResponseHeader("Content-Type", MgMimeType::Json);
+                $this->app->SetResponseHeader("Content-Type", MgMimeType::Json);
             }
-            $this->SetResponseBody($body);
+            $this->app->SetResponseBody($body);
         } catch (MgException $ex) {
             $this->OnException($ex, $this->GetMimeTypeForFormat($fmt));
         }
     }
 
-    public function SetResourceContentOrHeader($resId, $format) {
+    public function SetResourceContentOrHeader(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         try {
@@ -494,7 +494,7 @@ class MgResourceServiceController extends MgBaseController {
                     $body = $content->ToString();
                     $json = json_decode($body);
                     if ($json == NULL)
-                        throw new Exception($this->GetLocalizedText("E_MALFORMED_JSON_BODY"));
+                        throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
                     $body = MgUtils::Json2Xml($json);
                     $cntSource = new MgByteSource($body, strlen($body));
                     $content = $cntSource->GetReader();
@@ -503,7 +503,7 @@ class MgResourceServiceController extends MgBaseController {
                     $body = $header->ToString();
                     $json = json_decode($body);
                     if ($json == NULL)
-                        throw new Exception($this->GetLocalizedText("E_MALFORMED_JSON_BODY"));
+                        throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
                     $body = MgUtils::Json2Xml($json);
                     $hdrSource = new MgByteSource($body, strlen($body));
                     $header = $hdrSource->GetReader();
@@ -512,23 +512,23 @@ class MgResourceServiceController extends MgBaseController {
 
             $resSvc->SetResource($resId, $content, $header);
 
-            $this->SetResponseStatus(201);
+            $this->app->SetResponseStatus(201);
             $body = MgBoxedValue::String($resId->ToString(), $fmt);
             if ($fmt == "xml") {
-                $this->SetResponseHeader("Content-Type", MgMimeType::Xml);
+                $this->app->SetResponseHeader("Content-Type", MgMimeType::Xml);
             } else {
-                $this->SetResponseHeader("Content-Type", MgMimeType::Json);
+                $this->app->SetResponseHeader("Content-Type", MgMimeType::Json);
             }
-            $this->SetResponseBody($body);
+            $this->app->SetResponseBody($body);
         } catch (MgException $ex) {
             $this->OnException($ex);
         }
     }
 
-    public function GetResourceContent($resId, $format) {
+    public function GetResourceContent(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
-        $sessionId = $this->GetRequestParameter("session", "");
+        $sessionId = $this->app->GetRequestParameter("session", "");
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
         }
@@ -557,10 +557,10 @@ class MgResourceServiceController extends MgBaseController {
         }, false, "", $sessionId);
     }
 
-    public function GetResourceInfo($resId, $format) {
+    public function GetResourceInfo(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("html"));
-        $sessionId = $this->GetRequestParameter("session", "");
+        $sessionId = $this->app->GetRequestParameter("session", "");
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
         }
@@ -573,32 +573,32 @@ class MgResourceServiceController extends MgBaseController {
         
         $this->VerifyWhitelist($resIdStr, $mimeType, "GETRESOURCEINFO", $fmt, $site, $this->userName);
 
-        $pathInfo = $this->GetRequestPathInfo();
-        $selfUrl = $this->GetConfig("SelfUrl");
+        $pathInfo = $this->app->GetRequestPathInfo();
+        $selfUrl = $this->app->GetConfig("SelfUrl");
         $thisUrl = $selfUrl.$pathInfo;
         //Chop off the html part of the url
         $rootPath = substr($thisUrl, 0, strlen($thisUrl) - strlen("/html"));
 
         $resIdStr = $resId->ToString();
         $smarty = new Smarty();
-        $smarty->setCompileDir($this->GetConfig("Cache.RootDir")."/templates_c");
+        $smarty->setCompileDir($this->app->GetConfig("Cache.RootDir")."/templates_c");
         $smarty->assign("resId", $resIdStr);
         $smarty->assign("assetPath", MgUtils::GetSelfUrlRoot($selfUrl)."/assets");
         $smarty->assign("urlRoot", $rootPath);
         $smarty->assign("resourceType", $resId->GetResourceType());
 
-        $locale = $this->GetConfig("Locale");
+        $locale = $this->app->GetConfig("Locale");
 
-        $this->SetResponseHeader("Content-Type", MgMimeType::Html);
-        $this->SetResponseBody($smarty->fetch(dirname(__FILE__)."/../res/templates/$locale/resourceinfo.tpl"));
+        $this->app->SetResponseHeader("Content-Type", MgMimeType::Html);
+        $this->app->SetResponseBody($smarty->fetch(dirname(__FILE__)."/../res/templates/$locale/resourceinfo.tpl"));
     }
 
-    public function EnumerateResources($resId, $format) {
+    public function EnumerateResources(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
         $resIdStr = $resId->ToString();
         
-        $sessionId = $this->GetRequestParameter("session", "");
+        $sessionId = $this->app->GetRequestParameter("session", "");
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         try {
             $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
@@ -610,16 +610,16 @@ class MgResourceServiceController extends MgBaseController {
             return;
         }
         $this->VerifyWhitelist($resIdStr, $mimeType, "ENUMERATERESOURCES", $fmt, $site, $this->userName);
-        $pathInfo = $this->GetRequestPathInfo();
-        $selfUrl = $this->GetConfig("SelfUrl");
+        $pathInfo = $this->app->GetRequestPathInfo();
+        $selfUrl = $this->app->GetConfig("SelfUrl");
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr, $selfUrl, $pathInfo) {
             $param->AddParameter("OPERATION", "ENUMERATERESOURCES");
             $param->AddParameter("VERSION", "1.0.0");
-            $param->AddParameter("TYPE", $that->GetRequestParameter("type"));
+            $param->AddParameter("TYPE", $that->app->GetRequestParameter("type"));
             $param->AddParameter("COMPUTECHILDREN", $that->GetBooleanRequestParameter("computechildren", "0"));
             //Default the depth to 1 if not specified (think of the MapGuide Server!)
-            $param->AddParameter("DEPTH", $that->GetRequestParameter("depth", "1"));
+            $param->AddParameter("DEPTH", $that->app->GetRequestParameter("depth", "1"));
             if ($fmt === "json") {
                 $param->AddParameter("FORMAT", MgMimeType::Json);
             } else if ($fmt === "xml") {
@@ -651,9 +651,9 @@ class MgResourceServiceController extends MgBaseController {
     }
 
     public function CopyResource() {
-        $resIdStr = $this->GetRequestParameter("source");
+        $resIdStr = $this->app->GetRequestParameter("source");
         
-        $sessionId = $this->GetRequestParameter("session", "");
+        $sessionId = $this->app->GetRequestParameter("session", "");
         $fmt = "json";
         $mimeType = MgMimeType::Json;
         $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
@@ -667,8 +667,8 @@ class MgResourceServiceController extends MgBaseController {
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that) {
             $param->AddParameter("OPERATION", "COPYRESOURCE");
             $param->AddParameter("VERSION", "1.0.0");
-            $param->AddParameter("SOURCE", $that->GetRequestParameter("source"));
-            $param->AddParameter("DESTINATION", $that->GetRequestParameter("destination"));
+            $param->AddParameter("SOURCE", $that->app->GetRequestParameter("source"));
+            $param->AddParameter("DESTINATION", $that->app->GetRequestParameter("destination"));
             //Default the depth to 1 if not specified (think of the MapGuide Server!)
             $param->AddParameter("OVERWRITE", $that->GetBooleanRequestParameter("overwrite", "0"));
             $that->ExecuteHttpRequest($req);
@@ -676,9 +676,9 @@ class MgResourceServiceController extends MgBaseController {
     }
 
     public function MoveResource() {
-        $resIdStr = $this->GetRequestParameter("source");
+        $resIdStr = $this->app->GetRequestParameter("source");
         
-        $sessionId = $this->GetRequestParameter("session", "");
+        $sessionId = $this->app->GetRequestParameter("session", "");
         $fmt = "json";
         $mimeType = MgMimeType::Json;
         $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
@@ -692,8 +692,8 @@ class MgResourceServiceController extends MgBaseController {
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that) {
             $param->AddParameter("OPERATION", "MOVERESOURCE");
             $param->AddParameter("VERSION", "2.2.0");
-            $param->AddParameter("SOURCE", $that->GetRequestParameter("source"));
-            $param->AddParameter("DESTINATION", $that->GetRequestParameter("destination"));
+            $param->AddParameter("SOURCE", $that->app->GetRequestParameter("source"));
+            $param->AddParameter("DESTINATION", $that->app->GetRequestParameter("destination"));
             //Default the depth to 1 if not specified (think of the MapGuide Server!)
             $param->AddParameter("OVERWRITE", $that->GetBooleanRequestParameter("overwrite", "0"));
             $param->AddParameter("OVERWRITE", $that->GetBooleanRequestParameter("cascade", "1"));

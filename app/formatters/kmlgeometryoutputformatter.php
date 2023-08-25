@@ -26,7 +26,7 @@ class MgKmlGeometryOutputFormatter extends MgGeometryOutputFormatter
         parent::__construct();
     }
 
-    protected function OutputGeom($geom, $reader) {
+    protected function OutputGeom(MgGeometry $geom, IReader $reader) {
         $extrude = 0;
         $zval = null;
         //Check if special extrusion properties exist
@@ -76,7 +76,7 @@ class MgKmlGeometryOutputFormatter extends MgGeometryOutputFormatter
         }
     }
 
-    private function OutputCoordinateIterator($iter, $zval) {
+    private function OutputCoordinateIterator(MgCoordinateIterator $iter, /*php_double*/ $zval) {
         $output = "<coordinates>";
         while ($iter->MoveNext()) {
             $coord = $iter->GetCurrent();
@@ -91,7 +91,7 @@ class MgKmlGeometryOutputFormatter extends MgGeometryOutputFormatter
         return $output;
     }
 
-    private function OutputLinearRing($ring, $zval) {
+    private function OutputLinearRing(MgRing $ring, /*php_double*/ $zval) {
         $output = "<LinearRing>";
         $iter = $ring->GetCoordinates();
         $output .= $this->OutputCoordinateIterator($iter, $zval);
@@ -99,7 +99,7 @@ class MgKmlGeometryOutputFormatter extends MgGeometryOutputFormatter
         return $output;
     }
 
-    private function OutputLineString($geom, $extrude, $zval) {
+    private function OutputLineString(MgGeometry $geom, /*php_bool*/ $extrude, /*php_double*/ $zval) {
         $output  = "<LineString>";
         $output .= "<extrude>$extrude</extrude>";
         $output .= "<altitudeMode>relativeToGround</altitudeMode>";
@@ -109,7 +109,7 @@ class MgKmlGeometryOutputFormatter extends MgGeometryOutputFormatter
         return $output;
     }
 
-    private function OutputPoint($geom, $extrude, $zval) {
+    private function OutputPoint(MgPoint $geom, /*php_bool*/ $extrude, /*php_double*/ $zval) {
         $output  = "<Point>";
         $output .= "<extrude>$extrude</extrude>";
         $output .= "<altitudeMode>relativeToGround</altitudeMode>";
@@ -126,7 +126,7 @@ class MgKmlGeometryOutputFormatter extends MgGeometryOutputFormatter
         return $output;
     }
 
-    private function OutputMultiPoint($geom, $extrude, $zval) {
+    private function OutputMultiPoint(MgMultiPoint $geom, /*php_bool*/ $extrude, /*php_double*/ $zval) {
         $output = "<MultiGeometry>";
         $geomCount = $geom->GetCount();
         for ($i = 0; $i < $geomCount; $i++) {
@@ -136,7 +136,7 @@ class MgKmlGeometryOutputFormatter extends MgGeometryOutputFormatter
         return $output;
     }
 
-    private function OutputMultiLineString($geom, $extrude, $zval) {
+    private function OutputMultiLineString(MgMultiLineString $geom, /*php_bool*/ $extrude, /*php_double*/ $zval) {
         $output = "<MultiGeometry>";
         $geomCount = $geom->GetCount();
         for ($i = 0; $i < $geomCount; $i++) {
@@ -146,7 +146,7 @@ class MgKmlGeometryOutputFormatter extends MgGeometryOutputFormatter
         return $output;
     }
 
-    private function OutputMultiPolygon($geom, $extrude, $zval) {
+    private function OutputMultiPolygon(MgMultiPolygon $geom, /*php_bool*/ $extrude, /*php_double*/ $zval) {
         $output = "<MultiGeometry>";
         $geomCount = $geom->GetCount();
         for ($i = 0; $i < $geomCount; $i++) {
@@ -156,7 +156,7 @@ class MgKmlGeometryOutputFormatter extends MgGeometryOutputFormatter
         return $output;
     }
 
-    private function OutputPolygon($geom, $extrude, $zval) {
+    private function OutputPolygon(MgPolygon $geom, /*php_bool*/ $extrude, /*php_double*/ $zval) {
         $output  = "<Polygon>";
         $output .= "<extrude>$extrude</extrude>";
         $output .= "<altitudeMode>relativeToGround</altitudeMode>";

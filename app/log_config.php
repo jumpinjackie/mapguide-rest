@@ -19,7 +19,7 @@
 
 class LogWriter extends \Slim\LogWriter
 {
-    public function __construct($path) {
+    public function __construct(/*php_string*/ $path) {
         parent::__construct(fopen($path, "a"));
     }
 }

@@ -27,7 +27,7 @@ require_once "xmlschemainfo.php";
 
 class MgUtils
 {
-    public static function GetSelfUrlRoot($url) {
+    public static function GetSelfUrlRoot(/*php_string*/ $url) {
         //This is the case if no URL rewriting module was installed
         if (self::StringEndsWith($url, "/index.php")) {
             $url = substr($url, 0, strlen($url) - strlen("/index.php"));
@@ -35,8 +35,14 @@ class MgUtils
         return $url;
     }
 
-    public static function FormatException($bOutputStackTrace, $type, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
-        $errResponse = "";
+    public static function FormatException(/*php_bool*/ $bOutputStackTrace, 
+        /*php_string*/ $type,
+        /*php_string*/ $errorMessage,
+        /*php_string*/ $details,
+        /*php_string*/ $phpTrace,
+        /*php_int*/ $status = 500,
+        /*php_string*/ $mimeType = MgMimeType::Html) {
+        /*php_string*/ $errResponse = "";
         if ($bOutputStackTrace === false) {
             if ($mimeType === MgMimeType::Xml || $mimeType == MgMimeType::Kml) {
                 $errResponse = sprintf(
@@ -85,7 +91,7 @@ class MgUtils
         return $errResponse;
     }
 
-    public static function ValidateAcl($userName, $site, $config) {
+    public static function ValidateAcl(/*php_string*/ $userName, MgSite $site, array $config) {
         // Empty ACL config = open season
         if (empty($config))
             return true;
@@ -140,7 +146,7 @@ class MgUtils
         return false;
     }
     
-    public static function GetNamedRoute($handler, $servicePrefix, $routeName, $params = array()) {
+    public static function GetNamedRoute(IAppServices $handler, /*php_string*/ $servicePrefix, /*php_string*/ $routeName, array $params = array()) {
         $apiNamespace = self::GetApiVersionNamespace($handler, $servicePrefix);
         if ($apiNamespace == "") {
             $apiNamespace = "default";
@@ -149,7 +155,7 @@ class MgUtils
         return $app->urlFor($routeName, $params);
     }
 
-    public static function GetApiVersionNamespace($handler, $prefix) {
+    public static function GetApiVersionNamespace(IAppServices $handler, /*php_string*/ $prefix) {
         $pi = $handler->GetRequestPathInfo();
         if (strpos($pi, $prefix) > 0) {
             $tokens = explode("/", $pi);
@@ -168,7 +174,7 @@ class MgUtils
         }
     }
 
-    public static function TranscodeResourceUrl($baseUrl, $resId) {
+    public static function TranscodeResourceUrl(/*php_string*/ $baseUrl, MgResourceIdentifier $resId) {
         $fullUrl = $baseUrl;
         if ($resId->GetRepositoryType() == MgRepositoryType::Library) {
             $fullUrl .= "/library/";
@@ -179,7 +185,7 @@ class MgUtils
         return $fullUrl;
     }
 
-    public static function GetScale($extents, $csObj, $width, $height, $dpi)
+    public static function GetScale(MgEnvelope $extents, MgCoordinateSystem $csObj, /*php_int*/ $width, /*php_int*/ $height, /*php_int*/ $dpi)
     {
         $mapWidth = $csObj->ConvertCoordinateSystemUnitsToMeters($extents->GetWidth());
         $mapHeight = $csObj->ConvertCoordinateSystemUnitsToMeters($extents->GetHeight());
@@ -190,7 +196,7 @@ class MgUtils
         return min($xScale, $yScale);
     }
 
-    public static function GetFileNameFromMimeType($fileNameWithoutExtension, $mimeType = NULL) {
+    public static function GetFileNameFromMimeType(/*php_string*/ $fileNameWithoutExtension, /*php_string*/ $mimeType = NULL) {
         if ($mimeType == NULL) {
             return $fileNameWithoutExtension;
         } else {
@@ -223,7 +229,7 @@ class MgUtils
         }
     }
 
-    public static function ParseLibraryResourceID($parts, $stopAt = null) {
+    public static function ParseLibraryResourceID(array $parts, /*php_string*/ $stopAt = null) {
         $appendSlash = false;
         $count = count($parts);
         if ($stopAt != null) {
@@ -263,36 +269,36 @@ class MgUtils
         return new MgResourceIdentifier($resIdStr);
     }
 
-    public static function GetPaperSize($handler, $paperType) {
+    public static function GetPaperSize(IAppServices $handler, /*php_string*/ $paperType) {
         $sizes = $handler->GetConfig("PDF.PaperSizes");
         if (!array_key_exists($paperType, $sizes))
             throw new Exception($handler->GetLocalizedText("E_UNKNOWN_PAPER_SIZE", $paperType));
         return $sizes[$paperType];
     }
 
-    public static function ParseLocaleDouble($stringValue) {
+    public static function ParseLocaleDouble(/*php_string*/ $stringValue) {
         $lc = localeconv();
         $result = str_replace(".", $lc["decimal_point"], $stringValue);
         return doubleval($result);
     }
 
-    public static function InToMM($in) {
+    public static function InToMM(/*php_double*/ $in) {
         return $in * 25.4;
     }
 
-    public static function MMToIn($mm) {
+    public static function MMToIn(/*php_double*/ $mm) {
         return $mm / 25.4;
     }
 
-    public static function InToPx($in, $dpi) {
+    public static function InToPx(/*php_double*/ $in, /*php_int*/ $dpi) {
         return ($in * $dpi) / 25.4;
     }
     
-    public static function PxToIn($px, $dpi) {
+    public static function PxToIn(/*php_double*/ $px, /*php_int*/ $dpi) {
         return ($px * 25.4) / $dpi;
     }
 
-    public static function HtmlToRgba($argbColor) {
+    public static function HtmlToRgba(/*php_string*/ $argbColor) {
         if ($argbColor[0] == '#')
             $argbColor = substr($argbColor, 1);
 
@@ -322,7 +328,7 @@ class MgUtils
     //For example, convert 5.3 to 5, 5.5 to 6, 13 to 10, 230 to 200 and 1234 to 1200.
     //Basically no number will execced 9999 in scale bar display, however we support that situation
     //the minimum number for the return value is 0
-    public static function GetRoundNumber($number) {
+    public static function GetRoundNumber(/*php_double*/ $number) {
         $number = abs($number);
         $temp = $number = round($number);
         $len = 0;
@@ -354,26 +360,26 @@ class MgUtils
         return $number; 
     }
 
-    public static function MakeWktPolygon($x1, $y1, $x2, $y2) {
+    public static function MakeWktPolygon(/*php_double*/ $x1, /*php_double*/ $y1, /*php_double*/ $x2, /*php_double*/ $y2) {
         return "POLYGON(($x1 $y1, $x2 $y1, $x2 $y2, $x1 $y2, $x1 $y1))";
     }
 
-    public static function StringStartsWith($haystack, $needle) {
+    public static function StringStartsWith(/*php_string*/ $haystack, /*php_string*/ $needle) {
         return $needle === "" || strpos($haystack, $needle) === 0;
     }
 
-    public static function StringEndsWith($haystack, $needle) {
+    public static function StringEndsWith(/*php_string*/ $haystack, /*php_string*/ $needle) {
         return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
     }
 
-    public static function EscapeJsonString($str) {
+    public static function EscapeJsonString(/*php_string*/ $str) {
         $escapers = array("\\", "/", "\"", "\n", "\r", "\t", "\x08", "\x0c");
         $replacements = array("\\\\", "\\/", "\\\"", "\\n", "\\r", "\\t", "\\f", "\\b");
         $result = str_replace($escapers, $replacements, $str);
         return $result;
     }
 
-    public static function EscapeXmlChars($str) {
+    public static function EscapeXmlChars(/*php_string*/ $str) {
         $newStr = "";
         $len = strlen($str);
 
@@ -418,7 +424,7 @@ class MgUtils
         return ""; //"\n";
     }
 
-    public static function Json2Xml($value, $nodeName = null) {
+    public static function Json2Xml(/*php_mixed*/ $value, /*php_string*/ $nodeName = null) {
         //NOTE: This is not a generic JSON to XML conversion function. It is specialized for MapGuide's
         //case and makes several assumptions that do not apply to general conversion
         
@@ -479,7 +485,7 @@ class MgUtils
         return $xml;
     }
 
-    private static function DomElementToJson($domElement, $rootNode = true) {
+    private static function DomElementToJson(DOMElement $domElement, /*php_bool*/ $rootNode = true) {
         $result = '';
         if ($domElement->nodeType == XML_COMMENT_NODE) {
             return '';
@@ -598,14 +604,14 @@ class MgUtils
         return $result;
     }
 
-    public static function Xml2Json($xml) {
+    public static function Xml2Json(/*php_string*/ $xml) {
         $doc = new DOMDocument();
         $doc->loadXML($xml);
         $root = $doc->documentElement;
         return '{"'.$root->tagName.'":'.MgUtils::DomElementToJson($root).'}'; 
     }
 
-    public static function XslTransformByteReader($handler, $byteReader, $xslStylesheet, $xslParams) {
+    public static function XslTransformByteReader(IAppServices $handler, MgByteReader $byteReader, /*php_string*/ $xslStylesheet, array $xslParams) {
         $locale = $handler->GetConfig("Locale");
         $xslPath = dirname(__FILE__)."/../res/xsl/$locale/$xslStylesheet";
 
@@ -635,12 +641,12 @@ class MgUtils
         return $result;
     }
 
-    public static function StringToBool($str) {
+    public static function StringToBool(/*php_string*/ $str) {
         //boolval was only introduced in PHP 5.5, so this is the next best thing for older releases
         return filter_var($str, FILTER_VALIDATE_BOOLEAN);
     }
 
-    private static function ParseFeatureNode($handler, $propNodes, $agfRw, $wktRw, $classProps) {
+    private static function ParseFeatureNode(IAppServices $handler, DOMNodeList $propNodes, MgAgfReaderWriter $agfRw, MgWktReaderWriter $wktRw, MgPropertyDefinitionCollection $classProps) {
         $props = new MgPropertyCollection();
         for ($j = 0; $j < $propNodes->length; $j++) {
             $propNode = $propNodes->item($j);
@@ -804,14 +810,14 @@ class MgUtils
         return $props;
     }
 
-    public static function ParseMultiFeatureXml($handler, $classDef, $xml, $featureNodeName = "Feature", $propertyNodeName = "Property") {
+    public static function ParseMultiFeatureXml(IAppServices $handler, MgClassDefinition $classDef, /*php_string*/ $xml, /*php_string*/ $featureNodeName = "Feature", /*php_string*/ $propertyNodeName = "Property") {
         $doc = new DOMDocument();
         $doc->loadXML($xml);
 
         return MgUtils::ParseMultiFeatureDocument($handler, $classDef, $doc, $featureNodeName, $propertyNodeName);
     }
 
-    public static function ParseMultiFeatureDocument($handler, $classDef, $doc, $featureNodeName = "Feature", $propertyNodeName = "Property") {
+    public static function ParseMultiFeatureDocument(IAppServices $handler, MgClassDefinition $classDef, DOMDocument $doc, /*php_string*/ $featureNodeName = "Feature", /*php_string*/ $propertyNodeName = "Property") {
         $batchProps = new MgBatchPropertyCollection();
         $featureNodes = $doc->getElementsByTagName($featureNodeName);
 
@@ -828,7 +834,7 @@ class MgUtils
         return $batchProps;
     }
 
-    public static function ParseSingleFeatureDocument($app, $classDef, $doc, $featureNodeName = "Feature", $propertyNodeName = "Property") {
+    public static function ParseSingleFeatureDocument(IAppServices $handler, MgClassDefinition $classDef, DOMDocument $doc, /*php_string*/ $featureNodeName = "Feature", /*php_string*/ $propertyNodeName = "Property") {
         $wktRw = new MgWktReaderWriter();
         $agfRw = new MgAgfReaderWriter();
         $classProps = $classDef->GetProperties();
@@ -837,22 +843,22 @@ class MgUtils
         $featureNodes = $doc->GetElementsByTagName($featureNodeName);
         $propNodes = $featureNodes->item(0)->getElementsByTagName($propertyNodeName);
 
-        $props = MgUtils::ParseFeatureNode($app, $propNodes, $agfRw, $wktRw, $classProps);
+        $props = MgUtils::ParseFeatureNode($handler, $propNodes, $agfRw, $wktRw, $classProps);
         return $props;
     }
 
-    public static function ParseSingleFeatureXml($app, $classDef, $xml, $featureNodeName = "Feature", $propertyNodeName = "Property") {
+    public static function ParseSingleFeatureXml(IAppServices $handler, MgClassDefinition $classDef, /*php_string*/ $xml, /*php_string*/ $featureNodeName = "Feature", /*php_string*/ $propertyNodeName = "Property") {
         $doc = new DOMDocument($xml);
         $doc->loadXML($xml);
 
-        return MgUtils::ParseSingleFeatureDocument($app, $classDef, $doc, $featureNodeName, $propertyNodeName);
+        return MgUtils::ParseSingleFeatureDocument($handler, $classDef, $doc, $featureNodeName, $propertyNodeName);
     }
 
     /**
      * Builds a coordinate system transform from the class definition's coordinate system to the target
      * coordinate system indicated by the given coordinate system code
      */
-    public static function GetTransform($featSvc, $resId, $schemaName, $className, $transformto, $bInvert = false) {
+    public static function GetTransform(MgFeatureService $featSvc, MgResourceIdentifier $resId, /*php_string*/ $schemaName, /*php_string*/ $className, /*php_string*/ $transformto, /*php_bool*/ $bInvert = false) {
         $transform = null;
         $factory = new MgCoordinateSystemFactory();
         $targetWkt = $factory->ConvertCoordinateSystemCodeToWkt($transformto);
@@ -884,7 +890,7 @@ class MgUtils
         return $transform;
     }
 
-    public static function GetProviderCapabilties($featSvc, $resSvc, $fsId) {
+    public static function GetProviderCapabilties(MgFeatureService $featSvc, MgResourceService $resSvc, MgResourceIdentifier $fsId) {
         $content = $resSvc->GetResourceContent($fsId);
         $doc = new DOMDocument();
         $doc->loadXML($content->ToString());
@@ -897,7 +903,7 @@ class MgUtils
         return null;
     }
 
-    public static function GetFeatureClassMBR($handler, $featureSrvc, $featuresId, $schemaName, $className, $geomName = null, $transformToCsCode = null)
+    public static function GetFeatureClassMBR(IAppServices $handler, MgFeatureService $featureSrvc, MgResourceIdentifier $featuresId, /*php_string*/ $schemaName, /*php_string*/ $className, /*php_string*/ $geomName = null, /*php_string*/ $transformToCsCode = null)
     {
         $extentGeometryAgg = null;
         $extentGeometrySc = null;
@@ -1006,7 +1012,7 @@ class MgUtils
         return $mbr;
     }
 
-    public static function GetFeatureCount($featSvc, $featuresId, $schemaName, $className, $tryAggregate = true) {
+    public static function GetFeatureCount(MgFeatureService $featSvc, MgResourceIdentifier $featuresId, /*php_string*/ $schemaName, /*php_string*/ $className, /*php_bool*/ $tryAggregate = true) {
         //Try the SelectAggregate shortcut. This is faster than raw spinning a feature reader
         //
         //NOTE: If MapGuide supported scrollable readers like FDO, we'd have also tried 
@@ -1084,7 +1090,7 @@ class MgUtils
         return $totalEntries;
     }
 
-    public static function DateTimeToString($dt) {
+    public static function DateTimeToString(MgDateTime $dt) {
         $val = "";
         //WTF: IsDateTime() = true does not imply IsDate() = true and IsTime() = true
         //Therefore, we must explicitly test for the IsDateTime() case!
@@ -1119,7 +1125,7 @@ class MgUtils
         return $val;
     }
 
-    public static function GetBasicValueFromReader($reader, $propName) {
+    public static function GetBasicValueFromReader(MgReader $reader, /*php_string*/ $propName) {
         $val = "";
         if ($reader->IsNull($propName))
             return "";
@@ -1158,7 +1164,7 @@ class MgUtils
         return $val;
     }
 
-    public static function GetDistinctValues($featSvc, $fsId, $schemaName, $className, $distinctPropName) {
+    public static function GetDistinctValues(MgFeatureService $featSvc, MgResourceIdentifier $fsId, /*php_string*/ $schemaName, /*php_string*/ $className, /*php_string*/ $distinctPropName) {
         $values = array();
 
         $query = new MgFeatureAggregateOptions();
@@ -1172,7 +1178,7 @@ class MgUtils
         return $values;
     }
 
-    public static function RelativeToAbsoluteUrl($host, $path)
+    public static function RelativeToAbsoluteUrl(/*php_string*/ $host, /*php_string*/ $path)
     {
         $host_parts    = parse_url($host);
         $path_parts    = parse_url($path);
@@ -1290,7 +1296,7 @@ class MgUtils
         return $absolute_path;
     }
 
-    public static function ByteReaderToBase64($icon, $includeDataUriPrefix = false) {
+    public static function ByteReaderToBase64(MgByteReader $icon, /*php_bool*/ $includeDataUriPrefix = false) {
         $str = "";
         $buffer = '';
         $length = $icon->GetLength();
@@ -1310,7 +1316,7 @@ class MgUtils
     //
     // Due to the fixed size (16x16 px), the generated data URI will easily fall under the data URI limit of most (if not all) web browsers that support it.
     //
-    public static function GetLegendImageInline($mappingService, $layerDefinitionId, $scale, $geomType, $themeCategory, $iconWidth = 16, $iconHeight = 16, $iconFormat = MgImageFormats::Png, $includeDataUriPrefix = false)
+    public static function GetLegendImageInline(MgMappingService $mappingService, MgResourceIdentifier $layerDefinitionId, /*php_double*/ $scale, /*php_int*/ $geomType, /*php_int*/ $themeCategory, /*php_int*/ $iconWidth = 16, /*php_int*/ $iconHeight = 16, /*php_string*/ $iconFormat = MgImageFormats::Png, /*php_bool*/ $includeDataUriPrefix = false)
     {
         $icon = $mappingService->GenerateLegendImage($layerDefinitionId, $scale, $iconWidth, $iconHeight, $iconFormat, $geomType, $themeCategory);
         if ($icon != null)
@@ -1331,7 +1337,7 @@ class MgUtils
         return null;
     }
 
-    private static function PropertyDefinitionToJson($propDef, $isIdentity = false) {
+    private static function PropertyDefinitionToJson(MgPropertyDefinition $propDef, /*php_bool*/ $isIdentity = false) {
         $ptype = $propDef->GetPropertyType();
 
         $output = "{" . self::DEBUG_NEWLINE();
@@ -1379,7 +1385,7 @@ class MgUtils
         return $output;
     }
 
-    public static function ClassDefinitionToJson($clsDef) {
+    public static function ClassDefinitionToJson(MgClassDefinition $clsDef) {
         $idProps = $clsDef->GetIdentityProperties();
         $props = $clsDef->GetProperties();
         $propCount = $props->GetCount();
@@ -1404,7 +1410,7 @@ class MgUtils
         return $output;
     }
 
-    public static function SchemaToJson($schema) {
+    public static function SchemaToJson(MgFeatureSchema $schema) {
         $output = "{" . self::DEBUG_NEWLINE();
         $output .= '"Name": "'.self::EscapeJsonString($schema->GetName()).'",' . self::DEBUG_NEWLINE();
         $output .= '"Description": "'.self::EscapeJsonString($schema->GetDescription()).'",' . self::DEBUG_NEWLINE();
@@ -1423,7 +1429,7 @@ class MgUtils
         return $output;
     }
 
-    public static function SchemasToJson($schemas) {
+    public static function SchemasToJson(MgFeatureSchemaCollection $schemas) {
         $output = "{" . self::DEBUG_NEWLINE();
         $output .= '"Schemas": [';
         $schemaCount = $schemas->GetCount();
@@ -1442,7 +1448,7 @@ class MgUtils
     //This method should not have to exist, but we've discovered certain cases where partially
     //describing a schema does not give us a partial result (this must be a defect in the FDO provider). 
     //This method helps us workaround the problem, by whittling down the class list to only what's specified
-    public static function EnsurePartialSchema($schemas, $schemaName, $classNames) {
+    public static function EnsurePartialSchema(MgFeatureSchemaCollection $schemas, /*php_string*/ $schemaName, MgStringCollection $classNames) {
         
         $sidx = -1;
         for ($i = 0; $i < $schemas->GetCount(); $i++) {
@@ -1479,7 +1485,7 @@ class MgUtils
      * Call this for any controller action that does not use Slim (ie. Raw echo) to
      * output content
      */
-    public static function ApplyCorsIfApplicable($handler) {
+    public static function ApplyCorsIfApplicable(IAppServices $handler) {
         $corsOptions = $handler->GetConfig("MapGuide.Cors");
         if ($corsOptions != null) {
             foreach ($corsOptions as $key => $value) {
@@ -1507,7 +1513,7 @@ class MgUtils
         }
     }
     
-    public static function GetMimeTypeForFormat($format) {
+    public static function GetMimeTypeForFormat(/*php_string*/ $format) {
         $fmt = strtoupper($format);
         switch ($fmt) {
             case "PNG":
@@ -1529,7 +1535,7 @@ class MgUtils
         return $format;
     }
     
-    public static function MergeSelections($sel, $sel2) {
+    public static function MergeSelections(MgSelectionBase $sel, MgSelectionBase $sel2) {
         $layers = $sel2->GetLayers();
         if ($layers != NULL) {
             $count = $layers->GetCount();

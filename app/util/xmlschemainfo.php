@@ -567,7 +567,7 @@ class MgXmlSchemaInfo
         "/SelectionOverview/Layer" => "abcd1234",
     );
 
-    private static function GetXmlPath($domElement, $suffix = "") {
+    private static function GetXmlPath(DOMNode $domElement, /*php_string*/ $suffix = "") {
         $path = "/" . $domElement->nodeName . $suffix;
         $currNode = $domElement->parentNode;
         while ($currNode != null) {
@@ -583,12 +583,12 @@ class MgXmlSchemaInfo
         return $path;
     }
 
-    public static function DeEscape($str) {
+    public static function DeEscape(/*php_string*/ $str) {
         //Need to de-escape any escaped ' characters because an escaped ' is an illegal character under a double-quoted string in JSON
         return str_replace("\\'", "'", $str);
     }
 
-    private static function GetXmlType($domElement, $suffix = "") {
+    private static function GetXmlType(DOMNode $domElement, /*php_string*/ $suffix = "") {
         $path = self::GetXmlPath($domElement, $suffix);
         if (array_key_exists($path, self::$XML_ELEMENT_TYPES)) {
             return self::$XML_ELEMENT_TYPES[$path];
@@ -596,7 +596,7 @@ class MgXmlSchemaInfo
         return self::XML_DATA_TYPE_STRING;
     }
 
-    public static function GetAttributeValue($domAttr) {
+    public static function GetAttributeValue(DOMAttr $domAttr) {
         $parent = $domAttr->ownerElement;
         $type = self::GetXmlType($parent, "/@" . $domAttr->name);
         $result = null;
@@ -633,7 +633,7 @@ class MgXmlSchemaInfo
         return $result;
     }
 
-    public static function GetValue($domElement) {
+    public static function GetValue(DOMNode $domElement) {
         $result = null;
         $type = null;
         //If text node, we must walk up the parent to get the actual node path
@@ -677,7 +677,7 @@ class MgXmlSchemaInfo
         return $result;
     }
 
-    public static function IsMultiple($domElement, $suffix = "") {
+    public static function IsMultiple(DOMNode $domElement, /*php_string*/ $suffix = "") {
         $path = self::GetXmlPath($domElement, $suffix);
         $result = array_key_exists($path, self::$MULTI_ELEMENT_PATHS);
 

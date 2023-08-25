@@ -21,7 +21,7 @@ require_once "controller.php";
 require_once dirname(__FILE__)."/../util/lockutil.php";
 
 class MgTileServiceController extends MgBaseController {
-    public function __construct($app) {
+    public function __construct(IAppServices $app) {
         parent::__construct($app);
     }
 
@@ -53,7 +53,7 @@ class MgTileServiceController extends MgBaseController {
         $tileCacheName = str_replace(".MapDefinition", "", $tileCacheName);
         $tileCacheName = str_replace("/", "_", $tileCacheName);
         $path = sprintf("%s/%s/S%s/%s/%s/%s/%s_%s.%s",
-                        $this->GetConfig("MapGuide.PhysicalTilePath"),
+                        $this->app->GetConfig("MapGuide.PhysicalTilePath"),
                         $tileCacheName,
                         $scaleIndex,
                         $groupName,
@@ -61,14 +61,14 @@ class MgTileServiceController extends MgBaseController {
                         MgTileServiceController::GetFolderName("C", $col),
                         MgTileServiceController::GetTileIndexString($row),
                         MgTileServiceController::GetTileIndexString($col),
-                        $this->GetConfig("MapGuide.TileImageFormat"));
+                        $this->app->GetConfig("MapGuide.TileImageFormat"));
         //var_dump($path);
         //die;
         $path = str_replace("/", DIRECTORY_SEPARATOR, $path);
         if (file_exists($path)) {
             return filemtime($path);
         } else {
-            //$this->SetResponseHeader("X-Debug-Message", "Could not fetch mtime of $path. File does not exist");
+            //$this->app->SetResponseHeader("X-Debug-Message", "Could not fetch mtime of $path. File does not exist");
             return false;
         }
     }
@@ -78,7 +78,7 @@ class MgTileServiceController extends MgBaseController {
         $that = $this;
         $app = $this->app;
         $sessionId = "";
-        if ($resId->GetRepositoryType() === MgRepositoryType::Session && $this->GetRequestParameter("session") == null) {
+        if ($resId->GetRepositoryType() === MgRepositoryType::Session && $this->app->GetRequestParameter("session") == null) {
             $sessionId = $resId->GetRepositoryName();
         }
 
@@ -158,7 +158,7 @@ class MgTileServiceController extends MgBaseController {
         return false;
     }
 
-    private static function GetTilePath($handler, $resId, $groupName, $z, $x, $y, $type, $layerNames, $scale = 1) {
+    private static function GetTilePath(IAppServices $handler, $resId, $groupName, $z, $x, $y, $type, $layerNames, $scale = 1) {
         $ext = $type;
         if (strtolower($type) == "png8")
             $ext = substr($type, 0, 3); //png8 -> png
@@ -297,7 +297,7 @@ class MgTileServiceController extends MgBaseController {
 
     public function PutTileImageXYZ($map, $groupName, $retinaScale, $renderSvc, $path, $format, $boundsMinX, $boundsMinY, $boundsMaxX, $boundsMaxY, $layerNames, $requestId) {
         //We don't use RenderTile (as it uses key parameters that are locked to serverconfig.ini), we use RenderMap instead
-        $bufferPx = $this->GetConfig("MapGuide.XYZTileBuffer") * $retinaScale;
+        $bufferPx = $this->app->GetConfig("MapGuide.XYZTileBuffer") * $retinaScale;
         $tileWidth = self::XYZ_TILE_WIDTH * $retinaScale;
         $tileHeight = self::XYZ_TILE_HEIGHT * $retinaScale;
         $ratio = $bufferPx / $tileWidth;
@@ -342,7 +342,7 @@ class MgTileServiceController extends MgBaseController {
             $tmpPath = tempnam(sys_get_temp_dir(), 'TempTile');
             $sink->ToFile($tmpPath);
             
-            $this->LogDebug("($requestId): Saved image to $tmpPath for cropping");
+            $this->app->LogDebug("($requestId): Saved image to $tmpPath for cropping");
             
             $im = null;
             switch ($format)
@@ -373,7 +373,7 @@ class MgTileServiceController extends MgBaseController {
                 //are you're using MGOS 3.0 that has native XYZ tile support in which case: Why are you even
                 //here?
                 imagecopy($tile, $im, 0, 0, $bufferPx, $bufferPx, $tileWidth, $tileHeight);
-                $this->LogDebug("($requestId): Cropped image. Saving to $path");
+                $this->app->LogDebug("($requestId): Cropped image. Saving to $path");
                 
                 switch ($format)
                 {
@@ -431,7 +431,7 @@ class MgTileServiceController extends MgBaseController {
         
         $lock = $lockUtil->Acquire($y);
         
-        $section = new MgGetTileXYZCriticalSection($this, $resId, $groupName, $x, $y, $z, $layerNames, $type);
+        $section = new MgGetTileXYZCriticalSection($this->app, $resId, $groupName, $x, $y, $z, $layerNames, $type);
         $lock->EnterCriticalSection($this->app, $section);
     }
 
@@ -444,7 +444,7 @@ class MgTileServiceController extends MgBaseController {
         
         $lock = $lockUtil->Acquire($y);
         
-        $section = new MgGetTileXYZCriticalSection($this, $resId, $groupName, $x, $y, $z, $layerNames, $type);
+        $section = new MgGetTileXYZCriticalSection($this->app, $resId, $groupName, $x, $y, $z, $layerNames, $type);
         $section->SetRetinaScale($scale);
         $lock->EnterCriticalSection($this->app, $section);
     }

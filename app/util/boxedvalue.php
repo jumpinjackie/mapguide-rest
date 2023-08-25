@@ -21,7 +21,7 @@ require_once "utils.php";
 
 class MgBoxedValue
 {
-    private static function BoxValue($value, $type, $fmt = "xml") {
+    private static function BoxValue(/*php_string*/ $value, /*php_string*/ $type, /*php_string*/ $fmt = "xml") {
         $resp = "";
         if ($fmt == "xml") {
             $resp .= '<?xml version="1.0" encoding="utf-8"?>';
@@ -41,19 +41,19 @@ class MgBoxedValue
         return $resp;
     }
 
-    public static function Boolean($value, $fmt = "xml") {
+    public static function Boolean(/*php_bool*/ $value, /*php_string*/ $fmt = "xml") {
         return self::BoxValue($value ? "true" : "false", "Boolean", $fmt);
     }
 
-    public static function Int32($value, $fmt = "xml") {
+    public static function Int32(/*php_int*/ $value, /*php_string*/ $fmt = "xml") {
         return self::BoxValue($value, "Int32", $fmt);
     }
 
-    public static function Int64($value, $fmt = "xml") {
+    public static function Int64(/*php_long*/ $value, /*php_string*/ $fmt = "xml") {
         return self::BoxValue($value, "Int64", $fmt);
     }
 
-    public static function String($value, $fmt = "xml") {
+    public static function String(/*php_string*/ $value, /*php_string*/ $fmt = "xml") {
         return self::BoxValue($value, "String", $fmt);
     }
 }

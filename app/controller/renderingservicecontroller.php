@@ -20,15 +20,15 @@
 require_once "controller.php";
 
 class MgRenderingServiceController extends MgBaseController {
-    public function __construct($app) {
+    public function __construct(IAppServices $app) {
         parent::__construct($app);
     }
 
-    public function RenderDynamicOverlayImage($sessionId, $mapName, $format) {
+    public function RenderDynamicOverlayImage(/*php_string*/ $sessionId, /*php_string*/ $mapName, /*php_string*/ $format) {
         $req = new MgHttpRequest("");
         $param = $req->GetRequestParam();
         $param->AddParameter("SESSION", $sessionId);
-        $param->AddParameter("LOCALE", $this->GetConfig("Locale"));
+        $param->AddParameter("LOCALE", $this->app->GetConfig("Locale"));
         $param->AddParameter("CLIENTAGENT", "MapGuide REST Extension");
         $param->AddParameter("CLIENTIP", $this->GetClientIp());
         $param->AddParameter("OPERATION", "GETDYNAMICMAPOVERLAYIMAGE");
@@ -36,75 +36,75 @@ class MgRenderingServiceController extends MgBaseController {
         $param->AddParameter("MAPNAME", $mapName);
         $param->AddParameter("FORMAT", strtoupper($format));
 
-        $selColor = $this->GetRequestParameter("selectioncolor", null);
+        $selColor = $this->app->GetRequestParameter("selectioncolor", null);
         if ($selColor != null)
             $param->AddParameter("SELECTIONCOLOR", $selColor);
 
-        $behavior = $this->GetRequestParameter("behavior", null);
+        $behavior = $this->app->GetRequestParameter("behavior", null);
         if ($behavior != null)
             $param->AddParameter("BEHAVIOR", $behavior);
 
-        $x = $this->GetRequestParameter("x", null);
+        $x = $this->app->GetRequestParameter("x", null);
         if ($x != null)
             $param->AddParameter("SETVIEWCENTERX", $x);
 
-        $y = $this->GetRequestParameter("y", null);
+        $y = $this->app->GetRequestParameter("y", null);
         if ($y != null)
             $param->AddParameter("SETVIEWCENTERY", $y);
 
-        $scale = $this->GetRequestParameter("scale", null);
+        $scale = $this->app->GetRequestParameter("scale", null);
         if ($scale != null)
             $param->AddParameter("SETVIEWSCALE", $scale);
 
-        $dpi = $this->GetRequestParameter("dpi", null);
+        $dpi = $this->app->GetRequestParameter("dpi", null);
         if ($dpi != null)
             $param->AddParameter("SETDISPLAYDPI", $dpi);
 
-        $width = $this->GetRequestParameter("width", null);
+        $width = $this->app->GetRequestParameter("width", null);
         if ($width != null)
             $param->AddParameter("SETDISPLAYWIDTH", $width);
 
-        $height = $this->GetRequestParameter("height", null);
+        $height = $this->app->GetRequestParameter("height", null);
         if ($height != null)
             $param->AddParameter("SETDISPLAYHEIGHT", $height);
 
-        $showlayers = $this->GetRequestParameter("showlayers", null);
+        $showlayers = $this->app->GetRequestParameter("showlayers", null);
         if ($showlayers != null)
             $param->AddParameter("SHOWLAYERS", $showlayers);
 
-        $hidelayers = $this->GetRequestParameter("hidelayers", null);
+        $hidelayers = $this->app->GetRequestParameter("hidelayers", null);
         if ($hidelayers != null)
             $param->AddParameter("HIDELAYERS", $hidelayers);
 
-        $showgroups = $this->GetRequestParameter("showgroups", null);
+        $showgroups = $this->app->GetRequestParameter("showgroups", null);
         if ($showgroups != null)
             $param->AddParameter("SHOWGROUPS", $showgroups);
 
-        $hidegroups = $this->GetRequestParameter("hidegroups", null);
+        $hidegroups = $this->app->GetRequestParameter("hidegroups", null);
         if ($hidegroups != null)
             $param->AddParameter("HIDEGROUPS", $hidegroups);
 
         $this->ExecuteHttpRequest($req);
     }
 
-    public function RenderMapDefinition($mdfId, $format) {
+    public function RenderMapDefinition(MgResourceIdentifier $mdfId, /*php_string*/ $format) {
         $resIdStr = $mdfId->ToString();
-        $x = $this->GetRequestParameter("x", null);
-        $y = $this->GetRequestParameter("y", null);
-        $scale = $this->GetRequestParameter("scale", null);
-        $width = $this->GetRequestParameter("width", null);
-        $height = $this->GetRequestParameter("height", null);
+        $x = $this->app->GetRequestParameter("x", null);
+        $y = $this->app->GetRequestParameter("y", null);
+        $scale = $this->app->GetRequestParameter("scale", null);
+        $width = $this->app->GetRequestParameter("width", null);
+        $height = $this->app->GetRequestParameter("height", null);
 
         if ($x == null)
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "x"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "x"), $this->GetMimeTypeForFormat($format));
         if ($y == null)
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "y"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "y"), $this->GetMimeTypeForFormat($format));
         if ($scale == null)
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "scale"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "scale"), $this->GetMimeTypeForFormat($format));
         if ($width == null)
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "width"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "width"), $this->GetMimeTypeForFormat($format));
         if ($height == null)
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "height"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "height"), $this->GetMimeTypeForFormat($format));
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr, $format, $x, $y, $scale, $width, $height) {
@@ -117,7 +117,7 @@ class MgRenderingServiceController extends MgBaseController {
             if ($keepSelection != null)
                 $param->AddParameter("KEEPSELECTION", $keepSelection);
 
-            $clip = $that->GetRequestParameter("clip", null);
+            $clip = $that->app->GetRequestParameter("clip", null);
             if ($clip != null)
                 $param->AddParameter("CLIP", $clip);
 
@@ -125,26 +125,26 @@ class MgRenderingServiceController extends MgBaseController {
             $param->AddParameter("SETVIEWCENTERY", $y);
             $param->AddParameter("SETVIEWSCALE", $scale);
 
-            $dpi = $that->GetRequestParameter("dpi", null);
+            $dpi = $that->app->GetRequestParameter("dpi", null);
             if ($dpi != null)
                 $param->AddParameter("SETDISPLAYDPI", $dpi);
             
             $param->AddParameter("SETDISPLAYWIDTH", $width);
             $param->AddParameter("SETDISPLAYHEIGHT", $height);
 
-            $showlayers = $that->GetRequestParameter("showlayers", null);
+            $showlayers = $that->app->GetRequestParameter("showlayers", null);
             if ($showlayers != null)
                 $param->AddParameter("SHOWLAYERS", $showlayers);
 
-            $hidelayers = $that->GetRequestParameter("hidelayers", null);
+            $hidelayers = $that->app->GetRequestParameter("hidelayers", null);
             if ($hidelayers != null)
                 $param->AddParameter("HIDELAYERS", $hidelayers);
 
-            $showgroups = $that->GetRequestParameter("showgroups", null);
+            $showgroups = $that->app->GetRequestParameter("showgroups", null);
             if ($showgroups != null)
                 $param->AddParameter("SHOWGROUPS", $showgroups);
 
-            $hidegroups = $that->GetRequestParameter("hidegroups", null);
+            $hidegroups = $that->app->GetRequestParameter("hidegroups", null);
             if ($hidegroups != null)
                 $param->AddParameter("HIDEGROUPS", $hidegroups);
 
@@ -152,11 +152,11 @@ class MgRenderingServiceController extends MgBaseController {
         });
     }
 
-    public function RenderRuntimeMap($sessionId, $mapName, $format) {
+    public function RenderRuntimeMap(/*php_string*/ $sessionId, /*php_string*/ $mapName, /*php_string*/ $format) {
         $req = new MgHttpRequest("");
         $param = $req->GetRequestParam();
         $param->AddParameter("SESSION", $sessionId);
-        $param->AddParameter("LOCALE", $this->GetConfig("Locale"));
+        $param->AddParameter("LOCALE", $this->app->GetConfig("Locale"));
         $param->AddParameter("CLIENTAGENT", "MapGuide REST Extension");
         $param->AddParameter("CLIENTIP", $this->GetClientIp());
         $param->AddParameter("OPERATION", "GETMAPIMAGE");
@@ -164,62 +164,62 @@ class MgRenderingServiceController extends MgBaseController {
         $param->AddParameter("MAPNAME", $mapName);
         $param->AddParameter("FORMAT", strtoupper($format));
 
-        $keepSelection = $this->GetRequestParameter("keepselection", null);
+        $keepSelection = $this->app->GetRequestParameter("keepselection", null);
         if ($keepSelection != null)
             $param->AddParameter("KEEPSELECTION", $keepSelection);
 
-        $clip = $this->GetRequestParameter("clip", null);
+        $clip = $this->app->GetRequestParameter("clip", null);
         if ($clip != null)
             $param->AddParameter("CLIP", $clip);
 
-        $x = $this->GetRequestParameter("x", null);
+        $x = $this->app->GetRequestParameter("x", null);
         if ($x != null)
             $param->AddParameter("SETVIEWCENTERX", $x);
 
-        $y = $this->GetRequestParameter("y", null);
+        $y = $this->app->GetRequestParameter("y", null);
         if ($y != null)
             $param->AddParameter("SETVIEWCENTERY", $y);
 
-        $scale = $this->GetRequestParameter("scale", null);
+        $scale = $this->app->GetRequestParameter("scale", null);
         if ($scale != null)
             $param->AddParameter("SETVIEWSCALE", $scale);
 
-        $dpi = $this->GetRequestParameter("dpi", null);
+        $dpi = $this->app->GetRequestParameter("dpi", null);
         if ($dpi != null)
             $param->AddParameter("SETDISPLAYDPI", $dpi);
 
-        $width = $this->GetRequestParameter("width", null);
+        $width = $this->app->GetRequestParameter("width", null);
         if ($width != null)
             $param->AddParameter("SETDISPLAYWIDTH", $width);
 
-        $height = $this->GetRequestParameter("height", null);
+        $height = $this->app->GetRequestParameter("height", null);
         if ($height != null)
             $param->AddParameter("SETDISPLAYHEIGHT", $height);
 
-        $showlayers = $this->GetRequestParameter("showlayers", null);
+        $showlayers = $this->app->GetRequestParameter("showlayers", null);
         if ($showlayers != null)
             $param->AddParameter("SHOWLAYERS", $showlayers);
 
-        $hidelayers = $this->GetRequestParameter("hidelayers", null);
+        $hidelayers = $this->app->GetRequestParameter("hidelayers", null);
         if ($hidelayers != null)
             $param->AddParameter("HIDELAYERS", $hidelayers);
 
-        $showgroups = $this->GetRequestParameter("showgroups", null);
+        $showgroups = $this->app->GetRequestParameter("showgroups", null);
         if ($showgroups != null)
             $param->AddParameter("SHOWGROUPS", $showgroups);
 
-        $hidegroups = $this->GetRequestParameter("hidegroups", null);
+        $hidegroups = $this->app->GetRequestParameter("hidegroups", null);
         if ($hidegroups != null)
             $param->AddParameter("HIDEGROUPS", $hidegroups);
 
         $this->ExecuteHttpRequest($req);
     }
 
-    public function RenderRuntimeMapLegend($sessionId, $mapName, $format) {
+    public function RenderRuntimeMapLegend(/*php_string*/ $sessionId, /*php_string*/ $mapName, /*php_string*/ $format) {
         $req = new MgHttpRequest("");
         $param = $req->GetRequestParam();
         $param->AddParameter("SESSION", $sessionId);
-        $param->AddParameter("LOCALE", $this->GetConfig("Locale"));
+        $param->AddParameter("LOCALE", $this->app->GetConfig("Locale"));
         $param->AddParameter("CLIENTAGENT", "MapGuide REST Extension");
         $param->AddParameter("CLIENTIP", $this->GetClientIp());
         $param->AddParameter("OPERATION", "GETMAPLEGENDIMAGE");
@@ -227,11 +227,11 @@ class MgRenderingServiceController extends MgBaseController {
         $param->AddParameter("MAPNAME", $mapName);
         $param->AddParameter("FORMAT", strtoupper($format));
 
-        $width = $this->GetRequestParameter("width", null);
+        $width = $this->app->GetRequestParameter("width", null);
         if ($width != null)
             $param->AddParameter("WIDTH", $width);
 
-        $height = $this->GetRequestParameter("height", null);
+        $height = $this->app->GetRequestParameter("height", null);
         if ($height != null)
             $param->AddParameter("HEIGHT", $height);
 

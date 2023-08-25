@@ -21,11 +21,11 @@ class Localizer
 {
     private $strings;
 
-    public function __construct($strings) {
+    public function __construct(array $strings) {
         $this->strings = $strings;
     }
 
-    public function getText($key) {
+    public function getText(/*php_string*/ $key) {
         $args = array_slice(func_get_args(), 1);
         if (array_key_exists($key, $this->strings)) {
             $ret = @vsprintf($this->strings[$key], $args);

@@ -19,6 +19,7 @@
 
 require_once dirname(__FILE__)."/../../controller/coordinatesystemcontroller.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
+require_once dirname(__FILE__)."/../../core/app.php";
 
 /**
  *     @SWG\Get(
@@ -34,7 +35,7 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  *     )
  */
 $app->get("/coordsys/baselibrary.:format", function($format) use ($app) {
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController(new AppServices($app));
     $ctrl->GetBaseLibrary($format);
 });
 /**
@@ -52,7 +53,7 @@ $app->get("/coordsys/baselibrary.:format", function($format) use ($app) {
  *     )
  */
 $app->post("/coordsys/validatewkt.:format", function($format) use ($app) {
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController(new AppServices($app));
     $ctrl->ValidateWkt($format);
 });
 /**
@@ -70,7 +71,7 @@ $app->post("/coordsys/validatewkt.:format", function($format) use ($app) {
  *     )
  */
 $app->post("/coordsys/wkttoepsg.:format", function($format) use ($app) {
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController(new AppServices($app));
     $ctrl->WktToEpsg($format);
 });
 /**
@@ -88,7 +89,7 @@ $app->post("/coordsys/wkttoepsg.:format", function($format) use ($app) {
  *     )
  */
 $app->post("/coordsys/wkttomentor.:format", function($format) use ($app) {
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController(new AppServices($app));
     $ctrl->WktToMentor($format);
 });
 /**
@@ -105,7 +106,7 @@ $app->post("/coordsys/wkttomentor.:format", function($format) use ($app) {
  *     )
  */
 $app->get("/coordsys/categories.:format", function($format) use ($app) {
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController(new AppServices($app));
     $ctrl->EnumerateCategories($format); 
 });
 /**
@@ -123,7 +124,7 @@ $app->get("/coordsys/categories.:format", function($format) use ($app) {
  *     )
  */
 $app->get("/coordsys/category.:format/:category", function($format, $category) use ($app) {
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController(new AppServices($app));
     $ctrl->EnumerateCoordinateSystemsByCategory($category, $format);
 });
 /**
@@ -141,7 +142,7 @@ $app->get("/coordsys/category.:format/:category", function($format, $category) u
  *     )
  */
 $app->get("/coordsys/mentor/:cscode/epsg.:format", function($cscode, $format) use ($app) {
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController(new AppServices($app));
     $ctrl->ConvertCsCodeToEpsg($cscode, $format);
 });
 /**
@@ -159,7 +160,7 @@ $app->get("/coordsys/mentor/:cscode/epsg.:format", function($cscode, $format) us
  *     )
  */
 $app->get("/coordsys/mentor/:cscode/wkt.:format", function($cscode, $format) use ($app) {
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController(new AppServices($app));
     $ctrl->ConvertCsCodeToWkt($cscode, $format); 
 });
 /**
@@ -177,7 +178,7 @@ $app->get("/coordsys/mentor/:cscode/wkt.:format", function($cscode, $format) use
  *     )
  */
 $app->get("/coordsys/epsg/:epsg/mentor.:format", function($epsg, $format) use ($app) {
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController(new AppServices($app));
     $ctrl->ConvertEpsgToCsCode($epsg, $format);
 });
 /**
@@ -195,7 +196,7 @@ $app->get("/coordsys/epsg/:epsg/mentor.:format", function($epsg, $format) use ($
  *     )
  */
 $app->get("/coordsys/epsg/:epsg/wkt.:format", function($epsg, $format) use ($app) {
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController(new AppServices($app));
     $ctrl->ConvertEpsgToWkt($epsg, $format);
 });
 /*
@@ -203,14 +204,14 @@ $app->post("/coordsys/tomentor/:wkt+", function($wkt) use ($app) {
     $wktStr = implode("/", $wkt);
     echo $wktStr;
     die;
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController(new AppServices($app));
     $ctrl->ConvertWktToCsCode($wktStr);
 });
 $app->post("/coordsys/toepsg/:wkt+", function($wkt) use ($app) {
     $wktStr = implode("/", $wkt);
     echo $wktStr;
     die;
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController(new AppServices($app));
     $ctrl->ConvertWktToEpsg($wktStr);
 });
 */

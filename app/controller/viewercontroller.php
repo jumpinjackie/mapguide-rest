@@ -21,32 +21,31 @@ require_once "controller.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgViewerController extends MgBaseController {
-    public function __construct($app) {
+    public function __construct(IAppServices $app) {
         parent::__construct($app);
     }
 
-    public function LaunchAjaxViewer($resId) {
+    public function LaunchAjaxViewer(MgResourceIdentifier $resId) {
         $sessionPart = "";
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
             $sessionPart = "&SESSION=$sessionId";
         }
-        $selfUrl = MgUtils::GetSelfUrlRoot($this->GetConfig("SelfUrl"));
-        $this->Redirect("$selfUrl/../mapviewerajax/?WEBLAYOUT=".$resId->ToString().$sessionPart);
+        $selfUrl = MgUtils::GetSelfUrlRoot($this->app->GetConfig("SelfUrl"));
+        $this->app->Redirect("$selfUrl/../mapviewerajax/?WEBLAYOUT=".$resId->ToString().$sessionPart);
     }
 
-    public function LaunchFusionViewer($resId, $template) {
+    public function LaunchFusionViewer(MgResourceIdentifier $resId, /*php_string*/ $template) {
         $sessionPart = "";
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
             $sessionPart = "&session=$sessionId";
         }
-        $selfUrl = MgUtils::GetSelfUrlRoot($this->GetConfig("SelfUrl"));
-        $this->Redirect("$selfUrl/../fusion/templates/mapguide/$template/index.html?ApplicationDefinition=".$resId->ToString().$sessionPart);
+        $selfUrl = MgUtils::GetSelfUrlRoot($this->app->GetConfig("SelfUrl"));
+        $this->app->Redirect("$selfUrl/../fusion/templates/mapguide/$template/index.html?ApplicationDefinition=".$resId->ToString().$sessionPart);
     }
 
-    private function GetFeatureClassMBR($featuresId, $className, $geomProp, $featureSrvc)
-    {
+    private function GetFeatureClassMBR(MgResourceIdentifier $featuresId, /*php_string*/ $className, MgGeometricPropertyDefinition $geomProp, MgFeatureService $featureSrvc) {
         $extentGeometryAgg = null;
         $extentGeometrySc = null;
         $extentByteReader = null;
@@ -132,7 +131,7 @@ class MgViewerController extends MgBaseController {
         return $mbr;
     }
 
-    private function GetLayerBBOX($featSvc, $resSvc, $ldfId) {
+    private function GetLayerBBOX(MgFeatureService $featSvc, MgResourceService $resSvc, MgResourceIdentifier $ldfId) {
         $br = $resSvc->GetResourceContent($ldfId);
         $doc = new DOMDocument();
         $doc->loadXML($br->ToString());
@@ -183,14 +182,14 @@ class MgViewerController extends MgBaseController {
         return $bbox;
     }
 
-    private function CreateLayerXmlFragment($ldfId) {
+    private function CreateLayerXmlFragment(MgResourceIdentifier $ldfId) {
         return sprintf("<MapLayer><Name>%s</Name><ResourceId>%s</ResourceId><Selectable>true</Selectable><ShowInLegend>true</ShowInLegend><LegendLabel>%s</LegendLabel><ExpandInLegend>true</ExpandInLegend><Visible>true</Visible><Group /></MapLayer>",
             $ldfId->GetName(),
             $ldfId->ToString(),
             $ldfId->GetName());
     }
 
-    private function CreateWatermarkFragment($resId) {
+    private function CreateWatermarkFragment(MgResourceIdentifier $resId) {
         return sprintf("<Watermarks><Watermark><Name>%s</Name><ResourceId>%s</ResourceId></Watermark></Watermarks>",
             $resId->GetName(),
             $resId->ToString());
@@ -198,12 +197,12 @@ class MgViewerController extends MgBaseController {
 
     const XY_COORDSYS = 'LOCAL_CS["Non-Earth (Meter)",LOCAL_DATUM["Local Datum",0],UNIT["Meter", 1],AXIS["X",EAST],AXIS["Y",NORTH]]';
 
-    public function LaunchResourcePreview($resId) {
+    public function LaunchResourcePreview(MgResourceIdentifier $resId) {
         $sessionId = "";
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
         } else {
-            $sessionId = $this->GetRequestParameter("session");
+            $sessionId = $this->app->GetRequestParameter("session");
         }
         $this->EnsureAuthenticationForSite($sessionId, true);
         $siteConn = new MgSiteConnection();
@@ -214,11 +213,11 @@ class MgViewerController extends MgBaseController {
             $userInfo = new MgUserInformation($sessionId);
             $siteConn->Open($userInfo);
         }
-        $selfUrl = MgUtils::GetSelfUrlRoot($this->GetConfig("SelfUrl"));
+        $selfUrl = MgUtils::GetSelfUrlRoot($this->app->GetConfig("SelfUrl"));
         switch ($resId->GetResourceType()) {
             case MgResourceType::FeatureSource:
                 {
-                    $this->Redirect("$selfUrl/../schemareport/describeschema.php?viewer=basic&schemaName=&className=&resId=".$resId->ToString()."&sessionId=".$sessionId);
+                    $this->app->Redirect("$selfUrl/../schemareport/describeschema.php?viewer=basic&schemaName=&className=&resId=".$resId->ToString()."&sessionId=".$sessionId);
                 }
                 break;
             case MgResourceType::LayerDefinition:
@@ -241,7 +240,7 @@ class MgViewerController extends MgBaseController {
                     $previewId = new MgResourceIdentifier("Session:$sessionId//Preview.WebLayout");
 
                     $resSvc->SetResource($previewId, $br, NULL);
-                    $this->Redirect("$selfUrl/../mapviewerajax/?SESSION=$sessionId&USERNAME=Anonymous&WEBLAYOUT=".$previewId->ToString());
+                    $this->app->Redirect("$selfUrl/../mapviewerajax/?SESSION=$sessionId&USERNAME=Anonymous&WEBLAYOUT=".$previewId->ToString());
                 }
                 break;
             case MgResourceType::MapDefinition:
@@ -260,7 +259,7 @@ class MgViewerController extends MgBaseController {
                     $previewId = new MgResourceIdentifier("Session:$sessionId//Preview.WebLayout");
 
                     $resSvc->SetResource($previewId, $br, NULL);
-                    $this->Redirect("$selfUrl/../mapviewerajax/?SESSION=$sessionId&USERNAME=Anonymous&WEBLAYOUT=".$previewId->ToString());
+                    $this->app->Redirect("$selfUrl/../mapviewerajax/?SESSION=$sessionId&USERNAME=Anonymous&WEBLAYOUT=".$previewId->ToString());
                 }
                 break;
             case MgResourceType::SymbolDefinition:
@@ -298,11 +297,11 @@ class MgViewerController extends MgBaseController {
                     $previewId = new MgResourceIdentifier("Session:$sessionId//Preview.WebLayout");
 
                     $resSvc->SetResource($previewId, $br, NULL);
-                    $this->Redirect("$selfUrl/../mapviewerajax/?SESSION=$sessionId&USERNAME=Anonymous&WEBLAYOUT=".$previewId->ToString());
+                    $this->app->Redirect("$selfUrl/../mapviewerajax/?SESSION=$sessionId&USERNAME=Anonymous&WEBLAYOUT=".$previewId->ToString());
                 }
                 break;
             default:
-                $this->BadRequest($this->GetLocalizedText("E_UNPREVIEWABLE_RESOURCE_TYPE"), MgMimeType::Html);
+                $this->BadRequest($this->app->GetLocalizedText("E_UNPREVIEWABLE_RESOURCE_TYPE"), MgMimeType::Html);
                 break;
         }
     }

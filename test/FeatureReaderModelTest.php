@@ -59,7 +59,7 @@ class MockClass
     }
 }
 
-class MockReader
+class MockReader implements IReader
 {
     private $i;
     private $data;
@@ -153,7 +153,7 @@ class MockReader
     }
 }
 
-class MockFormatterSet
+class MockFormatterSet implements IFormatterSet
 {
     public function GetFormatter($formatterName) {
         return null;

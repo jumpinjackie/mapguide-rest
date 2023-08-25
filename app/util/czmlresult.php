@@ -42,7 +42,7 @@ class MgCzmlResult
     private $lineStyleNo;
     private $areaStyleNo;
 
-    public function __construct($featSvc, $fsId, $className, $query, $limit, $baseFilter, $vlNode, $writer = NULL) {
+    public function __construct(MgFeatureService $featSvc, MgResourceIdentifier $fsId, /*php_string*/ $className, MgFeatureQueryOptions $query, /*php_int*/ $limit, /*php_string*/ $baseFilter, DOMNode $vlNode, MgChunkWriter $writer = NULL) {
         $this->featSvc = $featSvc;
         $this->limit = $limit;
         $this->fsId = $fsId;
@@ -60,7 +60,7 @@ class MgCzmlResult
             $this->writer = new MgHttpChunkWriter();
     }
 
-    public function CheckAndSetDownloadHeaders($handler, $format) {
+    public function CheckAndSetDownloadHeaders(IAppServices $handler, /*php_string*/ $format) {
         $downloadFlag = $handler->GetRequestParameter("download");
         if ($downloadFlag === "1" || $downloadFlag === "true") {
             $fn = "download";
@@ -73,7 +73,7 @@ class MgCzmlResult
         }
     }
 
-    public function SetTransform($tx) {
+    public function SetTransform(MgTransform $tx) {
         $this->transform = $tx;
     }
 
@@ -98,7 +98,7 @@ class MgCzmlResult
         return $style;
     }
 
-    private function CreatePointStyle($query, $ruleNode) {
+    private function CreatePointStyle(MgFeatureQueryOptions $query, DOMNode $ruleNode) {
         $style = new stdClass();
         $sym2DNodes = $ruleNode->getElementsByTagName("PointSymbolization2D");
         $sym2DNode = $sym2DNodes->item(0);
@@ -143,7 +143,7 @@ class MgCzmlResult
         return $style;
     }
 
-    private function CreateLineStyle($query, $ruleNode) {
+    private function CreateLineStyle(MgFeatureQueryOptions $query, DOMNode $ruleNode) {
         $style = new stdClass();
         $sym2DNodes = $ruleNode->getElementsByTagName("LineSymbolization2D");
         $sym2DNode = $sym2DNodes->item(0);
@@ -171,7 +171,7 @@ class MgCzmlResult
         return $style;
     }
 
-    private function CreateAreaStyle($query, $ruleNode) {
+    private function CreateAreaStyle(MgFeatureQueryOptions $query, DOMNode $ruleNode) {
         $style = new stdClass();
         $sym2DNodes = $ruleNode->getElementsByTagName("AreaSymbolization2D");
         $sym2DNode = $sym2DNodes->item(0);

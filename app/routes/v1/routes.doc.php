@@ -26,9 +26,11 @@
 
 require_once dirname(__FILE__)."/../../version.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
+require_once dirname(__FILE__)."/../../core/app.php";
 
 $app->get("/apidoc/", function() use ($app) {
-    $prefix = MgUtils::GetApiVersionNamespace($app, "/apidoc");
+    $wrap = new AppServices($app);
+    $prefix = MgUtils::GetApiVersionNamespace($wrap, "/apidoc");
     $path = $app->config("AppRootDir")."/doc/data/swagger.json";
     
     $data = null;
@@ -40,8 +42,8 @@ $app->get("/apidoc/", function() use ($app) {
         $data = file_get_contents($path);
     }
     
-    $app->response->header("Content-Type", "application/json");
-    $app->response->setBody($data);
+    $wrap->SetResponseHeader("Content-Type", "application/json");
+    $wrap->SetResponseBody($data);
     /*
     //HACK: swagger-php doesn't seem to support annotations for describing the API
     //So we'll intercept the api-docs.json request via this route to inject that
@@ -66,44 +68,46 @@ $app->get("/apidoc/", function() use ($app) {
     */
 });
 $app->get("/doc/index.html", function() use ($app) {
-    $prefix = MgUtils::GetApiVersionNamespace($app, "/doc/index.html");
+    $wrap = new AppServices($app);
+    $prefix = MgUtils::GetApiVersionNamespace($wrap, "/doc/index.html");
     if (strlen($prefix) > 0)
-        $docUrl = $app->config("SelfUrl")."/$prefix/apidoc";
+        $docUrl = $wrap->GetConfig("SelfUrl")."/$prefix/apidoc";
     else
-        $docUrl = $app->config("SelfUrl")."/apidoc";
-    $assetUrlRoot = $app->config("SelfUrl")."/doc";
-    $docTpl = $app->config("AppRootDir")."/assets/doc/viewer.tpl";
+        $docUrl = $wrap->GetConfig("SelfUrl")."/apidoc";
+    $assetUrlRoot = $wrap->GetConfig("SelfUrl")."/doc";
+    $docTpl = $wrap->GetConfig("AppRootDir")."/assets/doc/viewer.tpl";
 
     $smarty = new Smarty();
-    $smarty->setCompileDir($app->config("Cache.RootDir")."/templates_c");
-    $smarty->assign("title", $app->localizer->getText("L_PRODUCT_API_REFERENCE", "mapguide-rest"));
+    $smarty->setCompileDir($wrap->GetConfig("Cache.RootDir")."/templates_c");
+    $smarty->assign("title", $wrap->GetLocalizedText("L_PRODUCT_API_REFERENCE", "mapguide-rest"));
     $smarty->assign("docUrl", $docUrl);
     $smarty->assign("docAssetRoot", $assetUrlRoot);
 
     $output = $smarty->fetch($docTpl);
-    $app->response->header("Content-Type", "text/html");
-    $app->response->setBody($output);
+    $wrap->SetResponseHeader("Content-Type", "text/html");
+    $wrap->SetResponseBody($output);
 });
 $app->get("/apidoc/:file", function($file) use ($app) {
     if (MgUtils::StringEndsWith($file, ".json"))
         $file = str_replace(".json", "", $file);
 
-    $prefix = MgUtils::GetApiVersionNamespace($app, "/apidoc");
+    $wrap = new AppServices($app);
+    $prefix = MgUtils::GetApiVersionNamespace($wrap, "/apidoc");
     if (strlen($prefix) > 0) {
-        $path = $app->config("AppRootDir")."/doc/data/$prefix/$file.json";
+        $path = $wrap->GetConfig("AppRootDir")."/doc/data/$prefix/$file.json";
     } else {
-        $path = $app->config("AppRootDir")."/doc/data/$file.json";
+        $path = $wrap->GetConfig("AppRootDir")."/doc/data/$file.json";
     }
 
     $doc = json_decode(file_get_contents($path));
     if (strlen($prefix) > 0) {
-        $doc->basePath = $app->config("SelfUrl")."/$prefix";
+        $doc->basePath = $wrap->GetConfig("SelfUrl")."/$prefix";
     } else {
-        $doc->basePath = $app->config("SelfUrl");
+        $doc->basePath = $wrap->GetConfig("SelfUrl");
     }
     $doc->swaggerVersion = SWAGGER_API_VERSION;
     $doc->apiVersion = MG_REST_API_VERSION;
 
-    $app->response->header("Content-Type", "application/json");
-    $app->response->setBody(json_encode($doc));
+    $wrap->SetResponseHeader("Content-Type", "application/json");
+    $wrap->SetResponseBody(json_encode($doc));
 });

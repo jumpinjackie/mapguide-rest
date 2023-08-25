@@ -20,7 +20,7 @@ require_once dirname(__FILE__)."/utils.php";
 
 class MgCzmlWriter
 {
-    private static function SingleFeatureToCzml($idVal, $reader, $geomCzml) {
+    private static function SingleFeatureToCzml(/*php_string|php_int*/ $idVal, MgReader $reader, /*php_string*/ $geomCzml) {
         $output = "{";
         $output .= '"id": "'.$idVal.'"';
 
@@ -55,7 +55,7 @@ class MgCzmlWriter
         return $output;
     }
 
-    public static function FeatureToCzml($reader, $agfRw, $transform, $geometryName, $style, $idName = NULL) {
+    public static function FeatureToCzml(MgReader $reader, MgAgfReaderWriter $agfRw, MgTransform $transform, /*php_string*/ $geometryName, array $style, /*php_string*/ $idName = NULL) {
         if (!$reader->IsNull($geometryName)) {
 
             $agf = null;
@@ -167,7 +167,7 @@ class MgCzmlWriter
         }
     }
 
-    private static function GeometryToCzml($geom, $reader, $style, $zval = 0.0) {
+    private static function GeometryToCzml(MgGeometry $geom, MgReader $reader, array $style, /*php_double*/ $zval = 0.0) {
         $geomType = $geom->GetGeometryType();
         //TODO: Convert all the geometry types.
         //TODO: Translate Layer Definition styles to CZML styles
@@ -222,7 +222,7 @@ class MgCzmlWriter
         }
     }
 
-    private static function CoordToCzml($coord, $zval = 0.0, $enclose = true) {
+    private static function CoordToCzml(MgCoordinate $coord, /*php_double*/ $zval = 0.0, /*php_bool*/ $enclose = true) {
         $str = "";
         if ($enclose)
             $str .= "[";
@@ -232,7 +232,7 @@ class MgCzmlWriter
         return $str;
     }
 
-    private static function LineStringToCzml($coords, $zval = 0.0) {
+    private static function LineStringToCzml(MgCoordinateIterator $coords, /*php_double*/ $zval = 0.0) {
         //HACK: Cesium does not like polylines that are all the same coordinates.
         //To workaround this, we bail on any line strings that have identical coordinates
         //this assoc array will use to check for this
@@ -260,7 +260,7 @@ class MgCzmlWriter
             return $str;
     }
 
-    private static function PolygonToCzml($geom, $zval = 0.0) {
+    private static function PolygonToCzml(MgGeometry $geom, /*php_double*/ $zval = 0.0) {
         $str = '{ "cartographicDegrees": [';
         $first = true;
         //TODO: Only handles exterior ring. Can CZML support polygons with holes?

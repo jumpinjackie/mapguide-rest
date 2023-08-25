@@ -44,9 +44,9 @@ class MgNullFeatureReader
 
 abstract class MgChunkWriter
 {
-    public abstract function SetHeader($name, $value);
+    public abstract function SetHeader(/*php_string*/ $name, /*php_string*/ $value);
 
-    public abstract function WriteChunk($chunk);
+    public abstract function WriteChunk(/*php_string*/ $chunk);
 
     public abstract function StartChunking();
 
@@ -57,15 +57,15 @@ class MgSlimChunkWriter extends MgChunkWriter
 {
     private $handler;
 
-    public function __construct($handler) {
+    public function __construct(IAppServices $handler) {
         $this->handler = $handler;
     }
 
-    public function SetHeader($name, $value) {
+    public function SetHeader(/*php_string*/ $name, /*php_string*/ $value) {
         $this->handler->SetResponseHeader($name, $value);
     }
 
-    public function WriteChunk($chunk) {
+    public function WriteChunk(/*php_string*/ $chunk) {
         $this->handler->WriteResponseContent($chunk);
     }
 
@@ -85,7 +85,7 @@ class MgHtmlHeaderFooterModel
     public $prevPageUrl;
     public $nextPageUrl;
 
-    public function __construct($className) {
+    public function __construct(/*php_string*/ $className) {
         $this->className = $className;
         $this->maxPages = -1;
         $this->pageNo = 1;
@@ -105,7 +105,7 @@ class MgHtmlBodyModel
     public $propertyCount;
     private $displayMap;
 
-    public function __construct($reader, $transform = null, $limit = -1, $displayMap = null) {
+    public function __construct(MgReader $reader, MgTransform $transform = null, /*php_int*/ $limit = -1, array $displayMap = null) {
         $this->reader = $reader;
         $this->propertyCount = $this->reader->GetPropertyCount();
         $this->agfRw = new MgAgfReaderWriter();
@@ -125,7 +125,7 @@ class MgHtmlBodyModel
             return false;
     }
 
-    public function propertyName($index) {
+    public function propertyName(/*php_int*/ $index) {
         $name = $this->reader->GetPropertyName($index);
         if (isset($this->displayMap) && array_key_exists($name, $this->displayMap)) {
             $name = $this->displayMap[$name];
@@ -133,7 +133,7 @@ class MgHtmlBodyModel
         return $name;
     }
 
-    public function getValue($i) {
+    public function getValue(/*php_int*/ $i) {
         $output = "";
         $propType = $this->reader->GetPropertyType($i);
         if (!$this->reader->IsNull($i)) {
@@ -254,7 +254,7 @@ class MgReaderChunkedResult
     private $orientation;
     private $templateRootDir;
 
-    public function __construct($featSvc, $reader, $limit, $writer) {
+    public function __construct(MgFeatureService $featSvc, MgReader $reader, /*php_int*/ $limit, MgChunkWriter $writer) {
         $this->featSvc = $featSvc;
         $this->reader = $reader;
         $this->limit = $limit;
@@ -272,7 +272,7 @@ class MgReaderChunkedResult
         $this->displayMap = $displayMap;
     }
 
-    public function CheckAndSetDownloadHeaders($handler, $format) {
+    public function CheckAndSetDownloadHeaders(IAppServices $handler, $format) {
         $downloadFlag = $handler->GetRequestParameter("download");
         if ($downloadFlag === "1" || $downloadFlag === "true") {
             $fn = "download";
@@ -285,15 +285,15 @@ class MgReaderChunkedResult
         }
     }
 
-    public function SetAttributeDisplayOrientation($orientation) {
+    public function SetAttributeDisplayOrientation(/*php_string*/ $orientation) {
         $this->orientation = $orientation;
     }
 
-    public function SetTransform($tx) {
+    public function SetTransform(MgTransform $tx) {
         $this->transform = $tx;
     }
 
-    public function SetHtmlParams($handler) {
+    public function SetHtmlParams(IAppServices $handler) {
         $this->baseUrl = $handler->GetConfig("SelfUrl");
         $this->thisUrl = $handler->GetConfig("SelfUrl").$handler->GetRequestPathInfo();
         $this->thisReqParams = $handler->GetAllRequestParams();
@@ -301,7 +301,7 @@ class MgReaderChunkedResult
         $this->locale = $handler->GetConfig("Locale");
     }
 
-    private function OutputGeoJson($schemas) {
+    private function OutputGeoJson(MgFeatureSchemaCollection $schemas) {
         $read = 0;
         $agfRw = new MgAgfReaderWriter();
 
@@ -339,7 +339,7 @@ class MgReaderChunkedResult
         $this->reader->Close();
     }
 
-    private static function WriteFeatureAttributeCell($reader, $i, $agfRw, $wktRw, $transform = null) {
+    private static function WriteFeatureAttributeCell(MgReader $reader, /*php_int*/ $i, MgAgfReaderWriter $agfRw, MgWktReaderWriter $wktRw, MgTransform $transform = null) {
         $output = "";
         $propType = $reader->GetPropertyType($i);
         if (!$reader->IsNull($i)) {
@@ -392,7 +392,7 @@ class MgReaderChunkedResult
         return $output;
     }
 
-    private function OutputHtml($schemas) {
+    private function OutputHtml(MgFeatureSchemaCollection $schemas) {
         $read = 0;
 
         $paginated = (is_callable(array($this->reader, "GetPageSize")) && is_callable(array($this->reader, "GetPageNo")));
@@ -481,7 +481,7 @@ class MgReaderChunkedResult
         $this->reader->Close();
     }
 
-    private function IsEmpty($schemas) {
+    private function IsEmpty(MgFeatureSchemaCollection $schemas) {
         $count = 0;
         for ($i = 0; $i < $schemas->GetCount(); $i++) {
             $schema = $schemas->GetItem($i);
@@ -491,7 +491,7 @@ class MgReaderChunkedResult
         return $count == 0;
     }
 
-    private function OutputXml($schemas) {
+    private function OutputXml(MgFeatureSchemaCollection $schemas) {
         $read = 0;
         $agfRw = new MgAgfReaderWriter();
         $wktRw = new MgWktReaderWriter();
@@ -594,7 +594,7 @@ class MgReaderChunkedResult
         $this->reader->Close();
     }
 
-    public function Output($format = "xml") {
+    public function Output(/*php_string*/ $format = "xml") {
         $schemas = new MgFeatureSchemaCollection();
         $schema = new MgFeatureSchema("TempSchema", "");
         $schemas->Add($schema);

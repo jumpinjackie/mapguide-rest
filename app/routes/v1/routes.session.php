@@ -26,6 +26,7 @@ require_once dirname(__FILE__)."/../../controller/tileservicecontroller.php";
 require_once dirname(__FILE__)."/../../controller/mappingservicecontroller.php";
 require_once dirname(__FILE__)."/../../controller/renderingservicecontroller.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
+require_once dirname(__FILE__)."/../../core/app.php";
 
 /**
  *     @SWG\Post(
@@ -41,7 +42,7 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  *     )
  */
 $app->post("/session.:format", function($format) use ($app) {
-    $ctrl = new MgRestServiceController($app);
+    $ctrl = new MgRestServiceController(new AppServices($app));
     $ctrl->CreateSession($format);
 });
 /**
@@ -57,7 +58,7 @@ $app->post("/session.:format", function($format) use ($app) {
  *     )
  */
 $app->delete("/session/:sessionId", function($sessionId) use ($app) {
-    $ctrl = new MgRestServiceController($app);
+    $ctrl = new MgRestServiceController(new AppServices($app));
     $ctrl->DestroySession($sessionId);
 });
 /**
@@ -74,7 +75,7 @@ $app->delete("/session/:sessionId", function($sessionId) use ($app) {
  *     )
  */
 $app->get("/session/:sessionId/timeout.:format", function($sessionId, $format) use ($app) {
-    $ctrl = new MgRestServiceController($app);
+    $ctrl = new MgRestServiceController(new AppServices($app));
     $ctrl->GetSessionTimeout($sessionId, $format);
 });
 /**
@@ -104,7 +105,7 @@ $app->get("/session/:sessionId/timeout.:format", function($sessionId, $format) u
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/image.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgRenderingServiceController($app);
+    $ctrl = new MgRenderingServiceController(new AppServices($app));
     $ctrl->RenderRuntimeMap($sessionId, $mapName, $format);
 });
 /**
@@ -136,7 +137,7 @@ $app->get("/session/:sessionId/:mapName.Map/image.:format", function($sessionId,
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/overlayimage.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgRenderingServiceController($app);
+    $ctrl = new MgRenderingServiceController(new AppServices($app));
     $ctrl->RenderDynamicOverlayImage($sessionId, $mapName, $format);
 });
 /**
@@ -156,7 +157,7 @@ $app->get("/session/:sessionId/:mapName.Map/overlayimage.:format", function($ses
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/legendimage.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgRenderingServiceController($app);
+    $ctrl = new MgRenderingServiceController(new AppServices($app));
     $ctrl->RenderRuntimeMapLegend($sessionId, $mapName, $format);
 });
 /**
@@ -180,7 +181,7 @@ $app->get("/session/:sessionId/:mapName.Map/legendimage.:format", function($sess
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/layers.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgMapController($app);
+    $ctrl = new MgMapController(new AppServices($app));
     $ctrl->EnumerateMapLayers($sessionId, $mapName, $format);
 });
 /**
@@ -198,7 +199,7 @@ $app->get("/session/:sessionId/:mapName.Map/layers.:format", function($sessionId
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/layergroups.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgMapController($app);
+    $ctrl = new MgMapController(new AppServices($app));
     $ctrl->EnumerateMapLayerGroups($sessionId, $mapName, $format);
 });
 /**
@@ -229,7 +230,7 @@ $app->get("/session/:sessionId/:mapName.Map/layergroups.:format", function($sess
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/plot.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgMappingServiceController($app);
+    $ctrl = new MgMappingServiceController(new AppServices($app));
     $ctrl->GeneratePlot($sessionId, $mapName, $format);
 });
 /**
@@ -252,7 +253,7 @@ $app->get("/session/:sessionId/:mapName.Map/plot.:format", function($sessionId, 
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/description.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgMappingServiceController($app);
+    $ctrl = new MgMappingServiceController(new AppServices($app));
     $ctrl->DescribeRuntimeMap($sessionId, $mapName, $format);
 });
 /**
@@ -270,7 +271,7 @@ $app->get("/session/:sessionId/:mapName.Map/description.:format", function($sess
  *     )
  */
 $app->put("/session/:sessionId/:mapName.Map/layersandgroups.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgMapController($app);
+    $ctrl = new MgMapController(new AppServices($app));
     $ctrl->UpdateMapLayersAndGroups($sessionId, $mapName, $format);
 });
 /**
@@ -287,7 +288,7 @@ $app->put("/session/:sessionId/:mapName.Map/layersandgroups.:format", function($
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgMapController($app);
+    $ctrl = new MgMapController(new AppServices($app));
     $ctrl->GetSelectionXml($sessionId, $mapName);
 });
 /**
@@ -305,7 +306,7 @@ $app->get("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $ma
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Selection/layers.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgMapController($app);
+    $ctrl = new MgMapController(new AppServices($app));
     $ctrl->GetSelectionLayerNames($sessionId, $mapName, $format);
 });
 /**
@@ -324,7 +325,7 @@ $app->get("/session/:sessionId/:mapName.Selection/layers.:format", function($ses
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Selection/overview.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgMapController($app);
+    $ctrl = new MgMapController(new AppServices($app));
     $ctrl->GetSelectionOverview($sessionId, $mapName, $format);
 });
 /**
@@ -350,7 +351,7 @@ $app->get("/session/:sessionId/:mapName.Selection/overview.:format", function($s
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Selection/features.:format/:layerName", function($sessionId, $mapName, $format, $layerName) use ($app) {
-    $ctrl = new MgMapController($app);
+    $ctrl = new MgMapController(new AppServices($app));
     $ctrl->GetSelectedFeatures($sessionId, $mapName, $layerName, $format);
 })->name("get_selected_features_$namespace");
 /**
@@ -368,7 +369,7 @@ $app->get("/session/:sessionId/:mapName.Selection/features.:format/:layerName", 
  *     )
  */
 $app->post("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgMapController($app);
+    $ctrl = new MgMapController(new AppServices($app));
     $ctrl->UpdateSelectionFromXml($sessionId, $mapName);
 });
 /**
@@ -398,7 +399,7 @@ $app->post("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $m
  *     )
  */
 $app->put("/session/:sessionId/:mapName.Selection", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgMapController($app);
+    $ctrl = new MgMapController(new AppServices($app));
     $ctrl->QueryMapFeatures($sessionId, $mapName);
 });
 /**
@@ -417,7 +418,7 @@ $app->put("/session/:sessionId/:mapName.Selection", function($sessionId, $mapNam
  */
 $app->post("/session/:sessionId/:resName.Map", function($sessionId, $resName) use($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.Map");
-    $ctrl = new MgMapController($app);
+    $ctrl = new MgMapController(new AppServices($app));
     $ctrl->CreateMap($resId);
 })->name("session_resource_id_$namespace");
 //
@@ -444,7 +445,7 @@ $app->post("/session/:sessionId/:resName.Map", function($sessionId, $resName) us
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/status", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->TestConnection($resId);
 });
 /**
@@ -463,7 +464,7 @@ $app->get("/session/:sessionId/:resName.FeatureSource/status", function($session
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/spatialcontexts.:format", function($sessionId, $resName, $format) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetSpatialContexts($resId, $format);
 });
 /**
@@ -487,7 +488,7 @@ $app->get("/session/:sessionId/:resName.FeatureSource/longtransactions.:format",
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetLongTransactions($resId, $format);
 });
 /**
@@ -506,7 +507,7 @@ $app->get("/session/:sessionId/:resName.FeatureSource/longtransactions.:format",
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/schemas.:format", function($sessionId, $resName, $format) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetSchemaNames($resId, $format);
 });
 /**
@@ -527,7 +528,7 @@ $app->get("/session/:sessionId/:resName.FeatureSource/schemas.:format", function
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/schema.:format/:schemaName", function($sessionId, $resName, $format, $schemaName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->DescribeSchema($resId, $schemaName, $format);
 });
 /**
@@ -547,7 +548,7 @@ $app->get("/session/:sessionId/:resName.FeatureSource/schema.:format/:schemaName
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/classes.:format/:schemaName", function($sessionId, $resName, $format, $schemaName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetClassNames($resId, $schemaName, $format);
 });
 /**
@@ -568,7 +569,7 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classes.:format/:schemaNam
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetClassDefinition($resId, $schemaName, $className, $format);
 });
 /**
@@ -588,7 +589,7 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:schemaNa
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:qualifiedClassName", function($sessionId, $resName, $format, $qualifiedClassName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $tokens = explode(":", $qualifiedClassName);
     $schemaName = "";
     $className = "";
@@ -616,7 +617,7 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:qualifie
  */
 $app->post("/session/:sessionId/:resName.FeatureSource/xml", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->CreateFeatureSource($resId, "xml");
 });
 /**
@@ -635,7 +636,7 @@ $app->post("/session/:sessionId/:resName.FeatureSource/xml", function($sessionId
  */
 $app->post("/session/:sessionId/:resName.FeatureSource/json", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->CreateFeatureSource($resId, "json");
 });
 /**
@@ -657,7 +658,7 @@ $app->post("/session/:sessionId/:resName.FeatureSource/json", function($sessionI
  */
 $app->post("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->InsertFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -679,7 +680,7 @@ $app->post("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaN
  */
 $app->put("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->UpdateFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -701,7 +702,7 @@ $app->put("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaNa
  */
 $app->delete("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->DeleteFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -727,7 +728,7 @@ $app->delete("/session/:sessionId/:resName.FeatureSource/features.:format/:schem
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->SelectFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -754,7 +755,7 @@ $app->get("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaNa
  */
 $app->get("/session/:sessionId/:resName.LayerDefinition/features.:format", function($sessionId, $resName, $format) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->SelectLayerFeatures($resId, $format);
 });
 /**
@@ -776,7 +777,7 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/features.:format", funct
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/aggregates.:format/:type/:schemaName/:className", function($sessionId, $resName, $format, $type, $schemaName, $className) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->SelectAggregates($resId, $schemaName, $className, $type, $format);
 });
 //========================= Resource Service APIs ================================
@@ -797,7 +798,7 @@ $app->get("/session/:sessionId/:resName.FeatureSource/aggregates.:format/:type/:
  */
 $app->get("/session/:sessionId/:resName/datalist.:format", function($sessionId, $resName, $format) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->EnumerateResourceData($resId, $format);
 });
 /**
@@ -816,7 +817,7 @@ $app->get("/session/:sessionId/:resName/datalist.:format", function($sessionId, 
  */
 $app->get("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->GetResourceData($resId, $dataName);
 });
 /**
@@ -837,7 +838,7 @@ $app->get("/session/:sessionId/:resName/data/:dataName", function($sessionId, $r
  */
 $app->post("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->SetResourceData($resId, $dataName);
 });
 /**
@@ -856,19 +857,19 @@ $app->post("/session/:sessionId/:resName/data/:dataName", function($sessionId, $
  */
 $app->delete("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->DeleteResourceData($resId, $dataName);
 });
 /*
 //Need to confirm if like EnumerateResources, this is not permitted on session repos
 $app->get("/session/:sessionId/:resName/header", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->GetResourceHeader($resId, "xml");
 });
 $app->get("/session/:sessionId/:resName/header.:format", function($sessionId, $resName, $format) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->GetResourceHeader($resId, $format);
 });
 */
@@ -890,7 +891,7 @@ $app->get("/session/:sessionId/:resName/header.:format", function($sessionId, $r
  */
 $app->post("/session/:sessionId/:resName/contentorheader.:format", function($sessionId, $resName, $format) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->SetResourceContentOrHeader($resId, $format);
 });
 /**
@@ -910,7 +911,7 @@ $app->post("/session/:sessionId/:resName/contentorheader.:format", function($ses
  */
 $app->post("/session/:sessionId/:resName/content.:format", function($sessionId, $resName, $format) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->SetResourceContent($resId, $format);
 });
 /**
@@ -929,7 +930,7 @@ $app->post("/session/:sessionId/:resName/content.:format", function($sessionId, 
  */
 $app->get("/session/:sessionId/:resName/content.:format", function($sessionId, $resName, $format) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->GetResourceContent($resId, $format);
 });
 /**
@@ -948,7 +949,7 @@ $app->get("/session/:sessionId/:resName/content.:format", function($sessionId, $
  */
 $app->get("/session/:sessionId/:resName/references.:format", function($sessionId, $resName, $format) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->EnumerateResourceReferences($resId, $format);
 });
 /**
@@ -966,7 +967,7 @@ $app->get("/session/:sessionId/:resName/references.:format", function($sessionId
  */
 $app->delete("/session/:sessionId/:resName", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->DeleteResource($resId);
 });
 //================================== Tile Service APIs =======================================
@@ -991,7 +992,7 @@ $app->delete("/session/:sessionId/:resName", function($sessionId, $resName) use 
  */
 $app->get("/session/:sessionId/:resName.MapDefinition/tile.:format/:groupName/:scaleIndex/:col/:row", function($sessionId, $resName, $format, $groupName, $scaleIndex, $col, $row) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
-    $ctrl = new MgTileServiceController($app);
+    $ctrl = new MgTileServiceController(new AppServices($app));
     $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $format);
 });
 //============================== Mapping Service APIs =====================================
@@ -1017,7 +1018,7 @@ $app->get("/session/:sessionId/:resName.MapDefinition/tile.:format/:groupName/:s
  */
 $app->get("/session/:sessionId/:resName.LayerDefinition/legend/:scale/:geomtype/:themecat/icon.:format", function($sessionId, $resName, $scale, $geomtype, $themecat, $format) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
-    $ctrl = new MgMappingServiceController($app);
+    $ctrl = new MgMappingServiceController(new AppServices($app));
     $ctrl->GenerateLegendImage($resId, $scale, $geomtype, $themecat, $format);
 });
 //============================= Rendering Service APIs ====================================
@@ -1046,7 +1047,7 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/legend/:scale/:geomtype/
  */
 $app->get("/session/:sessionId/:resName.MapDefinition/image.:format", function($sessionId, $resName, $format) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
-    $ctrl = new MgRenderingServiceController($app);
+    $ctrl = new MgRenderingServiceController(new AppServices($app));
     $ctrl->RenderMapDefinition($resId, $format);
 });
 
@@ -1067,7 +1068,7 @@ $app->get("/session/:sessionId/:resName.MapDefinition/image.:format", function($
  */
 $app->get("/session/:sessionId/:resName.WebLayout/viewer", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.WebLayout");
-    $ctrl = new MgViewerController($app);
+    $ctrl = new MgViewerController(new AppServices($app));
     $ctrl->LaunchAjaxViewer($resId);
 });
 
@@ -1087,7 +1088,7 @@ $app->get("/session/:sessionId/:resName.WebLayout/viewer", function($sessionId, 
  */
 $app->get("/session/:sessionId/:resName.ApplicationDefinition/viewer/:template", function($sessionId, $resName, $template) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.ApplicationDefinition");
-    $ctrl = new MgViewerController($app);
+    $ctrl = new MgViewerController(new AppServices($app));
     $ctrl->LaunchFusionViewer($resId, $template);
 });
 
@@ -1106,7 +1107,7 @@ $app->get("/session/:sessionId/:resName.ApplicationDefinition/viewer/:template",
  */
 $app->get("/session/:sessionId/:resName.FeatureSource/preview", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgViewerController($app);
+    $ctrl = new MgViewerController(new AppServices($app));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1125,7 +1126,7 @@ $app->get("/session/:sessionId/:resName.FeatureSource/preview", function($sessio
  */
 $app->get("/session/:sessionId/:resName.LayerDefinition/preview", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
-    $ctrl = new MgViewerController($app);
+    $ctrl = new MgViewerController(new AppServices($app));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1144,7 +1145,7 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/preview", function($sess
  */
 $app->get("/session/:sessionId/:resName.MapDefinition/preview", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
-    $ctrl = new MgViewerController($app);
+    $ctrl = new MgViewerController(new AppServices($app));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1163,7 +1164,7 @@ $app->get("/session/:sessionId/:resName.MapDefinition/preview", function($sessio
  */
 $app->get("/session/:sessionId/:resName.SymbolDefinition/preview", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.SymbolDefinition");
-    $ctrl = new MgViewerController($app);
+    $ctrl = new MgViewerController(new AppServices($app));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1182,7 +1183,7 @@ $app->get("/session/:sessionId/:resName.SymbolDefinition/preview", function($ses
  */
 $app->get("/session/:sessionId/:resName.WatermarkDefinition/preview", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.WatermarkDefinition");
-    $ctrl = new MgViewerController($app);
+    $ctrl = new MgViewerController(new AppServices($app));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1203,7 +1204,7 @@ $app->get("/session/:sessionId/:resName.WatermarkDefinition/preview", function($
  *     )
  */
 $app->get("/session/:sessionId/:mapName.Map/kml", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgKmlServiceController($app);
+    $ctrl = new MgKmlServiceController(new AppServices($app));
     $ctrl->GetSessionMapKml($sessionId, $mapName, "kml");
 });
 
@@ -1223,7 +1224,7 @@ $app->get("/session/:sessionId/:mapName.Map/kml", function($sessionId, $mapName)
  */
 $app->get("/session/:sessionId/:resName.MapDefinition/kml", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
-    $ctrl = new MgKmlServiceController($app);
+    $ctrl = new MgKmlServiceController(new AppServices($app));
     $ctrl->GetMapKml($resId, "kml");
 });
 
@@ -1247,7 +1248,7 @@ $app->get("/session/:sessionId/:resName.MapDefinition/kml", function($sessionId,
  */
 $app->get("/session/:sessionId/:resName.LayerDefinition/kml", function($sessionId, $resName) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
-    $ctrl = new MgKmlServiceController($app);
+    $ctrl = new MgKmlServiceController(new AppServices($app));
     $ctrl->GetLayerKml($resId, "kml");
 });
 
@@ -1272,6 +1273,6 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/kml", function($sessionI
  */
 $app->get("/session/:sessionId/:resName.LayerDefinition/kmlfeatures.:format", function($sessionId, $resName, $format) use ($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
-    $ctrl = new MgKmlServiceController($app);
+    $ctrl = new MgKmlServiceController(new AppServices($app));
     $ctrl->GetFeaturesKml($resId, $format);
 });

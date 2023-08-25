@@ -19,7 +19,7 @@
 
 class MgReaderToGeoJsonWriter
 {
-    public static function FeatureToGeoJson($reader, $agfRw, $transform, $idName = NULL, $displayMap = NULL) {
+    public static function FeatureToGeoJson(MgReader $reader, MgAgfReaderWriter $agfRw, MgTransform $transform = NULL, /*php_string*/ $idName = NULL, array $displayMap = NULL) {
         $idVal = NULL;
         $propVals = array();
         $geomJson = "";
@@ -129,7 +129,7 @@ class MgReaderToGeoJsonWriter
         return $output;
     }
 
-    public static function ToGeoJson($geom, $bIncludePropertyName = true, $coord_precision = 7) {
+    public static function ToGeoJson(MgGeometry $geom, /*php_bool*/ $bIncludePropertyName = true, /*php_int*/ $coord_precision = 7) {
         $geomType = $geom->GetGeometryType();
         $prefix = "";
         if ($bIncludePropertyName)
@@ -206,13 +206,13 @@ class MgReaderToGeoJsonWriter
         }
     }
 
-    public static function CoordToGeoJson($coord, $coord_precision = 7) {
+    public static function CoordToGeoJson(MgCoordinate $coord, /*php_int*/ $coord_precision = 7) {
         $x = $coord->GetX();
         $y = $coord->GetY();
         return "[".number_format($x, $coord_precision, '.', '').", ".number_format($y, $coord_precision, '.', '')."]";
     }
 
-    public static function CoordsToGeoJson($coords, $coord_precision = 7) {
+    public static function CoordsToGeoJson(MgCoordinateIterator $coords, /*php_int*/ $coord_precision = 7) {
         $str = '[';
         $first = true;
         while ($coords->MoveNext()) {
@@ -228,7 +228,7 @@ class MgReaderToGeoJsonWriter
         return $str;
     }
 
-    public static function MultiLineStringToGeoJson($multiLineStr, $coord_precision = 7) {
+    public static function MultiLineStringToGeoJson(MgMultiLineString $multiLineStr, /*php_int*/ $coord_precision = 7) {
         $str = '[';
 
         $count = $multiLineStr->GetCount();
@@ -246,7 +246,7 @@ class MgReaderToGeoJsonWriter
         return $str;
     }
 
-    public static function PolygonToGeoJson($poly, $coord_precision = 7) {
+    public static function PolygonToGeoJson(MgPolygon $poly, /*php_int*/ $coord_precision = 7) {
         $str = '[';
 
         $extRing = $poly->GetExteriorRing();

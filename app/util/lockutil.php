@@ -27,7 +27,7 @@ class MgFileLockUtil
     private $requestId;
     private $handler;
     
-    public function __construct($handler, $path, $requestId, $maxCreateDirAttempts = 5, $lockFileFormat = "lock_%s.lck") {
+    public function __construct(IAppServices $handler, $path, $requestId, $maxCreateDirAttempts = 5, $lockFileFormat = "lock_%s.lck") {
         $this->handler = $handler;
         $this->path = $path;
         $this->lockFileFormat = $lockFileFormat;
@@ -50,7 +50,7 @@ class MgFileLockUtil
                 $attempts++;
                 //Bail after MAX_RETRY_ATTEMPTS
                 if ($attempts >= $this->maxCreateDirAttempts)
-                    throw new Exception($this->GetLocalizedText("E_FAILED_TO_CREATE_DIR_AFTER_N_ATTEMPTS", $attempts), $this->GetMimeTypeForFormat($type));
+                    throw new Exception($this->app->GetLocalizedText("E_FAILED_TO_CREATE_DIR_AFTER_N_ATTEMPTS", $attempts), $this->GetMimeTypeForFormat($type));
             }
         }
         
@@ -129,7 +129,7 @@ class MgFileLock
             throw new Exception($sectionError);
         }
         
-        $section->PostProcess($this->requestId, $this->handler, $this, $this->filePath);
+        $section->PostProcess($this->requestId, $this->handler, $this->app, $this->filePath);
         // Release lock and cleanup 
         $this->Unlock();
         $this->Cleanup();
@@ -184,7 +184,7 @@ abstract class MgFileLockCriticalSection
      * is required in the implementing method, but the implementing class may choose
      * to override various hooks in this class to handle various events that may happen
      */
-    public abstract function Enter($requestId, $handler, $path);
+    public abstract function Enter($requestId, IAppServices $handler, $path);
     
     /**
      * Handles any MgException caught when entering this critical section
@@ -199,7 +199,7 @@ abstract class MgFileLockCriticalSection
     /**
      * Performs any post-processing after leaving the critical section
      */
-    public function PostProcess($requestId, $handler, $lock, $path) { }
+    public function PostProcess($requestId, IAppServices $handler, $lock, $path) { }
 }
 
 class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
@@ -230,7 +230,7 @@ class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
         $this->retinaScale = $scale;
     }
     
-    public function PostProcess($requestId, $handler, $lock, $path) {
+    public function PostProcess($requestId, IAppServices $handler, $lock, $path) {
         $modTime = filemtime($path);
         $handler->SetResponseLastModified($modTime);
 
@@ -275,7 +275,7 @@ class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
         }
     }
     
-    public function Enter($requestId, $handler, $path) {
+    public function Enter($requestId, IAppServices $handler, $path) {
         $handler->LogDebug("($requestId) Rendering tile to $path");
 
         $groupName = $this->groupName;

@@ -25,7 +25,7 @@ class MgGeoRssSimpleGeometryOutputFormatter extends MgGeometryOutputFormatter {
         parent::__construct();
     }
 
-    protected function OutputGeom($geom, $reader) {
+    protected function OutputGeom(MgGeometry $geom, IReader $reader) {
         $zval = null;
         $geomType = $geom->GetGeometryType();
         switch($geomType) {
@@ -38,7 +38,7 @@ class MgGeoRssSimpleGeometryOutputFormatter extends MgGeometryOutputFormatter {
         }
     }
 
-    private function OutputCoordinateIterator($iter, $zval) {
+    private function OutputCoordinateIterator(MgCoordinateIterator $iter, /*php_double*/ $zval) {
         $bFirstCoord = true;
         $output = "";
         while ($iter->MoveNext()) {
@@ -54,12 +54,12 @@ class MgGeoRssSimpleGeometryOutputFormatter extends MgGeometryOutputFormatter {
         return $output;
     }
 
-    private function OutputLinearRing($ring, $zval) {
+    private function OutputLinearRing(MgLinearRing $ring, /*php_double*/ $zval) {
         $iter = $ring->GetCoordinates();
         return $this->OutputCoordinateIterator($iter, $zval);
     }
 
-    private function OutputLineString($geom, $zval) {
+    private function OutputLineString(MgLineString $geom, /*php_double*/ $zval) {
         $output  = "<georss:line>";
         $iter = $geom->GetCoordinates();
         $output .= $this->OutputCoordinateIterator($iter, $zval);
@@ -69,7 +69,7 @@ class MgGeoRssSimpleGeometryOutputFormatter extends MgGeometryOutputFormatter {
         return $output;
     }
 
-    private function OutputPoint($geom, $zval) {
+    private function OutputPoint(MgPoint $geom, /*php_double*/ $zval) {
         $output  = "<georss:point>";
         $coord = $geom->GetCoordinate();
         if ($coord != null) {
@@ -81,7 +81,7 @@ class MgGeoRssSimpleGeometryOutputFormatter extends MgGeometryOutputFormatter {
         return $output;
     }
 
-    private function OutputPolygon($geom, $zval) {
+    private function OutputPolygon(MgPolygon $geom, /*php_double*/ $zval) {
         $output  = "<georss:polygon>";
         $output .= $this->OutputLinearRing($geom->GetExteriorRing(), $zval);
         $output .= "</georss:polygon>";
@@ -96,7 +96,7 @@ class MgGeoRssGmlGeometryOutputFormatter extends MgGmlGeometryOutputFormatter {
         parent::__construct();
     }
 
-    protected function OutputGeom($geom, $zval = null) {
-        return "<georss:where>".parent::OutputGeom($geom, $zval)."</georss:where>";
+    protected function OutputGeom(MgGeometry $geom, IReader $reader) {
+        return "<georss:where>".parent::OutputGeom($geom, $reader)."</georss:where>";
     }
 }

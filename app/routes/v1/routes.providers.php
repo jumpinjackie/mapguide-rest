@@ -19,6 +19,7 @@
 
 require_once dirname(__FILE__)."/../../controller/featureservicecontroller.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
+require_once dirname(__FILE__)."/../../core/app.php";
 
 /**
  *     @SWG\Get(
@@ -34,7 +35,7 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  *     )
  */
 $app->get("/providers.:format", function($format) use ($app) {
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetFeatureProviders($format);
 });
 /**
@@ -53,7 +54,7 @@ $app->get("/providers.:format", function($format) use ($app) {
  *     )
  */
 $app->get("/providers/:providerName/capabilities.:format", function($providerName, $format) use ($app) {
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetProviderCapabilities($providerName, $format);
 });
 /**
@@ -72,7 +73,7 @@ $app->get("/providers/:providerName/capabilities.:format", function($providerNam
  *     )
  */
 $app->get("/providers/:providerName/datastores.:format", function($providerName, $format) use ($app) {
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->EnumerateDataStores($providerName, $format);
 });
 /**
@@ -92,6 +93,6 @@ $app->get("/providers/:providerName/datastores.:format", function($providerName,
  *     )
  */
 $app->get("/providers/:providerName/connectvalues.:format/:propName", function($providerName, $format, $propName) use ($app) {
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetConnectPropertyValues($providerName, $propName, $format);
 });

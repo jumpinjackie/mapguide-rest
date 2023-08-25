@@ -20,11 +20,11 @@
 require_once "controller.php";
 
 class MgRestServiceController extends MgBaseController {
-    public function __construct($app) {
+    public function __construct(IAppServices $app) {
         parent::__construct($app);
     }
 
-    public function EnumerateApplicationTemplates($format) {
+    public function EnumerateApplicationTemplates(/*php_string*/ $format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
@@ -41,7 +41,7 @@ class MgRestServiceController extends MgBaseController {
         });
     }
 
-    public function EnumerateApplicationWidgets($format) {
+    public function EnumerateApplicationWidgets(/*php_string*/ $format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
@@ -56,7 +56,7 @@ class MgRestServiceController extends MgBaseController {
         });
     }
 
-    public function EnumerateApplicationContainers($format) {
+    public function EnumerateApplicationContainers(/*php_string*/ $format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt) {
@@ -71,7 +71,7 @@ class MgRestServiceController extends MgBaseController {
         });
     }
 
-    public function GetSessionTimeout($sessionId, $format) {
+    public function GetSessionTimeout(/*php_string*/ $sessionId, /*php_string*/ $format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
         $siteConn = new MgSiteConnection();
@@ -82,14 +82,14 @@ class MgRestServiceController extends MgBaseController {
 
         $body = MgBoxedValue::Int32($timeout, $fmt);
         if ($fmt == "xml") {
-            $this->SetResponseHeader("Content-Type", MgMimeType::Xml);
+            $this->app->SetResponseHeader("Content-Type", MgMimeType::Xml);
         } else {
-            $this->SetResponseHeader("Content-Type", MgMimeType::Json);
+            $this->app->SetResponseHeader("Content-Type", MgMimeType::Json);
         }
-        $this->SetResponseBody($body);
+        $this->app->SetResponseBody($body);
     }
 
-    public function CreateSession($format) {
+    public function CreateSession(/*php_string*/ $format) {
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $mimeType = $this->GetMimeTypeForFormat($format);
         try {
@@ -100,16 +100,16 @@ class MgRestServiceController extends MgBaseController {
             $site = $siteConn->GetSite();
             $session = $site->CreateSession();
 
-            $this->SetResponseStatus(201);
+            $this->app->SetResponseStatus(201);
             $body = MgBoxedValue::String($session, $fmt);
-            $this->SetResponseHeader("Content-Type", $mimeType);
-            $this->SetResponseBody($body);
+            $this->app->SetResponseHeader("Content-Type", $mimeType);
+            $this->app->SetResponseBody($body);
         } catch (MgException $ex) {
             $this->OnException($ex, $mimeType);
         }
     }
 
-    public function DestroySession($sessionId) {
+    public function DestroySession(/*php_string*/ $sessionId) {
         try {
             $siteConn = new MgSiteConnection();
             $userInfo = new MgUserInformation($sessionId);

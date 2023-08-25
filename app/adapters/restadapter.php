@@ -41,7 +41,7 @@ abstract class MgRestAdapter extends MgResponseHandler
     protected $transform;
     protected $useTransaction;
 
-    protected function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp = null) {
+    protected function __construct(IAppServices $app, MgSiteConnection $siteConn, MgResourceIdentifier $resId, /*php_string*/ $className, array $config, /*php_string*/ $configPath, /*php_string*/ $featureIdProp = null) {
         parent::__construct($app);
         $this->useTransaction = false;
         $this->limit = -1;
@@ -100,12 +100,12 @@ abstract class MgRestAdapter extends MgResponseHandler
     /**
      * Initializes the adapater with the given REST configuration
      */
-    protected abstract function InitAdapterConfig($config);
+    protected abstract function InitAdapterConfig(array $config);
 
     /**
      * Queries the configured feature source and returns a MgReader based on the current GET query parameters and adapter configuration
      */
-    protected function CreateQueryOptions($single) {
+    protected function CreateQueryOptions(/*php_bool*/ $single) {
         $query = new MgFeatureQueryOptions();
         $this->EnsureQualifiedClassName();
         $tokens = explode(":", $this->className);
@@ -113,15 +113,15 @@ abstract class MgRestAdapter extends MgResponseHandler
         $clsDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $tokens[0], $tokens[1]);
         if ($single === true) {
             if ($this->featureId == null) {
-                throw new Exception($this->GetLocalizedText("E_NO_FEATURE_ID_SET"));
+                throw new Exception($this->app->GetLocalizedText("E_NO_FEATURE_ID_SET"));
             }
             $idType = MgPropertyType::String;
             if ($this->featureIdProp == null) {
                 $idProps = $clsDef->GetIdentityProperties();
                 if ($idProps->GetCount() == 0) {
-                    throw new Exception($this->GetLocalizedText("E_CANNOT_QUERY_NO_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
+                    throw new Exception($this->app->GetLocalizedText("E_CANNOT_QUERY_NO_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
                 } else if ($idProps->GetCount() > 1) {
-                    throw new Exception($this->GetLocalizedText("E_CANNOT_QUERY_MULTIPLE_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
+                    throw new Exception($this->app->GetLocalizedText("E_CANNOT_QUERY_MULTIPLE_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
                 } else {
                     $idProp = $idProps->GetItem(0);
                     $this->featureIdProp = $idProp->GetName();
@@ -133,9 +133,9 @@ abstract class MgRestAdapter extends MgResponseHandler
                 if ($iidx >= 0) {
                     $propDef = $props->GetItem($iidx);
                     if ($propDef->GetPropertyType() != MgFeaturePropertyType::DataProperty)
-                        throw new Exception($this->GetLocalizedText("E_ID_PROP_NOT_DATA", $this->featureIdProp));
+                        throw new Exception($this->app->GetLocalizedText("E_ID_PROP_NOT_DATA", $this->featureIdProp));
                 } else {
-                    throw new Exception($this->GetLocalizedText("E_ID_PROP_NOT_FOUND", $this->featureIdProp));
+                    throw new Exception($this->app->GetLocalizedText("E_ID_PROP_NOT_FOUND", $this->featureIdProp));
                 }
             }
             if ($idType == MgPropertyType::String)
@@ -143,10 +143,10 @@ abstract class MgRestAdapter extends MgResponseHandler
             else
                 $query->SetFilter($this->featureIdProp." = ".$this->featureId);
         } else {
-            $flt = $this->GetRequestParameter("filter");
+            $flt = $this->app->GetRequestParameter("filter");
             if ($flt != null)
                 $query->SetFilter($flt);
-            $bbox = $this->GetRequestParameter("bbox");
+            $bbox = $this->app->GetRequestParameter("bbox");
             if ($bbox != null) {
                 $parts = explode(",", $bbox);
                 if (count($parts) == 4) {
@@ -185,8 +185,8 @@ abstract class MgRestAdapter extends MgResponseHandler
             }
         }
 
-        $orderby = $this->GetRequestParameter("orderby");
-        $orderOptions = $this->GetRequestParameter("orderoption");
+        $orderby = $this->app->GetRequestParameter("orderby");
+        $orderOptions = $this->app->GetRequestParameter("orderoption");
         if ($orderby != null) {
             if ($orderOptions == null)
                 $orderOptions = "asc";
@@ -207,35 +207,35 @@ abstract class MgRestAdapter extends MgResponseHandler
     /**
      * Handles GET requests for this adapter. Overridable. Does nothing if not overridden.
      */
-    public function HandleGet($single) {
+    public function HandleGet(/*php_bool*/ $single) {
 
     }
 
     /**
      * Handles POST requests for this adapter. Overridable. Does nothing if not overridden.
      */
-    public function HandlePost($single) {
+    public function HandlePost(/*php_bool*/ $single) {
 
     }
 
     /**
      * Handles PUT requests for this adapter. Overridable. Does nothing if not overridden.
      */
-    public function HandlePut($single) {
+    public function HandlePut(/*php_bool*/ $single) {
 
     }
 
     /**
      * Handles DELETE requests for this adapter. Overridable. Does nothing if not overridden.
      */
-    public function HandleDelete($single) {
+    public function HandleDelete(/*php_bool*/ $single) {
 
     }
 
     /**
      * Returns true if the given HTTP method is supported. Overridable.
      */
-    public function SupportsMethod($method) {
+    public function SupportsMethod(/*php_string*/ $method) {
         return strtoupper($method) === "GET";
     }
 
@@ -253,7 +253,7 @@ abstract class MgRestAdapter extends MgResponseHandler
         }
     }
 
-    public function HandleMethod($method, $single = false) {
+    public function HandleMethod(/*php_string*/ $method, /*php_bool*/ $single = false) {
         if (!$this->SupportsMethod($method)) {
             $this->MethodNotSupported($method, $this->GetMimeType());
         } else {
@@ -284,11 +284,11 @@ abstract class MgRestAdapter extends MgResponseHandler
  * allowing for subclasses to handle the MgReader output logic
  */
 abstract class MgFeatureRestAdapter extends MgRestAdapter { 
-    public function __construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
+    public function __construct(IAppServices $app, MgSiteConnection $siteConn, MgResourceIdentifier $resId, /*php_string*/ $className, array $config, /*php_string*/ $configPath, /*php_string*/ $featureIdProp) {
         parent::__construct($app, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
     }
 
-    protected function CreateReader($single) {
+    protected function CreateReader(/*php_bool*/ $single) {
         $query = $this->CreateQueryOptions($single);
         $reader = $this->featSvc->SelectFeatures($this->featureSourceId, $this->className, $query);
         return $reader;
@@ -297,41 +297,41 @@ abstract class MgFeatureRestAdapter extends MgRestAdapter {
     /**
      * Writes the GET response header based on content of the given MgReader
      */
-    protected abstract function GetResponseBegin($reader);
+    protected abstract function GetResponseBegin(MgReader $reader);
 
     /**
      * Returns true if the current reader iteration loop should continue, otherwise the loop is broken
      */
-    protected abstract function GetResponseShouldContinue($reader);
+    protected abstract function GetResponseShouldContinue(MgReader $reader);
 
     /**
      * Writes the GET response body based on the current record of the given MgReader. The caller must not advance to the next record
      * in the reader while inside this method
      */
-    protected abstract function GetResponseBodyRecord($reader);
+    protected abstract function GetResponseBodyRecord(MgReader $reader);
 
     /**
      * Writes the GET response ending based on content of the given MgReader
      */
-    protected abstract function GetResponseEnd($reader);
+    protected abstract function GetResponseEnd(MgReader $reader);
 
     protected abstract function GetFileExtension();
 
     /**
      * Handles GET requests for this adapter. Overridden.
      */
-    public function HandleGet($single) {
+    public function HandleGet(/*php_bool*/ $single) {
         $reader = $this->CreateReader($single);
         //Apply download headers
-        $downloadFlag = $this->GetRequestParameter("download");
+        $downloadFlag = $this->app->GetRequestParameter("download");
         if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
-            $name = $this->GetRequestParameter("downloadname");
+            $name = $this->app->GetRequestParameter("downloadname");
             if (!$name) {
                 $name = "download";
             }
             $name .= ".";
             $name .= $this->GetFileExtension();
-            $this->SetResponseHeader("Content-Disposition", "attachment; filename=".$name);
+            $this->app->SetResponseHeader("Content-Disposition", "attachment; filename=".$name);
         }
         $this->GetResponseBegin($reader);
 
@@ -339,7 +339,7 @@ abstract class MgFeatureRestAdapter extends MgRestAdapter {
         $end = -1;
         $read = 0;
 
-        $pageNo = $this->GetRequestParameter("page");
+        $pageNo = $this->app->GetRequestParameter("page");
         if ($pageNo == null)
             $pageNo = 1;
         else
@@ -381,7 +381,7 @@ abstract class MgFeatureRestAdapter extends MgRestAdapter {
 }
 
 interface IAdapterDocumentor {
-    public function DocumentOperation($handler, $method, $extension, $bSingle);
+    public function DocumentOperation(IAppServices $handler, /*php_string*/ $method, /*php_string*/ $extension, /*php_bool*/ $bSingle);
 }
 
 interface ISessionIDExtractor {
@@ -389,7 +389,7 @@ interface ISessionIDExtractor {
      * Tries to return the session id based on the given method. This is for methods that could accept a session id in places
      * other than the query string, url path or form parameter. If no session id is found, null is returned.
      */
-    public function TryGetSessionId($handler, $method);
+    public function TryGetSessionId(IAppServices $handler, /*php_string*/ $method);
 }
 
 class MgSessionIDExtractor implements ISessionIDExtractor {
@@ -397,27 +397,27 @@ class MgSessionIDExtractor implements ISessionIDExtractor {
      * Tries to return the session id based on the given method. This is for methods that could accept a session id in places
      * other than the query string, url path or form parameter. If no session id is found, null is returned.
      */
-    public function TryGetSessionId($handler, $method) {
+    public function TryGetSessionId(IAppServices $handler, /*php_string*/ $method) {
         return null;
     }
 }
 
 abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
 
-    private function DescribeMethodSummary($handler, $method, $extension) {
+    private function DescribeMethodSummary(IAppServices $handler, /*php_string*/ $method, /*php_string*/ $extension) {
         return $handler->GetLocalizedText("L_RETURNS_DATA_AS_TYPE", $extension);
     }
 
-    private function GetMethodNickname($method, $extension) {
+    private function GetMethodNickname(/*php_string*/ $method, /*php_string*/ $extension) {
         $str = ucwords(strtolower($method)." Features $extension");
         return implode("", explode(" ", $str));
     }
 
-    protected function GetAdditionalParameters($handler, $bSingle, $method) {
+    protected function GetAdditionalParameters(IAppServices $handler, /*php_bool*/ $bSingle, /*php_string*/ $method) {
         return array();
     }
 
-    public function DocumentOperation($handler, $method, $extension, $bSingle) {
+    public function DocumentOperation(IAppServices $handler, /*php_string*/ $method, /*php_string*/ $extension, /*php_bool*/ $bSingle) {
         $op = new stdClass();
         $op->summary = $this->DescribeMethodSummary($handler, $method, $extension);
         $op->operationId = $this->GetMethodNickname($method, $extension);
@@ -456,7 +456,7 @@ abstract class MgRestAdapterDocumentor implements IAdapterDocumentor {
 }
 
 abstract class MgFeatureRestAdapterDocumentor extends MgRestAdapterDocumentor {
-    protected function GetAdditionalParameters($handler, $bSingle, $method) {
+    protected function GetAdditionalParameters(IAppServices $handler, /*php_bool*/ $bSingle, /*php_string*/ $method) {
         $params = parent::GetAdditionalParameters($handler, $bSingle, $method);
         if (!$bSingle) {
             if ($method == "GET") {

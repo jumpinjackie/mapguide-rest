@@ -24,7 +24,7 @@ class MgDefaultDateTimeOutputFormatter extends MgDateTimeOutputFormatter {
         parent::__construct();
     }
 
-    protected function OutputDateTime($dateTime) {
+    protected function OutputDateTime(MgDateTime $dateTime) {
         return $dateTime->ToString();
     }
 }
@@ -34,7 +34,7 @@ class MgDMYDateTimeFormatter extends MgDateTimeOutputFormatter {
         parent::__construct();
     }
 
-    protected function OutputDateTime($dt) {
+    protected function OutputDateTime(MgDateTime $dt) {
         return sprintf("%02d/%02d/%d", $dt->GetDay(), $dt->GetMonth(), $dt->GetYear());
     }
 }
@@ -44,7 +44,7 @@ class MgMDYDateTimeFormatter extends MgDateTimeOutputFormatter {
         parent::__construct();
     }
 
-    protected function OutputDateTime($dt) {
+    protected function OutputDateTime(MgDateTime $dt) {
         return sprintf("%02d/%02d/%d", $dt->GetMonth(), $dt->GetDay(), $dt->GetYear());
     }
 }
@@ -54,7 +54,7 @@ class MgISO9601DateTimeFormatter extends MgDateTimeOutputFormatter {
         parent::__construct();
     }
 
-    protected function OutputDateTime($dt) {
+    protected function OutputDateTime(MgDateTime $dt) {
         return sprintf("%d-%02d-%02d", $dt->GetYear(), $dt->GetMonth(), $dt->GetDay());
     }
 }
@@ -64,7 +64,7 @@ class MgDMYFullDateTimeFormatter extends MgDateTimeOutputFormatter {
         parent::__construct();
     }
 
-    protected function OutputDateTime($dt) {
+    protected function OutputDateTime(MgDateTime $dt) {
         return sprintf("%02d/%02d/%d %02d:%02d:%02d", $dt->GetDay(), $dt->GetMonth(), $dt->GetYear(), $dt->GetHour(), $dt->GetMinute(), $dt->GetSecond());
     }
 }
@@ -74,7 +74,7 @@ class MgMDYFullDateTimeFormatter extends MgDateTimeOutputFormatter {
         parent::__construct();
     }
 
-    protected function OutputDateTime($dt) {
+    protected function OutputDateTime(MgDateTime $dt) {
         return sprintf("%02d/%02d/%d %02d:%02d:%02d", $dt->GetMonth(), $dt->GetDay(), $dt->GetYear(), $dt->GetHour(), $dt->GetMinute(), $dt->GetSecond());
     }
 }
@@ -84,7 +84,7 @@ class MgISO9601FullDateTimeFormatter extends MgDateTimeOutputFormatter {
         parent::__construct();
     }
 
-    protected function OutputDateTime($dt) {
+    protected function OutputDateTime(MgDateTime $dt) {
         return sprintf("%d-%02d-%02d %02d:%02d:%02d", $dt->GetYear(), $dt->GetMonth(), $dt->GetDay(), $dt->GetHour(), $dt->GetMinute(), $dt->GetSecond());
     }
 }
@@ -94,7 +94,7 @@ class MgAtomDateTimeFormatter extends MgDateTimeOutputFormatter {
         parent::__construct();
     }
 
-    protected function OutputDateTime($dt) {
+    protected function OutputDateTime(MgDateTime $dt) {
         return sprintf("%d-%02d-%02dT%02d:%02d:%02dZ", $dt->GetYear(), $dt->GetMonth(), $dt->GetDay(), $dt->GetHour(), $dt->GetMinute(), $dt->GetSecond());
     }
 }

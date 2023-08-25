@@ -21,6 +21,7 @@ require_once dirname(__FILE__)."/../../controller/coordinatesystemcontroller.php
 require_once dirname(__FILE__)."/../../controller/resourceservicecontroller.php";
 require_once dirname(__FILE__)."/../../controller/mappingservicecontroller.php";
 require_once dirname(__FILE__)."/../../controller/restservicecontroller.php";
+require_once dirname(__FILE__)."/../../core/app.php";
 
 /**
  *     @SWG\Get(
@@ -36,7 +37,7 @@ require_once dirname(__FILE__)."/../../controller/restservicecontroller.php";
  *     )
  */
 $app->get("/services/fusiontemplates.:format", function($format) use ($app) {
-    $ctrl = new MgRestServiceController($app);
+    $ctrl = new MgRestServiceController(new AppServices($app));
     $ctrl->EnumerateApplicationTemplates($format);
 });
 /**
@@ -53,7 +54,7 @@ $app->get("/services/fusiontemplates.:format", function($format) use ($app) {
  *     )
  */
 $app->get("/services/fusionwidgets.:format", function($format) use ($app) {
-    $ctrl = new MgRestServiceController($app);
+    $ctrl = new MgRestServiceController(new AppServices($app));
     $ctrl->EnumerateApplicationWidgets($format);
 });
 /**
@@ -70,7 +71,7 @@ $app->get("/services/fusionwidgets.:format", function($format) use ($app) {
  *     )
  */
 $app->get("/services/fusioncontainers.:format", function($format) use ($app) {
-    $ctrl = new MgRestServiceController($app);
+    $ctrl = new MgRestServiceController(new AppServices($app));
     $ctrl->EnumerateApplicationContainers($format);
 });
 /**
@@ -91,7 +92,7 @@ $app->get("/services/fusioncontainers.:format", function($format) use ($app) {
  *     )
  */
 $app->post("/services/listunmanageddata.:format", function($format) use ($app) {
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->EnumerateUnmanagedData($format);
 });
 /**
@@ -110,7 +111,7 @@ $app->post("/services/listunmanageddata.:format", function($format) use ($app) {
  *     )
  */
 $app->get("/services/getschemamapping.:format", function($format) use ($app) {
-    $ctrl = new MgFeatureServiceController($app);
+    $ctrl = new MgFeatureServiceController(new AppServices($app));
     $ctrl->GetSchemaMapping($format);
 });
 
@@ -129,7 +130,7 @@ $app->get("/services/getschemamapping.:format", function($format) use ($app) {
  *     )
  */
 $app->post("/services/copyresource", function() use ($app) {
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->CopyResource();
 });
 /**
@@ -148,7 +149,7 @@ $app->post("/services/copyresource", function() use ($app) {
  *     )
  */
 $app->post("/services/moveresource", function() use ($app) {
-    $ctrl = new MgResourceServiceController($app);
+    $ctrl = new MgResourceServiceController(new AppServices($app));
     $ctrl->MoveResource();
 });
 /**
@@ -167,7 +168,7 @@ $app->post("/services/moveresource", function() use ($app) {
  *     )
  */
 $app->post("/services/transformcoords", function() use ($app) {
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController(new AppServices($app));
     $ctrl->TransformCoordinates();
 });
 /**
@@ -193,6 +194,6 @@ $app->post("/services/transformcoords", function() use ($app) {
  *     )
  */
 $app->post("/services/createmap.:format", function($format) use ($app) {
-    $ctrl = new MgMappingServiceController($app);
+    $ctrl = new MgMappingServiceController(new AppServices($app));
     $ctrl->CreateRuntimeMap($format);
 });

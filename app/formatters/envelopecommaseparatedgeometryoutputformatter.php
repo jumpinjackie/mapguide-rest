@@ -25,7 +25,7 @@ class MgEnvelopeCommaSeparatedGeometryOutputFormatter extends MgGeometryOutputFo
         parent::__construct();
     }
 
-    protected function OutputGeom($geom, $reader) {
+    protected function OutputGeom(MgGeometry $geom, IReader $reader) {
         $env = $geom->Envelope();
         $ll = $env->GetLowerLeftCoordinate();
         $ur = $env->GetUpperRightCoordinate();

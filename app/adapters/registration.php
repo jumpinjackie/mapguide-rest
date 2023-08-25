@@ -6,10 +6,11 @@ require_once "geojsonadapter.php";
 require_once "mapimageadapter.php";
 require_once "templateadapter.php";
 require_once "csvadapter.php";
+require_once dirname(__FILE__)."/../core/app.php";
 
 $app->container->FeatureSetXml = function() use ($app) {
     return new MgFeatureXmlRestAdapter(
-        $app, 
+        new AppServices($app), 
         $app->container->MgSiteConnection, 
         $app->container->FeatureSource,
         $app->container->FeatureClass,
@@ -25,7 +26,7 @@ $app->container->FeatureSetXmlSessionID = function() use ($app) {
 };
 $app->container->FeatureSetGeoJson = function() use ($app) {
     return new MgGeoJsonRestAdapter(
-        $app, 
+        new AppServices($app), 
         $app->container->MgSiteConnection, 
         $app->container->FeatureSource,
         $app->container->FeatureClass,
@@ -41,7 +42,7 @@ $app->container->FeatureSetGeoJsonSessionID = function() use ($app) {
 };
 $app->container->MapImage = function() use ($app) {
     return new MgMapImageRestAdapter(
-        $app, 
+        new AppServices($app), 
         $app->container->MgSiteConnection, 
         $app->container->FeatureSource,
         $app->container->FeatureClass,
@@ -54,7 +55,7 @@ $app->container->MapImageDoc = function() use ($app) {
 };
 $app->container->Template = function() use ($app) {
     return new MgTemplateRestAdapter(
-        $app, 
+        new AppServices($app), 
         $app->container->MgSiteConnection, 
         $app->container->FeatureSource,
         $app->container->FeatureClass,
@@ -67,7 +68,7 @@ $app->container->TemplateDoc = function() use ($app) {
 };
 $app->container->FeatureSetCsv = function() use ($app) {
     return new MgCsvRestAdapter(
-        $app, 
+        new AppServices($app), 
         $app->container->MgSiteConnection, 
         $app->container->FeatureSource,
         $app->container->FeatureClass,

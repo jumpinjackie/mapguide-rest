@@ -66,7 +66,7 @@ class MgPdfPlotter
     const VALIGN_CENTER = 'M'; //Docs say 'C', usage says 'M' ???
     const VALIGN_BOTTOM = 'B';
 
-    public function __construct($handler, $renderingService, $map, $dpi = 96, $margin = NULL, $orientation = self::ORIENTATION_PORTRAIT, $paperType = 'A4', $showLegend = false, $showCoordinates = false, $showDisclaimer = false, $showScaleBar = false, $drawNorthArrow = false, $title = "", $subTitle = "") {
+    public function __construct(IAppServices $handler, $renderingService, $map, $dpi = 96, $margin = NULL, $orientation = self::ORIENTATION_PORTRAIT, $paperType = 'A4', $showLegend = false, $showCoordinates = false, $showDisclaimer = false, $showScaleBar = false, $drawNorthArrow = false, $title = "", $subTitle = "") {
         $this->handler = $handler;
         $this->renderingService = $renderingService;
         $this->map = $map;

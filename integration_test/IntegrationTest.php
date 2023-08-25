@@ -84,7 +84,7 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
         $response = curl_exec($curl);
         if ($response === false) {
             $err = curl_error($curl);
-            throw new Exception("Curl Error: $err");
+            throw new Exception("Curl Error: $err (requesting: $absUrl)");
         }
 
         //echo "**** $type ($origType) $absUrl\n";

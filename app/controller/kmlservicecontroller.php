@@ -57,11 +57,11 @@ class MgKmlDocument
 }
 
 class MgKmlServiceController extends MgBaseController {
-    public function __construct($app) {
+    public function __construct(IAppServices $app) {
         parent::__construct($app);
     }
 
-    private function WriteRegion($extent, $doc, $dpi, $dimension, $minScale, $maxScale) {
+    private function WriteRegion(MgEnvelope $extent, /*unused*/ $doc, /*php_int*/ $dpi, /*php_int*/ $dimension, /*php_double*/ $minScale, /*php_double*/ $maxScale) {
         if ($extent != null) {
             $ll = $extent->GetLowerLeftCoordinate();
             $ur = $extent->GetUpperRightCoordinate();
@@ -86,8 +86,8 @@ class MgKmlServiceController extends MgBaseController {
         }
     }
 
-    private function AppendScaleRange($resId, $extent, $dimension, $minScale, $maxScale, $dpi, $drawOrder, $format, $sessionId, $doc) {
-        $baseUrl = $this->GetConfig("SelfUrl");
+    private function AppendScaleRange(MgResourceIdentifier $resId, MgEnvelope $extent, /*php_int*/ $dimension, /*php_double*/ $minScale, /*php_double*/ $maxScale, /*php_int*/ $dpi, /*php_int*/ $drawOrder, /*php_string*/ $format, /*php_string*/ $sessionId, /*unused*/ $doc) {
+        $baseUrl = $this->app->GetConfig("SelfUrl");
         $content = "<NetworkLink>";
         $content .= "<name><![CDATA[";
         $content .= sprintf("%f - %f", $minScale, $maxScale);
@@ -110,8 +110,8 @@ class MgKmlServiceController extends MgBaseController {
         $doc->WriteString($content);
     }
 
-    private function AppendLayer($layer, $extent, $drawOrder, $format, $sessionId, $writer) {
-        $baseUrl = $this->GetConfig("SelfUrl");
+    private function AppendLayer(MgLayerBase $layer, MgEnvelope $extent, /*php_int*/ $drawOrder, /*php_string*/ $format, /*php_string*/ $sessionId, MgChunkWriter $writer) {
+        $baseUrl = $this->app->GetConfig("SelfUrl");
         $layerKml = "<NetworkLink>";
         $layerKml .= "<visibility>";
         $layerKml .= $layer->GetVisible() ? "1" : "0";
@@ -137,10 +137,10 @@ class MgKmlServiceController extends MgBaseController {
         $writer->WriteChunk($layerKml);
     }
 
-    private function _GetKmlForMap($map, $sessionId, $format = "kml", $chunk = "1") {
-        MgUtils::ApplyCorsIfApplicable($this);
+    private function _GetKmlForMap(MgMapBase $map, /*php_string*/ $sessionId, /*php_string*/ $format = "kml", /*php_string*/ $chunk = "1") {
+        MgUtils::ApplyCorsIfApplicable($this->app);
         if ($chunk === "0")
-            $writer = new MgSlimChunkWriter($this);
+            $writer = new MgSlimChunkWriter($this->app);
         else
             $writer = new MgHttpChunkWriter();
         $doc = new MgKmlDocument($writer);
@@ -173,7 +173,7 @@ class MgKmlServiceController extends MgBaseController {
         $doc->EndDocument();
     }
 
-    private static function GetLayerExtent($csFactory, $doc, $csObj, $featSvc, $resSvc) {
+    private static function GetLayerExtent(MgCoordinateSystemFactory $csFactory, DOMDocument $doc, MgCoordinateSystem $csObj, MgFeatureService $featSvc, MgResourceService $resSvc) {
         $agfRw = new MgAgfReaderWriter();
         $vlNodes = $doc->getElementsByTagName("VectorLayerDefinition");
         $glNodes = $doc->getElementsByTagName("GridLayerDefinition");
@@ -277,7 +277,7 @@ class MgKmlServiceController extends MgBaseController {
         return null;
     }
 
-    public function GetMapKml($resId, $format = "kml") {
+    public function GetMapKml(MgResourceIdentifier $resId, /*php_string*/ $format = "kml") {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("kml", "kmz"));
         $native = ($this->GetBooleanRequestParameter("native", "0") == "1");
@@ -287,7 +287,7 @@ class MgKmlServiceController extends MgBaseController {
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
         } else {
-            $sessionId = $this->GetRequestParameter("session", "");
+            $sessionId = $this->app->GetRequestParameter("session", "");
         }
         $this->EnsureAuthenticationForSite($sessionId, true);
         $siteConn = new MgSiteConnection();
@@ -304,8 +304,8 @@ class MgKmlServiceController extends MgBaseController {
         }
         if ($native) {
             $mdfIdStr = $resId->ToString();
-            $selfUrl = MgUtils::GetSelfUrlRoot($this->GetConfig("SelfUrl"));
-            $this->Redirect("$selfUrl/../mapagent/mapagent.fcgi?OPERATION=GETMAPKML&VERSION=1.0.0&SESSION=$sessionId&MAPDEFINITION=$mdfIdStr&CLIENTAGENT=MapGuide REST Extension");
+            $selfUrl = MgUtils::GetSelfUrlRoot($this->app->GetConfig("SelfUrl"));
+            $this->app->Redirect("$selfUrl/../mapagent/mapagent.fcgi?OPERATION=GETMAPKML&VERSION=1.0.0&SESSION=$sessionId&MAPDEFINITION=$mdfIdStr&CLIENTAGENT=MapGuide REST Extension");
         } else {
             $map = new MgMap($siteConn);
             $map->Create($resId, $resId->GetName());
@@ -314,7 +314,7 @@ class MgKmlServiceController extends MgBaseController {
         }
     }
 
-    public function GetSessionMapKml($sessionId, $mapName, $format = "kml") {
+    public function GetSessionMapKml(/*php_string*/ $sessionId, /*php_string*/ $mapName, /*php_string*/ $format = "kml") {
         $fmt = $this->ValidateRepresentation($format, array("kml", "kmz"));
         $native = ($this->GetBooleanRequestParameter("native", "0") == "1");
         //Internal debugging flag
@@ -330,32 +330,32 @@ class MgKmlServiceController extends MgBaseController {
         if ($native) {
             $mdfId = $map->GetMapDefinition();
             $mdfIdStr = $mdfId->ToString();
-            $selfUrl = MgUtils::GetSelfUrlRoot($this->GetConfig("SelfUrl"));
-            $this->Redirect("$selfUrl/../mapagent/mapagent.fcgi?OPERATION=GETMAPKML&VERSION=1.0.0&SESSION=$sessionId&MAPDEFINITION=$mdfIdStr&CLIENTAGENT=MapGuide REST Extension");
+            $selfUrl = MgUtils::GetSelfUrlRoot($this->app->GetConfig("SelfUrl"));
+            $this->app->Redirect("$selfUrl/../mapagent/mapagent.fcgi?OPERATION=GETMAPKML&VERSION=1.0.0&SESSION=$sessionId&MAPDEFINITION=$mdfIdStr&CLIENTAGENT=MapGuide REST Extension");
         } else {
             $this->_GetKmlForMap($map, $sessionId, $format, $chunk);
         }
     }
 
-    public function GetLayerKml($resId, $format = "kml") {
+    public function GetLayerKml(MgResourceIdentifier $resId, /*php_string*/ $format = "kml") {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("kml", "kmz"));
 
-        $width = $this->GetRequestParameter("width", null);
-        $height = $this->GetRequestParameter("height", null);
-        $drawOrder = $this->GetRequestParameter("draworder", null);
-        $dpi = $this->GetRequestParameter("dpi", 96);
-        $bbox = $this->GetRequestParameter("bbox", null);
+        $width = $this->app->GetRequestParameter("width", null);
+        $height = $this->app->GetRequestParameter("height", null);
+        $drawOrder = $this->app->GetRequestParameter("draworder", null);
+        $dpi = $this->app->GetRequestParameter("dpi", 96);
+        $bbox = $this->app->GetRequestParameter("bbox", null);
         $extents = null;
 
         if ($width == null)
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "width"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "width"), $this->GetMimeTypeForFormat($format));
         if ($height == null)
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "height"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "height"), $this->GetMimeTypeForFormat($format));
         if ($drawOrder == null)
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "draworder"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "draworder"), $this->GetMimeTypeForFormat($format));
         if ($bbox == null) {
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "bbox"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "bbox"), $this->GetMimeTypeForFormat($format));
         } else {
             $parts = explode(",", $bbox);
             if (count($parts) == 4) {
@@ -367,7 +367,7 @@ class MgKmlServiceController extends MgBaseController {
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
         } else {
-            $sessionId = $this->GetRequestParameter("session", "");
+            $sessionId = $this->app->GetRequestParameter("session", "");
         }
         $this->EnsureAuthenticationForSite($sessionId, true);
         $siteConn = new MgSiteConnection();
@@ -387,7 +387,7 @@ class MgKmlServiceController extends MgBaseController {
         $csObj = $csFactory->CreateFromCode("LL84");
         $scale = MgUtils::GetScale($extents, $csObj, $width, $height, $dpi);
 
-        $writer = new MgSlimChunkWriter($this);
+        $writer = new MgSlimChunkWriter($this->app);
         $doc = new MgKmlDocument($writer);
 
         $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
@@ -445,35 +445,35 @@ class MgKmlServiceController extends MgBaseController {
         $doc->EndDocument();
     }
 
-    public function GetFeaturesKml($resId, $format = "kml") {
+    public function GetFeaturesKml(MgResourceIdentifier $resId, /*php_string*/ $format = "kml") {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("kml", "kmz"));
 
-        $bbox = $this->GetRequestParameter("bbox", null);
-        $dpi = $this->GetRequestParameter("dpi", 96);
-        $width = $this->GetRequestParameter("width", null);
-        $height = $this->GetRequestParameter("height", null);
-        $drawOrder = $this->GetRequestParameter("draworder", null);
+        $bbox = $this->app->GetRequestParameter("bbox", null);
+        $dpi = $this->app->GetRequestParameter("dpi", 96);
+        $width = $this->app->GetRequestParameter("width", null);
+        $height = $this->app->GetRequestParameter("height", null);
+        $drawOrder = $this->app->GetRequestParameter("draworder", null);
 
         $sessionId = "";
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
         } else {
-            $sessionId = $this->GetRequestParameter("session", "");
+            $sessionId = $this->app->GetRequestParameter("session", "");
         }
 
         if ($width == null)
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "width"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "width"), $this->GetMimeTypeForFormat($format));
         if ($height == null)
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "height"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "height"), $this->GetMimeTypeForFormat($format));
         if ($drawOrder == null)
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "draworder"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "draworder"), $this->GetMimeTypeForFormat($format));
         if ($bbox == null)
-            $this->BadRequest($this->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "bbox"), $this->GetMimeTypeForFormat($format));
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "bbox"), $this->GetMimeTypeForFormat($format));
 
         //We still need the mapagent URL so that GETFEATURESKML can generate legend icons from
         //within the operation
-        $agentUri = MgUtils::GetSelfUrlRoot($this->GetConfig("SelfUrl"))."/../mapagent/mapagent.fcgi";
+        $agentUri = MgUtils::GetSelfUrlRoot($this->app->GetConfig("SelfUrl"))."/../mapagent/mapagent.fcgi";
 
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resId, $bbox, $width, $height, $drawOrder, $dpi) {
@@ -489,10 +489,10 @@ class MgKmlServiceController extends MgBaseController {
 
             $bChunk = true;
             //Apply file download parameters if specified
-            if ($that->GetRequestParameter("download") === "1" || $that->GetRequestParameter("download") === "true") {
+            if ($that->app->GetRequestParameter("download") === "1" || $that->app->GetRequestParameter("download") === "true") {
                 $param->AddParameter("X-DOWNLOAD-ATTACHMENT", "true");
-                if ($that->GetRequestParameter("downloadname")) {
-                    $param->AddParameter("X-DOWNLOAD-ATTACHMENT-NAME", $that->GetRequestParameter("downloadname"));
+                if ($that->app->GetRequestParameter("downloadname")) {
+                    $param->AddParameter("X-DOWNLOAD-ATTACHMENT-NAME", $that->app->GetRequestParameter("downloadname"));
                     $bChunk = false;
                 }
             }

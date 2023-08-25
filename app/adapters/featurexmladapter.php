@@ -21,7 +21,7 @@ require_once "restadapter.php";
 require_once dirname(__FILE__)."/../util/utils.php";
 
 class MgFeatureXmlRestAdapterDocumentor extends MgFeatureRestAdapterDocumentor {
-    protected function GetAdditionalParameters($handler, $bSingle, $method) {
+    protected function GetAdditionalParameters(IAppServices $handler, $bSingle, $method) {
         $params = parent::GetAdditionalParameters($handler, $bSingle, $method);
         if ($method == "POST") {
             $pPostBody = new stdClass();
@@ -60,13 +60,13 @@ class MgFeatureXmlSessionIDExtractor extends MgSessionIDExtractor {
      * Tries to return the session id based on the given method. This is for methods that could accept a session id in places
      * other than the query string, url path or form parameter. If no session id is found, null is returned.
      */
-    public function TryGetSessionId($handler, $method) {
+    public function TryGetSessionId(IAppServices $handler, $method) {
         if ($method == "POST" || $method == "PUT") {
             $doc = new DOMDocument();
             $doc->loadXML($handler->GetRequestBody());
 
             //Stash for adapter to grab
-            $handler->SetContextVariable("REQUEST_BODY_DOCUMENT", $doc);
+            $handler->RegisterDependency("REQUEST_BODY_DOCUMENT", $doc);
 
             $sesNodes = $doc->getElementsByTagName("SessionID");
             if ($sesNodes->length == 1)
@@ -81,7 +81,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     private $wktRw;
     private $requestDoc;
 
-    public function __construct($handler, $siteConn, $resId, $className, $config, $configPath, $featureIdProp) {
+    public function __construct(IAppServices $handler, MgSiteConnection $siteConn, MgResourceIdentifier $resId, /*php_string*/ $className, array $config, /*php_string*/ $configPath, /*php_string*/ $featureIdProp) {
         parent::__construct($handler, $siteConn, $resId, $className, $config, $configPath, $featureIdProp);
         $this->requestDoc = null;
     }
@@ -89,7 +89,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     /**
      * Returns true if the given HTTP method is supported. Overridable.
      */
-    public function SupportsMethod($method) {
+    public function SupportsMethod(/*php_string*/ $method) {
         return strtoupper($method) === "GET" ||
                strtoupper($method) === "POST" ||
                strtoupper($method) === "PUT" ||
@@ -99,7 +99,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     /**
      * Initializes the adapater with the given REST configuration
      */
-    protected function InitAdapterConfig($config) {
+    protected function InitAdapterConfig(array $config) {
         
     }
 
@@ -110,11 +110,11 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     /**
      * Writes the GET response header based on content of the given MgReader
      */
-    protected function GetResponseBegin($reader) {
+    protected function GetResponseBegin(MgReader $reader) {
         $this->agfRw = new MgAgfReaderWriter();
         $this->wktRw = new MgWktReaderWriter();
 
-        $this->SetResponseHeader("Content-Type", MgMimeType::Xml);
+        $this->app->SetResponseHeader("Content-Type", MgMimeType::Xml);
 
         $schemas = new MgFeatureSchemaCollection();
         $schema = new MgFeatureSchema("TempSchema", "");
@@ -130,13 +130,13 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
         $output .= $classXml;
         $output .= "<Features>";
 
-        $this->WriteResponseContent($output);
+        $this->app->WriteResponseContent($output);
     }
 
     /**
      * Returns true if the current reader iteration loop should continue, otherwise the loop is broken
      */
-    protected function GetResponseShouldContinue($reader) {
+    protected function GetResponseShouldContinue(MgReader $reader) {
         return true;
     }
 
@@ -144,7 +144,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
      * Writes the GET response body based on the current record of the given MgReader. The caller must not advance to the next record
      * in the reader while inside this method
      */
-    protected function GetResponseBodyRecord($reader) {
+    protected function GetResponseBodyRecord(MgReader $reader) {
         $output = "<Feature>";
         $propCount = $reader->GetPropertyCount();
         for ($i = 0; $i < $propCount; $i++) {
@@ -204,20 +204,20 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
 
         $output .= "</Feature>";
 
-        $this->WriteResponseContent($output);
+        $this->app->WriteResponseContent($output);
     }
 
     /**
      * Writes the GET response ending based on content of the given MgReader
      */
-    protected function GetResponseEnd($reader) {
-        $this->WriteResponseContent("</Features></FeatureSet>");
+    protected function GetResponseEnd(MgReader $reader) {
+        $this->app->WriteResponseContent("</Features></FeatureSet>");
     }
 
     /**
      * Handles POST requests for this adapter. Overridable. Does nothing if not overridden.
      */
-    public function HandlePost($single) {
+    public function HandlePost(/*php_bool*/ $single) {
         $trans = null;
         try {
             $tokens = explode(":", $this->className);
@@ -225,11 +225,11 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
             $className = $tokens[1];
             $commands = new MgFeatureCommandCollection();
             $classDef = $this->featSvc->GetClassDefinition($this->featureSourceId, $schemaName, $className);
-            $rdoc = $this->GetContextVariable("REQUEST_BODY_DOCUMENT");
+            $rdoc = $this->app->GetDependency("REQUEST_BODY_DOCUMENT");
             if ($rdoc != null)
-                $batchProps = MgUtils::ParseMultiFeatureDocument($this, $classDef, $rdoc);
+                $batchProps = MgUtils::ParseMultiFeatureDocument($this->app, $classDef, $rdoc);
             else    
-                $batchProps = MgUtils::ParseMultiFeatureXml($this, $classDef, $this->GetRequestBody());
+                $batchProps = MgUtils::ParseMultiFeatureXml($this->app, $classDef, $this->app->GetRequestBody());
             $insertCmd = new MgInsertFeatures("$schemaName:$className", $batchProps);
             $commands->Add($insertCmd);
 
@@ -256,17 +256,17 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     /**
      * Handles PUT requests for this adapter. Overridable. Does nothing if not overridden.
      */
-    public function HandlePut($single) {
+    public function HandlePut(/*php_bool*/ $single) {
         $trans = null;
         try {
             $tokens = explode(":", $this->className);
             $schemaName = $tokens[0];
             $className = $tokens[1];
 
-            $rdoc = $this->GetContextVariable("REQUEST_BODY_DOCUMENT");
+            $rdoc = $this->app->GetDependency("REQUEST_BODY_DOCUMENT");
             if ($rdoc == null) {
                 $doc = new DOMDocument();
-                $doc->loadXML($this->GetRequestBody());
+                $doc->loadXML($this->app->GetRequestBody());
             } else {
                 $doc = $rdoc;
             }
@@ -279,7 +279,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
             if ($single === true) {
                 $idProps = $classDef->GetIdentityProperties();
                 if ($idProps->GetCount() != 1) {
-                    $app->halt(400, $this->GetLocalizedText("E_CANNOT_APPLY_UPDATE_CANNOT_UNIQUELY_IDENTIFY", $this->featureId, $idProps->GetCount()));
+                    $this->app->Halt(400, $this->app->GetLocalizedText("E_CANNOT_APPLY_UPDATE_CANNOT_UNIQUELY_IDENTIFY", $this->featureId, $idProps->GetCount()));
                 } else {
                     $idProp = $idProps->GetItem(0);
                     if ($idProp->GetDataType() == MgPropertyType::String) {
@@ -321,7 +321,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
     /**
      * Handles DELETE requests for this adapter. Overridable. Does nothing if not overridden.
      */
-    public function HandleDelete($single) {
+    public function HandleDelete(/*php_bool*/ $single) {
         $trans = null;
         try {
             $tokens = explode(":", $this->className);
@@ -332,7 +332,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
 
             if ($single === true) {
                 if ($this->featureId == null) {
-                    throw new Exception($this->GetLocalizedText("E_NO_FEATURE_ID_SET"));
+                    throw new Exception($this->app->GetLocalizedText("E_NO_FEATURE_ID_SET"));
                 }
                 $idType = MgPropertyType::String;
                 $tokens = explode(":", $this->className);
@@ -340,9 +340,9 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
                 if ($this->featureIdProp == null) {
                     $idProps = $clsDef->GetIdentityProperties();
                     if ($idProps->GetCount() == 0) {
-                        throw new Exception($this->GetLocalizedText("E_CANNOT_DELETE_NO_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
+                        throw new Exception($this->app->GetLocalizedText("E_CANNOT_DELETE_NO_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
                     } else if ($idProps->GetCount() > 1) {
-                        throw new Exception($this->GetLocalizedText("E_CANNOT_DELETE_MULTIPLE_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
+                        throw new Exception($this->app->GetLocalizedText("E_CANNOT_DELETE_MULTIPLE_ID_PROPS", $this->className, $this->featureSourceId->ToString()));
                     } else {
                         $idProp = $idProps->GetItem(0);
                         $this->featureIdProp = $idProp->GetName();
@@ -354,9 +354,9 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
                     if ($iidx >= 0) {
                         $propDef = $props->GetItem($iidx);
                         if ($propDef->GetPropertyType() != MgFeaturePropertyType::DataProperty)
-                            throw new Exception($this->GetLocalizedText("E_ID_PROP_NOT_DATA", $this->featureIdProp));
+                            throw new Exception($this->app->GetLocalizedText("E_ID_PROP_NOT_DATA", $this->featureIdProp));
                     } else {
-                        throw new Exception($this->GetLocalizedText("E_ID_PROP_NOT_FOUND", $this->featureIdProp));
+                        throw new Exception($this->app->GetLocalizedText("E_ID_PROP_NOT_FOUND", $this->featureIdProp));
                     }
                 }
                 if ($idType == MgPropertyType::String)
@@ -364,7 +364,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
                 else
                     $filter = $this->featureIdProp." = ".$this->featureId;
             } else {
-                $filter = $this->GetRequestParameter("filter");
+                $filter = $this->app->GetRequestParameter("filter");
                 if ($filter == null)
                     $filter = "";
             }

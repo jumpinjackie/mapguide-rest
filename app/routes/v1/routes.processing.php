@@ -19,6 +19,7 @@
 
 require_once dirname(__FILE__)."/../../controller/processingcontroller.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
+require_once dirname(__FILE__)."/../../core/app.php";
 
 /**
  *     @SWG\Post(
@@ -39,7 +40,7 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  *     )
  */
 $app->post("/processing/buffer", function() use ($app) {
-    $ctrl = new MgProcessingController($app);
+    $ctrl = new MgProcessingController(new AppServices($app));
     $ctrl->Buffer();
 });
 
@@ -60,7 +61,7 @@ $app->post("/processing/buffer", function() use ($app) {
  *     )
  */
 $app->post("/processing/difference", function() use ($app) {
-    $ctrl = new MgProcessingController($app);
+    $ctrl = new MgProcessingController(new AppServices($app));
     $ctrl->Difference();
 });
 
@@ -81,7 +82,7 @@ $app->post("/processing/difference", function() use ($app) {
  *     )
  */
 $app->post("/processing/intersection", function() use ($app) {
-    $ctrl = new MgProcessingController($app);
+    $ctrl = new MgProcessingController(new AppServices($app));
     $ctrl->Intersection();
 });
 
@@ -102,7 +103,7 @@ $app->post("/processing/intersection", function() use ($app) {
  *     )
  */
 $app->post("/processing/symmetricdifference", function() use ($app) {
-    $ctrl = new MgProcessingController($app);
+    $ctrl = new MgProcessingController(new AppServices($app));
     $ctrl->SymmetricDifference();
 });
 
@@ -123,7 +124,7 @@ $app->post("/processing/symmetricdifference", function() use ($app) {
  *     )
  */
 $app->post("/processing/union", function() use ($app) {
-    $ctrl = new MgProcessingController($app);
+    $ctrl = new MgProcessingController(new AppServices($app));
     $ctrl->Union();
 });
 
@@ -143,6 +144,6 @@ $app->post("/processing/union", function() use ($app) {
  *     )
  */
 $app->post("/processing/spatialpredicate", function() use ($app) {
-    $ctrl = new MgProcessingController($app);
+    $ctrl = new MgProcessingController(new AppServices($app));
     $ctrl->SpatialPredicate();
 });
