@@ -94,7 +94,7 @@ class AppServices implements IAppServices {
     }
 
     public /* internal */ function WriteResponseContent(/*php_string*/ $content) {
-        $this->response->write($body);
+        $this->response->write($content);
     }
 
     public /* internal */ function SetResponseBody(/*php_mixed*/ $content) {

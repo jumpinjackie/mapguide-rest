@@ -112,9 +112,12 @@ $app->post("/coordsys/wkttomentor.:format", function($format) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/coordsys/categories.:format", function($format) {
-    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
-    $ctrl->EnumerateCategories($format); 
+$app->get("/coordsys/categories.{format}", function($req, $resp, $args) {
+    $format = $args['format'];
+    $app = $this->get("AppServices");
+    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl->EnumerateCategories($format);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
