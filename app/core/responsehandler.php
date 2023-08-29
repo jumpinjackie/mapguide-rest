@@ -20,6 +20,9 @@
 require_once dirname(__FILE__)."/../util/utils.php";
 require_once dirname(__FILE__)."/../util/readerchunkedresult.php";
 require_once dirname(__FILE__)."/interfaces.php";
+require_once dirname(__FILE__)."/bytereaderstreamadapter.php";
+require_once dirname(__FILE__)."/stringcontentadapter.php";
+require_once dirname(__FILE__)."/aggregatecontentadapter.php";
 
 abstract class MgResponseHandler
 {
@@ -351,9 +354,28 @@ abstract class MgResponseHandler
         $this->app->WriteResponseContent($content);
     }
 
+    const XML_PROLOG = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+
     protected function OutputByteReader(MgByteReader $byteReader, /*php_bool*/ $bChunkResult = false, /*php_bool*/ $bPrependXmlProlog = false) {
         $mimeType = $byteReader->GetMimeType();
-
+        $this->app->SetResponseHeader("Content-Type", $mimeType);
+        $bNeedXmlProlog = $mimeType == MgMimeType::Xml && $bPrependXmlProlog;
+        if (!$bChunkResult) {
+            $rdrLen = $byteReader->GetLength();
+            if ($bNeedXmlProlog) {
+                $rdrLen += strlen(self::XML_PROLOG);
+            }
+            $this->app->SetResponseHeader("Content-Length", $rdrLen);
+        }
+        if ($bNeedXmlProlog) {
+            $this->app->SetResponseBody(new AggregateContentAdapter([
+                new StringContentAdapter(self::XML_PROLOG),
+                new MgByteReaderStreamAdapter($byteReader)
+            ]));
+        } else {
+            $this->app->SetResponseBody(new MgByteReaderStreamAdapter($byteReader));
+        }
+        /*
         $writer = null;
         if ($bChunkResult)
             $writer = new MgHttpChunkWriter();
@@ -380,6 +402,7 @@ abstract class MgResponseHandler
             }
         } while ($len > 0);
         $writer->EndChunking();
+        */
     }
 
     protected function ValidateValueInDomain(/*php_string*/ $value, array $allowedValues = null, /*php_string*/ $mimeType = MgMimeType::Html) {

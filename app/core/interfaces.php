@@ -36,7 +36,7 @@ interface IAppServices {
 
     public /* internal */ function WriteResponseContent(/*php_string*/ $content);
 
-    public /* internal */ function SetResponseBody(/*php_mixed*/ $body);
+    public /* internal */ function SetResponseBody(/* string | Psr\Http\Message\StreamInterface */ $content);
 
     public /* internal */ function SetResponseStatus(/*php_int*/ $statusCode);
 

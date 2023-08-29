@@ -121,7 +121,7 @@ $app->get("/coordsys/categories.{format}", function($req, $resp, $args) {
 });
 /**
  *     @SWG\Get(
- *        path="/coordsys/category/{category}.{type}",
+ *        path="/coordsys/category.{type}/{category}",
  *        operationId="EnumerateCoordinateSystemsByCategory",
  *        summary="Enumerates coordinate systems under the specified category",
  *        tags={"coordsys"},
@@ -133,9 +133,13 @@ $app->get("/coordsys/categories.{format}", function($req, $resp, $args) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/coordsys/category.:format/:category", function($format, $category) {
-    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
+$app->get("/coordsys/category.{format}/{category}", function($req, $resp, $args) {
+    $format = $args['format'];
+    $category = $args['category'];
+    $app = $this->get("AppServices");
+    $ctrl = new MgCoordinateSystemController($app);
     $ctrl->EnumerateCoordinateSystemsByCategory($category, $format);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(

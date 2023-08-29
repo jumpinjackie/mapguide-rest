@@ -70,7 +70,7 @@ $container['AppServices'] = function($c) {
 
 //Override error handler for unhandled exceptions
 $container['errorHandler'] = function ($c) {
-    return function ($request, $response, $exception) use ($c) {
+    return function ($request, $response, $err) use ($c) {
         $wrap = $c->get('AppServices');
         $title = $wrap->GetLocalizedText("E_UNHANDLED_EXCEPTION");
         $mimeType = MgMimeType::Html;

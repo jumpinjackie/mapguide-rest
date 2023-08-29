@@ -18,6 +18,7 @@
 //
 
 require_once dirname(__FILE__)."/interfaces.php";
+require_once dirname(__FILE__)."/stringcontentadapter.php";
 
 class AppServices implements IAppServices {
     private $container;
@@ -97,9 +98,9 @@ class AppServices implements IAppServices {
         $this->response->write($content);
     }
 
-    public /* internal */ function SetResponseBody(/*php_mixed*/ $content) {
-        $body = $this->response->getBody();
-        $body->write($content);
+    public /* internal */ function SetResponseBody(/*string | Psr\Http\Message\StreamInterface*/ $content) {
+        $adapter = is_string($content) ? new StringContentAdapter($content) : $content;
+        $this->response = $this->response->withBody($adapter);
     }
 
     public /* internal */ function SetResponseStatus(/*php_int*/ $statusCode) {
