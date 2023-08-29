@@ -34,9 +34,12 @@ require_once dirname(__FILE__)."/../../core/app.php";
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/providers.:format", function($format) {
-    $ctrl = new MgFeatureServiceController($this->get("AppServices"));
-    $ctrl->GetFeatureProviders($format);
+$app->get("/providers.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->GetFeatureProviders($type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -46,16 +49,20 @@ $app->get("/providers.:format", function($format) {
  *        tags={"providers"},
  *          @SWG\Parameter(name="session", in="query", required=false, type="string", description="Your MapGuide Session ID"),
  *          @SWG\Parameter(name="providerName", in="path", required=true, type="string", description="The FDO Provider"),
- *          @SWG\Parameter(name="connection", in="query", required=true, type="string", description="The partial connection string"),
+ *          @SWG\Parameter(name="connection", in="query", required=false, type="string", description="The partial connection string"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
  *        @SWG\Response(response=401, description="Session ID or MapGuide credentials not specified"),
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/providers/:providerName/capabilities.:format", function($providerName, $format) {
-    $ctrl = new MgFeatureServiceController($this->get("AppServices"));
-    $ctrl->GetProviderCapabilities($providerName, $format);
+$app->get("/providers/{providerName}/capabilities.{type}", function($req, $resp, $args) {
+    $providerName = $args['providerName'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->GetProviderCapabilities($providerName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -72,9 +79,13 @@ $app->get("/providers/:providerName/capabilities.:format", function($providerNam
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/providers/:providerName/datastores.:format", function($providerName, $format) {
-    $ctrl = new MgFeatureServiceController($this->get("AppServices"));
-    $ctrl->EnumerateDataStores($providerName, $format);
+$app->get("/providers/{providerName}/datastores.{type}", function($req, $resp, $args) {
+    $providerName = $args['providerName'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->EnumerateDataStores($providerName, $type);
+    return $this->Done();
 });
 /**
  *     @SWG\Get(
@@ -92,7 +103,12 @@ $app->get("/providers/:providerName/datastores.:format", function($providerName,
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/providers/:providerName/connectvalues.:format/:propName", function($providerName, $format, $propName) {
-    $ctrl = new MgFeatureServiceController($this->get("AppServices"));
-    $ctrl->GetConnectPropertyValues($providerName, $propName, $format);
+$app->get("/providers/{providerName}/connectvalues.{type}/{propName}", function($req, $resp, $args) {
+    $providerName = $args['providerName'];
+    $type = $args['type'];
+    $propName = $args['propName'];
+    $app = $this->get("AppServices");
+    $ctrl = new MgFeatureServiceController($app);
+    $ctrl->GetConnectPropertyValues($providerName, $propName, $type);
+    return $app->Done();
 });

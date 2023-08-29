@@ -236,7 +236,7 @@
                 }
             }
         },
-        "/coordsys/category/{category}.{type}": {
+        "/coordsys/category.{type}/{category}": {
             "get": {
                 "tags": [
                     "coordsys"
@@ -4436,7 +4436,7 @@
                         "name": "connection",
                         "in": "query",
                         "description": "The partial connection string",
-                        "required": true,
+                        "required": false,
                         "type": "string"
                     },
                     {

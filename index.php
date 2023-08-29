@@ -82,6 +82,7 @@ $container['errorHandler'] = function ($c) {
         $details = $wrap->GetLocalizedText("E_PHP_EXCEPTION_DETAILS", $err->getMessage(), $err->getFile(), $err->getLine());
         $wrap->SetResponseHeader("Content-Type", $mimeType);
         $wrap->SetResponseBody(MgUtils::FormatException($wrap, "UnhandledError", $title, $details, $err->getTraceAsString(), 500, $mimeType));
+        return $wrap->Done();
     };
 };
 
