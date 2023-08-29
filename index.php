@@ -72,7 +72,8 @@ if ($corsOptions != null) {
 }
 //Override error handler for unhandled exceptions
 $app->error(function($err) use ($app) {
-    $title = $app->localizer->getText("E_UNHANDLED_EXCEPTION");
+    $wrap = new AppServices($app);
+    $title = $wrap->GetLocalizedText("E_UNHANDLED_EXCEPTION");
     $mimeType = MgMimeType::Html;
     //As part of validating the desired representation, this variable will be set, this will tell us
     //what mime type to shape the response
@@ -80,8 +81,8 @@ $app->error(function($err) use ($app) {
         $mimeType = $app->requestedMimeType;
     }
     $details = $app->localizer->getText("E_PHP_EXCEPTION_DETAILS", $err->getMessage(), $err->getFile(), $err->getLine());
-    $app->response->header("Content-Type", $mimeType);
-    $app->response->setBody(MgUtils::FormatException($app->config("Error.OutputStackTrace"), "UnhandledError", $title, $details, $err->getTraceAsString(), 500, $mimeType));
+    $wrap->SetResponseHeader("Content-Type", $mimeType);
+    $wrap->SetResponseBody(MgUtils::FormatException($wrap, "UnhandledError", $title, $details, $err->getTraceAsString(), 500, $mimeType));
 });
 $app->localizer = new Localizer($strings);
 //Set server version

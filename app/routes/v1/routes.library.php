@@ -43,13 +43,13 @@ require_once dirname(__FILE__)."/../../core/app.php";
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/status.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/status.:format", function($resourcePath, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->TestConnection($resId, $format);
 });
 /**
@@ -67,13 +67,13 @@ $app->get("/library/:resourcePath+.FeatureSource/status.:format", function($reso
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/editcapabilities.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/editcapabilities.:format", function($resourcePath, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetEditCapabilities($resId, $format);
 });
 /**
@@ -91,13 +91,13 @@ $app->get("/library/:resourcePath+.FeatureSource/editcapabilities.:format", func
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+.FeatureSource/xml", function($resourcePath) use ($app) {
+$app->post("/library/:resourcePath+.FeatureSource/xml", function($resourcePath) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->CreateFeatureSource($resId, "xml");
 });
 /**
@@ -115,13 +115,13 @@ $app->post("/library/:resourcePath+.FeatureSource/xml", function($resourcePath) 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+.FeatureSource/json", function($resourcePath) use ($app) {
+$app->post("/library/:resourcePath+.FeatureSource/json", function($resourcePath) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->CreateFeatureSource($resId, "json");
 });
 /**
@@ -141,13 +141,13 @@ $app->post("/library/:resourcePath+.FeatureSource/json", function($resourcePath)
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+.FeatureSource/editcapabilities.:format", function($resourcePath, $format) use ($app) {
+$app->post("/library/:resourcePath+.FeatureSource/editcapabilities.:format", function($resourcePath, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->SetEditCapabilities($resId, $format);
 });
 /**
@@ -164,13 +164,13 @@ $app->post("/library/:resourcePath+.FeatureSource/editcapabilities.:format", fun
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/spatialcontexts.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/spatialcontexts.:format", function($resourcePath, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetSpatialContexts($resId, $format);
 });
 /**
@@ -188,13 +188,13 @@ $app->get("/library/:resourcePath+.FeatureSource/spatialcontexts.:format", funct
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/longtransactions.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/longtransactions.:format", function($resourcePath, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetLongTransactions($resId, $format);
 });
 /**
@@ -211,13 +211,13 @@ $app->get("/library/:resourcePath+.FeatureSource/longtransactions.:format", func
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/schemas.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/schemas.:format", function($resourcePath, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetSchemaNames($resId, $format);
 });
 /**
@@ -236,13 +236,13 @@ $app->get("/library/:resourcePath+.FeatureSource/schemas.:format", function($res
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/schema.:format/:schemaName", function($resourcePath, $format, $schemaName) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/schema.:format/:schemaName", function($resourcePath, $format, $schemaName) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->DescribeSchema($resId, $schemaName, $format);
 });
 /**
@@ -260,13 +260,13 @@ $app->get("/library/:resourcePath+.FeatureSource/schema.:format/:schemaName", fu
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/classes.:format/:schemaName", function($resourcePath, $format, $schemaName) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/classes.:format/:schemaName", function($resourcePath, $format, $schemaName) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetClassNames($resId, $schemaName, $format);
 });
 /**
@@ -285,13 +285,13 @@ $app->get("/library/:resourcePath+.FeatureSource/classes.:format/:schemaName", f
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetClassDefinition($resId, $schemaName, $className, $format);
 });
 /**
@@ -309,13 +309,13 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:schemaName/:c
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:qualifiedClassName", function($resourcePath, $format, $qualifiedClassName) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:qualifiedClassName", function($resourcePath, $format, $qualifiedClassName) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $tokens = explode(":", $qualifiedClassName);
     $schemaName = "";
     $className = "";
@@ -346,13 +346,13 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:qualifiedClas
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+$app->post("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->InsertFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -375,13 +375,13 @@ $app->post("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->put("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+$app->put("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->UpdateFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -404,13 +404,13 @@ $app->put("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:c
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+$app->delete("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->DeleteFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -439,13 +439,13 @@ $app->delete("/library/:resourcePath+.FeatureSource/features.:format/:schemaName
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->SelectFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -473,13 +473,13 @@ $app->get("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:c
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.LayerDefinition/features.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+.LayerDefinition/features.:format", function($resourcePath, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->SelectLayerFeatures($resId, $format);
 });
 /**
@@ -500,13 +500,13 @@ $app->get("/library/:resourcePath+.LayerDefinition/features.:format", function($
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/aggregates.:format/:type/:schemaName/:className", function($resourcePath, $format, $type, $schemaName, $className) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/aggregates.:format/:type/:schemaName/:className", function($resourcePath, $format, $type, $schemaName, $className) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->SelectAggregates($resId, $schemaName, $className, $type, $format);
 });
 
@@ -528,8 +528,8 @@ $app->get("/library/:resourcePath+.FeatureSource/aggregates.:format/:type/:schem
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library", function() use ($app) {
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+$app->post("/library", function() {
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->ApplyResourcePackage();
 });
 /**
@@ -546,9 +546,9 @@ $app->post("/library", function() use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+/datalist.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+/datalist.:format", function($resourcePath, $format) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateResourceData($resId, $format);
 });
 /**
@@ -567,9 +567,9 @@ $app->get("/library/:resourcePath+/datalist.:format", function($resourcePath, $f
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/list.:format", function($format) use ($app) {
+$app->get("/library/list.:format", function($format) {
     $resId = new MgResourceIdentifier("Library://");
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateResources($resId, $format);
 });
 /**
@@ -589,9 +589,9 @@ $app->get("/library/list.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+/list.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+/list.:format", function($resourcePath, $format) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath, "list.".$format);
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateResources($resId, $format);
 });
 /**
@@ -608,9 +608,9 @@ $app->get("/library/:resourcePath+/list.:format", function($resourcePath, $forma
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+/data/:dataName", function($resourcePath, $dataName) use ($app) {
+$app->get("/library/:resourcePath+/data/:dataName", function($resourcePath, $dataName) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetResourceData($resId, $dataName);
 });
 /**
@@ -630,9 +630,9 @@ $app->get("/library/:resourcePath+/data/:dataName", function($resourcePath, $dat
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+/data/:dataName", function($resourcePath, $dataName) use ($app) {
+$app->post("/library/:resourcePath+/data/:dataName", function($resourcePath, $dataName) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->SetResourceData($resId, $dataName);
 });
 /**
@@ -649,9 +649,9 @@ $app->post("/library/:resourcePath+/data/:dataName", function($resourcePath, $da
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/library/:resourcePath+/data/:dataName", function($resourcePath, $dataName) use ($app) {
+$app->delete("/library/:resourcePath+/data/:dataName", function($resourcePath, $dataName) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->DeleteResourceData($resId, $dataName);
 });
 /**
@@ -671,9 +671,9 @@ $app->delete("/library/:resourcePath+/data/:dataName", function($resourcePath, $
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+/header.:format", function($resourcePath, $format) use ($app) {
+$app->post("/library/:resourcePath+/header.:format", function($resourcePath, $format) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->SetResourceHeader($resId, $format);
 });
 /**
@@ -691,9 +691,9 @@ $app->post("/library/:resourcePath+/header.:format", function($resourcePath, $fo
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+/header.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+/header.:format", function($resourcePath, $format) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetResourceHeader($resId, $format);
 });
 /**
@@ -714,9 +714,9 @@ $app->get("/library/:resourcePath+/header.:format", function($resourcePath, $for
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+/contentorheader.:format", function($resourcePath, $format) use ($app) {
+$app->post("/library/:resourcePath+/contentorheader.:format", function($resourcePath, $format) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->SetResourceContentOrHeader($resId, $format);
 });
 /**
@@ -736,9 +736,9 @@ $app->post("/library/:resourcePath+/contentorheader.:format", function($resource
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+/content.:format", function($resourcePath, $format) use ($app) {
+$app->post("/library/:resourcePath+/content.:format", function($resourcePath, $format) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->SetResourceContent($resId, $format);
 });
 /**
@@ -754,9 +754,9 @@ $app->post("/library/:resourcePath+/content.:format", function($resourcePath, $f
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+/html", function($resourcePath) use ($app) {
+$app->get("/library/:resourcePath+/html", function($resourcePath) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetResourceInfo($resId, "html");
 });
 /**
@@ -773,9 +773,9 @@ $app->get("/library/:resourcePath+/html", function($resourcePath) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+/content.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+/content.:format", function($resourcePath, $format) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetResourceContent($resId, $format);
 });
 /**
@@ -792,9 +792,9 @@ $app->get("/library/:resourcePath+/content.:format", function($resourcePath, $fo
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+/references.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+/references.:format", function($resourcePath, $format) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateResourceReferences($resId, $format);
 });
 /**
@@ -810,9 +810,9 @@ $app->get("/library/:resourcePath+/references.:format", function($resourcePath, 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/library/:resourcePath+", function($resourcePath) use ($app) {
+$app->delete("/library/:resourcePath+", function($resourcePath) {
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->DeleteResource($resId);
 });
 //============================== Tile Service APIs ============================================
@@ -836,7 +836,7 @@ $app->delete("/library/:resourcePath+", function($resourcePath) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:z/:x/:y/tile.:format", function($resourcePath, $groupName, $z, $x, $y, $format) use ($app) {
+$app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:z/:x/:y/tile.:format", function($resourcePath, $groupName, $z, $x, $y, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
@@ -844,7 +844,7 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:z/:x/:y/tile.:f
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     //echo "ResId: ".$resId->ToString()."<br/>Group: $groupName<br/>X: $x<br/>Y: $y<br/>Z: $z<br/>Format: $format";
     //die;
-    $ctrl = new MgTileServiceController(new AppServices($app));
+    $ctrl = new MgTileServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetTileXYZ($resId, $groupName, $x, $y, $z, $format);
 });
 /**
@@ -867,7 +867,7 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:z/:x/:y/tile.:f
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:layerName/:z/:x/:y/tile.:format", function($resourcePath, $groupName, $layerName, $z, $x, $y, $format) use ($app) {
+$app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:layerName/:z/:x/:y/tile.:format", function($resourcePath, $groupName, $layerName, $z, $x, $y, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
@@ -875,7 +875,7 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:layerName/:z/:x
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     //echo "ResId: ".$resId->ToString()."<br/>Group: $groupName<br/>X: $x<br/>Y: $y<br/>Z: $z<br/>Format: $format";
     //die;
-    $ctrl = new MgTileServiceController(new AppServices($app));
+    $ctrl = new MgTileServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetTileXYZForLayer($resId, $groupName, $layerName, $x, $y, $z, $format);
 });
 /**
@@ -898,7 +898,7 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:layerName/:z/:x
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/xyz@:scale/:groupName/:z/:x/:y/tile.:format", function($resourcePath, $scale, $groupName, $z, $x, $y, $format) use ($app) {
+$app->get("/library/:resourcePath+.MapDefinition/xyz@:scale/:groupName/:z/:x/:y/tile.:format", function($resourcePath, $scale, $groupName, $z, $x, $y, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
@@ -906,7 +906,7 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz@:scale/:groupName/:z/:x/:y/
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     //echo "ResId: ".$resId->ToString()."<br/>Group: $groupName<br/>X: $x<br/>Y: $y<br/>Z: $z<br/>Format: $format";
     //die;
-    $ctrl = new MgTileServiceController(new AppServices($app));
+    $ctrl = new MgTileServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetTileXYZRetina($resId, $groupName, $x, $y, $z, $format, $scale);
 });
 /**
@@ -928,13 +928,13 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz@:scale/:groupName/:z/:x/:y/
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/tile.:format/:groupName/:scaleIndex/:col/:row", function($resourcePath, $format, $groupName, $scaleIndex, $col, $row) use ($app) {
+$app->get("/library/:resourcePath+.MapDefinition/tile.:format/:groupName/:scaleIndex/:col/:row", function($resourcePath, $format, $groupName, $scaleIndex, $col, $row) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgTileServiceController(new AppServices($app));
+    $ctrl = new MgTileServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $format);
 });
 
@@ -957,13 +957,13 @@ $app->get("/library/:resourcePath+.MapDefinition/tile.:format/:groupName/:scaleI
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.TileSetDefinition/tile.:format/:groupName/:scaleIndex/:col/:row", function($resourcePath, $format, $groupName, $scaleIndex, $col, $row) use ($app) {
+$app->get("/library/:resourcePath+.TileSetDefinition/tile.:format/:groupName/:scaleIndex/:col/:row", function($resourcePath, $format, $groupName, $scaleIndex, $col, $row) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".TileSetDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgTileServiceController(new AppServices($app));
+    $ctrl = new MgTileServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $format);
 });
 
@@ -988,13 +988,13 @@ $app->get("/library/:resourcePath+.TileSetDefinition/tile.:format/:groupName/:sc
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.LayerDefinition/legend/:scale/:geomtype/:themecat/icon.:format", function($resourcePath, $scale, $geomtype, $themecat, $format) use ($app) {
+$app->get("/library/:resourcePath+.LayerDefinition/legend/:scale/:geomtype/:themecat/icon.:format", function($resourcePath, $scale, $geomtype, $themecat, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgMappingServiceController(new AppServices($app));
+    $ctrl = new MgMappingServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GenerateLegendImage($resId, $scale, $geomtype, $themecat, $format);
 });
 /**
@@ -1028,13 +1028,13 @@ $app->get("/library/:resourcePath+.LayerDefinition/legend/:scale/:geomtype/:them
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/plot.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+.MapDefinition/plot.:format", function($resourcePath, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgMappingServiceController(new AppServices($app));
+    $ctrl = new MgMappingServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GeneratePlotFromMapDefinition($resId, $format);
 });
 //================================= Rendering Service APIs ==================================
@@ -1061,13 +1061,13 @@ $app->get("/library/:resourcePath+.MapDefinition/plot.:format", function($resour
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/image.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+.MapDefinition/image.:format", function($resourcePath, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgRenderingServiceController(new AppServices($app));
+    $ctrl = new MgRenderingServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->RenderMapDefinition($resId, $format);
 });
 
@@ -1086,13 +1086,13 @@ $app->get("/library/:resourcePath+.MapDefinition/image.:format", function($resou
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.WebLayout/viewer", function($resourcePath) use ($app) {
+$app->get("/library/:resourcePath+.WebLayout/viewer", function($resourcePath) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".WebLayout";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgViewerController(new AppServices($app));
+    $ctrl = new MgViewerController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->LaunchAjaxViewer($resId);
 });
 
@@ -1110,13 +1110,13 @@ $app->get("/library/:resourcePath+.WebLayout/viewer", function($resourcePath) us
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.ApplicationDefinition/viewer/:template", function($resourcePath, $template) use ($app) {
+$app->get("/library/:resourcePath+.ApplicationDefinition/viewer/:template", function($resourcePath, $template) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".ApplicationDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgViewerController(new AppServices($app));
+    $ctrl = new MgViewerController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->LaunchFusionViewer($resId, $template);
 });
 
@@ -1133,13 +1133,13 @@ $app->get("/library/:resourcePath+.ApplicationDefinition/viewer/:template", func
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/preview", function($resourcePath) use ($app) {
+$app->get("/library/:resourcePath+.FeatureSource/preview", function($resourcePath) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgViewerController(new AppServices($app));
+    $ctrl = new MgViewerController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1156,13 +1156,13 @@ $app->get("/library/:resourcePath+.FeatureSource/preview", function($resourcePat
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.LayerDefinition/preview", function($resourcePath) use ($app) {
+$app->get("/library/:resourcePath+.LayerDefinition/preview", function($resourcePath) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgViewerController(new AppServices($app));
+    $ctrl = new MgViewerController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1179,13 +1179,13 @@ $app->get("/library/:resourcePath+.LayerDefinition/preview", function($resourceP
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/preview", function($resourcePath) use ($app) {
+$app->get("/library/:resourcePath+.MapDefinition/preview", function($resourcePath) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgViewerController(new AppServices($app));
+    $ctrl = new MgViewerController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1202,13 +1202,13 @@ $app->get("/library/:resourcePath+.MapDefinition/preview", function($resourcePat
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.SymbolDefinition/preview", function($resourcePath) use ($app) {
+$app->get("/library/:resourcePath+.SymbolDefinition/preview", function($resourcePath) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".SymbolDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgViewerController(new AppServices($app));
+    $ctrl = new MgViewerController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1225,13 +1225,13 @@ $app->get("/library/:resourcePath+.SymbolDefinition/preview", function($resource
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.WatermarkDefinition/preview", function($resourcePath) use ($app) {
+$app->get("/library/:resourcePath+.WatermarkDefinition/preview", function($resourcePath) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".WatermarkDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgViewerController(new AppServices($app));
+    $ctrl = new MgViewerController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1251,13 +1251,13 @@ $app->get("/library/:resourcePath+.WatermarkDefinition/preview", function($resou
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/kml", function($resourcePath) use ($app) {
+$app->get("/library/:resourcePath+.MapDefinition/kml", function($resourcePath) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgKmlServiceController(new AppServices($app));
+    $ctrl = new MgKmlServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetMapKml($resId, "kml");
 });
 
@@ -1280,13 +1280,13 @@ $app->get("/library/:resourcePath+.MapDefinition/kml", function($resourcePath) u
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.LayerDefinition/kml", function($resourcePath) use ($app) {
+$app->get("/library/:resourcePath+.LayerDefinition/kml", function($resourcePath) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgKmlServiceController(new AppServices($app));
+    $ctrl = new MgKmlServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetLayerKml($resId, "kml");
 });
 
@@ -1309,12 +1309,12 @@ $app->get("/library/:resourcePath+.LayerDefinition/kml", function($resourcePath)
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.LayerDefinition/kmlfeatures.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/:resourcePath+.LayerDefinition/kmlfeatures.:format", function($resourcePath, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgKmlServiceController(new AppServices($app));
+    $ctrl = new MgKmlServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetFeaturesKml($resId, $format);
 });

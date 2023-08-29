@@ -41,8 +41,8 @@ require_once dirname(__FILE__)."/../../core/app.php";
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session.:format", function($format) use ($app) {
-    $ctrl = new MgRestServiceController(new AppServices($app));
+$app->post("/session.:format", function($format) {
+    $ctrl = new MgRestServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->CreateSession($format);
 });
 /**
@@ -57,8 +57,8 @@ $app->post("/session.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/session/:sessionId", function($sessionId) use ($app) {
-    $ctrl = new MgRestServiceController(new AppServices($app));
+$app->delete("/session/:sessionId", function($sessionId) {
+    $ctrl = new MgRestServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->DestroySession($sessionId);
 });
 /**
@@ -74,8 +74,8 @@ $app->delete("/session/:sessionId", function($sessionId) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/timeout.:format", function($sessionId, $format) use ($app) {
-    $ctrl = new MgRestServiceController(new AppServices($app));
+$app->get("/session/:sessionId/timeout.:format", function($sessionId, $format) {
+    $ctrl = new MgRestServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetSessionTimeout($sessionId, $format);
 });
 /**
@@ -104,8 +104,8 @@ $app->get("/session/:sessionId/timeout.:format", function($sessionId, $format) u
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/image.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgRenderingServiceController(new AppServices($app));
+$app->get("/session/:sessionId/:mapName.Map/image.:format", function($sessionId, $mapName, $format) {
+    $ctrl = new MgRenderingServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->RenderRuntimeMap($sessionId, $mapName, $format);
 });
 /**
@@ -136,8 +136,8 @@ $app->get("/session/:sessionId/:mapName.Map/image.:format", function($sessionId,
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/overlayimage.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgRenderingServiceController(new AppServices($app));
+$app->get("/session/:sessionId/:mapName.Map/overlayimage.:format", function($sessionId, $mapName, $format) {
+    $ctrl = new MgRenderingServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->RenderDynamicOverlayImage($sessionId, $mapName, $format);
 });
 /**
@@ -156,8 +156,8 @@ $app->get("/session/:sessionId/:mapName.Map/overlayimage.:format", function($ses
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/legendimage.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgRenderingServiceController(new AppServices($app));
+$app->get("/session/:sessionId/:mapName.Map/legendimage.:format", function($sessionId, $mapName, $format) {
+    $ctrl = new MgRenderingServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->RenderRuntimeMapLegend($sessionId, $mapName, $format);
 });
 /**
@@ -180,8 +180,8 @@ $app->get("/session/:sessionId/:mapName.Map/legendimage.:format", function($sess
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/layers.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgMapController(new AppServices($app));
+$app->get("/session/:sessionId/:mapName.Map/layers.:format", function($sessionId, $mapName, $format) {
+    $ctrl = new MgMapController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateMapLayers($sessionId, $mapName, $format);
 });
 /**
@@ -198,8 +198,8 @@ $app->get("/session/:sessionId/:mapName.Map/layers.:format", function($sessionId
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/layergroups.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgMapController(new AppServices($app));
+$app->get("/session/:sessionId/:mapName.Map/layergroups.:format", function($sessionId, $mapName, $format) {
+    $ctrl = new MgMapController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateMapLayerGroups($sessionId, $mapName, $format);
 });
 /**
@@ -229,8 +229,8 @@ $app->get("/session/:sessionId/:mapName.Map/layergroups.:format", function($sess
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/plot.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgMappingServiceController(new AppServices($app));
+$app->get("/session/:sessionId/:mapName.Map/plot.:format", function($sessionId, $mapName, $format) {
+    $ctrl = new MgMappingServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GeneratePlot($sessionId, $mapName, $format);
 });
 /**
@@ -252,8 +252,8 @@ $app->get("/session/:sessionId/:mapName.Map/plot.:format", function($sessionId, 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/description.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgMappingServiceController(new AppServices($app));
+$app->get("/session/:sessionId/:mapName.Map/description.:format", function($sessionId, $mapName, $format) {
+    $ctrl = new MgMappingServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->DescribeRuntimeMap($sessionId, $mapName, $format);
 });
 /**
@@ -270,8 +270,8 @@ $app->get("/session/:sessionId/:mapName.Map/description.:format", function($sess
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->put("/session/:sessionId/:mapName.Map/layersandgroups.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgMapController(new AppServices($app));
+$app->put("/session/:sessionId/:mapName.Map/layersandgroups.:format", function($sessionId, $mapName, $format) {
+    $ctrl = new MgMapController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->UpdateMapLayersAndGroups($sessionId, $mapName, $format);
 });
 /**
@@ -287,8 +287,8 @@ $app->put("/session/:sessionId/:mapName.Map/layersandgroups.:format", function($
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgMapController(new AppServices($app));
+$app->get("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $mapName) {
+    $ctrl = new MgMapController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetSelectionXml($sessionId, $mapName);
 });
 /**
@@ -305,8 +305,8 @@ $app->get("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $ma
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Selection/layers.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgMapController(new AppServices($app));
+$app->get("/session/:sessionId/:mapName.Selection/layers.:format", function($sessionId, $mapName, $format) {
+    $ctrl = new MgMapController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetSelectionLayerNames($sessionId, $mapName, $format);
 });
 /**
@@ -324,8 +324,8 @@ $app->get("/session/:sessionId/:mapName.Selection/layers.:format", function($ses
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Selection/overview.:format", function($sessionId, $mapName, $format) use ($app) {
-    $ctrl = new MgMapController(new AppServices($app));
+$app->get("/session/:sessionId/:mapName.Selection/overview.:format", function($sessionId, $mapName, $format) {
+    $ctrl = new MgMapController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetSelectionOverview($sessionId, $mapName, $format);
 });
 /**
@@ -350,8 +350,8 @@ $app->get("/session/:sessionId/:mapName.Selection/overview.:format", function($s
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Selection/features.:format/:layerName", function($sessionId, $mapName, $format, $layerName) use ($app) {
-    $ctrl = new MgMapController(new AppServices($app));
+$app->get("/session/:sessionId/:mapName.Selection/features.:format/:layerName", function($sessionId, $mapName, $format, $layerName) {
+    $ctrl = new MgMapController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetSelectedFeatures($sessionId, $mapName, $layerName, $format);
 })->name("get_selected_features_$namespace");
 /**
@@ -368,8 +368,8 @@ $app->get("/session/:sessionId/:mapName.Selection/features.:format/:layerName", 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgMapController(new AppServices($app));
+$app->post("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $mapName) {
+    $ctrl = new MgMapController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->UpdateSelectionFromXml($sessionId, $mapName);
 });
 /**
@@ -398,8 +398,8 @@ $app->post("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $m
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->put("/session/:sessionId/:mapName.Selection", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgMapController(new AppServices($app));
+$app->put("/session/:sessionId/:mapName.Selection", function($sessionId, $mapName) {
+    $ctrl = new MgMapController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->QueryMapFeatures($sessionId, $mapName);
 });
 /**
@@ -418,7 +418,7 @@ $app->put("/session/:sessionId/:mapName.Selection", function($sessionId, $mapNam
  */
 $app->post("/session/:sessionId/:resName.Map", function($sessionId, $resName) use($app) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.Map");
-    $ctrl = new MgMapController(new AppServices($app));
+    $ctrl = new MgMapController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->CreateMap($resId);
 })->name("session_resource_id_$namespace");
 //
@@ -443,9 +443,9 @@ $app->post("/session/:sessionId/:resName.Map", function($sessionId, $resName) us
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/status", function($sessionId, $resName) use ($app) {
+$app->get("/session/:sessionId/:resName.FeatureSource/status", function($sessionId, $resName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->TestConnection($resId);
 });
 /**
@@ -462,9 +462,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/status", function($session
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/spatialcontexts.:format", function($sessionId, $resName, $format) use ($app) {
+$app->get("/session/:sessionId/:resName.FeatureSource/spatialcontexts.:format", function($sessionId, $resName, $format) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetSpatialContexts($resId, $format);
 });
 /**
@@ -482,13 +482,13 @@ $app->get("/session/:sessionId/:resName.FeatureSource/spatialcontexts.:format", 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/longtransactions.:format", function($sessionId, $resName, $format) use ($app) {
+$app->get("/session/:sessionId/:resName.FeatureSource/longtransactions.:format", function($sessionId, $resName, $format) {
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetLongTransactions($resId, $format);
 });
 /**
@@ -505,9 +505,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/longtransactions.:format",
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/schemas.:format", function($sessionId, $resName, $format) use ($app) {
+$app->get("/session/:sessionId/:resName.FeatureSource/schemas.:format", function($sessionId, $resName, $format) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetSchemaNames($resId, $format);
 });
 /**
@@ -526,9 +526,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/schemas.:format", function
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/schema.:format/:schemaName", function($sessionId, $resName, $format, $schemaName) use ($app) {
+$app->get("/session/:sessionId/:resName.FeatureSource/schema.:format/:schemaName", function($sessionId, $resName, $format, $schemaName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->DescribeSchema($resId, $schemaName, $format);
 });
 /**
@@ -546,9 +546,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/schema.:format/:schemaName
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/classes.:format/:schemaName", function($sessionId, $resName, $format, $schemaName) use ($app) {
+$app->get("/session/:sessionId/:resName.FeatureSource/classes.:format/:schemaName", function($sessionId, $resName, $format, $schemaName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetClassNames($resId, $schemaName, $format);
 });
 /**
@@ -567,9 +567,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classes.:format/:schemaNam
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
+$app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetClassDefinition($resId, $schemaName, $className, $format);
 });
 /**
@@ -587,9 +587,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:schemaNa
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:qualifiedClassName", function($sessionId, $resName, $format, $qualifiedClassName) use ($app) {
+$app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:qualifiedClassName", function($sessionId, $resName, $format, $qualifiedClassName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $tokens = explode(":", $qualifiedClassName);
     $schemaName = "";
     $className = "";
@@ -615,9 +615,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:qualifie
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:resName.FeatureSource/xml", function($sessionId, $resName) use ($app) {
+$app->post("/session/:sessionId/:resName.FeatureSource/xml", function($sessionId, $resName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->CreateFeatureSource($resId, "xml");
 });
 /**
@@ -634,9 +634,9 @@ $app->post("/session/:sessionId/:resName.FeatureSource/xml", function($sessionId
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:resName.FeatureSource/json", function($sessionId, $resName) use ($app) {
+$app->post("/session/:sessionId/:resName.FeatureSource/json", function($sessionId, $resName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->CreateFeatureSource($resId, "json");
 });
 /**
@@ -656,9 +656,9 @@ $app->post("/session/:sessionId/:resName.FeatureSource/json", function($sessionI
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
+$app->post("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->InsertFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -678,9 +678,9 @@ $app->post("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaN
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->put("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
+$app->put("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->UpdateFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -700,9 +700,9 @@ $app->put("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaNa
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
+$app->delete("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->DeleteFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -726,9 +726,9 @@ $app->delete("/session/:sessionId/:resName.FeatureSource/features.:format/:schem
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
+$app->get("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->SelectFeatures($resId, $schemaName, $className, $format);
 });
 /**
@@ -753,9 +753,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaNa
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.LayerDefinition/features.:format", function($sessionId, $resName, $format) use ($app) {
+$app->get("/session/:sessionId/:resName.LayerDefinition/features.:format", function($sessionId, $resName, $format) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->SelectLayerFeatures($resId, $format);
 });
 /**
@@ -775,9 +775,9 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/features.:format", funct
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/aggregates.:format/:type/:schemaName/:className", function($sessionId, $resName, $format, $type, $schemaName, $className) use ($app) {
+$app->get("/session/:sessionId/:resName.FeatureSource/aggregates.:format/:type/:schemaName/:className", function($sessionId, $resName, $format, $type, $schemaName, $className) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->SelectAggregates($resId, $schemaName, $className, $type, $format);
 });
 //========================= Resource Service APIs ================================
@@ -796,9 +796,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/aggregates.:format/:type/:
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName/datalist.:format", function($sessionId, $resName, $format) use ($app) {
+$app->get("/session/:sessionId/:resName/datalist.:format", function($sessionId, $resName, $format) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateResourceData($resId, $format);
 });
 /**
@@ -815,9 +815,9 @@ $app->get("/session/:sessionId/:resName/datalist.:format", function($sessionId, 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) use ($app) {
+$app->get("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetResourceData($resId, $dataName);
 });
 /**
@@ -836,9 +836,9 @@ $app->get("/session/:sessionId/:resName/data/:dataName", function($sessionId, $r
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) use ($app) {
+$app->post("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->SetResourceData($resId, $dataName);
 });
 /**
@@ -855,21 +855,21 @@ $app->post("/session/:sessionId/:resName/data/:dataName", function($sessionId, $
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) use ($app) {
+$app->delete("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->DeleteResourceData($resId, $dataName);
 });
 /*
 //Need to confirm if like EnumerateResources, this is not permitted on session repos
-$app->get("/session/:sessionId/:resName/header", function($sessionId, $resName) use ($app) {
+$app->get("/session/:sessionId/:resName/header", function($sessionId, $resName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetResourceHeader($resId, "xml");
 });
-$app->get("/session/:sessionId/:resName/header.:format", function($sessionId, $resName, $format) use ($app) {
+$app->get("/session/:sessionId/:resName/header.:format", function($sessionId, $resName, $format) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetResourceHeader($resId, $format);
 });
 */
@@ -889,9 +889,9 @@ $app->get("/session/:sessionId/:resName/header.:format", function($sessionId, $r
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:resName/contentorheader.:format", function($sessionId, $resName, $format) use ($app) {
+$app->post("/session/:sessionId/:resName/contentorheader.:format", function($sessionId, $resName, $format) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->SetResourceContentOrHeader($resId, $format);
 });
 /**
@@ -909,9 +909,9 @@ $app->post("/session/:sessionId/:resName/contentorheader.:format", function($ses
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:resName/content.:format", function($sessionId, $resName, $format) use ($app) {
+$app->post("/session/:sessionId/:resName/content.:format", function($sessionId, $resName, $format) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->SetResourceContent($resId, $format);
 });
 /**
@@ -928,9 +928,9 @@ $app->post("/session/:sessionId/:resName/content.:format", function($sessionId, 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName/content.:format", function($sessionId, $resName, $format) use ($app) {
+$app->get("/session/:sessionId/:resName/content.:format", function($sessionId, $resName, $format) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetResourceContent($resId, $format);
 });
 /**
@@ -947,9 +947,9 @@ $app->get("/session/:sessionId/:resName/content.:format", function($sessionId, $
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName/references.:format", function($sessionId, $resName, $format) use ($app) {
+$app->get("/session/:sessionId/:resName/references.:format", function($sessionId, $resName, $format) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateResourceReferences($resId, $format);
 });
 /**
@@ -965,9 +965,9 @@ $app->get("/session/:sessionId/:resName/references.:format", function($sessionId
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/session/:sessionId/:resName", function($sessionId, $resName) use ($app) {
+$app->delete("/session/:sessionId/:resName", function($sessionId, $resName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->DeleteResource($resId);
 });
 //================================== Tile Service APIs =======================================
@@ -990,9 +990,9 @@ $app->delete("/session/:sessionId/:resName", function($sessionId, $resName) use 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.MapDefinition/tile.:format/:groupName/:scaleIndex/:col/:row", function($sessionId, $resName, $format, $groupName, $scaleIndex, $col, $row) use ($app) {
+$app->get("/session/:sessionId/:resName.MapDefinition/tile.:format/:groupName/:scaleIndex/:col/:row", function($sessionId, $resName, $format, $groupName, $scaleIndex, $col, $row) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
-    $ctrl = new MgTileServiceController(new AppServices($app));
+    $ctrl = new MgTileServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $format);
 });
 //============================== Mapping Service APIs =====================================
@@ -1016,9 +1016,9 @@ $app->get("/session/:sessionId/:resName.MapDefinition/tile.:format/:groupName/:s
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.LayerDefinition/legend/:scale/:geomtype/:themecat/icon.:format", function($sessionId, $resName, $scale, $geomtype, $themecat, $format) use ($app) {
+$app->get("/session/:sessionId/:resName.LayerDefinition/legend/:scale/:geomtype/:themecat/icon.:format", function($sessionId, $resName, $scale, $geomtype, $themecat, $format) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
-    $ctrl = new MgMappingServiceController(new AppServices($app));
+    $ctrl = new MgMappingServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GenerateLegendImage($resId, $scale, $geomtype, $themecat, $format);
 });
 //============================= Rendering Service APIs ====================================
@@ -1045,9 +1045,9 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/legend/:scale/:geomtype/
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.MapDefinition/image.:format", function($sessionId, $resName, $format) use ($app) {
+$app->get("/session/:sessionId/:resName.MapDefinition/image.:format", function($sessionId, $resName, $format) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
-    $ctrl = new MgRenderingServiceController(new AppServices($app));
+    $ctrl = new MgRenderingServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->RenderMapDefinition($resId, $format);
 });
 
@@ -1066,9 +1066,9 @@ $app->get("/session/:sessionId/:resName.MapDefinition/image.:format", function($
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.WebLayout/viewer", function($sessionId, $resName) use ($app) {
+$app->get("/session/:sessionId/:resName.WebLayout/viewer", function($sessionId, $resName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.WebLayout");
-    $ctrl = new MgViewerController(new AppServices($app));
+    $ctrl = new MgViewerController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->LaunchAjaxViewer($resId);
 });
 
@@ -1086,9 +1086,9 @@ $app->get("/session/:sessionId/:resName.WebLayout/viewer", function($sessionId, 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.ApplicationDefinition/viewer/:template", function($sessionId, $resName, $template) use ($app) {
+$app->get("/session/:sessionId/:resName.ApplicationDefinition/viewer/:template", function($sessionId, $resName, $template) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.ApplicationDefinition");
-    $ctrl = new MgViewerController(new AppServices($app));
+    $ctrl = new MgViewerController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->LaunchFusionViewer($resId, $template);
 });
 
@@ -1105,9 +1105,9 @@ $app->get("/session/:sessionId/:resName.ApplicationDefinition/viewer/:template",
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/preview", function($sessionId, $resName) use ($app) {
+$app->get("/session/:sessionId/:resName.FeatureSource/preview", function($sessionId, $resName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
-    $ctrl = new MgViewerController(new AppServices($app));
+    $ctrl = new MgViewerController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1124,9 +1124,9 @@ $app->get("/session/:sessionId/:resName.FeatureSource/preview", function($sessio
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.LayerDefinition/preview", function($sessionId, $resName) use ($app) {
+$app->get("/session/:sessionId/:resName.LayerDefinition/preview", function($sessionId, $resName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
-    $ctrl = new MgViewerController(new AppServices($app));
+    $ctrl = new MgViewerController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1143,9 +1143,9 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/preview", function($sess
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.MapDefinition/preview", function($sessionId, $resName) use ($app) {
+$app->get("/session/:sessionId/:resName.MapDefinition/preview", function($sessionId, $resName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
-    $ctrl = new MgViewerController(new AppServices($app));
+    $ctrl = new MgViewerController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1162,9 +1162,9 @@ $app->get("/session/:sessionId/:resName.MapDefinition/preview", function($sessio
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.SymbolDefinition/preview", function($sessionId, $resName) use ($app) {
+$app->get("/session/:sessionId/:resName.SymbolDefinition/preview", function($sessionId, $resName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.SymbolDefinition");
-    $ctrl = new MgViewerController(new AppServices($app));
+    $ctrl = new MgViewerController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1181,9 +1181,9 @@ $app->get("/session/:sessionId/:resName.SymbolDefinition/preview", function($ses
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.WatermarkDefinition/preview", function($sessionId, $resName) use ($app) {
+$app->get("/session/:sessionId/:resName.WatermarkDefinition/preview", function($sessionId, $resName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.WatermarkDefinition");
-    $ctrl = new MgViewerController(new AppServices($app));
+    $ctrl = new MgViewerController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->LaunchResourcePreview($resId);
 });
 
@@ -1203,8 +1203,8 @@ $app->get("/session/:sessionId/:resName.WatermarkDefinition/preview", function($
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/kml", function($sessionId, $mapName) use ($app) {
-    $ctrl = new MgKmlServiceController(new AppServices($app));
+$app->get("/session/:sessionId/:mapName.Map/kml", function($sessionId, $mapName) {
+    $ctrl = new MgKmlServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetSessionMapKml($sessionId, $mapName, "kml");
 });
 
@@ -1222,9 +1222,9 @@ $app->get("/session/:sessionId/:mapName.Map/kml", function($sessionId, $mapName)
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.MapDefinition/kml", function($sessionId, $resName) use ($app) {
+$app->get("/session/:sessionId/:resName.MapDefinition/kml", function($sessionId, $resName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
-    $ctrl = new MgKmlServiceController(new AppServices($app));
+    $ctrl = new MgKmlServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetMapKml($resId, "kml");
 });
 
@@ -1246,9 +1246,9 @@ $app->get("/session/:sessionId/:resName.MapDefinition/kml", function($sessionId,
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.LayerDefinition/kml", function($sessionId, $resName) use ($app) {
+$app->get("/session/:sessionId/:resName.LayerDefinition/kml", function($sessionId, $resName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
-    $ctrl = new MgKmlServiceController(new AppServices($app));
+    $ctrl = new MgKmlServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetLayerKml($resId, "kml");
 });
 
@@ -1271,8 +1271,8 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/kml", function($sessionI
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.LayerDefinition/kmlfeatures.:format", function($sessionId, $resName, $format) use ($app) {
+$app->get("/session/:sessionId/:resName.LayerDefinition/kmlfeatures.:format", function($sessionId, $resName, $format) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
-    $ctrl = new MgKmlServiceController(new AppServices($app));
+    $ctrl = new MgKmlServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetFeaturesKml($resId, $format);
 });

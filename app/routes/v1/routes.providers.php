@@ -34,8 +34,8 @@ require_once dirname(__FILE__)."/../../core/app.php";
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/providers.:format", function($format) use ($app) {
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+$app->get("/providers.:format", function($format) {
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetFeatureProviders($format);
 });
 /**
@@ -53,8 +53,8 @@ $app->get("/providers.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/providers/:providerName/capabilities.:format", function($providerName, $format) use ($app) {
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+$app->get("/providers/:providerName/capabilities.:format", function($providerName, $format) {
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetProviderCapabilities($providerName, $format);
 });
 /**
@@ -72,8 +72,8 @@ $app->get("/providers/:providerName/capabilities.:format", function($providerNam
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/providers/:providerName/datastores.:format", function($providerName, $format) use ($app) {
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+$app->get("/providers/:providerName/datastores.:format", function($providerName, $format) {
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateDataStores($providerName, $format);
 });
 /**
@@ -92,7 +92,7 @@ $app->get("/providers/:providerName/datastores.:format", function($providerName,
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/providers/:providerName/connectvalues.:format/:propName", function($providerName, $format, $propName) use ($app) {
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+$app->get("/providers/:providerName/connectvalues.:format/:propName", function($providerName, $format, $propName) {
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetConnectPropertyValues($providerName, $propName, $format);
 });

@@ -36,8 +36,8 @@ require_once dirname(__FILE__)."/../../core/app.php";
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/services/fusiontemplates.:format", function($format) use ($app) {
-    $ctrl = new MgRestServiceController(new AppServices($app));
+$app->get("/services/fusiontemplates.:format", function($format) {
+    $ctrl = new MgRestServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateApplicationTemplates($format);
 });
 /**
@@ -53,8 +53,8 @@ $app->get("/services/fusiontemplates.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/services/fusionwidgets.:format", function($format) use ($app) {
-    $ctrl = new MgRestServiceController(new AppServices($app));
+$app->get("/services/fusionwidgets.:format", function($format) {
+    $ctrl = new MgRestServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateApplicationWidgets($format);
 });
 /**
@@ -70,8 +70,8 @@ $app->get("/services/fusionwidgets.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/services/fusioncontainers.:format", function($format) use ($app) {
-    $ctrl = new MgRestServiceController(new AppServices($app));
+$app->get("/services/fusioncontainers.:format", function($format) {
+    $ctrl = new MgRestServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateApplicationContainers($format);
 });
 /**
@@ -91,8 +91,8 @@ $app->get("/services/fusioncontainers.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/services/listunmanageddata.:format", function($format) use ($app) {
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+$app->post("/services/listunmanageddata.:format", function($format) {
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateUnmanagedData($format);
 });
 /**
@@ -110,8 +110,8 @@ $app->post("/services/listunmanageddata.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/services/getschemamapping.:format", function($format) use ($app) {
-    $ctrl = new MgFeatureServiceController(new AppServices($app));
+$app->get("/services/getschemamapping.:format", function($format) {
+    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetSchemaMapping($format);
 });
 
@@ -129,8 +129,8 @@ $app->get("/services/getschemamapping.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/services/copyresource", function() use ($app) {
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+$app->post("/services/copyresource", function() {
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->CopyResource();
 });
 /**
@@ -148,8 +148,8 @@ $app->post("/services/copyresource", function() use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/services/moveresource", function() use ($app) {
-    $ctrl = new MgResourceServiceController(new AppServices($app));
+$app->post("/services/moveresource", function() {
+    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->MoveResource();
 });
 /**
@@ -167,8 +167,8 @@ $app->post("/services/moveresource", function() use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/services/transformcoords", function() use ($app) {
-    $ctrl = new MgCoordinateSystemController(new AppServices($app));
+$app->post("/services/transformcoords", function() {
+    $ctrl = new MgCoordinateSystemController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->TransformCoordinates();
 });
 /**
@@ -193,7 +193,7 @@ $app->post("/services/transformcoords", function() use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/services/createmap.:format", function($format) use ($app) {
-    $ctrl = new MgMappingServiceController(new AppServices($app));
+$app->post("/services/createmap.:format", function($format) {
+    $ctrl = new MgMappingServiceController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->CreateRuntimeMap($format);
 });

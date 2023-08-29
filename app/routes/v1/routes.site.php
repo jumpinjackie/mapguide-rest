@@ -33,8 +33,8 @@ require_once dirname(__FILE__)."/../../core/app.php";
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/site/status.:format", function($format) use ($app) {
-    $ctrl = new MgSiteAdminController(new AppServices($app));
+$app->get("/site/status.:format", function($format) {
+    $ctrl = new MgSiteAdminController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetSiteStatus($format);
 });
 /**
@@ -49,8 +49,8 @@ $app->get("/site/status.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/site/info.:format", function($format) use ($app) {
-    $ctrl = new MgSiteAdminController(new AppServices($app));
+$app->get("/site/info.:format", function($format) {
+    $ctrl = new MgSiteAdminController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetSiteInformation($format);
 });
 /**
@@ -65,8 +65,8 @@ $app->get("/site/info.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/site/version.:format", function($format) use ($app) {
-    $ctrl = new MgSiteAdminController(new AppServices($app));
+$app->get("/site/version.:format", function($format) {
+    $ctrl = new MgSiteAdminController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->GetSiteVersion($format);
 });
 /**
@@ -81,8 +81,8 @@ $app->get("/site/version.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/site/groups.:format", function($format) use ($app) {
-    $ctrl = new MgSiteAdminController(new AppServices($app));
+$app->get("/site/groups.:format", function($format) {
+    $ctrl = new MgSiteAdminController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateGroups($format);
 });
 /**
@@ -98,8 +98,8 @@ $app->get("/site/groups.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/site/groups/:groupName/users.:format", function($groupName, $format) use ($app) {
-    $ctrl = new MgSiteAdminController(new AppServices($app));
+$app->get("/site/groups/:groupName/users.:format", function($groupName, $format) {
+    $ctrl = new MgSiteAdminController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateUsersForGroup($groupName, $format);
 });
 /**
@@ -115,8 +115,8 @@ $app->get("/site/groups/:groupName/users.:format", function($groupName, $format)
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/site/user/:userName/groups.:format", function($userName, $format) use ($app) {
-    $ctrl = new MgSiteAdminController(new AppServices($app));
+$app->get("/site/user/:userName/groups.:format", function($userName, $format) {
+    $ctrl = new MgSiteAdminController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateGroupsForUser($userName, $format);
 });
 /**
@@ -132,7 +132,7 @@ $app->get("/site/user/:userName/groups.:format", function($userName, $format) us
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/site/user/:userName/roles.:format", function($userName, $format) use ($app) {
-    $ctrl = new MgSiteAdminController(new AppServices($app));
+$app->get("/site/user/:userName/roles.:format", function($userName, $format) {
+    $ctrl = new MgSiteAdminController(new AppServices(\Slim\Slim::getInstance()));
     $ctrl->EnumerateRolesForUser($userName, $format);
 });

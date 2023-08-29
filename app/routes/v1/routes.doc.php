@@ -28,8 +28,8 @@ require_once dirname(__FILE__)."/../../version.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
 require_once dirname(__FILE__)."/../../core/app.php";
 
-$app->get("/apidoc/", function() use ($app) {
-    $wrap = new AppServices($app);
+$app->get("/apidoc/", function() {
+    $wrap = new AppServices(\Slim\Slim::getInstance());
     $prefix = MgUtils::GetApiVersionNamespace($wrap, "/apidoc");
     $path = $app->config("AppRootDir")."/doc/data/swagger.json";
     
@@ -67,8 +67,8 @@ $app->get("/apidoc/", function() use ($app) {
     $app->response->setBody($data);
     */
 });
-$app->get("/doc/index.html", function() use ($app) {
-    $wrap = new AppServices($app);
+$app->get("/doc/index.html", function() {
+    $wrap = new AppServices(\Slim\Slim::getInstance());
     $prefix = MgUtils::GetApiVersionNamespace($wrap, "/doc/index.html");
     if (strlen($prefix) > 0)
         $docUrl = $wrap->GetConfig("SelfUrl")."/$prefix/apidoc";
@@ -87,11 +87,11 @@ $app->get("/doc/index.html", function() use ($app) {
     $wrap->SetResponseHeader("Content-Type", "text/html");
     $wrap->SetResponseBody($output);
 });
-$app->get("/apidoc/:file", function($file) use ($app) {
+$app->get("/apidoc/:file", function($file) {
     if (MgUtils::StringEndsWith($file, ".json"))
         $file = str_replace(".json", "", $file);
 
-    $wrap = new AppServices($app);
+    $wrap = new AppServices(\Slim\Slim::getInstance());
     $prefix = MgUtils::GetApiVersionNamespace($wrap, "/apidoc");
     if (strlen($prefix) > 0) {
         $path = $wrap->GetConfig("AppRootDir")."/doc/data/$prefix/$file.json";
