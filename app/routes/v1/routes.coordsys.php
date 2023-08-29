@@ -34,9 +34,13 @@ require_once dirname(__FILE__)."/../../core/app.php";
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/coordsys/baselibrary.:format", function($format) {
-    $ctrl = new MgCoordinateSystemController(new AppServices(\Slim\Slim::getInstance()));
+$app->get("/coordsys/baselibrary.{format}", function($req, $resp, $args) {
+    $format = $args['format'];
+    $app = $this->get("AppServices");
+    $ctrl = new MgCoordinateSystemController($app);
     $ctrl->GetBaseLibrary($format);
+    return $app->Done();
+
 });
 /**
  *     @SWG\Post(
@@ -52,9 +56,12 @@ $app->get("/coordsys/baselibrary.:format", function($format) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/coordsys/validatewkt.:format", function($format) {
-    $ctrl = new MgCoordinateSystemController(new AppServices(\Slim\Slim::getInstance()));
+$app->post("/coordsys/validatewkt.{format}", function($req, $resp, $args) {
+    $format = $args['format'];
+    $app = $this->get("AppServices");
+    $ctrl = new MgCoordinateSystemController($app);
     $ctrl->ValidateWkt($format);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -71,7 +78,7 @@ $app->post("/coordsys/validatewkt.:format", function($format) {
  *     )
  */
 $app->post("/coordsys/wkttoepsg.:format", function($format) {
-    $ctrl = new MgCoordinateSystemController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
     $ctrl->WktToEpsg($format);
 });
 /**
@@ -89,7 +96,7 @@ $app->post("/coordsys/wkttoepsg.:format", function($format) {
  *     )
  */
 $app->post("/coordsys/wkttomentor.:format", function($format) {
-    $ctrl = new MgCoordinateSystemController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
     $ctrl->WktToMentor($format);
 });
 /**
@@ -106,7 +113,7 @@ $app->post("/coordsys/wkttomentor.:format", function($format) {
  *     )
  */
 $app->get("/coordsys/categories.:format", function($format) {
-    $ctrl = new MgCoordinateSystemController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
     $ctrl->EnumerateCategories($format); 
 });
 /**
@@ -124,7 +131,7 @@ $app->get("/coordsys/categories.:format", function($format) {
  *     )
  */
 $app->get("/coordsys/category.:format/:category", function($format, $category) {
-    $ctrl = new MgCoordinateSystemController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
     $ctrl->EnumerateCoordinateSystemsByCategory($category, $format);
 });
 /**
@@ -142,7 +149,7 @@ $app->get("/coordsys/category.:format/:category", function($format, $category) {
  *     )
  */
 $app->get("/coordsys/mentor/:cscode/epsg.:format", function($cscode, $format) {
-    $ctrl = new MgCoordinateSystemController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
     $ctrl->ConvertCsCodeToEpsg($cscode, $format);
 });
 /**
@@ -160,7 +167,7 @@ $app->get("/coordsys/mentor/:cscode/epsg.:format", function($cscode, $format) {
  *     )
  */
 $app->get("/coordsys/mentor/:cscode/wkt.:format", function($cscode, $format) {
-    $ctrl = new MgCoordinateSystemController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
     $ctrl->ConvertCsCodeToWkt($cscode, $format); 
 });
 /**
@@ -178,7 +185,7 @@ $app->get("/coordsys/mentor/:cscode/wkt.:format", function($cscode, $format) {
  *     )
  */
 $app->get("/coordsys/epsg/:epsg/mentor.:format", function($epsg, $format) {
-    $ctrl = new MgCoordinateSystemController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
     $ctrl->ConvertEpsgToCsCode($epsg, $format);
 });
 /**
@@ -196,7 +203,7 @@ $app->get("/coordsys/epsg/:epsg/mentor.:format", function($epsg, $format) {
  *     )
  */
 $app->get("/coordsys/epsg/:epsg/wkt.:format", function($epsg, $format) {
-    $ctrl = new MgCoordinateSystemController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
     $ctrl->ConvertEpsgToWkt($epsg, $format);
 });
 /*
@@ -204,14 +211,14 @@ $app->post("/coordsys/tomentor/:wkt+", function($wkt) {
     $wktStr = implode("/", $wkt);
     echo $wktStr;
     die;
-    $ctrl = new MgCoordinateSystemController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
     $ctrl->ConvertWktToCsCode($wktStr);
 });
 $app->post("/coordsys/toepsg/:wkt+", function($wkt) {
     $wktStr = implode("/", $wkt);
     echo $wktStr;
     die;
-    $ctrl = new MgCoordinateSystemController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
     $ctrl->ConvertWktToEpsg($wktStr);
 });
 */

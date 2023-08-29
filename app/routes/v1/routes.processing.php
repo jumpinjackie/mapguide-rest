@@ -40,7 +40,7 @@ require_once dirname(__FILE__)."/../../core/app.php";
  *     )
  */
 $app->post("/processing/buffer", function() {
-    $ctrl = new MgProcessingController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgProcessingController($this->get("AppServices"));
     $ctrl->Buffer();
 });
 
@@ -61,7 +61,7 @@ $app->post("/processing/buffer", function() {
  *     )
  */
 $app->post("/processing/difference", function() {
-    $ctrl = new MgProcessingController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgProcessingController($this->get("AppServices"));
     $ctrl->Difference();
 });
 
@@ -82,7 +82,7 @@ $app->post("/processing/difference", function() {
  *     )
  */
 $app->post("/processing/intersection", function() {
-    $ctrl = new MgProcessingController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgProcessingController($this->get("AppServices"));
     $ctrl->Intersection();
 });
 
@@ -103,7 +103,7 @@ $app->post("/processing/intersection", function() {
  *     )
  */
 $app->post("/processing/symmetricdifference", function() {
-    $ctrl = new MgProcessingController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgProcessingController($this->get("AppServices"));
     $ctrl->SymmetricDifference();
 });
 
@@ -124,7 +124,7 @@ $app->post("/processing/symmetricdifference", function() {
  *     )
  */
 $app->post("/processing/union", function() {
-    $ctrl = new MgProcessingController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgProcessingController($this->get("AppServices"));
     $ctrl->Union();
 });
 
@@ -144,6 +144,6 @@ $app->post("/processing/union", function() {
  *     )
  */
 $app->post("/processing/spatialpredicate", function() {
-    $ctrl = new MgProcessingController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgProcessingController($this->get("AppServices"));
     $ctrl->SpatialPredicate();
 });

@@ -20,33 +20,41 @@
 require_once dirname(__FILE__)."/interfaces.php";
 
 class AppServices implements IAppServices {
-    private $app;
-    public function __construct(\Slim\Slim $app) {
-        $this->app = $app;
+    private $container;
+    private $config;
+    private $localizer;
+    private $request;
+    private $response;
+    public function __construct(\Slim\Container $container) {
+        $this->container = $container;
+        $this->config = $this->container->get('settings');
+        $this->localizer = $this->container->get('localizer');
+        $this->request = $this->container->get('request');
+        $this->response = $this->container->get('response');
     }
 
     public /* internal */ function GetLocalizedText(/*php_string*/ $key) {
-        $this->app->localizer->getText($key);
+        $this->localizer->getText($key);
     }
 
     public /* internal */ function GetConfig(/*php_string*/ $name) {
-        return $this->app->config($name);
+        return $this->config[$name];
     }
 
     public /* internal */ function GetRequestPathInfo() {
-        return $this->app->request->getPathInfo();
+        return $this->request->getUri()->getPath();
     }
 
     public /* internal */ function GetRequestHeader(/*php_string*/ $name) {
-        return $this->app->request->headers->get($name);
+        return $this->request->getHeader($name);
     }
 
     public /* internal */ function GetRequestBody() {
-        return $this->app->request->getBody();
+        return $this->request->getBody();
     }
 
     public /* internal */ function GetAllRequestParams() {
-        return $this->app->request->params();
+        return $this->request->params();
     }
 
     /**
@@ -70,11 +78,11 @@ class AppServices implements IAppServices {
      *   String - the matching parameter value or the default value if no matches can be found
      */
     public /* internal */ function GetRequestParameter(/*php_string*/ $key, /*php_string*/ $defaultValue = "") {
-        $value = $this->app->request->params($key);
+        $value = $this->request->getParam($key);
         if ($value == null)
-            $value = $this->app->request->params(strtoupper($key));
+            $value = $this->request->getParam(strtoupper($key));
         if ($value == null)
-            $value = $this->app->request->params(strtolower($key));
+            $value = $this->request->getParam(strtolower($key));
         if ($value == null)
             $value = $defaultValue;
 
@@ -82,23 +90,24 @@ class AppServices implements IAppServices {
     }
 
     public /* internal */ function SetResponseHeader(/*php_string*/ $name, /*php_string*/ $value) {
-        $this->app->response->header($name, $value);
+        $this->response = $this->response->withHeader($name, $value);
     }
 
     public /* internal */ function WriteResponseContent(/*php_string*/ $content) {
-        $this->app->response->write($content);
+        $this->response->write($body);
     }
 
-    public /* internal */ function SetResponseBody(/*php_mixed*/ $body) {
-        $this->app->response->setBody($body);
+    public /* internal */ function SetResponseBody(/*php_mixed*/ $content) {
+        $body = $this->response->getBody();
+        $body->write($content);
     }
 
     public /* internal */ function SetResponseStatus(/*php_int*/ $statusCode) {
-        $this->app->response->setStatus($statusCode);
+        $this->response = $this->response->withStatus($statusCode);
     }
 
     public /* internal */ function LogDebug(/*php_string*/ $message) {
-        $this->app->log->debug($message);
+        //$this->app->log->debug($message);
     }
 
     public /* internal */ function SetResponseExpiry(/*php_string*/ $expires) {
@@ -106,7 +115,7 @@ class AppServices implements IAppServices {
     }
 
     public /* internal */ function GetMapGuideVersion() {
-        return $this->app->MG_VERSION;
+        return $this->container->get('mgVersion');
     }
 
     public /* internal */ function SetResponseLastModified(/*php_string*/ $mod) {
@@ -118,18 +127,23 @@ class AppServices implements IAppServices {
     }
 
     public /* internal */ function Halt(/*php_int*/ $statusCode, /*php_string*/ $body) {
-        $this->app->Halt($statusCode, $body);
+        $this->SetResponseStatus($statusCode);
+        $this->SetResponseBody($body);
     }
 
     public /* internal */ function HasDependency(/*php_string*/ $name) {
-        return $this->app->container->has($name);
+        return $this->container->has($name);
     }
 
     public /* internal */ function GetDependency(/*php_string*/ $name) {
-        return $this->app->container->$name;
+        return $this->container->get($name);
     }
 
     public /* internal */ function RegisterDependency(/*php_string*/ $name, /*php_mixed*/ $value) {
         $this->app->container->set($name, $value);
+    }
+    
+    public function Done() {
+        return $this->response;
     }
 }

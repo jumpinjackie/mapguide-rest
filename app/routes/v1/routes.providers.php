@@ -35,7 +35,7 @@ require_once dirname(__FILE__)."/../../core/app.php";
  *     )
  */
 $app->get("/providers.:format", function($format) {
-    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgFeatureServiceController($this->get("AppServices"));
     $ctrl->GetFeatureProviders($format);
 });
 /**
@@ -54,7 +54,7 @@ $app->get("/providers.:format", function($format) {
  *     )
  */
 $app->get("/providers/:providerName/capabilities.:format", function($providerName, $format) {
-    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgFeatureServiceController($this->get("AppServices"));
     $ctrl->GetProviderCapabilities($providerName, $format);
 });
 /**
@@ -73,7 +73,7 @@ $app->get("/providers/:providerName/capabilities.:format", function($providerNam
  *     )
  */
 $app->get("/providers/:providerName/datastores.:format", function($providerName, $format) {
-    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgFeatureServiceController($this->get("AppServices"));
     $ctrl->EnumerateDataStores($providerName, $format);
 });
 /**
@@ -93,6 +93,6 @@ $app->get("/providers/:providerName/datastores.:format", function($providerName,
  *     )
  */
 $app->get("/providers/:providerName/connectvalues.:format/:propName", function($providerName, $format, $propName) {
-    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgFeatureServiceController($this->get("AppServices"));
     $ctrl->GetConnectPropertyValues($providerName, $propName, $format);
 });

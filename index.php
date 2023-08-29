@@ -58,39 +58,69 @@ if (!class_exists("MgImageFormats")) {
 $webConfigPath = dirname(__FILE__)."/../webconfig.ini";
 MgInitializeWebTier($webConfigPath);
 
-require_once dirname(__FILE__)."/app/util/localizer.php";
-require_once dirname(__FILE__)."/app/util/utils.php";
-$config = require_once dirname(__FILE__)."/app/config.php";
-$logConfig = require_once dirname(__FILE__)."/app/log_config.php";
-$config = array_merge($config, $logConfig);
-//Pull in the appropriate string bundle
-$strings = require_once dirname(__FILE__)."/app/res/lang/".$config["Locale"].".php";
-$app = new \Slim\Slim($config);
-$corsOptions = $app->config("MapGuide.Cors");
-if ($corsOptions != null) {
-    $app->add(new \CorsSlim\CorsSlim($corsOptions));
-}
+require dirname(__FILE__)."/app/util/localizer.php";
+require dirname(__FILE__)."/app/util/utils.php";
+$config = require dirname(__FILE__)."/app/config.php";
+$container = new \Slim\Container($config);
+
+//Register our app services wrapper
+$container['AppServices'] = function($c) {
+    return new AppServices($c);
+};
+
 //Override error handler for unhandled exceptions
-$app->error(function($err) use ($app) {
-    $wrap = new AppServices($app);
-    $title = $wrap->GetLocalizedText("E_UNHANDLED_EXCEPTION");
-    $mimeType = MgMimeType::Html;
-    //As part of validating the desired representation, this variable will be set, this will tell us
-    //what mime type to shape the response
-    if (isset($app->requestedMimeType)) {
-        $mimeType = $app->requestedMimeType;
-    }
-    $details = $app->localizer->getText("E_PHP_EXCEPTION_DETAILS", $err->getMessage(), $err->getFile(), $err->getLine());
-    $wrap->SetResponseHeader("Content-Type", $mimeType);
-    $wrap->SetResponseBody(MgUtils::FormatException($wrap, "UnhandledError", $title, $details, $err->getTraceAsString(), 500, $mimeType));
-});
-$app->localizer = new Localizer($strings);
+$container['errorHandler'] = function ($c) {
+    return function ($request, $response, $exception) use ($c) {
+        $wrap = $c->get('AppServices');
+        $title = $wrap->GetLocalizedText("E_UNHANDLED_EXCEPTION");
+        $mimeType = MgMimeType::Html;
+        //As part of validating the desired representation, this variable will be set, this will tell us
+        //what mime type to shape the response
+        //if (isset($app->requestedMimeType)) {
+        //    $mimeType = $app->requestedMimeType;
+        //}
+        $details = $wrap->GetLocalizedText("E_PHP_EXCEPTION_DETAILS", $err->getMessage(), $err->getFile(), $err->getLine());
+        $wrap->SetResponseHeader("Content-Type", $mimeType);
+        $wrap->SetResponseBody(MgUtils::FormatException($wrap, "UnhandledError", $title, $details, $err->getTraceAsString(), 500, $mimeType));
+    };
+};
+
+$settings = $container->get('settings');
+
+//Pull in the appropriate string bundle
+$strings = require dirname(__FILE__)."/app/res/lang/".$settings["Locale"].".php";
+
+//Register our text localizer
+$container['localizer'] = function ($c) use ($strings) {
+    return new Localizer($strings);
+};
+
 //Set server version
 $ver = explode(".", SITE_ADMINISTRATOR_VERSION, 4);
-$app->MG_VERSION = array(intval($ver[0]), intval($ver[1]), intval($ver[2]), intval($ver[3]));
-$app->config("SelfUrl", $app->request->getUrl() . $app->request->getRootUri());
-$un = new URL\Normalizer($app->config("SelfUrl") . "/" . $app->config("MapGuide.MapAgentUrl"));
-$app->config("MapGuide.MapAgentUrl", $un->normalize());
+$container['mgVersion'] = function ($c) use ($ver) {
+    return array(intval($ver[0]), intval($ver[1]), intval($ver[2]), intval($ver[3]));
+};
+
+//Add extra settings
+$settings->replace([
+    //Set the root dir of this file for code that needs to know about it
+    "AppRootDir" => dirname(__FILE__),
+    "SelfUrl" => MgUtils::GetSelfUrlRoot("$_SERVER[REQUEST_SCHEME]://$_SERVER[HTTP_HOST]$_SERVER[SCRIPT_NAME]")
+]);
+
+$un = new URL\Normalizer($settings["SelfUrl"] . "/" . $settings["MapGuide.MapAgentUrl"]);
+$settings->replace([
+    "MapGuide.MapAgentUrl" => $un->normalize()
+]);
+
+//Now we can init the main slim app
+$app = new \Slim\App($container);
+
+//require dirname(__FILE__)."/app/log_config.php";
+//$corsOptions = $container->get('settings')["MapGuide.Cors"];
+//if ($corsOptions != null) {
+//    $app->add(new \CorsSlim\CorsSlim($corsOptions));
+//}
 /*
 var_dump($app->localizer->getText("E_METHOD_NOT_SUPPORTED"));
 var_dump($app->localizer->getText("E_METHOD_NOT_SUPPORTED", "test"));
@@ -112,9 +142,7 @@ die;
 include dirname(__FILE__)."/app/adapters/registration.php";
 include dirname(__FILE__)."/app/formatters/registration.php";
 
-//Set the root dir of this file for code that needs to know about it
-$app->config("AppRootDir", dirname(__FILE__));
-include "app/config.php";
+
 
 //$namespace is used to uniquely suffix named routes. Otherwise the slim router can throw
 //an error about duplicate routes

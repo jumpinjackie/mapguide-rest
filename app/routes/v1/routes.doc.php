@@ -28,10 +28,10 @@ require_once dirname(__FILE__)."/../../version.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
 require_once dirname(__FILE__)."/../../core/app.php";
 
-$app->get("/apidoc/", function() {
-    $wrap = new AppServices(\Slim\Slim::getInstance());
+$app->get("/apidoc", function() {
+    $wrap = $this->get("AppServices");
     $prefix = MgUtils::GetApiVersionNamespace($wrap, "/apidoc");
-    $path = $app->config("AppRootDir")."/doc/data/swagger.json";
+    $path = $wrap->GetConfig("AppRootDir")."/doc/data/swagger.json";
     
     $data = null;
     if (strlen($prefix) > 0) {
@@ -42,7 +42,7 @@ $app->get("/apidoc/", function() {
         $data = file_get_contents($path);
     }
     
-    $wrap->SetResponseHeader("Content-Type", "application/json");
+    $wrap->SetResponseHeader("Content-Type", MgMimeType::Json);
     $wrap->SetResponseBody($data);
     /*
     //HACK: swagger-php doesn't seem to support annotations for describing the API
@@ -66,9 +66,10 @@ $app->get("/apidoc/", function() {
     $app->response->header("Content-Type", "application/json");
     $app->response->setBody($data);
     */
+    return $wrap->Done();
 });
 $app->get("/doc/index.html", function() {
-    $wrap = new AppServices(\Slim\Slim::getInstance());
+    $wrap = $this->get("AppServices");
     $prefix = MgUtils::GetApiVersionNamespace($wrap, "/doc/index.html");
     if (strlen($prefix) > 0)
         $docUrl = $wrap->GetConfig("SelfUrl")."/$prefix/apidoc";
@@ -86,12 +87,14 @@ $app->get("/doc/index.html", function() {
     $output = $smarty->fetch($docTpl);
     $wrap->SetResponseHeader("Content-Type", "text/html");
     $wrap->SetResponseBody($output);
+    return $wrap->Done();
 });
-$app->get("/apidoc/:file", function($file) {
+$app->get("/apidoc/{file}", function($req, $resp, $args) {
+    $file = $args['file'];
     if (MgUtils::StringEndsWith($file, ".json"))
         $file = str_replace(".json", "", $file);
 
-    $wrap = new AppServices(\Slim\Slim::getInstance());
+    $wrap = $this->get("AppServices");
     $prefix = MgUtils::GetApiVersionNamespace($wrap, "/apidoc");
     if (strlen($prefix) > 0) {
         $path = $wrap->GetConfig("AppRootDir")."/doc/data/$prefix/$file.json";
@@ -110,4 +113,5 @@ $app->get("/apidoc/:file", function($file) {
 
     $wrap->SetResponseHeader("Content-Type", "application/json");
     $wrap->SetResponseBody(json_encode($doc));
+    return $wrap->Done();
 });

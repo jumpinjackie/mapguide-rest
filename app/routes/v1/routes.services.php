@@ -37,7 +37,7 @@ require_once dirname(__FILE__)."/../../core/app.php";
  *     )
  */
 $app->get("/services/fusiontemplates.:format", function($format) {
-    $ctrl = new MgRestServiceController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgRestServiceController($this->get("AppServices"));
     $ctrl->EnumerateApplicationTemplates($format);
 });
 /**
@@ -54,7 +54,7 @@ $app->get("/services/fusiontemplates.:format", function($format) {
  *     )
  */
 $app->get("/services/fusionwidgets.:format", function($format) {
-    $ctrl = new MgRestServiceController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgRestServiceController($this->get("AppServices"));
     $ctrl->EnumerateApplicationWidgets($format);
 });
 /**
@@ -71,7 +71,7 @@ $app->get("/services/fusionwidgets.:format", function($format) {
  *     )
  */
 $app->get("/services/fusioncontainers.:format", function($format) {
-    $ctrl = new MgRestServiceController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgRestServiceController($this->get("AppServices"));
     $ctrl->EnumerateApplicationContainers($format);
 });
 /**
@@ -92,7 +92,7 @@ $app->get("/services/fusioncontainers.:format", function($format) {
  *     )
  */
 $app->post("/services/listunmanageddata.:format", function($format) {
-    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgResourceServiceController($this->get("AppServices"));
     $ctrl->EnumerateUnmanagedData($format);
 });
 /**
@@ -111,7 +111,7 @@ $app->post("/services/listunmanageddata.:format", function($format) {
  *     )
  */
 $app->get("/services/getschemamapping.:format", function($format) {
-    $ctrl = new MgFeatureServiceController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgFeatureServiceController($this->get("AppServices"));
     $ctrl->GetSchemaMapping($format);
 });
 
@@ -130,7 +130,7 @@ $app->get("/services/getschemamapping.:format", function($format) {
  *     )
  */
 $app->post("/services/copyresource", function() {
-    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgResourceServiceController($this->get("AppServices"));
     $ctrl->CopyResource();
 });
 /**
@@ -149,7 +149,7 @@ $app->post("/services/copyresource", function() {
  *     )
  */
 $app->post("/services/moveresource", function() {
-    $ctrl = new MgResourceServiceController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgResourceServiceController($this->get("AppServices"));
     $ctrl->MoveResource();
 });
 /**
@@ -168,7 +168,7 @@ $app->post("/services/moveresource", function() {
  *     )
  */
 $app->post("/services/transformcoords", function() {
-    $ctrl = new MgCoordinateSystemController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
     $ctrl->TransformCoordinates();
 });
 /**
@@ -194,6 +194,6 @@ $app->post("/services/transformcoords", function() {
  *     )
  */
 $app->post("/services/createmap.:format", function($format) {
-    $ctrl = new MgMappingServiceController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgMappingServiceController($this->get("AppServices"));
     $ctrl->CreateRuntimeMap($format);
 });

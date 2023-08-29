@@ -57,6 +57,8 @@ interface IAppServices {
     public /* internal */ function GetDependency(/*php_string*/ $name);
 
     public /* internal */ function RegisterDependency(/*php_string*/ $name, /*php_mixed*/ $value);
+
+    public function Done();
 }
 
 interface IFormatterSet {

@@ -34,7 +34,7 @@ require_once dirname(__FILE__)."/../../core/app.php";
  *     )
  */
 $app->get("/site/status.:format", function($format) {
-    $ctrl = new MgSiteAdminController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgSiteAdminController($this->get("AppServices"));
     $ctrl->GetSiteStatus($format);
 });
 /**
@@ -50,7 +50,7 @@ $app->get("/site/status.:format", function($format) {
  *     )
  */
 $app->get("/site/info.:format", function($format) {
-    $ctrl = new MgSiteAdminController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgSiteAdminController($this->get("AppServices"));
     $ctrl->GetSiteInformation($format);
 });
 /**
@@ -66,7 +66,7 @@ $app->get("/site/info.:format", function($format) {
  *     )
  */
 $app->get("/site/version.:format", function($format) {
-    $ctrl = new MgSiteAdminController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgSiteAdminController($this->get("AppServices"));
     $ctrl->GetSiteVersion($format);
 });
 /**
@@ -82,7 +82,7 @@ $app->get("/site/version.:format", function($format) {
  *     )
  */
 $app->get("/site/groups.:format", function($format) {
-    $ctrl = new MgSiteAdminController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgSiteAdminController($this->get("AppServices"));
     $ctrl->EnumerateGroups($format);
 });
 /**
@@ -99,7 +99,7 @@ $app->get("/site/groups.:format", function($format) {
  *     )
  */
 $app->get("/site/groups/:groupName/users.:format", function($groupName, $format) {
-    $ctrl = new MgSiteAdminController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgSiteAdminController($this->get("AppServices"));
     $ctrl->EnumerateUsersForGroup($groupName, $format);
 });
 /**
@@ -116,7 +116,7 @@ $app->get("/site/groups/:groupName/users.:format", function($groupName, $format)
  *     )
  */
 $app->get("/site/user/:userName/groups.:format", function($userName, $format) {
-    $ctrl = new MgSiteAdminController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgSiteAdminController($this->get("AppServices"));
     $ctrl->EnumerateGroupsForUser($userName, $format);
 });
 /**
@@ -133,6 +133,6 @@ $app->get("/site/user/:userName/groups.:format", function($userName, $format) {
  *     )
  */
 $app->get("/site/user/:userName/roles.:format", function($userName, $format) {
-    $ctrl = new MgSiteAdminController(new AppServices(\Slim\Slim::getInstance()));
+    $ctrl = new MgSiteAdminController($this->get("AppServices"));
     $ctrl->EnumerateRolesForUser($userName, $format);
 });
