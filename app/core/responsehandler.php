@@ -416,7 +416,8 @@ abstract class MgResponseHandler
                     return $fmt;
             }
         }
-        $this->BadRequest($this->app->GetLocalizedText("E_UNRECOGNIZED_VALUE_IN_DOMAIN", $value, implode(", ", $allowedValues)), $mimeType);
+        $msg = $this->app->GetLocalizedText("E_UNRECOGNIZED_VALUE_IN_DOMAIN", $value, implode(", ", $allowedValues));
+        $this->BadRequest($msg, $mimeType);
     }
 
     protected function ValidateRepresentation(/*php_string*/ $format, array $validRepresentations = null) {
@@ -434,7 +435,8 @@ abstract class MgResponseHandler
             }
         }
         //Since we dont recognize the representation, we don't exactly know the ideal output format of this error. So default to HTML
-        $this->BadRequest($this->app->GetLocalizedText("E_UNSUPPORTED_REPRESENTATION", $format), MgMimeType::Html);
+        $msg = $this->app->GetLocalizedText("E_UNSUPPORTED_REPRESENTATION", $format);
+        $this->BadRequest($msg, MgMimeType::Html);
     }
 
     protected function OutputMgPropertyCollection(MgPropertyCollection $props, /*php_string*/ $mimeType = MgMimeType::Xml) {
@@ -557,51 +559,44 @@ abstract class MgResponseHandler
 
     protected function OutputException(/*php_string*/ $statusMessage, /*php_string*/ $errorMessage, /*php_string*/ $details, /*php_string*/ $phpTrace, /*php_int*/ $status = 500, /*php_string*/ $mimeType = MgMimeType::Html) {
         $errResponse = $this->FormatException($statusMessage, $errorMessage, $details, $phpTrace, $status, $mimeType);
-        $this->app->SetResponseHeader("Content-Type", $mimeType);
-        $this->app->Halt($status, $errResponse);
+        $this->app->Halt($status, $errResponse, $mimeType);
     }
 
     public function BadRequest(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("BadRequest", $this->app->GetLocalizedText("E_BAD_REQUEST"), $msg, $e->getTraceAsString(), 400, $mimeType);
-        $this->app->SetResponseHeader("Content-Type", $mimeType);
-        $this->app->Halt(400, $errResponse);
+        $this->app->Halt(400, $errResponse, $mimeType);
     }
 
     public function MethodNotSupported(/*php_string*/ $method, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $msg = $this->app->GetLocalizedText("E_METHOD_NOT_SUPPORTED_DESC", $method);
         $errResponse = $this->FormatException("MethodNotSupported", $this->app->GetLocalizedText("E_METHOD_NOT_SUPPORTED"), $msg, $e->getTraceAsString(), 405, $mimeType);
-        $this->app->SetResponseHeader("Content-Type", $mimeType);
-        $this->app->Halt(405, $errResponse);
+        $this->app->Halt(405, $errResponse, $mimeType);
     }
 
     public function NotFound(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("NotFound", $this->app->GetLocalizedText("E_NOT_FOUND"), $msg, $e->getTraceAsString(), 404, $mimeType);
-        $this->app->SetResponseHeader("Content-Type", $mimeType);
-        $this->app->Halt(404, $errResponse);
+        $this->app->Halt(404, $errResponse, $mimeType);
     }
 
     public function Forbidden(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("Forbidden", $this->app->GetLocalizedText("E_FORBIDDEN"), $msg, $e->getTraceAsString(), 403, $mimeType);
-        $this->app->SetResponseHeader("Content-Type", $mimeType);
-        $this->app->Halt(403, $errResponse);
+        $this->app->Halt(403, $errResponse, $mimeType);
     }
 
     public function ServerError(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("ServerError", $this->app->GetLocalizedText("E_SERVER_ERROR"), $msg, $e->getTraceAsString(), 500, $mimeType);
-        $this->app->SetResponseHeader("Content-Type", $mimeType);
-        $this->app->Halt(500, $errResponse);
+        $this->app->Halt(500, $errResponse, $mimeType);
     }
 
     public function ServiceUnavailable(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("ServiceUnavailable", $this->app->GetLocalizedText("E_SERVICE_UNAVAILABLE"), $msg, $e->getTraceAsString(), 503, $mimeType);
-        $this->app->SetResponseHeader("Content-Type", $mimeType);
-        $this->app->Halt(503, $errResponse);
+        $this->app->Halt(503, $errResponse, $mimeType);
     }
 
     public function Unauthorized(/*php_string*/ $mimeType = MgMimeType::Html) {
@@ -615,7 +610,6 @@ abstract class MgResponseHandler
         $message = $this->app->GetLocalizedText("E_UNAUTHORIZED_DESC");
         $errResponse = $this->FormatException("Unauthorized", $title, $message, $e->getTraceAsString(), 401, $mimeType);
 
-        $this->app->SetResponseHeader("Content-Type", $mimeType);
-        $this->app->Halt(401, $errResponse);
+        $this->app->Halt(401, $errResponse, $mimeType);
     }
 }

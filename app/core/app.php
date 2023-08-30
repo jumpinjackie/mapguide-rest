@@ -19,6 +19,7 @@
 
 require_once dirname(__FILE__)."/interfaces.php";
 require_once dirname(__FILE__)."/stringcontentadapter.php";
+require_once dirname(__FILE__)."/exceptions.php";
 
 class AppServices implements IAppServices {
     private $container;
@@ -35,7 +36,7 @@ class AppServices implements IAppServices {
     }
 
     public /* internal */ function GetLocalizedText(/*php_string*/ $key) {
-        $this->localizer->getText($key);
+        return call_user_func_array(array($this->localizer, "getText"), func_get_args());
     }
 
     public /* internal */ function GetConfig(/*php_string*/ $name) {
@@ -127,9 +128,8 @@ class AppServices implements IAppServices {
         $this->app->redirect($url);
     }
 
-    public /* internal */ function Halt(/*php_int*/ $statusCode, /*php_string*/ $body) {
-        $this->SetResponseStatus($statusCode);
-        $this->SetResponseBody($body);
+    public /* internal */ function Halt(/*php_int*/ $statusCode, /*php_string*/ $body, /*php_string*/ $mimeType) {
+        throw new HaltException($body, $statusCode, $mimeType);
     }
 
     public /* internal */ function HasDependency(/*php_string*/ $name) {

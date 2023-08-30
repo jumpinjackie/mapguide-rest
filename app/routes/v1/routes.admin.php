@@ -52,4 +52,10 @@ $app->get("/aggregateadaptertest", function($req, $resp, $args) {
     return $resp->withHeader("Content-Type", "text/plain")
                 ->withBody($adapter);
 });
+
+$app->get("/testlocalizer", function($req, $resp, $args) {
+    $app = $this->get("AppServices");
+    echo $app->GetLocalizedText("E_UNSUPPORTED_REPRESENTATION", "adsfkj");
+    die;
+});
 */

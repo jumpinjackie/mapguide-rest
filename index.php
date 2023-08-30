@@ -36,6 +36,7 @@ if (strpos($_SERVER['SERVER_SOFTWARE'], "IIS") !== FALSE)
 }
 
 require 'vendor/autoload.php';
+require dirname(__FILE__)."/app/core/exceptions.php";
 include dirname(__FILE__)."/../mapadmin/constants.php";
 //This is a quick and dirty way to inject the MapGuide Server version. That version number is stamped on
 //resizableadmin.php from the Site Administrator, since we're already pulling in its constants, we can pull
@@ -71,18 +72,24 @@ $container['AppServices'] = function($c) {
 //Override error handler for unhandled exceptions
 $container['errorHandler'] = function ($c) {
     return function ($request, $response, $err) use ($c) {
-        $wrap = $c->get('AppServices');
-        $title = $wrap->GetLocalizedText("E_UNHANDLED_EXCEPTION");
-        $mimeType = MgMimeType::Html;
-        //As part of validating the desired representation, this variable will be set, this will tell us
-        //what mime type to shape the response
-        //if (isset($app->requestedMimeType)) {
-        //    $mimeType = $app->requestedMimeType;
-        //}
-        $details = $wrap->GetLocalizedText("E_PHP_EXCEPTION_DETAILS", $err->getMessage(), $err->getFile(), $err->getLine());
-        $wrap->SetResponseHeader("Content-Type", $mimeType);
-        $wrap->SetResponseBody(MgUtils::FormatException($wrap, "UnhandledError", $title, $details, $err->getTraceAsString(), 500, $mimeType));
-        return $wrap->Done();
+        if ($err instanceof HaltException) {
+            return $response->withStatus($err->getCode())
+                            ->withHeader('Content-Type', $err->getMimeType())
+                            ->write($err->getMessage());
+        } else {
+            $wrap = $c->get('AppServices');
+            $title = $wrap->GetLocalizedText("E_UNHANDLED_EXCEPTION");
+            $mimeType = MgMimeType::Html;
+            //As part of validating the desired representation, this variable will be set, this will tell us
+            //what mime type to shape the response
+            //if (isset($app->requestedMimeType)) {
+            //    $mimeType = $app->requestedMimeType;
+            //}
+            $details = $wrap->GetLocalizedText("E_PHP_EXCEPTION_DETAILS", $err->getMessage(), $err->getFile(), $err->getLine());
+            $wrap->SetResponseHeader("Content-Type", $mimeType);
+            $wrap->SetResponseBody(MgUtils::FormatException($wrap, "UnhandledError", $title, $details, $err->getTraceAsString(), 500, $mimeType));
+            return $wrap->Done();
+        }
     };
 };
 

@@ -279,7 +279,7 @@ class MgFeatureXmlRestAdapter extends MgFeatureRestAdapter {
             if ($single === true) {
                 $idProps = $classDef->GetIdentityProperties();
                 if ($idProps->GetCount() != 1) {
-                    $this->app->Halt(400, $this->app->GetLocalizedText("E_CANNOT_APPLY_UPDATE_CANNOT_UNIQUELY_IDENTIFY", $this->featureId, $idProps->GetCount()));
+                    $this->app->Halt(400, $this->app->GetLocalizedText("E_CANNOT_APPLY_UPDATE_CANNOT_UNIQUELY_IDENTIFY", $this->featureId, $idProps->GetCount()), "text/plain");
                 } else {
                     $idProp = $idProps->GetItem(0);
                     if ($idProp->GetDataType() == MgPropertyType::String) {

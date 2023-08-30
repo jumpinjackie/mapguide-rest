@@ -50,7 +50,7 @@ interface IAppServices {
 
     public /* internal */ function Redirect(/*php_string*/ $url);
 
-    public /* internal */ function Halt(/*php_int*/ $statusCode, /*php_string*/ $body);
+    public /* internal */ function Halt(/*php_int*/ $statusCode, /*php_string*/ $body, /*php_string*/ $mimeType);
 
     public /* internal */ function HasDependency(/*php_string*/ $name);
 

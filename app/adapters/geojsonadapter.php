@@ -279,7 +279,7 @@ class MgGeoJsonRestAdapter extends MgFeatureRestAdapter {
             if ($single === true) {
                 $idProps = $classDef->GetIdentityProperties();
                 if ($idProps->GetCount() != 1) {
-                    $this->handler->Halt(400, $this->handler->GetLocalizedText("E_CANNOT_APPLY_UPDATE_CANNOT_UNIQUELY_IDENTIFY", $this->featureId, $idProps->GetCount()));
+                    $this->handler->Halt(400, $this->handler->GetLocalizedText("E_CANNOT_APPLY_UPDATE_CANNOT_UNIQUELY_IDENTIFY", $this->featureId, $idProps->GetCount()), "text/plain");
                 } else {
                     $idProp = $idProps->GetItem(0);
                     if ($idProp->GetDataType() == MgPropertyType::String) {
