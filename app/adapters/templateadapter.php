@@ -33,7 +33,7 @@ class MgFormatterSet implements IFormatterSet
     private $formatters;
 
     public function __construct(IAppServices $app) {
-        $this->handler = $app;
+        $this->app = $app;
         $this->formatters = array();
     }
     

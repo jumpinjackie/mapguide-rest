@@ -141,7 +141,9 @@ class AppServices implements IAppServices {
     }
 
     public /* internal */ function RegisterDependency(/*php_string*/ $name, /*php_mixed*/ $value) {
-        $this->app->container->set($name, $value);
+        $this->container[$name] = function($c) use ($value) {
+            return $value;
+        };
     }
     
     public function Done() {

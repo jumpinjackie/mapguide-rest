@@ -58,4 +58,9 @@ $app->get("/testlocalizer", function($req, $resp, $args) {
     echo $app->GetLocalizedText("E_UNSUPPORTED_REPRESENTATION", "adsfkj");
     die;
 });
+
+$app->get("/testing/{uriPart:.*}/config", function($req, $resp, $args) {
+    var_dump($args);
+    die;
+});
 */
