@@ -48,7 +48,11 @@ class AppServices implements IAppServices {
     }
 
     public /* internal */ function GetRequestHeader(/*php_string*/ $name) {
-        return $this->request->getHeader($name);
+        $h = $this->request->getHeader($name);
+        if (is_array($h) && count($h) === 1) {
+            return $h[0];
+        }
+        return $h; //assume it's a string
     }
 
     public /* internal */ function GetRequestBody() {
