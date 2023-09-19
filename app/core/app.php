@@ -129,7 +129,7 @@ class AppServices implements IAppServices {
     }
 
     public /* internal */ function Redirect(/*php_string*/ $url) {
-        $this->app->redirect($url);
+        $this->response = $this->response->withRedirect($url);
     }
 
     public /* internal */ function Halt(/*php_int*/ $statusCode, /*php_string*/ $body, /*php_string*/ $mimeType) {

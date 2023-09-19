@@ -1135,7 +1135,7 @@ $app->get("/session/{session}/{resName}/content.{type}", function($req, $resp, $
     $resId = new MgResourceIdentifier("Session:$session//$resName");
     $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->GetResourceContent($resId, $format);
+    $ctrl->GetResourceContent($resId, $type);
     return $app->Done();
 });
 /**
