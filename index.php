@@ -243,6 +243,17 @@ $app->get("/chunktest", function() use ($app) {
     dump_chunk("</queryresult>");
 });
 */
+// Uncomment below to dump the known route table
+/*
+$routes = $app->getContainer()->get('router')->getRoutes();
+echo "<ul>";
+foreach ($routes as $route) {
+    foreach ($route->getMethods() as $method) {
+        echo "<li>" . ($method . " " . $route->getPattern()) . "</li>";
+    }
+}
+echo "</ul>";
+*/
 $app->run();
 
 ?>
