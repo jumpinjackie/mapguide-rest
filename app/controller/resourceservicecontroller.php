@@ -379,16 +379,38 @@ class MgResourceServiceController extends MgBaseController {
             $this->VerifyWhitelist($resIdStr, $mimeType, "SETRESOURCEHEADER", $fmt, $site, $this->userName);
 
             $resSvc = $siteConn->CreateService(MgServiceType::ResourceService);
+            
             $body = $this->app->GetRequestBody();
             if ($fmt == "json") {
                 $json = json_decode($body);
                 if ($json == NULL)
                     throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
                 $body = MgUtils::Json2Xml($json);
+
+                $bs = new MgByteSource($body, strlen($body));
+                $header = $bs->GetReader();
+                $resSvc->SetResource($resId, null, $header);
+            } else if ($body instanceof \Slim\Http\RequestBody) {
+                // Have to funnel body contents to a temp file in order to
+                // be able to create a MgByteSource from it
+                $tmpPath = tempnam(sys_get_temp_dir(), 'BodyRequest');
+                $os = fopen($tmpPath, "w");
+                $bufSize = 8196;
+                while (!$body->eof()) {
+                    $buf = $body->read($bufSize);
+                    fwrite($os, $buf);
+                }
+                fclose($os);
+
+                $bs = new MgByteSource($tmpPath);
+                $header = $bs->GetReader();
+                $resSvc->SetResource($resId, null, $header);
+
+                // Clean up temp file
+                unlink($tmpPath);
+            } else {
+                throw new Exception("Don't know how to process body");
             }
-            $bs = new MgByteSource($body, strlen($body));
-            $header = $bs->GetReader();
-            $resSvc->SetResource($resId, null, $header);
 
             //$this->app->SetResponseStatus(201);
             $body = MgBoxedValue::String($resId->ToString(), $fmt);
@@ -428,11 +450,31 @@ class MgResourceServiceController extends MgBaseController {
                 if ($json == NULL)
                     throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
                 $body = MgUtils::Json2Xml($json);
-            }
-            $bs = new MgByteSource($body, strlen($body));
-            $content = $bs->GetReader();
 
-            $resSvc->SetResource($resId, $content, null);
+                $bs = new MgByteSource($body, strlen($body));
+                $content = $bs->GetReader();
+                $resSvc->SetResource($resId, $content, null);
+            } else if ($body instanceof \Slim\Http\RequestBody) {
+                // Have to funnel body contents to a temp file in order to
+                // be able to create a MgByteSource from it
+                $tmpPath = tempnam(sys_get_temp_dir(), 'BodyRequest');
+                $os = fopen($tmpPath, "w");
+                $bufSize = 8196;
+                while (!$body->eof()) {
+                    $buf = $body->read($bufSize);
+                    fwrite($os, $buf);
+                }
+                fclose($os);
+
+                $bs = new MgByteSource($tmpPath);
+                $content = $bs->GetReader();
+                $resSvc->SetResource($resId, $content, null);
+
+                // Clean up temp file
+                unlink($tmpPath);
+            } else {
+                throw new Exception("Don't know how to process body");
+            }
 
             $this->app->SetResponseStatus(201);
             $body = MgBoxedValue::String($resId->ToString(), $fmt);
