@@ -937,7 +937,7 @@ $app->get("/library/{resourcePath:.*}/references.{type}", function($req, $resp, 
 });
 /**
  *     @SWG\Delete(
- *        path="/library/{resourcePath}",
+ *        path="/library/{resourcePath}/resource",
  *        operationId="DeleteResource",
  *        summary="Deletes the given resource",
  *        tags={"library"},
@@ -948,7 +948,7 @@ $app->get("/library/{resourcePath:.*}/references.{type}", function($req, $resp, 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/library/{resourcePath:.*}", function($req, $resp, $args) {
+$app->delete("/library/{resourcePath:.*}/resource", function($req, $resp, $args) {
     $resourcePath = explode('/', $args['resourcePath']);
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     $app = $this->get("AppServices");
