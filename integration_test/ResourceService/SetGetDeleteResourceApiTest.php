@@ -62,11 +62,11 @@ class SetGetDeleteResourceApiTest extends ServiceTest {
         $this->assertStatusCodeIs(201, $resp);
 
         if ($bTestUnauth) {
-            $resp = $this->apiTestAnon("$resPart", "DELETE", null);
+            $resp = $this->apiTestAnon("$resPart/resource", "DELETE", null);
             $this->assertStatusCodeIs(401, $resp);
         }
 
-        $resp = $this->apiTestAdmin("$resPart", "DELETE", null);
+        $resp = $this->apiTestAdmin("$resPart/resource", "DELETE", null);
         $this->assertStatusCodeIs(200, $resp);
     }
     private function __testOperationAltRoute($resPart, $resPart2, $bTestUnauth, $bTestGetHeader) {
@@ -99,11 +99,11 @@ class SetGetDeleteResourceApiTest extends ServiceTest {
         }
 
         if ($bTestUnauth) {
-            $resp = $this->apiTestAnon("$resPart2", "DELETE", null);
+            $resp = $this->apiTestAnon("$resPart2/resource", "DELETE", null);
             $this->assertStatusCodeIs(401, $resp);
         }
 
-        $resp = $this->apiTestAdmin("$resPart2", "DELETE", null);
+        $resp = $this->apiTestAdmin("$resPart2/resource", "DELETE", null);
         $this->assertStatusCodeIs(200, $resp);
     }
     public function testLibraryOperation() {

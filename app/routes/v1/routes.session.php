@@ -1164,7 +1164,7 @@ $app->get("/session/{session}/{resName}/references.{type}", function($req, $resp
 });
 /**
  *     @SWG\Delete(
- *        path="/session/{session}/{resName}",
+ *        path="/session/{session}/{resName}/resource",
  *        operationId="DeleteResource",
  *        summary="Deletes the given resource",
  *        tags={"session"},
@@ -1175,7 +1175,7 @@ $app->get("/session/{session}/{resName}/references.{type}", function($req, $resp
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/session/{session}/{resName}", function($req, $resp, $args) {
+$app->delete("/session/{session}/{resName}/resource", function($req, $resp, $args) {
     $session = $args['session'];
     $resName = $args['resName'];
     $resId = new MgResourceIdentifier("Session:$session//$resName");
