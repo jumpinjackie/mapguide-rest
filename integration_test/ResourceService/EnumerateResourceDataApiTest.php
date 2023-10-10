@@ -21,8 +21,8 @@ require_once dirname(__FILE__)."/../Config.php";
 require_once dirname(__FILE__)."/../ServiceTest.php";
 
 class EnumerateResourceDataTest extends ServiceTest {
-    protected function setUp() {
-        parent::setUp();
+    protected function set_up() {
+        parent::set_up();
         $resp = $this->apiTest("/services/copyresource", "POST", array(
             "session" => $this->anonymousSessionId,
             "source" => "Library://Samples/Sheboygan/Data/Parcels.FeatureSource",
@@ -31,8 +31,8 @@ class EnumerateResourceDataTest extends ServiceTest {
         ));
         $this->assertStatusCodeIs(200, $resp);
     }
-    protected function tearDown() {
-        parent::tearDown();
+    protected function tear_down() {
+        parent::tear_down();
     }
     private function getSessionResourceUrlPart() {
         return "/session/" . $this->anonymousSessionId . "/Parcels.FeatureSource";

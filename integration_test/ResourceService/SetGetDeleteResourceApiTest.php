@@ -21,11 +21,11 @@ require_once dirname(__FILE__)."/../Config.php";
 require_once dirname(__FILE__)."/../ServiceTest.php";
 
 class SetGetDeleteResourceApiTest extends ServiceTest {
-    protected function setUp() {
-        parent::setUp();
+    protected function set_up() {
+        parent::set_up();
     }
-    protected function tearDown() {
-        parent::tearDown();
+    protected function tear_down() {
+        parent::tear_down();
     }
     private function getSessionResourceUrlPart() {
         return "/session/" . $this->anonymousSessionId . "/Empty.FeatureSource";

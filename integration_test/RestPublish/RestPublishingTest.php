@@ -29,7 +29,7 @@ abstract class RestPublishingTest extends IntegrationTest {
     private $user1SessionId;
     private $user2SessionId;
 
-    protected function setUp() {
+    protected function set_up() {
         $resp = $this->apiTestWithCredentials("/session.json", "POST", array(), "Anonymous", "");
         $this->assertStatusCodeIsNot(401, $resp);
         $this->anonymousSessionId = json_decode($resp->getContent(), true)["PrimitiveValue"]["Value"];
@@ -58,7 +58,7 @@ abstract class RestPublishingTest extends IntegrationTest {
         $this->assertStatusCodeIsNot(401, $resp);
         $this->user2SessionId = json_decode($resp->getContent(), true)["PrimitiveValue"]["Value"];
     }
-    protected function tearDown() {
+    protected function tear_down() {
         $resp = $this->apiTest("/session/".$this->anonymousSessionId, "DELETE", null);
         $this->assertStatusCodeIs(200, $resp);
         $this->anonymousSessionId = null;
