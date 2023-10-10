@@ -18,6 +18,7 @@
 //
 
 require_once "geometryoutputformatter.php";
+require_once dirname(__FILE__)."/../constants.php";
 
 class MgKmlGeometryOutputFormatter extends MgGeometryOutputFormatter
 {

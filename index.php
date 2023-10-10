@@ -37,7 +37,7 @@ if (strpos($_SERVER['SERVER_SOFTWARE'], "IIS") !== FALSE)
 
 require 'vendor/autoload.php';
 require dirname(__FILE__)."/app/core/exceptions.php";
-include dirname(__FILE__)."/app/polyfill.php";
+require dirname(__FILE__)."/app/polyfill.php";
 
 $webConfigPath = dirname(__FILE__)."/../webconfig.ini";
 MgInitializeWebTier($webConfigPath);

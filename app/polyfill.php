@@ -25,8 +25,8 @@ if (!class_exists("MgPropertyType") || !class_exists("MgMimeType") || !class_exi
     //This is a quick and dirty way to inject the MapGuide Server version. That version number is stamped on
     //resizableadmin.php from the Site Administrator, since we're already pulling in its constants, we can pull
     //this in as well
-    include dirname(__FILE__)."/../mapadmin/resizableadmin.php";
-    include dirname(__FILE__)."/../mapadmin/constants.php";
+    require_once dirname(__FILE__)."/../../mapadmin/resizableadmin.php";
+    require_once dirname(__FILE__)."/../../mapadmin/constants.php";
 
     //Shim some constants we know haven't been properly exposed in previous versions of MapGuide
     if (!class_exists("MgImageFormats")) {
