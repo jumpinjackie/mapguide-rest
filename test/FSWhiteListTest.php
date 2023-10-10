@@ -20,12 +20,10 @@
 require_once dirname(__FILE__)."/../app/util/whitelist.php";
 require_once dirname(__FILE__)."/TestUtils.php";
 
-use PHPUnit\Framework\TestCase;
-use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 class FSWhiteListTest extends TestCase
 {
-    use AssertIsType;
     private $actions;
     private $representations;
     private $testIds;

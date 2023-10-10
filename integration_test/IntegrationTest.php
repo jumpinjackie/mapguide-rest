@@ -20,8 +20,7 @@
 require_once dirname(__FILE__)."/Config.php";
 require_once dirname(__FILE__)."/ApiResponse.php";
 
-use PHPUnit\Framework\TestCase;
-use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
  * This is the base class of all our integration tests. Provides common boilerplates and
@@ -29,8 +28,6 @@ use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
  */
 abstract class IntegrationTest extends TestCase
 {
-    use AssertIsType;
-
     protected function apiTestAnon($url, $type, $data) {
         return $this->apiTestWithCredentials($url, $type, $data, "Anonymous", "");
     }

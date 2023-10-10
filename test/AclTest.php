@@ -3,12 +3,10 @@
 require_once dirname(__FILE__)."/TestUtils.php";
 require_once dirname(__FILE__)."/../app/util/utils.php";
 
-use PHPUnit\Framework\TestCase;
-use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 class AclTest extends TestCase
 {
-    use AssertIsType;
     public function testEmptyAcl() {
         $site = $this->getMockBuilder("MgSite")->getMock();
         $this->assertTrue(MgUtils::ValidateAcl("Anonymous", $site, array()));

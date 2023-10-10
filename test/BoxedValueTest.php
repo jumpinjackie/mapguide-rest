@@ -19,12 +19,10 @@
 
 require_once dirname(__FILE__)."/../app/util/boxedvalue.php";
 
-use PHPUnit\Framework\TestCase;
-use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 class BoxedValueTest extends TestCase
 {
-    use AssertIsType;
     public function testBoxBoolean() {
         $bvXmlTrue = MgBoxedValue::Boolean(true, "xml");
         $bvXmlFalse = MgBoxedValue::Boolean(false, "xml");
