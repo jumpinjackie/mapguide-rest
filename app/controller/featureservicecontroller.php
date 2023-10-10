@@ -18,7 +18,6 @@
 //
 
 require_once "controller.php";
-require_once dirname(__FILE__)."/../constants.php";
 require_once dirname(__FILE__)."/../util/paginatedfeaturereader.php";
 require_once dirname(__FILE__)."/../util/readerchunkedresult.php";
 require_once dirname(__FILE__)."/../util/czmlresult.php";

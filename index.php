@@ -37,24 +37,7 @@ if (strpos($_SERVER['SERVER_SOFTWARE'], "IIS") !== FALSE)
 
 require 'vendor/autoload.php';
 require dirname(__FILE__)."/app/core/exceptions.php";
-include dirname(__FILE__)."/../mapadmin/constants.php";
-//This is a quick and dirty way to inject the MapGuide Server version. That version number is stamped on
-//resizableadmin.php from the Site Administrator, since we're already pulling in its constants, we can pull
-//this in as well
-include dirname(__FILE__)."/../mapadmin/resizableadmin.php";
-
-//Shim some constants we know haven't been properly exposed in previous versions of MapGuide
-if (!class_exists("MgImageFormats")) {
-    class MgImageFormats
-    {
-        const Gif = "GIF";
-        const Jpeg = "JPG";
-        const Png = "PNG";
-        const Png8 = "PNG8";
-        const Raw = "RAW";
-        const Tiff = "TIF";
-    }
-}
+include dirname(__FILE__)."/app/polyfill.php";
 
 $webConfigPath = dirname(__FILE__)."/../webconfig.ini";
 MgInitializeWebTier($webConfigPath);
