@@ -19,8 +19,12 @@
 
 require_once dirname(__FILE__)."/../app/util/localizer.php";
 
-class LocalizerTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
+
+class LocalizerTest extends TestCase
 {
+    use AssertIsType;
     public function testGetText() {
         $strings = array(
             "FOO_BAR" => "Foo Bar"

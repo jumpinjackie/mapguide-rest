@@ -20,6 +20,9 @@
 require_once dirname(__FILE__)."/../app/adapters/templateadapter.php";
 require_once dirname(__FILE__)."/TestUtils.php";
 
+use PHPUnit\Framework\TestCase;
+use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
+
 class MockIDProperty
 {
     public function GetName() {
@@ -178,8 +181,9 @@ class MockFormatterSet implements IFormatterSet
     }
 }
 
-class FeatureReaderModelTest extends PHPUnit_Framework_TestCase
+class FeatureReaderModelTest extends TestCase
 {
+    use AssertIsType;
     public function testMockReader() {
         //Test our mock is in good order before feeding it to our 
         //reader model
