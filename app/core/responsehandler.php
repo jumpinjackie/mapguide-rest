@@ -547,10 +547,10 @@ abstract class MgResponseHandler
         // Pre-MG4.0 code path
         if (class_exists("MgAuthenticationFailedException") &&
             class_exists("MgUnauthorizedAccessException") &&
-            class_exists("MgPermissionDeniedException") &&
+            //class_exists("MgPermissionDeniedException") && //BUG: This was never exposed to the public API bindings. Too late to fix now.
             class_exists("MgResourceNotFoundException") &&
             class_exists("MgResourceDataNotFoundException")) {
-            if ($ex instanceof MgAuthenticationFailedException || $ex instanceof MgUnauthorizedAccessException || $ex instanceof MgPermissionDeniedException) {
+            if ($ex instanceof MgAuthenticationFailedException || $ex instanceof MgUnauthorizedAccessException) { // || $ex instanceof MgPermissionDeniedException) {
                 $status = 401;
             } else if ($ex instanceof MgResourceNotFoundException || $ex instanceof MgResourceDataNotFoundException) {
                 $status = 404;
