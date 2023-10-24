@@ -267,11 +267,24 @@ class MgGetTileXYZCriticalSection extends MgFileLockCriticalSection {
     }
     
     public function HandleMgException($ex) {
-        if ($ex instanceof MgResourceNotFoundException || $ex instanceof MgObjectNotFoundException) {
-            $this->ctrl->NotFound($ex->GetExceptionMessage(), $this->ctrl->GetMimeTypeForFormat($fmt));
-        }
-        else if ($ex instanceof MgConnectionFailedException) {
-            $this->ctrl->ServiceUnavailable($ex->GetExceptionMessage(), $this->ctrl->GetMimeTypeForFormat($fmt));
+        //pre-4.0 code path
+        if (class_exists("MgResourceNotFoundException") &&
+            class_exists("MgObjectNotFoundException") &&
+            class_exists("MgConnectionFailedException")) {
+            if ($ex instanceof MgResourceNotFoundException || $ex instanceof MgObjectNotFoundException) {
+                $this->ctrl->NotFound($ex->GetExceptionMessage(), $this->ctrl->GetMimeTypeForFormat($fmt));
+            }
+            else if ($ex instanceof MgConnectionFailedException) {
+                $this->ctrl->ServiceUnavailable($ex->GetExceptionMessage(), $this->ctrl->GetMimeTypeForFormat($fmt));
+            }
+        } else {
+            $exCode = $ex->GetExceptionCode();
+            if ($exCode === MgExceptionCodes::MgResourceNotFoundException || $exCode === MgExceptionCodes::MgObjectNotFoundException) {
+                $this->ctrl->NotFound($ex->GetExceptionMessage(), $this->ctrl->GetMimeTypeForFormat($fmt));
+            }
+            else if ($exCode === MgExceptionCodes::MgConnectionFailedException) {
+                $this->ctrl->ServiceUnavailable($ex->GetExceptionMessage(), $this->ctrl->GetMimeTypeForFormat($fmt));
+            }
         }
     }
     
