@@ -6,5 +6,5 @@ Options -Indexes
     RewriteCond %{REQUEST_FILENAME} !-d
 
     #This assumes the extension is installed under $WWWROOT/rest
-    RewriteRule ^(.*)$ /mapguide/rest/index.php?/$1 [QSA,L]
+    RewriteRule ^(.*)$ /mapguide/rest/index.php?/$1 [E=REMOTE_USER:%{HTTP:Authorization},QSA,L]
 </IfModule>
