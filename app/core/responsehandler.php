@@ -544,10 +544,24 @@ abstract class MgResponseHandler
 
     protected function OnException(MgException $ex, /*php_string*/ $mimeType = MgMimeType::Html) {
         $status = 500;
-        if ($ex instanceof MgAuthenticationFailedException || $ex instanceof MgUnauthorizedAccessException || $ex instanceof MgPermissionDeniedException) {
-            $status = 401;
-        } else if ($ex instanceof MgResourceNotFoundException || $ex instanceof MgResourceDataNotFoundException) {
-            $status = 404;
+        // Pre-MG4.0 code path
+        if (class_exists("MgAuthenticationFailedException") &&
+            class_exists("MgUnauthorizedAccessException") &&
+            class_exists("MgPermissionDeniedException") &&
+            class_exists("MgResourceNotFoundException") &&
+            class_exists("MgResourceDataNotFoundException")) {
+            if ($ex instanceof MgAuthenticationFailedException || $ex instanceof MgUnauthorizedAccessException || $ex instanceof MgPermissionDeniedException) {
+                $status = 401;
+            } else if ($ex instanceof MgResourceNotFoundException || $ex instanceof MgResourceDataNotFoundException) {
+                $status = 404;
+            }
+        } else {
+            $exCode = $ex->GetExceptionCode();
+            if ($exCode === MgExceptionCodes::MgAuthenticationFailedException || $exCode === MgExceptionCodes::MgUnauthorizedAccessException || $exCode === MgExceptionCodes::MgPermissionDeniedException) {
+                $status = 401;
+            } else if ($exCode === MgExceptionCodes::MgResourceNotFoundException || $exCode === MgExceptionCodes::MgResourceDataNotFoundException) {
+                $status = 404;
+            }
         }
         $this->app->SetResponseHeader("Content-Type", $mimeType);
         $this->OutputException(get_class($ex), $ex->GetExceptionMessage(), $ex->GetDetails(), $ex->getTraceAsString(), $status, $mimeType);
