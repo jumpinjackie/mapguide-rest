@@ -667,13 +667,18 @@ class MgMappingServiceController extends MgBaseController {
         if ($fmt == "dwf") {
             $size = MgUtils::GetPaperSize($this->app, $paperSize);
             //If landscape, flip the width/height
-            $width = ($orientation == 'L') ? MgUtils::MMToIn($size[1]) : MgUtils::MMToIn($size[0]);
-            $height = ($orientation == 'L') ? MgUtils::MMToIn($size[0]) : MgUtils::MMToIn($size[1]);
+            $width = ($orientation == 'L') ? MgUtils::MMToIn(floatval($size[1])) : MgUtils::MMToIn(floatval($size[0]));
+            $height = ($orientation == 'L') ? MgUtils::MMToIn(floatval($size[0])) : MgUtils::MMToIn(floatval($size[1]));
             $printLayoutStr = $this->app->GetRequestParameter("printlayout", null);
             $mappingSvc = $siteConn->CreateService(MgServiceType::MappingService);
 
             $dwfVersion = new MgDwfVersion("6.01", "1.2");
-            $plotSpec = new MgPlotSpecification($width, $height, MgPageUnitsType::Inches);
+            $mgVer = $this->app->GetMapGuideVersion();
+            if (intval($mgVer[0]) > 3) { //4.0 or greater
+                $plotSpec = new MgPlotSpecification($width, $height, MgPageUnitsType::Inches, 0.0, 0.0, 0.0, 0.0);
+            } else {
+                $plotSpec = new MgPlotSpecification($width, $height, MgPageUnitsType::Inches);
+            }
             $plotSpec->SetMargins($marginLeft, $marginTop, $marginRight, $marginBottom);
 
             $layout = null;

@@ -20,6 +20,11 @@
 return [
     'settings' => [
         //
+        //displayErrorDetails
+        //
+        //
+        "displayErrorDetails" => false,
+        //
         //debug
         //
         //Enable/disable debugging facilities in the slim framework

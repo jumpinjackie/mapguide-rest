@@ -494,8 +494,8 @@ class MgPdfPlotter
                                                        $selection,
                                                        $center,
                                                        $scale,
-                                                       $toSize->width,
-                                                       $toSize->height,
+                                                       intval($toSize->width),
+                                                       intval($toSize->height),
                                                        $color,
                                                        MgImageFormats::Png,
                                                        true);
@@ -765,8 +765,8 @@ class MgPdfPlotter
                 $this->pdf->endLayer();
             }
         } else {
-            $filelocation = $this->RenderMap(MgUtils::InToPx($this->printSize->width, $this->dpi),
-                                             MgUtils::InToPx($this->printSize->height, $this->dpi),
+            $filelocation = $this->RenderMap(MgUtils::InToPx(floatval($this->printSize->width), intval($this->dpi)),
+                                             MgUtils::InToPx(floatval($this->printSize->height), intval($this->dpi)),
                                              $center,
                                              $scale);
 

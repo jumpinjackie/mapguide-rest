@@ -102,8 +102,8 @@ class MgTileServiceController extends MgBaseController {
             if ($tmd !== FALSE) {
                 $that->SetResponseLastModified($tmd);
             }
-            $that->SetResponseExpiry("+6 months");
-            $that->SetResponseHeader("Cache-Control", "max-age=31536000, must-revalidate");
+            $app->SetResponseExpiry("+6 months");
+            $app->SetResponseHeader("Cache-Control", "max-age=31536000, must-revalidate");
         }, true, "", $sessionId); //Tile access can be anonymous, so allow for it if credentials/session specified, but if this is a session-based Map Definition, use the session id as the nominated one
     }
 

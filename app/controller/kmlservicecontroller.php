@@ -359,7 +359,7 @@ class MgKmlServiceController extends MgBaseController {
         } else {
             $parts = explode(",", $bbox);
             if (count($parts) == 4) {
-                $extents = new MgEnvelope($parts[0], $parts[1], $parts[2], $parts[3]);
+                $extents = new MgEnvelope(floatval($parts[0]), floatval($parts[1]), floatval($parts[2]), floatval($parts[3]));
             }
         }
 

@@ -117,7 +117,13 @@ class AppServices implements IAppServices {
     }
 
     public /* internal */ function SetResponseExpiry(/*php_string*/ $expires) {
-        $this->app->expires($expires);
+        if (!is_integer($expires)) {
+            $expires = strtotime($expires);
+            if ($expires === false) {
+                throw new Exception('Expiration value could not be parsed with `strtotime()`.');
+            }
+        }
+        $this->response = $this->response->withHeader('Expires', gmdate('D, d M Y H:i:s T', $expires));
     }
 
     public /* internal */ function GetMapGuideVersion() {
