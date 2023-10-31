@@ -596,7 +596,7 @@ class MgResourceServiceController extends MgBaseController {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             $param->AddParameter("RESOURCEID", $resIdStr);
             $that->ExecuteHttpRequest($req);
-        }, false, "", $sessionId);
+        }, false, "", $sessionId, $mimeType);
     }
 
     public function GetResourceInfo(MgResourceIdentifier $resId, /*php_string*/ $format) {

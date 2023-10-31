@@ -40,7 +40,7 @@ class MgCoordinateSystemController extends MgBaseController {
                 $param->AddParameter("X-FORCE-JSON-CONVERSION", "true");
             }
             $that->ExecuteHttpRequest($req);
-        }, false, "", $sessionId);
+        }, false, "", $sessionId, $mimeType);
     }
 
     public function ValidateWkt(/*php_string*/ $format) {
@@ -60,7 +60,7 @@ class MgCoordinateSystemController extends MgBaseController {
                 $param->AddParameter("X-FORCE-JSON-CONVERSION", "true");
             }
             $that->ExecuteHttpRequest($req);
-        }, false, "", $sessionId);
+        }, false, "", $sessionId, $mimeType);
     }
 
     public function WktToEpsg(/*php_string*/ $format) {
@@ -80,7 +80,7 @@ class MgCoordinateSystemController extends MgBaseController {
                 $param->AddParameter("X-FORCE-JSON-CONVERSION", "true");
             }
             $that->ExecuteHttpRequest($req);
-        }, false, "", $sessionId);
+        }, false, "", $sessionId, $mimeType);
     }
 
     public function WktToMentor(/*php_string*/ $format) {
@@ -100,7 +100,7 @@ class MgCoordinateSystemController extends MgBaseController {
                 $param->AddParameter("X-FORCE-JSON-CONVERSION", "true");
             }
             $that->ExecuteHttpRequest($req);
-        }, false, "", $sessionId);
+        }, false, "", $sessionId, $mimeType);
     }
 
     public function EnumerateCategories(/*php_string*/ $format) {
