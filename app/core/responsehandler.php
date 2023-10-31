@@ -573,57 +573,57 @@ abstract class MgResponseHandler
 
     protected function OutputException(/*php_string*/ $statusMessage, /*php_string*/ $errorMessage, /*php_string*/ $details, /*php_string*/ $phpTrace, /*php_int*/ $status = 500, /*php_string*/ $mimeType = MgMimeType::Html) {
         $errResponse = $this->FormatException($statusMessage, $errorMessage, $details, $phpTrace, $status, $mimeType);
-        $this->app->Halt($status, $errResponse, $mimeType);
+        $this->app->Halt($status, $errResponse, $mimeType, false);
     }
 
     public function BadRequest(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("BadRequest", $this->app->GetLocalizedText("E_BAD_REQUEST"), $msg, $e->getTraceAsString(), 400, $mimeType);
-        $this->app->Halt(400, $errResponse, $mimeType);
+        $this->app->Halt(400, $errResponse, $mimeType, false);
     }
 
     public function MethodNotSupported(/*php_string*/ $method, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $msg = $this->app->GetLocalizedText("E_METHOD_NOT_SUPPORTED_DESC", $method);
         $errResponse = $this->FormatException("MethodNotSupported", $this->app->GetLocalizedText("E_METHOD_NOT_SUPPORTED"), $msg, $e->getTraceAsString(), 405, $mimeType);
-        $this->app->Halt(405, $errResponse, $mimeType);
+        $this->app->Halt(405, $errResponse, $mimeType, false);
     }
 
     public function NotFound(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("NotFound", $this->app->GetLocalizedText("E_NOT_FOUND"), $msg, $e->getTraceAsString(), 404, $mimeType);
-        $this->app->Halt(404, $errResponse, $mimeType);
+        $this->app->Halt(404, $errResponse, $mimeType, false);
     }
 
     public function Forbidden(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("Forbidden", $this->app->GetLocalizedText("E_FORBIDDEN"), $msg, $e->getTraceAsString(), 403, $mimeType);
-        $this->app->Halt(403, $errResponse, $mimeType);
+        $this->app->Halt(403, $errResponse, $mimeType, false);
     }
 
     public function ServerError(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("ServerError", $this->app->GetLocalizedText("E_SERVER_ERROR"), $msg, $e->getTraceAsString(), 500, $mimeType);
-        $this->app->Halt(500, $errResponse, $mimeType);
+        $this->app->Halt(500, $errResponse, $mimeType, false);
     }
 
     public function ServiceUnavailable(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
         $errResponse = $this->FormatException("ServiceUnavailable", $this->app->GetLocalizedText("E_SERVICE_UNAVAILABLE"), $msg, $e->getTraceAsString(), 503, $mimeType);
-        $this->app->Halt(503, $errResponse, $mimeType);
+        $this->app->Halt(503, $errResponse, $mimeType, false);
     }
 
     public function Unauthorized(/*php_string*/ $mimeType = MgMimeType::Html) {
         //Send back 401
         //HACK: But don't put the WWW-Authenticate header so the test harness doesn't trip up
         $fromTestHarness = $this->app->GetRequestHeader("x-mapguide-test-harness");
-        if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
-            $this->app->SetResponseHeader('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
+        $challenge = ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE");
+            //$this->app->SetResponseHeader('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
         $e = new Exception();
         $title = $this->app->GetLocalizedText("E_UNAUTHORIZED");
         $message = $this->app->GetLocalizedText("E_UNAUTHORIZED_DESC");
         $errResponse = $this->FormatException("Unauthorized", $title, $message, $e->getTraceAsString(), 401, $mimeType);
 
-        $this->app->Halt(401, $errResponse, $mimeType);
+        $this->app->Halt(401, $errResponse, $mimeType, $challenge);
     }
 }

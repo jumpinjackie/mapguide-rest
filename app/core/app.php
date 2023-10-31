@@ -138,8 +138,8 @@ class AppServices implements IAppServices {
         $this->response = $this->response->withRedirect($url);
     }
 
-    public /* internal */ function Halt(/*php_int*/ $statusCode, /*php_string*/ $body, /*php_string*/ $mimeType) {
-        throw new HaltException($body, $statusCode, $mimeType);
+    public /* internal */ function Halt(/*php_int*/ $statusCode, /*php_string*/ $body, /*php_string*/ $mimeType, /*php_bool*/ $shouldSendChallenge) {
+        throw new HaltException($body, $statusCode, $mimeType, $shouldSendChallenge);
     }
 
     public /* internal */ function HasDependency(/*php_string*/ $name) {

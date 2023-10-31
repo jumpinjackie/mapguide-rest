@@ -19,9 +19,14 @@
 
 class HaltException extends Exception {
     private $mimeType;
-    public function __construct($message, $code, $mimeType) {
+    private $shouldSendChallenge;
+    public function __construct($message, $code, $mimeType, $shouldSendChallenge) {
         $this->mimeType = $mimeType;
+        $this->shouldSendChallenge = $shouldSendChallenge;
         parent::__construct($message, $code);
+    }
+    public function shouldSendChallenge() {
+        return $this->shouldSendChallenge;
     }
     public function getMimeType() {
         return $this->mimeType;

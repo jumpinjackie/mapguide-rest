@@ -56,9 +56,16 @@ $container['AppServices'] = function($c) {
 $container['errorHandler'] = function ($c) {
     return function ($request, $response, $err) use ($c) {
         if ($err instanceof HaltException) {
-            return $response->withStatus($err->getCode())
-                            ->withHeader('Content-Type', $err->getMimeType())
-                            ->write($err->getMessage());
+            if ($err->shouldSendChallenge()) {
+                return $response->withStatus($err->getCode())
+                                ->withHeader('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"')
+                                ->withHeader('Content-Type', $err->getMimeType())
+                                ->write($err->getMessage());
+            } else {
+                return $response->withStatus($err->getCode())
+                                ->withHeader('Content-Type', $err->getMimeType())
+                                ->write($err->getMessage());
+            }
         } else {
             $wrap = $c->get('AppServices');
             $title = $wrap->GetLocalizedText("E_UNHANDLED_EXCEPTION");
