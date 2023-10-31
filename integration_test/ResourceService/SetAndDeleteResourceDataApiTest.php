@@ -20,7 +20,7 @@
 require_once dirname(__FILE__)."/../Config.php";
 require_once dirname(__FILE__)."/../ServiceTest.php";
 
-class SetResourceDataTest extends ServiceTest {
+class SetAndDeleteResourceDataApiTest extends ServiceTest {
     private function getSessionResourceId() {
         return "/session/".$this->adminSessionId."/Empty.FeatureSource";
     }

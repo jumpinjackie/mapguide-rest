@@ -20,7 +20,7 @@
 require_once dirname(__FILE__)."/../Config.php";
 require_once dirname(__FILE__)."/../ServiceTest.php";
 
-class SelectParcelsLibraryTest extends ServiceTest {
+class SelectTest extends ServiceTest {
     protected function set_up() {
         parent::set_up();
         $resp = $this->apiTest("/services/copyresource", "POST", array(
