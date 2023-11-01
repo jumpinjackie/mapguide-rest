@@ -130,8 +130,15 @@ class AppServices implements IAppServices {
         return $this->container->get('mgVersion');
     }
 
-    public /* internal */ function SetResponseLastModified(/*php_string*/ $mod) {
-        $this->app->lastModified($mod);
+    public /* internal */ function SetResponseLastModified(/*php_string*/ $time) {
+        if (is_integer($time)) {
+            $this->response = $this->response->withHeader('Expires', gmdate('D, d M Y H:i:s T', $time));
+            if ($time === strtotime($this->request->getHeaderLine('IF_MODIFIED_SINCE'))) {
+                $this->Halt(304);
+            }
+        } else {
+            throw new Exception('SetResponseLastModified only accepts an integer UNIX timestamp value.');
+        }
     }
 
     public /* internal */ function Redirect(/*php_string*/ $url) {

@@ -86,7 +86,7 @@ class MgFileLock
         $this->app = $app;
     }
     
-    public function EnterCriticalSection($section) {
+    public function EnterCriticalSection(MgFileLockCriticalSection $section) {
         //Message of any exception caught will be set to this variable
         $sectionError = null;
         
@@ -156,7 +156,7 @@ class MgFileLock
     
     public function UnlockExclusive() {
         if ($this->bLocked) {
-            $this->handler->LogDebug("(".$this->requestId.") Releasing lock for ".$this->lockPath);
+            $this->app->LogDebug("(".$this->requestId.") Releasing lock for ".$this->lockPath);
             $this->Unlock();
             $this->bLocked = false;
         }

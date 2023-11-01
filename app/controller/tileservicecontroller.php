@@ -431,8 +431,8 @@ class MgTileServiceController extends MgBaseController {
         
         $lock = $lockUtil->Acquire($y);
         
-        $section = new MgGetTileXYZCriticalSection($this->app, $resId, $groupName, $x, $y, $z, $layerNames, $type);
-        $lock->EnterCriticalSection($this->app, $section);
+        $section = new MgGetTileXYZCriticalSection($this, $resId, $groupName, $x, $y, $z, $layerNames, $type);
+        $lock->EnterCriticalSection($section);
     }
 
     public function GetTileXYZRetina($resId, $groupName, $x, $y, $z, $type, $scale, $layerNames = NULL) {
@@ -444,9 +444,9 @@ class MgTileServiceController extends MgBaseController {
         
         $lock = $lockUtil->Acquire($y);
         
-        $section = new MgGetTileXYZCriticalSection($this->app, $resId, $groupName, $x, $y, $z, $layerNames, $type);
+        $section = new MgGetTileXYZCriticalSection($this, $resId, $groupName, $x, $y, $z, $layerNames, $type);
         $section->SetRetinaScale($scale);
-        $lock->EnterCriticalSection($this->app, $section);
+        $lock->EnterCriticalSection($section);
     }
     
     public function AcquireConnectionForGetTileXYZ() {
