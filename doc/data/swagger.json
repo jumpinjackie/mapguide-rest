@@ -2739,7 +2739,7 @@
                 }
             }
         },
-        "/library/{resourcePath}": {
+        "/library/{resourcePath}/resource": {
             "delete": {
                 "tags": [
                     "library"
@@ -7809,7 +7809,7 @@
                 }
             }
         },
-        "/session/{session}/{resName}": {
+        "/session/{session}/{resName}/resource": {
             "delete": {
                 "tags": [
                     "session"
@@ -7845,7 +7845,7 @@
                 }
             }
         },
-        "/session/{session}/{resName}/tile.{type}/{groupName}/{scaleIndex}/{col}/{row}": {
+        "/session/{session}/{resName}.MapDefinition/tile.{type}/{groupName}/{scaleIndex}/{col}/{row}": {
             "get": {
                 "tags": [
                     "session"
