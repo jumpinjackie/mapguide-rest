@@ -2,7 +2,6 @@ version: 1.0.0.{build}
 build: false
 shallow_clone: true
 platform:
-    - x86
     - x64
 clone_folder: c:\projects\mapguide-rest
 cache:
