@@ -72,7 +72,6 @@ for:
       - IF %PHP%==1 curl -fksSL -o %PHP_DIST_NAME%.zip https://windows.php.net/downloads/releases/archives/%PHP_DIST_NAME%.zip
       - IF %PHP%==1 7z x %PHP_DIST_NAME%.zip -y >nul
       - IF %PHP%==1 del /Q *.zip
-      - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
       - IF %PHP%==1 copy /Y php.ini-development php.ini
       - IF %PHP%==1 echo max_execution_time=1200 >> php.ini
       - IF %PHP%==1 echo date.timezone="UTC" >> php.ini
@@ -86,7 +85,6 @@ for:
       - IF "%APPVEYOR_REPO_TAG%" == "true" SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_REPO_TAG_NAME%
       - cd c:\projects\mapguide-rest
       - curl -fksSL -o composer.phar https://getcomposer.org/download/%PHP_COMPOSER_VER%/composer.phar
-      - php --ini
       - php -v
       - php composer.phar install --prefer-source --no-progress --ansi
 
@@ -99,7 +97,7 @@ for:
 
     artifacts:
       - path: .\dist\mapguide-rest-$(ARTIFACT_RELEASE_LABEL)-$(MG_REL_SUFFIX).zip
-        name: dist
+        name: dist_php56
         type: zip
 
     #on_finish:
@@ -134,6 +132,27 @@ for:
       - SET PATH=c:\php;%PATH%
       - SET COMPOSER_NO_INTERACTION=1
       - SET PHP=1
+      - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
+      - cd c:\php
+      - IF %PHP%==1 curl -fksSL -o %PHP_DIST_NAME%.zip https://windows.php.net/downloads/releases/archives/%PHP_DIST_NAME%.zip
+      - IF %PHP%==1 7z x %PHP_DIST_NAME%.zip -y >nul
+      - IF %PHP%==1 del /Q *.zip
+      - IF %PHP%==1 copy /Y php.ini-development php.ini
+      - SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_BUILD_VERSION%
+      - IF "%APPVEYOR_REPO_TAG%" == "true" SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_REPO_TAG_NAME%
+      - cd c:\projects\mapguide-rest
+      - curl -fksSL -o composer.phar https://getcomposer.org/download/%PHP_COMPOSER_VER%/composer.phar
+      - php -v
+      - php composer.phar install --prefer-source --no-progress --ansi
 
-    build_script:
-      - echo build PHP 8.1
+    test_script:
+      - vendor\bin\parallel-lint.bat -s -e php,phpt --exclude vendor .
+      - vendor\bin\phpunit test
+
+    after_test:
+      - vendor\bin\phing -Dapp.version=%ARTIFACT_RELEASE_LABEL%-%MG_REL_SUFFIX% -f build.phing.xml dist
+
+    artifacts:
+      - path: .\dist\mapguide-rest-$(ARTIFACT_RELEASE_LABEL)-$(MG_REL_SUFFIX).zip
+        name: dist_php81
+        type: zip
