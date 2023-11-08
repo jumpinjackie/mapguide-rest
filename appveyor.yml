@@ -111,7 +111,7 @@ for:
       only:
         - job_name: PHP 8.1
 
-    init:
+    install:
       - echo PLATFORM                       %PLATFORM%
       - echo MG_REL_SUFFIX                  %MG_REL_SUFFIX%
       - echo COMPOSER                       %COMPOSER%
