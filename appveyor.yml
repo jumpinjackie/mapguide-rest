@@ -1,4 +1,22 @@
 version: 1.0.0.{build}
+
+environment:
+  matrix:
+    fast_finish: true
+    - job_name: PHP 8.1
+      PLATFORM: x64
+      MG_REL_SUFFIX: php81
+      COMPOSER: composer.php5.json
+      PHP_COMPOSER_VER: 2.5.8
+      PHP_DIST_NAME: php-8.1.17-nts-Win32-vs16-x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    - job_name: PHP 5.6
+      PLATFORM: x64
+      MG_REL_SUFFIX: php56
+      COMPOSER: composer.json
+      PHP_COMPOSER_VER: 2.2.21
+      PHP_DIST_NAME: php-5.6.40-nts-Win32-VC11-x64
+
 build: false
 shallow_clone: true
 platform:
@@ -35,8 +53,8 @@ init:
 install:
     - IF EXIST c:\php_%PLATFORM% (SET PHP=0) ELSE (mkdir c:\php_%PLATFORM%)
     - cd c:\php_%PLATFORM%
-    - IF %PHP%==1 curl -fksSL -o php-5.6.40-nts-Win32-VC11-%PLATFORM%.zip https://windows.php.net/downloads/releases/archives/php-5.6.40-nts-Win32-VC11-%PLATFORM%.zip
-    - IF %PHP%==1 7z x php-5.6.40-nts-Win32-VC11-%PLATFORM%.zip -y >nul
+    - IF %PHP%==1 curl -fksSL -o %PHP_DIST_NAME%.zip https://windows.php.net/downloads/releases/archives/%PHP_DIST_NAME%.zip
+    - IF %PHP%==1 7z x %PHP_DIST_NAME%.zip -y >nul
     - IF %PHP%==1 del /Q *.zip
     - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
     - IF %PHP%==1 copy /Y php.ini-development php.ini
@@ -48,7 +66,7 @@ install:
     - IF %PHP%==1 echo extension=php_curl.dll >> php.ini
     - IF %PHP%==1 echo extension=php_gd2.dll >> php.ini
     - IF %PHP%==1 echo extension=php_xsl.dll >> php.ini
-    - appveyor DownloadFile https://getcomposer.org/download/2.2.21/composer.phar
+    - appveyor DownloadFile https://getcomposer.org/download/%PHP_COMPOSER_VER%/composer.phar
     - SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_BUILD_VERSION%
     - IF "%APPVEYOR_REPO_TAG%" == "true" SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_REPO_TAG_NAME%
     - cd c:\projects\mapguide-rest
@@ -58,10 +76,10 @@ test_script:
     - vendor\bin\phpunit test
 
 after_test:
-    - vendor\bin\phing -Dapp.version=%ARTIFACT_RELEASE_LABEL%-php56 -f build.phing.xml dist
+    - vendor\bin\phing -Dapp.version=%ARTIFACT_RELEASE_LABEL%-%MG_REL_SUFFIX% -f build.phing.xml dist
 
 artifacts:
-  - path: .\dist\mapguide-rest-$(ARTIFACT_RELEASE_LABEL).zip
+  - path: .\dist\mapguide-rest-$(ARTIFACT_RELEASE_LABEL)-$(MG_REL_SUFFIX).zip
     name: dist
     type: zip
 
