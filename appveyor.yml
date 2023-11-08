@@ -1,7 +1,7 @@
 version: 1.0.0.{build}
 
 environment:
-  APPVEYOR_RDP_PASSWORD: What1swrongwithyou
+  # APPVEYOR_RDP_PASSWORD: What1swrongwithyou
   matrix:
     - job_name: PHP 8.1
       PLATFORM: x64
@@ -42,10 +42,11 @@ for:
       only:
         - job_name: PHP 5.6
 
-    init:
-      - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    #init:
+    #  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
     install:
+      - choco install vcredist-all
       - echo PLATFORM                       %PLATFORM%
       - echo MG_REL_SUFFIX                  %MG_REL_SUFFIX%
       - echo COMPOSER                       %COMPOSER%
@@ -101,8 +102,8 @@ for:
         name: dist
         type: zip
 
-    on_finish:
-      - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    #on_finish:
+    #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
   # ======================================
   #      PHP 8.1
