@@ -34,30 +34,30 @@ class MgFeatureServiceController extends MgBaseController {
     private $whitelistConf;
     private $whitelist;
 
-    public function __construct($app) {
+    public function __construct(IAppServices $app) {
         parent::__construct($app);
-        $this->whitelistConf = $this->app->config("MapGuide.FeatureSourceConfiguration");
+        $this->whitelistConf = $this->app->GetConfig("MapGuide.FeatureSourceConfiguration");
         $this->whitelist = new MgWhitelist($this->whitelistConf);
     }
 
-    private function VerifyWhitelist($resIdStr, $mimeType, $requiredAction, $requiredRepresentation, $site, $userName) {
+    private function VerifyWhitelist(/*php_string*/ $resIdStr, /*php_string*/ $mimeType, /*php_callable*/ $requiredAction, /*php_string*/ $requiredRepresentation, MgSite $site, /*php_string*/ $userName) {
         $this->whitelist->VerifyWhitelist($resIdStr, $mimeType, function($msg, $mt) {
             $this->Forbidden($msg, $mt);
         }, $requiredAction, $requiredRepresentation, $site, $userName);
     }
 
-    private function VerifyGlobalWhitelist($mimeType, $requiredAction, $requiredRepresentation, $site, $userName) {
+    private function VerifyGlobalWhitelist(/*php_string*/ $mimeType, /*php_callable*/ $requiredAction, /*php_string*/ $requiredRepresentation, MgSite $site, /*php_string*/ $userName) {
         $this->whitelist->VerifyGlobalWhitelist($mimeType, function($msg, $mt) {
             $this->Forbidden($msg, $mt);
         }, $requiredAction, $requiredRepresentation, $site, $userName);
     }
 
-    public function GetConnectPropertyValues($providerName, $propName, $format) {
+    public function GetConnectPropertyValues(/*php_string*/ $providerName, /*php_string*/ $propName, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
-        $partialConnStr = $this->GetRequestParameter("connection", "");
-        $sessionId = $this->app->request->params("session");
+        $partialConnStr = $this->app->GetRequestParameter("connection", "");
+        $sessionId = $this->app->GetRequestParameter("session");
 
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
@@ -84,12 +84,12 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function EnumerateDataStores($providerName, $format) {
+    public function EnumerateDataStores(/*php_string*/ $providerName, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
-        $partialConnStr = $this->GetRequestParameter("connection", "");
-        $sessionId = $this->app->request->params("session");
+        $partialConnStr = $this->app->GetRequestParameter("connection", "");
+        $sessionId = $this->app->GetRequestParameter("session");
 
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
@@ -115,12 +115,12 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function GetProviderCapabilities($providerName, $format) {
+    public function GetProviderCapabilities(/*php_string*/ $providerName, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
-        $partialConnStr = $this->GetRequestParameter("connection", "");
-        $sessionId = $this->app->request->params("session");
+        $partialConnStr = $this->app->GetRequestParameter("connection", "");
+        $sessionId = $this->app->GetRequestParameter("session");
 
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
@@ -146,10 +146,10 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function GetFeatureProviders($format) {
+    public function GetFeatureProviders(/*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
-        $sessionId = $this->app->request->params("session");
+        $sessionId = $this->app->GetRequestParameter("session");
 
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
@@ -176,12 +176,12 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function GetSchemaMapping($format) {
+    public function GetSchemaMapping(/*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
-        $provider = $this->GetRequestParameter("provider", "");
-        $connStr = $this->GetRequestParameter("connection", "");
-        $sessionId = $this->app->request->params("session");
+        $provider = $this->app->GetRequestParameter("provider", "");
+        $connStr = $this->app->GetRequestParameter("connection", "");
+        $sessionId = $this->app->GetRequestParameter("session");
 
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         $this->EnsureAuthenticationForSite($sessionId, false, $mimeType);
@@ -205,7 +205,7 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function TestConnection($resId, $format) {
+    public function TestConnection(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $sessionId = "";
@@ -235,7 +235,7 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function GetSpatialContexts($resId, $format) {
+    public function GetSpatialContexts(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
@@ -267,7 +267,7 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function GetLongTransactions($resId, $format) {
+    public function GetLongTransactions(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
@@ -300,7 +300,7 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function GetSchemaNames($resId, $format) {
+    public function GetSchemaNames(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
@@ -319,8 +319,8 @@ class MgFeatureServiceController extends MgBaseController {
         $this->VerifyWhitelist($resIdStr, $mimeType, "GETSCHEMANAMES", $fmt, $site, $this->userName);
 
         $resName = $resId->GetName().".".$resId->GetResourceType();
-        $pathInfo = $this->app->request->getPathInfo();
-        $selfUrl = $this->app->config("SelfUrl");
+        $pathInfo = $this->app->GetRequestPathInfo();
+        $selfUrl = $this->app->GetConfig("SelfUrl");
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $resIdStr, $resName, $selfUrl, $pathInfo) {
             $param->AddParameter("OPERATION", "GETSCHEMAS");
@@ -330,7 +330,7 @@ class MgFeatureServiceController extends MgBaseController {
             } else if ($fmt === "xml") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             } else if ($fmt === "html") {
-                $thisUrl = $selfUrl.$pathInfo;
+                $thisUrl = MgUtils::EnsureEndingSlash($selfUrl).$pathInfo;;
                 //Chop off the schemas.html
                 $rootPath = substr($thisUrl, 0, strlen($thisUrl) - strlen("schemas.html"));
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
@@ -345,7 +345,7 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function CreateFeatureSource($resId, $inputFormat) {
+    public function CreateFeatureSource(MgResourceIdentifier $resId, /*php_string*/ $inputFormat) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($inputFormat, array("xml", "json"));
         $sessionId = "";
@@ -368,28 +368,28 @@ class MgFeatureServiceController extends MgBaseController {
         $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
 
         if ($fmt == "json") {
-            $body = $this->app->request->getBody();
+            $body = $this->app->GetRequestBody();
             $json = json_decode($body);
             if ($json == NULL)
-                throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+                throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
         } else {
-            $body = $this->app->request->getBody();
+            $body = $this->app->GetRequestBody();
             $jsonStr = MgUtils::Xml2Json($body);
             $json = json_decode($jsonStr);
         }
 
         if (!isset($json->FeatureSourceParams)) {
-            throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+            throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
         }
         $fsParams = $json->FeatureSourceParams;
         if (!isset($fsParams->File)) {
-            throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+            throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
         }
         if (!isset($fsParams->SpatialContext)) {
-            throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+            throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
         }
         if (!isset($fsParams->FeatureSchema)) {
-            throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+            throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
         }
 
         $mkParams = new MgFileFeatureSourceParams();
@@ -464,7 +464,7 @@ class MgFeatureServiceController extends MgBaseController {
                             }
                             break;
                         default:
-                            throw new Exception($this->app->localizer->getText("E_UNSUPPORTED_PROPERTY_TYPE"));
+                            throw new Exception($this->app->GetLocalizedText("E_UNSUPPORTED_PROPERTY_TYPE"));
                     }
                     if ($mkProp != null) {
                         if (isset($propDef->Description))
@@ -493,7 +493,7 @@ class MgFeatureServiceController extends MgBaseController {
         }
     }
 
-    public function DescribeSchema($resId, $schemaName, $format) {
+    public function DescribeSchema(MgResourceIdentifier $resId, /*php_string*/ $schemaName, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
@@ -512,9 +512,6 @@ class MgFeatureServiceController extends MgBaseController {
         $this->VerifyWhitelist($resIdStr, $mimeType, "DESCRIBESCHEMA", $fmt, $site, $this->userName);
 
         $resName = $resId->GetName().".".$resId->GetResourceType();
-        $pathInfo = $this->app->request->getPathInfo();
-        $selfUrl = $this->app->config("SelfUrl");
-
         if ($fmt == "json") {
             //For JSON, we are defining a completely new response format. No point trying to transform the XML version, which is just a plain
             //XML schema. Do we really want to serve a JSON-ified version of that?
@@ -522,7 +519,7 @@ class MgFeatureServiceController extends MgBaseController {
             $siteConn = new MgSiteConnection();
             $siteConn->Open($this->userInfo);
 
-            $classNames = explode(",", $this->GetRequestParameter("classnames", ""));
+            $classNames = explode(",", $this->app->GetRequestParameter("classnames", ""));
             $collClassNames = null;
             if (count($classNames) > 0)
             {
@@ -539,10 +536,12 @@ class MgFeatureServiceController extends MgBaseController {
                 MgUtils::EnsurePartialSchema($schemas, $schemaName, $collClassNames);
             }
 
-            $this->app->response->header("Content-Type", MgMimeType::Json);
-            $this->app->response->setBody(MgUtils::SchemasToJson($schemas));
+            $this->app->SetResponseHeader("Content-Type", MgMimeType::Json);
+            $this->app->SetResponseBody(MgUtils::SchemasToJson($schemas));
         } else {
             $that = $this;
+            $pathInfo = $this->app->GetRequestPathInfo();
+            $selfUrl = $this->app->GetConfig("SelfUrl");
             $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $resIdStr, $resName, $selfUrl, $pathInfo) {
                 $param->AddParameter("OPERATION", "DESCRIBEFEATURESCHEMA");
                 $param->AddParameter("VERSION", "1.0.0");
@@ -571,7 +570,7 @@ class MgFeatureServiceController extends MgBaseController {
                 }
                 $param->AddParameter("RESOURCEID", $resIdStr);
                 $param->AddParameter("SCHEMA", $schemaName);
-                $classNames = $that->GetRequestParameter("classnames", null);
+                $classNames = $that->app->GetRequestParameter("classnames", null);
                 if ($classNames != null)
                     $param->AddParameter("CLASSNAMES", $classNames);
                 $that->ExecuteHttpRequest($req);
@@ -579,7 +578,7 @@ class MgFeatureServiceController extends MgBaseController {
         }
     }
 
-    public function GetClassNames($resId, $schemaName, $format) {
+    public function GetClassNames(MgResourceIdentifier $resId, /*php_string*/ $schemaName, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json", "html"));
 
@@ -597,7 +596,7 @@ class MgFeatureServiceController extends MgBaseController {
 
         $this->VerifyWhitelist($resIdStr, $mimeType, "GETCLASSNAMES", $fmt, $site, $this->userName);
 
-        $selfUrl = $this->app->config("SelfUrl");
+        $selfUrl = $this->app->GetConfig("SelfUrl");
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $resIdStr, $selfUrl) {
             $param->AddParameter("OPERATION", "GETCLASSES");
@@ -618,7 +617,7 @@ class MgFeatureServiceController extends MgBaseController {
         }, false, "", $sessionId, $mimeType);
     }
 
-    public function GetClassDefinition($resId, $schemaName, $className, $format) {
+    public function GetClassDefinition(MgResourceIdentifier $resId, /*php_string*/ $schemaName, /*php_string*/ $className, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
@@ -646,8 +645,8 @@ class MgFeatureServiceController extends MgBaseController {
             $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
             $clsDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
 
-            $this->app->response->header("Content-Type", MgMimeType::Json);
-            $this->app->response->setBody(MgUtils::ClassDefinitionToJson($clsDef));
+            $this->app->SetResponseHeader("Content-Type", MgMimeType::Json);
+            $this->app->SetResponseBody(MgUtils::ClassDefinitionToJson($clsDef));
         } else {
             $that = $this;
             $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $fmt, $schemaName, $className, $resIdStr) {
@@ -665,7 +664,7 @@ class MgFeatureServiceController extends MgBaseController {
         }
     }
 
-    public function GetEditCapabilities($resId, $format) {
+    public function GetEditCapabilities(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
@@ -689,8 +688,8 @@ class MgFeatureServiceController extends MgBaseController {
             $resp = new stdClass();
             //This is for consistency with the XML version
             $resp->RestCapabilities = $perms;
-            $this->app->response->header("Content-Type", MgMimeType::Json);
-            $this->app->response->write(json_encode($resp));
+            $this->app->SetResponseHeader("Content-Type", MgMimeType::Json);
+            $this->app->WriteResponseContent(json_encode($resp));
         } else { //xml
             $resp = '<?xml version="1.0" encoding="utf-8"?>';
             $resp .= "<RestCapabilities>";
@@ -699,19 +698,19 @@ class MgFeatureServiceController extends MgBaseController {
             $resp .= "<AllowDelete>".($perms->AllowDelete ? "true" : "false")."</AllowDelete>";
             $resp .= "<UseTransaction>".($perms->UseTransaction ? "true" : "false")."</UseTransaction>";
             $resp .= "</RestCapabilities>";
-            $this->app->response->header("Content-Type", MgMimeType::Xml);
-            $this->app->response->write($resp);
+            $this->app->SetResponseHeader("Content-Type", MgMimeType::Xml);
+            $this->app->WriteResponseContent($resp);
         }
     }
 
-    public function SetEditCapabilities($resId, $format) {
+    public function SetEditCapabilities(MgResourceIdentifier $resId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
 
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         $sessionId = "";
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
-            $this->BadRequest($this->app->localizer->getText("E_NOT_SUPPORTED_FOR_SESSION_RESOURCES"), $mimeType);
+            $this->BadRequest($this->app->GetLocalizedText("E_NOT_SUPPORTED_FOR_SESSION_RESOURCES"), $mimeType);
         }
 
         $this->EnsureAuthenticationForSite($sessionId);
@@ -734,10 +733,10 @@ class MgFeatureServiceController extends MgBaseController {
         $perms->UseTransaction = false;
 
         if ($fmt == "json") {
-            $body = $this->app->request->getBody();
+            $body = $this->app->GetRequestBody();
             $json = json_decode($body);
             if ($json == NULL)
-                throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+                throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
 
             if (isset($json->RestCapabilities)) {
                 if (isset($json->RestCapabilities->AllowInsert)) {
@@ -753,10 +752,10 @@ class MgFeatureServiceController extends MgBaseController {
                     $perms->UseTransaction = $json->RestCapabilities->UseTransaction;
                 }
             } else {
-                throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+                throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
             }
         } else {
-            $body = $this->app->request->getBody();
+            $body = $this->app->GetRequestBody();
             $jsonStr = MgUtils::Xml2Json($body);
             $json = json_decode($jsonStr);
 
@@ -778,7 +777,7 @@ class MgFeatureServiceController extends MgBaseController {
 
         try {
             self::PutEditPermissions($resSvc, $resId, $perms);
-            $this->app->response->setStatus(201);
+            $this->app->SetResponseStatus(201);
             /*
             $perms = self::CheckPermissions($resSvc, $resId);
 
@@ -786,8 +785,8 @@ class MgFeatureServiceController extends MgBaseController {
                 $resp = new stdClass();
                 //This is for consistency with the XML version
                 $resp->RestCapabilities = $perms;
-                $this->app->response->header("Content-Type", MgMimeType::Json);
-                $this->app->response->write(json_encode($resp));
+                $this->app->SetResponseHeader("Content-Type", MgMimeType::Json);
+                $this->app->WriteResponseContent(json_encode($resp));
             } else { //xml
                 $resp = '<?xml version="1.0" encoding="utf-8"?>';
                 $resp .= "<RestCapabilities>";
@@ -796,8 +795,8 @@ class MgFeatureServiceController extends MgBaseController {
                 $resp .= "<AllowDelete>".($perms->AllowDelete ? "true" : "false")."</AllowDelete>";
                 $resp .= "<UseTransaction>".($perms->UseTransaction ? "true" : "false")."</UseTransaction>";
                 $resp .= "</RestCapabilities>";
-                $this->app->response->header("Content-Type", MgMimeType::Xml);
-                $this->app->response->write($resp);
+                $this->app->SetResponseHeader("Content-Type", MgMimeType::Xml);
+                $this->app->WriteResponseContent($resp);
             }
             */
         } catch (MgException $ex) {
@@ -805,7 +804,7 @@ class MgFeatureServiceController extends MgBaseController {
         }
     }
 
-    private static function PutEditPermissions($resSvc, $resId, $perms) {
+    private static function PutEditPermissions(MgResourceService $resSvc, MgResourceIdentifier $resId, /*php_mixed*/ $perms) {
         $resHeader = $resSvc->GetResourceHeader($resId);
         $jsonStr = MgUtils::Xml2Json($resHeader->ToString());
         $json = json_decode($jsonStr);
@@ -853,7 +852,7 @@ class MgFeatureServiceController extends MgBaseController {
         $resSvc->SetResource($resId, null, $br);
     }
 
-    private static function CheckPermissions($resSvc, $resId) {
+    private static function CheckPermissions(MgResourceService $resSvc, MgResourceIdentifier $resId) {
         $perms = new stdClass();
         $perms->AllowInsert = false;
         $perms->AllowUpdate = false;
@@ -897,7 +896,7 @@ class MgFeatureServiceController extends MgBaseController {
         return $perms;
     }
 
-    public function InsertFeatures($resId, $schemaName, $className, $format) {
+    public function InsertFeatures(MgResourceIdentifier $resId, /*php_string*/ $schemaName, /*php_string*/ $className, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $mimeType = $this->GetMimeTypeForFormat($fmt);
@@ -915,11 +914,11 @@ class MgFeatureServiceController extends MgBaseController {
 
             $this->VerifyWhitelist($resId->ToString(), $mimeType, "INSERTFEATURES", $fmt, $site, $this->userName);
 
-            $body = $this->app->request->getBody();
+            $body = $this->app->GetRequestBody();
             if ($fmt == "json") {
                 $json = json_decode($body);
                 if ($json == NULL)
-                    throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+                    throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
                 $body = MgUtils::Json2Xml($json);
             }
 
@@ -932,8 +931,8 @@ class MgFeatureServiceController extends MgBaseController {
                     $e = new Exception();
                     $this->OutputException(
                         "Forbidden",
-                        $this->app->localizer->getText("E_OPERATION_NOT_ALLOWED"),
-                        $this->app->localizer->getText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
+                        $this->app->GetLocalizedText("E_OPERATION_NOT_ALLOWED"),
+                        $this->app->GetLocalizedText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
                         $e->getTraceAsString(),
                         403,
                         $mimeType);
@@ -968,7 +967,7 @@ class MgFeatureServiceController extends MgBaseController {
         }
     }
 
-    public function UpdateFeatures($resId, $schemaName, $className, $format) {
+    public function UpdateFeatures(MgResourceIdentifier $resId, /*php_string*/ $schemaName, /*php_string*/ $className, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $mimeType = $this->GetMimeTypeForFormat($fmt);
@@ -986,11 +985,11 @@ class MgFeatureServiceController extends MgBaseController {
 
             $this->VerifyWhitelist($resId->ToString(), $mimeType, "UPDATEFEATURES", $fmt, $site, $this->userName);
 
-            $body = $this->app->request->getBody();
+            $body = $this->app->GetRequestBody();
             if ($fmt == "json") {
                 $json = json_decode($body);
                 if ($json == NULL)
-                    throw new Exception($this->app->localizer->getText("E_MALFORMED_JSON_BODY"));
+                    throw new Exception($this->app->GetLocalizedText("E_MALFORMED_JSON_BODY"));
                 $body = MgUtils::Json2Xml($json);
             }
 
@@ -1003,8 +1002,8 @@ class MgFeatureServiceController extends MgBaseController {
                     $e = new Exception();
                     $this->OutputException(
                         "Forbidden",
-                        $this->app->localizer->getText("E_OPERATION_NOT_ALLOWED"),
-                        $this->app->localizer->getText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
+                        $this->app->GetLocalizedText("E_OPERATION_NOT_ALLOWED"),
+                        $this->app->GetLocalizedText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
                         $e->getTraceAsString(),
                         403,
                         $mimeType);
@@ -1045,7 +1044,7 @@ class MgFeatureServiceController extends MgBaseController {
         }
     }
 
-    public function DeleteFeatures($resId, $schemaName, $className, $format) {
+    public function DeleteFeatures(MgResourceIdentifier $resId, /*php_string*/ $schemaName, /*php_string*/ $className, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $mimeType = $this->GetMimeTypeForFormat($fmt);
@@ -1072,8 +1071,8 @@ class MgFeatureServiceController extends MgBaseController {
                     $e = new Exception();
                     $this->OutputException(
                         "Forbidden",
-                        $this->app->localizer->getText("E_OPERATION_NOT_ALLOWED"),
-                        $this->app->localizer->getText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
+                        $this->app->GetLocalizedText("E_OPERATION_NOT_ALLOWED"),
+                        $this->app->GetLocalizedText("E_FEATURE_SOURCE_NOT_CONFIGURED_TO_ALLOW_UPDATES", $resId->ToString()),
                         $e->getTraceAsString(),
                         403,
                         $mimeType);
@@ -1083,7 +1082,7 @@ class MgFeatureServiceController extends MgBaseController {
             $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
             $classDef = $featSvc->GetClassDefinition($resId, $schemaName, $className);
             $commands = new MgFeatureCommandCollection();
-            $filter = $this->app->request->params("filter");
+            $filter = $this->app->GetRequestParameter("filter");
             if ($filter == null)
                 $filter = "";
             $deleteCmd = new MgDeleteFeatures("$schemaName:$className", $filter);
@@ -1109,15 +1108,15 @@ class MgFeatureServiceController extends MgBaseController {
         }
     }
 
-    public function SelectAggregates($resId, $schemaName, $className, $type, $format) {
+    public function SelectAggregates(MgResourceIdentifier $resId, /*php_string*/ $schemaName, /*php_string*/ $className, /*php_string*/ $type, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "json"));
         $mimeType = $this->GetMimeTypeForFormat($fmt);
         try {
             $aggType = $this->ValidateValueInDomain($type, array("count", "bbox", "distinctvalues"), $this->GetMimeTypeForFormat($format));
-            $distinctPropName = $this->GetRequestParameter("property", "");
+            $distinctPropName = $this->app->GetRequestParameter("property", "");
             if ($aggType === "distinctvalues" && $distinctPropName === "") {
-                $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "property"), $this->GetMimeTypeForFormat($format));
+                $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "property"), $this->GetMimeTypeForFormat($format));
             }
 
             $sessionId = "";
@@ -1162,8 +1161,8 @@ class MgFeatureServiceController extends MgBaseController {
                     break;
                 case "bbox":
                     {
-                        $geomName = $this->app->request->get("property");
-                        $txTo = $this->app->request->get("transformto");
+                        $geomName = $this->app->GetRequestParameter("property");
+                        $txTo = $this->app->GetRequestParameter("transformto");
                         $bounds = MgUtils::GetFeatureClassMBR($this->app, $featSvc, $resId, $schemaName, $className, $geomName, $txTo);
                         $iterator = $bounds->extentGeometry->GetCoordinates();
                         $csCode = $bounds->csCode;
@@ -1242,7 +1241,7 @@ class MgFeatureServiceController extends MgBaseController {
         }
     }
 
-    public function SelectLayerFeatures($ldfId, $format) {
+    public function SelectLayerFeatures(MgResourceIdentifier $ldfId, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "geojson", "html", "czml"));
         $mimeType = $this->GetMimeTypeForFormat($fmt);
@@ -1260,30 +1259,27 @@ class MgFeatureServiceController extends MgBaseController {
             $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
             $query = new MgFeatureQueryOptions();
 
-            $propList = $this->GetRequestParameter("properties", "");
-            $filter = $this->GetRequestParameter("filter", "");
-            $orderby = $this->GetRequestParameter("orderby", "");
-            $orderOptions = $this->GetRequestParameter("orderoption", "");
-            $maxFeatures = $this->GetRequestParameter("maxfeatures", "");
-            $transformto = $this->GetRequestParameter("transformto", "");
-            $bbox = $this->GetRequestParameter("bbox", "");
+            $propList = $this->app->GetRequestParameter("properties", "");
+            $filter = $this->app->GetRequestParameter("filter", "");
+            $orderby = $this->app->GetRequestParameter("orderby", "");
+            $orderOptions = $this->app->GetRequestParameter("orderoption", "");
+            $maxFeatures = $this->app->GetRequestParameter("maxfeatures", "");
+            $transformto = $this->app->GetRequestParameter("transformto", "");
+            $bbox = $this->app->GetRequestParameter("bbox", "");
 
-            $pageSize = $this->GetRequestParameter("pagesize", -1);
-            $pageNo = $this->GetRequestParameter("page", -1);
+            $pageSize = $this->app->GetRequestParameter("pagesize", -1);
+            $pageNo = $this->app->GetRequestParameter("page", -1);
 
             $bIncludeGeom = ($this->GetBooleanRequestParameter("includegeom", "0") == "1");
             $bDisplayProperties = ($this->GetBooleanRequestParameter("displayproperties", "0") == "1");
             $bMapped = ($this->GetBooleanRequestParameter("mappedonly", "0") == "1");
 
-            //Internal debugging flag
-            $chunk = $this->GetBooleanRequestParameter("chunk", true);
-
             if ($pageNo >= 0 && $pageSize === -1) {
-                $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "pagesize"), $mimeType);
+                $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "pagesize"), $mimeType);
             } else {
                 //The way that CZML output is done means we cannot support pagination
                 if ($pageNo >= 0 && $pageSize > 0 && $fmt === "czml") {
-                    $this->BadRequest($this->app->localizer->getText("E_CZML_PAGINATION_NOT_SUPPORTED"), $mimeType);
+                    $this->BadRequest($this->app->GetLocalizedText("E_CZML_PAGINATION_NOT_SUPPORTED"), $mimeType);
                 }
             }
 
@@ -1456,11 +1452,7 @@ class MgFeatureServiceController extends MgBaseController {
                             }
                         }
 
-                        $owriter = null;
-                        if ($chunk === "0")
-                            $owriter = new MgSlimChunkWriter($this->app);
-                        else
-                            $owriter = new MgHttpChunkWriter();
+                        $owriter = new MgSlimChunkWriter($this->app);
 
                         MgUtils::ApplyCorsIfApplicable($this->app);
                         if ($fmt == "czml") {
@@ -1473,9 +1465,9 @@ class MgFeatureServiceController extends MgBaseController {
                             $reader = $featSvc->SelectFeatures($fsId, "$schemaName:$className", $query);
                             if ($pageSize > 0) {
                                 $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo, $limit);
-                                $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, $owriter, $this->app->localizer);
+                                $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, $owriter);
                             } else {
-                                $result = new MgReaderChunkedResult($featSvc, $reader, $limit, $owriter, $this->app->localizer);
+                                $result = new MgReaderChunkedResult($featSvc, $reader, $limit, $owriter);
                             }
                             $result->CheckAndSetDownloadHeaders($this->app, $format);
                             if ($bDisplayProperties) {
@@ -1489,10 +1481,10 @@ class MgFeatureServiceController extends MgBaseController {
                             $result->Output($format);
                         }
                     } else {
-                        throw new Exception($this->app->localizer->getText("E_LAYER_HAS_INVALID_FEATURE_CLASS", $ldfId->ToString()));
+                        throw new Exception($this->app->GetLocalizedText("E_LAYER_HAS_INVALID_FEATURE_CLASS", $ldfId->ToString()));
                     }
                 } else {
-                    throw new Exception($this->app->localizer->getText("E_LAYER_HAS_INVALID_FEATURE_SOURCE", $ldfId->ToString()));
+                    throw new Exception($this->app->GetLocalizedText("E_LAYER_HAS_INVALID_FEATURE_SOURCE", $ldfId->ToString()));
                 }
             }
         } catch (MgException $ex) {
@@ -1500,7 +1492,7 @@ class MgFeatureServiceController extends MgBaseController {
         }
     }
 
-    public function SelectFeatures($resId, $schemaName, $className, $format) {
+    public function SelectFeatures(MgResourceIdentifier $resId, /*php_string*/ $schemaName, /*php_string*/ $className, /*php_string*/ $format) {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("xml", "html", "geojson"));
         $mimeType = $this->GetMimeTypeForFormat($fmt);
@@ -1520,22 +1512,19 @@ class MgFeatureServiceController extends MgBaseController {
             $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
             $query = new MgFeatureQueryOptions();
 
-            $filter = $this->GetRequestParameter("filter", "");
-            $propList = $this->GetRequestParameter("properties", "");
-            $orderby = $this->GetRequestParameter("orderby", "");
-            $orderOptions = $this->GetRequestParameter("orderoption", "asc");
-            $maxFeatures = $this->GetRequestParameter("maxfeatures", "");
-            $transformto = $this->GetRequestParameter("transformto", "");
-            $bbox = $this->GetRequestParameter("bbox", "");
+            $filter = $this->app->GetRequestParameter("filter", "");
+            $propList = $this->app->GetRequestParameter("properties", "");
+            $orderby = $this->app->GetRequestParameter("orderby", "");
+            $orderOptions = $this->app->GetRequestParameter("orderoption", "asc");
+            $maxFeatures = $this->app->GetRequestParameter("maxfeatures", "");
+            $transformto = $this->app->GetRequestParameter("transformto", "");
+            $bbox = $this->app->GetRequestParameter("bbox", "");
 
-            $pageSize = $this->GetRequestParameter("pagesize", -1);
-            $pageNo = $this->GetRequestParameter("page", -1);
-
-            //Internal debugging flag
-            $chunk = $this->GetBooleanRequestParameter("chunk", true);
+            $pageSize = $this->app->GetRequestParameter("pagesize", -1);
+            $pageNo = $this->app->GetRequestParameter("page", -1);
 
             if ($pageNo >= 0 && $pageSize === -1) {
-                $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "pagesize"), $mimeType);
+                $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "pagesize"), $mimeType);
             }
 
             if ($filter !== "") {
@@ -1590,20 +1579,16 @@ class MgFeatureServiceController extends MgBaseController {
 
             $reader = $featSvc->SelectFeatures($resId, "$schemaName:$className", $query);
 
-            $owriter = null;
-            if ($chunk === "0")
-                $owriter = new MgSlimChunkWriter($this->app);
-            else
-                $owriter = new MgHttpChunkWriter();
+            $owriter = new MgSlimChunkWriter($this->app);
 
             if ($pageSize > 0) {
                 if ($pageNo < 1) {
                     $pageNo = 1;
                 }
                 $pageReader = new MgPaginatedFeatureReader($reader, $pageSize, $pageNo, $limit);
-                $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, $owriter, $this->app->localizer);
+                $result = new MgReaderChunkedResult($featSvc, $pageReader, $limit, $owriter);
             } else {
-                $result = new MgReaderChunkedResult($featSvc, $reader, $limit, $owriter, $this->app->localizer);
+                $result = new MgReaderChunkedResult($featSvc, $reader, $limit, $owriter);
             }
             MgUtils::ApplyCorsIfApplicable($this->app);
             $result->CheckAndSetDownloadHeaders($this->app, $format);

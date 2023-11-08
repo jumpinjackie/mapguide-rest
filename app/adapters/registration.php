@@ -6,75 +6,76 @@ require_once "geojsonadapter.php";
 require_once "mapimageadapter.php";
 require_once "templateadapter.php";
 require_once "csvadapter.php";
+require_once dirname(__FILE__)."/../core/app.php";
 
-$app->container->FeatureSetXml = function() use ($app) {
+$container['FeatureSetXml'] = function($c) {
     return new MgFeatureXmlRestAdapter(
-        $app, 
-        $app->container->MgSiteConnection, 
-        $app->container->FeatureSource,
-        $app->container->FeatureClass,
-        $app->container->AdapterConfig,
-        $app->container->ConfigPath,
-        $app->container->IdentityProperty);
+        $c->get('AppServices'), 
+        $c->get('MgSiteConnection'),
+        $c->get('FeatureSource'),
+        $c->get('FeatureClass'),
+        $c->get('AdapterConfig'),
+        $c->get('ConfigPath'),
+        $c->get('IdentityProperty'));
 };
-$app->container->FeatureSetXmlDoc = function() use ($app) {
+$container['FeatureSetXmlDoc'] = function($c) {
     return MgFeatureXmlRestAdapter::GetDocumentor();
 };
-$app->container->FeatureSetXmlSessionID = function() use ($app) {
+$container['FeatureSetXmlSessionID'] = function($c) {
     return new MgFeatureXmlSessionIDExtractor();
 };
-$app->container->FeatureSetGeoJson = function() use ($app) {
+$container['FeatureSetGeoJson'] = function($c) {
     return new MgGeoJsonRestAdapter(
-        $app, 
-        $app->container->MgSiteConnection, 
-        $app->container->FeatureSource,
-        $app->container->FeatureClass,
-        $app->container->AdapterConfig,
-        $app->container->ConfigPath,
-        $app->container->IdentityProperty);
+        $c->get('AppServices'), 
+        $c->get('MgSiteConnection'),
+        $c->get('FeatureSource'),
+        $c->get('FeatureClass'),
+        $c->get('AdapterConfig'),
+        $c->get('ConfigPath'),
+        $c->get('IdentityProperty'));
 };
-$app->container->FeatureSetGeoJsonDoc = function() use ($app) {
+$container['FeatureSetGeoJsonDoc'] = function($c) {
     return MgGeoJsonRestAdapter::GetDocumentor();
 };
-$app->container->FeatureSetGeoJsonSessionID = function() use ($app) {
+$container['FeatureSetGeoJsonSessionID'] = function($c) {
     return new MgJsonSessionIDExtractor();
 };
-$app->container->MapImage = function() use ($app) {
+$container['MapImage'] = function($c) {
     return new MgMapImageRestAdapter(
-        $app, 
-        $app->container->MgSiteConnection, 
-        $app->container->FeatureSource,
-        $app->container->FeatureClass,
-        $app->container->AdapterConfig,
-        $app->container->ConfigPath,
-        $app->container->IdentityProperty);
+        $c->get('AppServices'), 
+        $c->get('MgSiteConnection'),
+        $c->get('FeatureSource'),
+        $c->get('FeatureClass'),
+        $c->get('AdapterConfig'),
+        $c->get('ConfigPath'),
+        $c->get('IdentityProperty'));
 };
-$app->container->MapImageDoc = function() use ($app) {
+$container['MapImageDoc'] = function($c) {
     return MgMapImageRestAdapter::GetDocumentor();
 };
-$app->container->Template = function() use ($app) {
+$container['Template'] = function($c) {
     return new MgTemplateRestAdapter(
-        $app, 
-        $app->container->MgSiteConnection, 
-        $app->container->FeatureSource,
-        $app->container->FeatureClass,
-        $app->container->AdapterConfig,
-        $app->container->ConfigPath,
-        $app->container->IdentityProperty);
+        $c->get('AppServices'), 
+        $c->get('MgSiteConnection'),
+        $c->get('FeatureSource'),
+        $c->get('FeatureClass'),
+        $c->get('AdapterConfig'),
+        $c->get('ConfigPath'),
+        $c->get('IdentityProperty'));
 };
-$app->container->TemplateDoc = function() use ($app) {
+$container['TemplateDoc'] = function($c) {
     return MgTemplateRestAdapter::GetDocumentor();
 };
-$app->container->FeatureSetCsv = function() use ($app) {
+$container['FeatureSetCsv'] = function($c) {
     return new MgCsvRestAdapter(
-        $app, 
-        $app->container->MgSiteConnection, 
-        $app->container->FeatureSource,
-        $app->container->FeatureClass,
-        $app->container->AdapterConfig,
-        $app->container->ConfigPath,
-        $app->container->IdentityProperty);
+        $c->get('AppServices'), 
+        $c->get('MgSiteConnection'),
+        $c->get('FeatureSource'),
+        $c->get('FeatureClass'),
+        $c->get('AdapterConfig'),
+        $c->get('ConfigPath'),
+        $c->get('IdentityProperty'));
 };
-$app->container->FeatureSetCsvDoc = function() use ($app) {
+$container['FeatureSetCsvDoc'] = function($c) {
     return MgCsvRestAdapter::GetDocumentor();
 };

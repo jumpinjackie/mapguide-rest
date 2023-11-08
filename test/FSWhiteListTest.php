@@ -20,13 +20,16 @@
 require_once dirname(__FILE__)."/../app/util/whitelist.php";
 require_once dirname(__FILE__)."/TestUtils.php";
 
-class FSWhiteListTest extends PHPUnit_Framework_TestCase
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
+class FSWhiteListTest extends TestCase
 {
     private $actions;
     private $representations;
     private $testIds;
     
-    public function __construct() {
+    protected function set_up() {
+        parent::set_up();
         $this->actions = array(
             "GETCONNECTIONPROPERTYVALUES",
             "ENUMERATEDATASTORES",
@@ -276,18 +279,12 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
         
         $this->assertEquals("text/xml", $everyoneGroupBr->GetMimeType());
         $this->assertEquals($everyoneGroupXml, $everyoneGroupBr->ToString());
-        $site = $this->getMockBuilder("MgSite")->getMock();
-        
-        $site->method("EnumerateGroups")
-            ->will($this->returnValue($everyoneGroupBr));
-        
         $roleMethodMap = array(
-            array("Author", new FakeStringCollection(array("Authors"))),
-            array("Anonymous", new FakeStringCollection(array("Users"))),
-            array("Administrator", new FakeStringCollection(array("Administrator")))
+            "Author" => new FakeStringCollection(array("Authors")),
+            "Anonymous" => new FakeStringCollection(array("Users")),
+            "Administrator" => new FakeStringCollection(array("Administrator"))
         );
-        $site->method("EnumerateRoles")
-            ->will($this->returnValueMap($roleMethodMap));
+        $site = TestUtils::mockSite($this, $everyoneGroupBr, $roleMethodMap);
         
         //Everything not parcels is forbidden
         //Any parcel action in the list with any representation is allowed if the calling user is part of any of the users/groups/roles specified
@@ -374,18 +371,12 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
         
         $this->assertEquals("text/xml", $everyoneGroupBr->GetMimeType());
         $this->assertEquals($everyoneGroupXml, $everyoneGroupBr->ToString());
-        $site = $this->getMockBuilder("MgSite")->getMock();
-        
-        $site->method("EnumerateGroups")
-            ->will($this->returnValue($everyoneGroupBr));
-        
         $roleMethodMap = array(
-            array("Author", new FakeStringCollection(array("Authors"))),
-            array("Anonymous", new FakeStringCollection(array("Users"))),
-            array("Administrator", new FakeStringCollection(array("Administrator")))
+            "Author" => new FakeStringCollection(array("Authors")),
+            "Anonymous" => new FakeStringCollection(array("Users")),
+            "Administrator" => new FakeStringCollection(array("Administrator"))
         );
-        $site->method("EnumerateRoles")
-            ->will($this->returnValueMap($roleMethodMap));
+        $site = TestUtils::mockSite($this, $everyoneGroupBr, $roleMethodMap);
         
         //Everything not parcels is forbidden
         //Any parcel action in the list with any representation is allowed if the calling user is part of any of the users/groups/roles specified
@@ -490,18 +481,12 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
         
         $this->assertEquals("text/xml", $everyoneGroupBr->GetMimeType());
         $this->assertEquals($everyoneGroupXml, $everyoneGroupBr->ToString());
-        $site = $this->getMockBuilder("MgSite")->getMock();
-        
-        $site->method("EnumerateGroups")
-            ->will($this->returnValue($everyoneGroupBr));
-        
         $roleMethodMap = array(
-            array("Author", new FakeStringCollection(array("Author"))),
-            array("Anonymous", new FakeStringCollection(array("Users"))),
-            array("Administrator", new FakeStringCollection(array("Administrator")))
+            "Author" => new FakeStringCollection(array("Author")),
+            "Anonymous" => new FakeStringCollection(array("Users")),
+            "Administrator" => new FakeStringCollection(array("Administrator"))
         );
-        $site->method("EnumerateRoles")
-            ->will($this->returnValueMap($roleMethodMap));
+        $site = TestUtils::mockSite($this, $everyoneGroupBr, $roleMethodMap);
         
         //Everything not parcels is forbidden
         //Any parcel action in the list with any representation is allowed if the calling user is part of any of the users/groups/roles specified
@@ -554,18 +539,12 @@ class FSWhiteListTest extends PHPUnit_Framework_TestCase
         
         $this->assertEquals("text/xml", $everyoneGroupBr->GetMimeType());
         $this->assertEquals($everyoneGroupXml, $everyoneGroupBr->ToString());
-        $site = $this->getMockBuilder("MgSite")->getMock();
-        
-        $site->method("EnumerateGroups")
-            ->will($this->returnValue($everyoneGroupBr));
-        
         $roleMethodMap = array(
-            array("Author", new FakeStringCollection(array("Author"))),
-            array("Anonymous", new FakeStringCollection(array("Users"))),
-            array("Administrator", new FakeStringCollection(array("Administrator")))
+            "Author" => new FakeStringCollection(array("Author")),
+            "Anonymous" => new FakeStringCollection(array("Users")),
+            "Administrator" => new FakeStringCollection(array("Administrator"))
         );
-        $site->method("EnumerateRoles")
-            ->will($this->returnValueMap($roleMethodMap));
+        $site = TestUtils::mockSite($this, $everyoneGroupBr, $roleMethodMap);
         
         //Everything not parcels is subject to the global rules
         //Any parcel action in the list with any representation is allowed if the calling user is part of any of the users/groups/roles specified

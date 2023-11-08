@@ -28,7 +28,7 @@ class MgWktGeometryOutputFormatter extends MgGeometryOutputFormatter
         $this->wktRw = new MgWktReaderWriter();
     }
 
-    protected function OutputGeom($geom, $reader) {
+    protected function OutputGeom(MgGeometry $geom, IReader $reader) {
         return $this->wktRw->Write($geom);
     }
 }

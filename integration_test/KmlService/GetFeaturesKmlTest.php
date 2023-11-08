@@ -21,8 +21,8 @@ require_once dirname(__FILE__)."/../ServiceTest.php";
 require_once dirname(__FILE__)."/../Config.php";
 
 class GetFeaturesKmlTest extends ServiceTest {
-    protected function setUp() {
-        parent::setUp();
+    protected function set_up() {
+        parent::set_up();
         $resp = $this->apiTest("/services/copyresource", "POST", array(
             "session" => $this->anonymousSessionId,
             "source" => "Library://Samples/Sheboygan/Layers/Districts.LayerDefinition",
@@ -31,8 +31,8 @@ class GetFeaturesKmlTest extends ServiceTest {
         ));
         $this->assertStatusCodeIs(200, $resp);
     }
-    protected function tearDown() {
-        parent::tearDown();
+    protected function tear_down() {
+        parent::tear_down();
     }
     private function getSessionLayerPart() {
         return "/session/" . $this->anonymousSessionId . "/Districts.LayerDefinition";
@@ -45,68 +45,68 @@ class GetFeaturesKmlTest extends ServiceTest {
 
     private function __testBase($lyrPart) {
         if (!$this->isCorsTesting()) {
-            $resp = $this->apiTestAnon("$lyrPart/kmlfeatures", "GET", array());
+            $resp = $this->apiTestAnon("$lyrPart/kmlfeatures.kml", "GET", array());
             $this->assertStatusCodeIs(400, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
             $this->assertTrue(strpos($resp->getContent(), "mapagent/mapagent.fcgi") === FALSE, "Expected no mapagent callback urls in response");
 
-            $resp = $this->apiTestAdmin("$lyrPart/kmlfeatures", "GET", array());
+            $resp = $this->apiTestAdmin("$lyrPart/kmlfeatures.kml", "GET", array());
             $this->assertStatusCodeIs(400, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
             $this->assertTrue(strpos($resp->getContent(), "mapagent/mapagent.fcgi") === FALSE, "Expected no mapagent callback urls in response");
 
-            $resp = $this->apiTest("$lyrPart/kmlfeatures", "GET", array());
+            $resp = $this->apiTest("$lyrPart/kmlfeatures.kml", "GET", array());
             $this->assertStatusCodeIs(400, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
             $this->assertTrue(strpos($resp->getContent(), "mapagent/mapagent.fcgi") === FALSE, "Expected no mapagent callback urls in response");
 
-            $resp = $this->apiTestAnon("$lyrPart/kmlfeatures", "GET", array("width" => 640));
+            $resp = $this->apiTestAnon("$lyrPart/kmlfeatures.kml", "GET", array("width" => 640));
             $this->assertStatusCodeIs(400, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
 
-            $resp = $this->apiTestAdmin("$lyrPart/kmlfeatures", "GET", array("width" => 640));
+            $resp = $this->apiTestAdmin("$lyrPart/kmlfeatures.kml", "GET", array("width" => 640));
             $this->assertStatusCodeIs(400, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
 
-            $resp = $this->apiTest("$lyrPart/kmlfeatures", "GET", array("width" => 640));
+            $resp = $this->apiTest("$lyrPart/kmlfeatures.kml", "GET", array("width" => 640));
             $this->assertStatusCodeIs(400, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
 
-            $resp = $this->apiTestAnon("$lyrPart/kmlfeatures", "GET", array("width" => 640, "height" => 480));
+            $resp = $this->apiTestAnon("$lyrPart/kmlfeatures.kml", "GET", array("width" => 640, "height" => 480));
             $this->assertStatusCodeIs(400, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
 
-            $resp = $this->apiTestAdmin("$lyrPart/kmlfeatures", "GET", array("width" => 640, "height" => 480));
+            $resp = $this->apiTestAdmin("$lyrPart/kmlfeatures.kml", "GET", array("width" => 640, "height" => 480));
             $this->assertStatusCodeIs(400, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
 
-            $resp = $this->apiTest("$lyrPart/kmlfeatures", "GET", array("width" => 640, "height" => 480));
+            $resp = $this->apiTest("$lyrPart/kmlfeatures.kml", "GET", array("width" => 640, "height" => 480));
             $this->assertStatusCodeIs(400, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
 
-            $resp = $this->apiTestAnon("$lyrPart/kmlfeatures", "GET", array("width" => 640, "height" => 480, "draworder" => 1));
+            $resp = $this->apiTestAnon("$lyrPart/kmlfeatures.kml", "GET", array("width" => 640, "height" => 480, "draworder" => 1));
             $this->assertStatusCodeIs(400, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
 
-            $resp = $this->apiTestAdmin("$lyrPart/kmlfeatures", "GET", array("width" => 640, "height" => 480, "draworder" => 1));
+            $resp = $this->apiTestAdmin("$lyrPart/kmlfeatures.kml", "GET", array("width" => 640, "height" => 480, "draworder" => 1));
             $this->assertStatusCodeIs(400, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
 
-            $resp = $this->apiTest("$lyrPart/kmlfeatures", "GET", array("width" => 640, "height" => 480, "draworder" => 1));
+            $resp = $this->apiTest("$lyrPart/kmlfeatures.kml", "GET", array("width" => 640, "height" => 480, "draworder" => 1));
             $this->assertStatusCodeIs(400, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
 
-            $resp = $this->apiTestAnon("$lyrPart/kmlfeatures", "GET", array("width" => 640, "height" => 480, "draworder" => 1, "bbox" => "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569"));
+            $resp = $this->apiTestAnon("$lyrPart/kmlfeatures.kml", "GET", array("width" => 640, "height" => 480, "draworder" => 1, "bbox" => "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569"));
             $this->assertStatusCodeIs(200, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
             $this->assertTrue(strpos($resp->getContent(), "mapagent/mapagent.fcgi") === FALSE, "Expected no mapagent callback urls in response");
 
-            $resp = $this->apiTestAdmin("$lyrPart/kmlfeatures", "GET", array("width" => 640, "height" => 480, "draworder" => 1, "bbox" => "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569"));
+            $resp = $this->apiTestAdmin("$lyrPart/kmlfeatures.kml", "GET", array("width" => 640, "height" => 480, "draworder" => 1, "bbox" => "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569"));
             $this->assertStatusCodeIs(200, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
             $this->assertTrue(strpos($resp->getContent(), "mapagent/mapagent.fcgi") === FALSE, "Expected no mapagent callback urls in response");
 
-            $resp = $this->apiTest("$lyrPart/kmlfeatures", "GET", array("width" => 640, "height" => 480, "draworder" => 1, "bbox" => "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569"));
+            $resp = $this->apiTest("$lyrPart/kmlfeatures.kml", "GET", array("width" => 640, "height" => 480, "draworder" => 1, "bbox" => "-87.8779085915893,43.63163894079797,-87.58662241010836,43.81974480009569"));
             $this->assertStatusCodeIs(200, $resp);
             $this->assertMimeType(Configuration::MIME_KML, $resp);
             $this->assertTrue(strpos($resp->getContent(), "mapagent/mapagent.fcgi") === FALSE, "Expected no mapagent callback urls in response");

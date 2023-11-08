@@ -42,7 +42,7 @@ class MgCzmlResult
     private $lineStyleNo;
     private $areaStyleNo;
 
-    public function __construct($featSvc, $fsId, $className, $query, $limit, $baseFilter, $vlNode, $writer = NULL) {
+    public function __construct(MgFeatureService $featSvc, MgResourceIdentifier $fsId, /*php_string*/ $className, MgFeatureQueryOptions $query, /*php_int*/ $limit, /*php_string*/ $baseFilter, DOMNode $vlNode, MgChunkWriter $writer = NULL) {
         $this->featSvc = $featSvc;
         $this->limit = $limit;
         $this->fsId = $fsId;
@@ -54,18 +54,15 @@ class MgCzmlResult
         $this->pointStyleNo = 1;
         $this->lineStyleNo = 1;
         $this->areaStyleNo = 1;
-        if ($writer != null)
-            $this->writer = $writer;
-        else
-            $this->writer = new MgHttpChunkWriter();
+        $this->writer = $writer;
     }
 
-    public function CheckAndSetDownloadHeaders($app, $format) {
-        $downloadFlag = $app->request->params("download");
+    public function CheckAndSetDownloadHeaders(IAppServices $app, /*php_string*/ $format) {
+        $downloadFlag = $app->GetRequestParameter("download");
         if ($downloadFlag === "1" || $downloadFlag === "true") {
             $fn = "download";
-            if ($app->request->params("downloadname"))
-                $fn = $app->request->params("downloadname");
+            if ($app->GetRequestParameter("downloadname"))
+                $fn = $app->GetRequestParameter("downloadname");
             $ext = $format;
             if ($format == "geojson")
                 $ext = "json";
@@ -73,7 +70,7 @@ class MgCzmlResult
         }
     }
 
-    public function SetTransform($tx) {
+    public function SetTransform(MgTransform $tx) {
         $this->transform = $tx;
     }
 
@@ -98,7 +95,7 @@ class MgCzmlResult
         return $style;
     }
 
-    private function CreatePointStyle($query, $ruleNode) {
+    private function CreatePointStyle(MgFeatureQueryOptions $query, DOMNode $ruleNode) {
         $style = new stdClass();
         $sym2DNodes = $ruleNode->getElementsByTagName("PointSymbolization2D");
         $sym2DNode = $sym2DNodes->item(0);
@@ -143,7 +140,7 @@ class MgCzmlResult
         return $style;
     }
 
-    private function CreateLineStyle($query, $ruleNode) {
+    private function CreateLineStyle(MgFeatureQueryOptions $query, DOMNode $ruleNode) {
         $style = new stdClass();
         $sym2DNodes = $ruleNode->getElementsByTagName("LineSymbolization2D");
         $sym2DNode = $sym2DNodes->item(0);
@@ -171,7 +168,7 @@ class MgCzmlResult
         return $style;
     }
 
-    private function CreateAreaStyle($query, $ruleNode) {
+    private function CreateAreaStyle(MgFeatureQueryOptions $query, DOMNode $ruleNode) {
         $style = new stdClass();
         $sym2DNodes = $ruleNode->getElementsByTagName("AreaSymbolization2D");
         $sym2DNode = $sym2DNodes->item(0);

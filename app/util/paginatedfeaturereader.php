@@ -35,7 +35,7 @@ class MgPaginatedFeatureReader
 
     private $actuallyEndOfReader;
 
-    public function __construct($reader, $pageSize, $pageNo, $total = -1) {
+    public function __construct(MgFeatureReader $reader, /*php_int*/ $pageSize, /*php_int*/ $pageNo, /*php_int*/ $total = -1) {
         $this->innerReader = $reader;
         $this->pageSize = $pageSize;
         $this->pageNo = $pageNo;
@@ -108,7 +108,7 @@ class MgPaginatedFeatureReader
         return $this->innerReader->GetClassDefinition();
     }
 
-    public function GetFeatureObject($propNameOrIndex) {
+    public function GetFeatureObject(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetFeatureObject($propNameOrIndex);
     }
 
@@ -116,43 +116,43 @@ class MgPaginatedFeatureReader
         $this->innerReader->Close();
     }
 
-    public function GetBLOB($propNameOrIndex) {
+    public function GetBLOB(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetBLOB($propNameOrIndex);
     }
 
-    public function GetBoolean($propNameOrIndex) {
+    public function GetBoolean(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetBoolean($propNameOrIndex);
     }
 
-    public function GetByte($propNameOrIndex) {
+    public function GetByte(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetByte($propNameOrIndex);
     }
 
-    public function GetCLOB($propNameOrIndex) {
+    public function GetCLOB(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetCLOB($propNameOrIndex);
     }
 
-    public function GetDateTime($propNameOrIndex) {
+    public function GetDateTime(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetDateTime($propNameOrIndex);
     }
 
-    public function GetDouble($propNameOrIndex) {
+    public function GetDouble(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetDouble($propNameOrIndex);
     }
 
-    public function GetGeometry($propNameOrIndex) {
+    public function GetGeometry(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetGeometry($propNameOrIndex);
     }
 
-    public function GetInt16($propNameOrIndex) {
+    public function GetInt16(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetInt16($propNameOrIndex);
     }
 
-    public function GetInt32($propNameOrIndex) {
+    public function GetInt32(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetInt32($propNameOrIndex);
     }
 
-    public function GetInt64($propNameOrIndex) {
+    public function GetInt64(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetInt64($propNameOrIndex);
     }
 
@@ -160,19 +160,19 @@ class MgPaginatedFeatureReader
         return $this->innerReader->GetPropertyCount();
     }
 
-    public function GetPropertyIndex($propName) {
+    public function GetPropertyIndex(/*php_string*/ $propName) {
         return $this->innerReader->GetPropertyIndex($propName);
     }
 
-    public function GetPropertyName($propIndex) {
+    public function GetPropertyName(/*php_int*/ $propIndex) {
         return $this->innerReader->GetPropertyName($propIndex);
     }
 
-    public function GetPropertyType($propNameOrIndex) {
+    public function GetPropertyType(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetPropertyType($propNameOrIndex);
     }
 
-    public function GetRaster($propNameOrIndex) {
+    public function GetRaster(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetRaster($propNameOrIndex);
     }
 
@@ -180,15 +180,15 @@ class MgPaginatedFeatureReader
         return $this->innerReader->GetReaderType();
     }
 
-    public function GetSingle($propNameOrIndex) {
+    public function GetSingle(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetSingle($propNameOrIndex);
     }
 
-    public function GetString($propNameOrIndex) {
+    public function GetString(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->GetString($propNameOrIndex);
     }
 
-    public function IsNull($propNameOrIndex) {
+    public function IsNull(/*php_string|php_int*/ $propNameOrIndex) {
         return $this->innerReader->IsNull($propNameOrIndex);
     }
 }

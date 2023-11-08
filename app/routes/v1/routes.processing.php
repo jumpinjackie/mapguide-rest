@@ -19,6 +19,7 @@
 
 require_once dirname(__FILE__)."/../../controller/processingcontroller.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
+require_once dirname(__FILE__)."/../../core/app.php";
 
 /**
  *     @SWG\Post(
@@ -38,8 +39,8 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/processing/buffer", function() use ($app) {
-    $ctrl = new MgProcessingController($app);
+$app->post("/processing/buffer", function() {
+    $ctrl = new MgProcessingController($this->get("AppServices"));
     $ctrl->Buffer();
 });
 
@@ -59,8 +60,8 @@ $app->post("/processing/buffer", function() use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/processing/difference", function() use ($app) {
-    $ctrl = new MgProcessingController($app);
+$app->post("/processing/difference", function() {
+    $ctrl = new MgProcessingController($this->get("AppServices"));
     $ctrl->Difference();
 });
 
@@ -80,8 +81,8 @@ $app->post("/processing/difference", function() use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/processing/intersection", function() use ($app) {
-    $ctrl = new MgProcessingController($app);
+$app->post("/processing/intersection", function() {
+    $ctrl = new MgProcessingController($this->get("AppServices"));
     $ctrl->Intersection();
 });
 
@@ -101,8 +102,8 @@ $app->post("/processing/intersection", function() use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/processing/symmetricdifference", function() use ($app) {
-    $ctrl = new MgProcessingController($app);
+$app->post("/processing/symmetricdifference", function() {
+    $ctrl = new MgProcessingController($this->get("AppServices"));
     $ctrl->SymmetricDifference();
 });
 
@@ -122,8 +123,8 @@ $app->post("/processing/symmetricdifference", function() use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/processing/union", function() use ($app) {
-    $ctrl = new MgProcessingController($app);
+$app->post("/processing/union", function() {
+    $ctrl = new MgProcessingController($this->get("AppServices"));
     $ctrl->Union();
 });
 
@@ -142,7 +143,7 @@ $app->post("/processing/union", function() use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/processing/spatialpredicate", function() use ($app) {
-    $ctrl = new MgProcessingController($app);
+$app->post("/processing/spatialpredicate", function() {
+    $ctrl = new MgProcessingController($this->get("AppServices"));
     $ctrl->SpatialPredicate();
 });

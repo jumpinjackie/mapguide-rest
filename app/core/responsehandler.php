@@ -19,16 +19,20 @@
 
 require_once dirname(__FILE__)."/../util/utils.php";
 require_once dirname(__FILE__)."/../util/readerchunkedresult.php";
+require_once dirname(__FILE__)."/interfaces.php";
+require_once dirname(__FILE__)."/bytereaderstreamadapter.php";
+require_once dirname(__FILE__)."/stringcontentadapter.php";
+require_once dirname(__FILE__)."/aggregatecontentadapter.php";
 
 abstract class MgResponseHandler
 {
     protected $app;
 
-    protected function __construct($app) {
+    protected function __construct(IAppServices $app) {
         $this->app = $app;
     }
 
-    protected function CollectXslParameters($param) {
+    protected function CollectXslParameters(MgHttpRequestParam $param) {
         $names = $param->GetParameterNames();
         if ($names == null || $names->GetCount() == 0)
             return array();
@@ -44,7 +48,7 @@ abstract class MgResponseHandler
         return $values;
     }
 
-    public function ExecuteHttpRequest($req, $ovHandler = NULL) {
+    public function ExecuteHttpRequest(MgHttpRequest $req, /*php_callable*/ $ovHandler = NULL) {
         $param = $req->GetRequestParam();
         $origMimeType = $param->GetParameterValue("FORMAT");
         try {
@@ -81,29 +85,29 @@ abstract class MgResponseHandler
                     $resultObj = $result->GetResultObject();
                     if ($resultObj != null) {
                         $mimeType = $result->GetResultContentType();
-                        $this->app->response->headers->set("Content-Type", $mimeType);
+                        $this->app->SetResponseHeader("Content-Type", $mimeType);
                         //Set download response headers if specified
                         if ($bDownload === true) {
                             $filebasename = "download";
                             if ($param->ContainsParameter("X-DOWNLOAD-ATTACHMENT-NAME")) {
                                 $filebasename = $param->GetParameterValue("X-DOWNLOAD-ATTACHMENT-NAME");
                             }
-                            $this->app->response->headers->set("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($filebasename, $mimeType));
+                            $this->app->SetResponseHeader("Content-Disposition", "attachment; filename=".MgUtils::GetFileNameFromMimeType($filebasename, $mimeType));
                         }
                         if ($resultObj instanceof MgByteReader) {
                             if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
                                 if ($result->GetResultContentType() === MgMimeType::Xml && $param->ContainsParameter("XSLSTYLESHEET")) {
                                     $body = MgUtils::XslTransformByteReader($this->app, $resultObj, $param->GetParameterValue("XSLSTYLESHEET"), $this->CollectXslParameters($param));
-                                    $this->app->response->header("Content-Type", MgMimeType::Json);
-                                    $this->app->response->setBody(MgUtils::Xml2Json($body));
+                                    $this->app->SetResponseHeader("Content-Type", MgMimeType::Json);
+                                    $this->app->SetResponseBody(MgUtils::Xml2Json($body));
                                 } else {
                                     $this->OutputXmlByteReaderAsJson($resultObj);
                                 }
                             } else {
                                 if ($result->GetResultContentType() === MgMimeType::Xml && $param->ContainsParameter("XSLSTYLESHEET")) {
                                     if ($param->ContainsParameter("X-OVERRIDE-CONTENT-TYPE"))
-                                        $this->app->response->header("Content-Type", $param->GetParameterValue("X-OVERRIDE-CONTENT-TYPE"));
-                                    $this->app->response->setBody(MgUtils::XslTransformByteReader($this->app, $resultObj, $param->GetParameterValue("XSLSTYLESHEET"), $this->CollectXslParameters($param)));
+                                        $this->app->SetResponseHeader("Content-Type", $param->GetParameterValue("X-OVERRIDE-CONTENT-TYPE"));
+                                    $this->app->SetResponseBody(MgUtils::XslTransformByteReader($this->app, $resultObj, $param->GetParameterValue("XSLSTYLESHEET"), $this->CollectXslParameters($param)));
                                 } else {
                                     $this->OutputByteReader($resultObj, ($param->GetParameterValue("X-CHUNK-RESPONSE") === "true"), ($param->GetParameterValue("X-PREPEND-XML-PROLOG") === "true"));
                                 }
@@ -114,9 +118,9 @@ abstract class MgResponseHandler
                             $fmt = "xml";
                             if ($param->GetParameterValue("X-FORCE-JSON-CONVERSION") === "true") {
                                 $fmt = "json";
-                                $this->app->response->header("Content-Type", MgMimeType::Json);
+                                $this->app->SetResponseHeader("Content-Type", MgMimeType::Json);
                             } else {
-                                $this->app->response->header("Content-Type", MgMimeType::Xml);
+                                $this->app->SetResponseHeader("Content-Type", MgMimeType::Xml);
                             }
                             $body = null;
                             switch ($resultObj->GetType())
@@ -132,7 +136,7 @@ abstract class MgResponseHandler
                                     break;
                             }
                             if ($body != null) {
-                                $this->app->response->setBody($body);
+                                $this->app->SetResponseBody($body);
                             }
                         } else if (method_exists($resultObj, "ToXml")) {
                             $byteReader = $resultObj->ToXml();
@@ -142,7 +146,7 @@ abstract class MgResponseHandler
                                 $this->OutputByteReader($byteReader, ($param->GetParameterValue("X-CHUNK-RESPONSE") === "true"));
                             }
                         } else {
-                            $this->ServerError($this->app->localizer->getText("E_DONT_KNOW_HOW_TO_OUTPUT", $resultObj->ToString()));
+                            $this->ServerError($this->app->GetLocalizedText("E_DONT_KNOW_HOW_TO_OUTPUT", $resultObj->ToString()));
                         }
                     }
                 } else {
@@ -165,17 +169,17 @@ abstract class MgResponseHandler
         }
     }
 
-    public function GetMimeTypeForFormat($format) {
+    public function GetMimeTypeForFormat(/*php_string*/ $format) {
         return MgUtils::GetMimeTypeForFormat($format);
     }
 
-    private function OutputError($result, $mimeType = MgMimeType::Html) {
+    private function OutputError(MgHttpResult $result, /*php_string*/ $mimeType = MgMimeType::Html) {
         $statusMessage = $result->GetHttpStatusMessage();
         $e = new Exception();
         if ($statusMessage === "MgAuthenticationFailedException" || $statusMessage === "MgUnauthorizedAccessException" || $statusMessage == "MgPermissionDeniedException") {
             $this->Unauthorized($mimeType);
         } else {
-            $this->app->response->header("Content-Type", $mimeType);
+            $this->app->SetResponseHeader("Content-Type", $mimeType);
             //Amend error code for certain classes of errors
             $status = 500;
             if ($statusMessage === "MgResourceNotFoundException" || $statusMessage === "MgResourceDataNotFoundException") {
@@ -207,39 +211,16 @@ abstract class MgResponseHandler
         return $clientIp;
     }
 
-    /**
-     * Method: GetRequestParameter
-     *
-     * Convenience method to get a parameter by name. This method tries to get the named parameter:
-     *  1. As-is
-     *  2. As upper-case
-     *  3. As lower-case
-     *
-     * In that particular order, if none could be found after these attempts, the defaultValue is returned
-     * instead, otherwise the matching parameter value is returned
-     *
-     * Parameters:
-     *
-     *   String key          - [String/The parameter name]
-     *   String defaultValue - [String/The default value]
-     *
-     * Returns:
-     *
-     *   String - the matching parameter value or the default value if no matches can be found
-     */
-    public function GetRequestParameter($key, $defaultValue = "") {
-        $value = $this->app->request->params($key);
-        if ($value == null)
-            $value = $this->app->request->params(strtoupper($key));
-        if ($value == null)
-            $value = $this->app->request->params(strtolower($key));
-        if ($value == null)
-            $value = $defaultValue;
-
-        return $value;
+    public function GetBooleanRequestParameter($name, $defaultValue) {
+        $val = strtolower($this->app->GetRequestParameter($name, $defaultValue));
+        if ($val == "true")
+            $val = "1";
+        else if ($val == "false")
+            $val = "0";
+        return $val;
     }
 
-    protected function GetFileUploadPath($paramName) {
+    protected function GetFileUploadPath(/*php_string*/ $paramName) {
         if (!array_key_exists($paramName, $_FILES))
             return null;
         $err = $_FILES[$paramName]["error"];
@@ -247,13 +228,13 @@ abstract class MgResponseHandler
         if ($err == 0) {
             $fileName = $_FILES[$paramName]["tmp_name"];
         } else {
-            $this->app->response->setStatus(500);
-            $this->app->response->setBody($this->app->localizer->getText("E_PHP_FILE_UPLOAD_ERROR", $err));
+            $this->app->SetResponseStatus(500);
+            $this->app->SetResponseBody($this->app->GetLocalizedText("E_PHP_FILE_UPLOAD_ERROR", $err));
         }
         return $fileName;
     }
 
-    protected function OutputUpdateFeaturesResult($commands, $result, $classDef, $convertToJson = false) {
+    protected function OutputUpdateFeaturesResult(MgFeatureCommandCollection $commands, MgPropertyCollection $result, MgClassDefinition $classDef, /*php_bool*/ $convertToJson = false) {
         $bHasError = false;
         $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?><UpdateFeaturesResult>";
         $ccount = $commands->GetCount();
@@ -355,32 +336,47 @@ abstract class MgResponseHandler
         }
         $output .= "</UpdateFeaturesResult>";
         if ($bHasError === true) {
-            $this->app->response->setStatus(500);
+            $this->app->SetResponseStatus(500);
         }
         if ($convertToJson) {
             $output = MgUtils::Xml2Json($output);
-            $this->app->response->header("Content-Type", MgMimeType::Json);
-            $this->app->response->write($output);
+            $this->app->SetResponseHeader("Content-Type", MgMimeType::Json);
+            $this->app->WriteResponseContent($output);
         } else {
-            $this->app->response->header("Content-Type", MgMimeType::Xml);
-            $this->app->response->write($output);
+            $this->app->SetResponseHeader("Content-Type", MgMimeType::Xml);
+            $this->app->WriteResponseContent($output);
         }
     }
 
-    protected function OutputXmlByteReaderAsJson($byteReader) {
+    protected function OutputXmlByteReaderAsJson(MgByteReader $byteReader) {
         $content = MgUtils::Xml2Json($byteReader->ToString());
-        $this->app->response->header("Content-Type", MgMimeType::Json);
-        $this->app->response->write($content);
+        $this->app->SetResponseHeader("Content-Type", MgMimeType::Json);
+        $this->app->WriteResponseContent($content);
     }
 
-    protected function OutputByteReader($byteReader, $bChunkResult = false, $bPrependXmlProlog = false) {
-        $mimeType = $byteReader->GetMimeType();
+    const XML_PROLOG = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
-        $writer = null;
-        if ($bChunkResult)
-            $writer = new MgHttpChunkWriter();
-        else
-            $writer = new MgSlimChunkWriter($this->app);
+    protected function OutputByteReader(MgByteReader $byteReader, /*php_bool*/ $bChunkResult = false, /*php_bool*/ $bPrependXmlProlog = false) {
+        $mimeType = $byteReader->GetMimeType();
+        $this->app->SetResponseHeader("Content-Type", $mimeType);
+        $bNeedXmlProlog = $mimeType == MgMimeType::Xml && $bPrependXmlProlog;
+        if (!$bChunkResult) {
+            $rdrLen = $byteReader->GetLength();
+            if ($bNeedXmlProlog) {
+                $rdrLen += strlen(self::XML_PROLOG);
+            }
+            $this->app->SetResponseHeader("Content-Length", $rdrLen);
+        }
+        if ($bNeedXmlProlog) {
+            $this->app->SetResponseBody(new AggregateContentAdapter([
+                new StringContentAdapter(self::XML_PROLOG),
+                new MgByteReaderStreamAdapter($byteReader)
+            ]));
+        } else {
+            $this->app->SetResponseBody(new MgByteReaderStreamAdapter($byteReader));
+        }
+        /*
+        $writer = new MgSlimChunkWriter($this->app);
 
         $writer->SetHeader("Content-Type", $mimeType);
         if (!$bChunkResult) {
@@ -402,9 +398,10 @@ abstract class MgResponseHandler
             }
         } while ($len > 0);
         $writer->EndChunking();
+        */
     }
 
-    protected function ValidateValueInDomain($value, $allowedValues = null, $mimeType = MgMimeType::Html) {
+    protected function ValidateValueInDomain(/*php_string*/ $value, array $allowedValues = null, /*php_string*/ $mimeType = MgMimeType::Html) {
         if ($allowedValues == null) {
             return $value;
         } else {
@@ -415,10 +412,11 @@ abstract class MgResponseHandler
                     return $fmt;
             }
         }
-        $this->BadRequest($this->app->localizer->getText("E_UNRECOGNIZED_VALUE_IN_DOMAIN", $value, implode(", ", $allowedValues)), $mimeType);
+        $msg = $this->app->GetLocalizedText("E_UNRECOGNIZED_VALUE_IN_DOMAIN", $value, implode(", ", $allowedValues));
+        $this->BadRequest($msg, $mimeType);
     }
 
-    protected function ValidateRepresentation($format, $validRepresentations = null) {
+    protected function ValidateRepresentation(/*php_string*/ $format, array $validRepresentations = null) {
         if ($validRepresentations == null) {
             $this->app->requestedMimeType = $this->GetMimeTypeForFormat($format);
             return $format;
@@ -433,15 +431,16 @@ abstract class MgResponseHandler
             }
         }
         //Since we dont recognize the representation, we don't exactly know the ideal output format of this error. So default to HTML
-        $this->BadRequest($this->app->localizer->getText("E_UNSUPPORTED_REPRESENTATION", $format), MgMimeType::Html);
+        $msg = $this->app->GetLocalizedText("E_UNSUPPORTED_REPRESENTATION", $format);
+        $this->BadRequest($msg, MgMimeType::Html);
     }
 
-    protected function OutputMgPropertyCollection($props, $mimeType = MgMimeType::Xml) {
+    protected function OutputMgPropertyCollection(MgPropertyCollection $props, /*php_string*/ $mimeType = MgMimeType::Xml) {
         $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PropertyCollection />";
         $count = $props->GetCount();
         $agfRw = null;
         $wktRw = null;
-        $this->app->response->header("Content-Type", $mimeType);
+        $this->app->SetResponseHeader("Content-Type", $mimeType);
         if ($count > 0) {
             $content = "<PropertyCollection>";
             for ($i = 0; $i < $count; $i++) {
@@ -516,11 +515,11 @@ abstract class MgResponseHandler
         if ($mimeType === MgMimeType::Json) {
             $content = MgUtils::Xml2Json($content);
         }
-        $this->app->response->header("Content-Type", $mimeType);
-        $this->app->response->setBody($content);
+        $this->app->SetResponseHeader("Content-Type", $mimeType);
+        $this->app->SetResponseBody($content);
     }
 
-    protected function OutputMgStringCollection($strCol, $mimeType = MgMimeType::Xml) {
+    protected function OutputMgStringCollection(MgStringCollection $strCol, /*php_string*/ $mimeType = MgMimeType::Xml) {
         $content = "<?xml version=\"1.0\" encoding=\"utf-8\"?><StringCollection />";
         if ($strCol != null) {
             // MgStringCollection::ToXml() doesn't seem to be reliable in PHP (bug?), so do this manually
@@ -535,86 +534,92 @@ abstract class MgResponseHandler
         if ($mimeType === MgMimeType::Json) {
             $content = MgUtils::Xml2Json($content);
         }
-        $this->app->response->header("Content-Type", $mimeType);
-        $this->app->response->setBody($content);
+        $this->app->SetResponseHeader("Content-Type", $mimeType);
+        $this->app->SetResponseBody($content);
     }
 
-    protected function OnException($ex, $mimeType = MgMimeType::Html) {
+    protected function OnException(MgException $ex, /*php_string*/ $mimeType = MgMimeType::Html) {
         $status = 500;
-        if ($ex instanceof MgAuthenticationFailedException || $ex instanceof MgUnauthorizedAccessException || $ex instanceof MgPermissionDeniedException) {
-            $status = 401;
-        } else if ($ex instanceof MgResourceNotFoundException || $ex instanceof MgResourceDataNotFoundException) {
-            $status = 404;
+        // Pre-MG4.0 code path
+        if (class_exists("MgAuthenticationFailedException") &&
+            class_exists("MgUnauthorizedAccessException") &&
+            //class_exists("MgPermissionDeniedException") && //BUG: This was never exposed to the public API bindings. Too late to fix now.
+            class_exists("MgResourceNotFoundException") &&
+            class_exists("MgResourceDataNotFoundException")) {
+            if ($ex instanceof MgAuthenticationFailedException || $ex instanceof MgUnauthorizedAccessException) { // || $ex instanceof MgPermissionDeniedException) {
+                $status = 401;
+            } else if ($ex instanceof MgResourceNotFoundException || $ex instanceof MgResourceDataNotFoundException) {
+                $status = 404;
+            }
+        } else {
+            $exCode = $ex->GetExceptionCode();
+            if ($exCode === MgExceptionCodes::MgAuthenticationFailedException || $exCode === MgExceptionCodes::MgUnauthorizedAccessException || $exCode === MgExceptionCodes::MgPermissionDeniedException) {
+                $status = 401;
+            } else if ($exCode === MgExceptionCodes::MgResourceNotFoundException || $exCode === MgExceptionCodes::MgResourceDataNotFoundException) {
+                $status = 404;
+            }
         }
-        $this->app->response->header("Content-Type", $mimeType);
+        $this->app->SetResponseHeader("Content-Type", $mimeType);
         $this->OutputException(get_class($ex), $ex->GetExceptionMessage(), $ex->GetDetails(), $ex->getTraceAsString(), $status, $mimeType);
     }
 
-    protected function FormatException($type, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
+    protected function FormatException(/*php_string*/ $type, /*php_string*/ $errorMessage, /*php_string*/ $details, /*php_string*/ $phpTrace, /*php_int*/ $status = 500, /*php_string*/ $mimeType = MgMimeType::Html) {
         return MgUtils::FormatException($this->app, $type, $errorMessage, $details, $phpTrace, $status, $mimeType);
     }
 
-    protected function OutputException($statusMessage, $errorMessage, $details, $phpTrace, $status = 500, $mimeType = MgMimeType::Html) {
+    protected function OutputException(/*php_string*/ $statusMessage, /*php_string*/ $errorMessage, /*php_string*/ $details, /*php_string*/ $phpTrace, /*php_int*/ $status = 500, /*php_string*/ $mimeType = MgMimeType::Html) {
         $errResponse = $this->FormatException($statusMessage, $errorMessage, $details, $phpTrace, $status, $mimeType);
-        $this->app->response->header("Content-Type", $mimeType);
-        $this->app->halt($status, $errResponse);
+        $this->app->Halt($status, $errResponse, $mimeType, false);
     }
 
-    public function BadRequest($msg, $mimeType = MgMimeType::Html) {
+    public function BadRequest(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
-        $errResponse = $this->FormatException("BadRequest", $this->app->localizer->getText("E_BAD_REQUEST"), $msg, $e->getTraceAsString(), 400, $mimeType);
-        $this->app->response->header("Content-Type", $mimeType);
-        $this->app->halt(400, $errResponse);
+        $errResponse = $this->FormatException("BadRequest", $this->app->GetLocalizedText("E_BAD_REQUEST"), $msg, $e->getTraceAsString(), 400, $mimeType);
+        $this->app->Halt(400, $errResponse, $mimeType, false);
     }
 
-    public function MethodNotSupported($method, $mimeType = MgMimeType::Html) {
+    public function MethodNotSupported(/*php_string*/ $method, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
-        $msg = $this->app->localizer->getText("E_METHOD_NOT_SUPPORTED_DESC", $method);
-        $errResponse = $this->FormatException("MethodNotSupported", $this->app->localizer->getText("E_METHOD_NOT_SUPPORTED"), $msg, $e->getTraceAsString(), 405, $mimeType);
-        $this->app->response->header("Content-Type", $mimeType);
-        $this->app->halt(405, $errResponse);
+        $msg = $this->app->GetLocalizedText("E_METHOD_NOT_SUPPORTED_DESC", $method);
+        $errResponse = $this->FormatException("MethodNotSupported", $this->app->GetLocalizedText("E_METHOD_NOT_SUPPORTED"), $msg, $e->getTraceAsString(), 405, $mimeType);
+        $this->app->Halt(405, $errResponse, $mimeType, false);
     }
 
-    public function NotFound($msg, $mimeType = MgMimeType::Html) {
+    public function NotFound(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
-        $errResponse = $this->FormatException("NotFound", $this->app->localizer->getText("E_NOT_FOUND"), $msg, $e->getTraceAsString(), 404, $mimeType);
-        $this->app->response->header("Content-Type", $mimeType);
-        $this->app->halt(404, $errResponse);
+        $errResponse = $this->FormatException("NotFound", $this->app->GetLocalizedText("E_NOT_FOUND"), $msg, $e->getTraceAsString(), 404, $mimeType);
+        $this->app->Halt(404, $errResponse, $mimeType, false);
     }
 
-    public function Forbidden($msg, $mimeType = MgMimeType::Html) {
+    public function Forbidden(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
-        $errResponse = $this->FormatException("Forbidden", $this->app->localizer->getText("E_FORBIDDEN"), $msg, $e->getTraceAsString(), 403, $mimeType);
-        $this->app->response->header("Content-Type", $mimeType);
-        $this->app->halt(403, $errResponse);
+        $errResponse = $this->FormatException("Forbidden", $this->app->GetLocalizedText("E_FORBIDDEN"), $msg, $e->getTraceAsString(), 403, $mimeType);
+        $this->app->Halt(403, $errResponse, $mimeType, false);
     }
 
-    public function ServerError($msg, $mimeType = MgMimeType::Html) {
+    public function ServerError(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
-        $errResponse = $this->FormatException("ServerError", $this->app->localizer->getText("E_SERVER_ERROR"), $msg, $e->getTraceAsString(), 500, $mimeType);
-        $this->app->response->header("Content-Type", $mimeType);
-        $this->app->halt(500, $errResponse);
+        $errResponse = $this->FormatException("ServerError", $this->app->GetLocalizedText("E_SERVER_ERROR"), $msg, $e->getTraceAsString(), 500, $mimeType);
+        $this->app->Halt(500, $errResponse, $mimeType, false);
     }
 
-    public function ServiceUnavailable($msg, $mimeType = MgMimeType::Html) {
+    public function ServiceUnavailable(/*php_string*/ $msg, /*php_string*/ $mimeType = MgMimeType::Html) {
         $e = new Exception();
-        $errResponse = $this->FormatException("ServiceUnavailable", $this->app->localizer->getText("E_SERVICE_UNAVAILABLE"), $msg, $e->getTraceAsString(), 503, $mimeType);
-        $this->app->response->header("Content-Type", $mimeType);
-        $this->app->halt(503, $errResponse);
+        $errResponse = $this->FormatException("ServiceUnavailable", $this->app->GetLocalizedText("E_SERVICE_UNAVAILABLE"), $msg, $e->getTraceAsString(), 503, $mimeType);
+        $this->app->Halt(503, $errResponse, $mimeType, false);
     }
 
-    public function Unauthorized($mimeType = MgMimeType::Html) {
+    public function Unauthorized(/*php_string*/ $mimeType = MgMimeType::Html) {
         //Send back 401
         //HACK: But don't put the WWW-Authenticate header so the test harness doesn't trip up
-        $fromTestHarness = $this->app->request->headers->get("x-mapguide-test-harness");
-        if ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE")
-            $this->app->response->header('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
+        $fromTestHarness = $this->app->GetRequestHeader("x-mapguide-test-harness");
+        $challenge = ($fromTestHarness == null || strtoupper($fromTestHarness) !== "TRUE");
+            //$this->app->SetResponseHeader('WWW-Authenticate', 'Basic realm="MapGuide REST Extension"');
         $e = new Exception();
-        $title = $this->app->localizer->getText("E_UNAUTHORIZED");
-        $message = $this->app->localizer->getText("E_UNAUTHORIZED_DESC");
+        $title = $this->app->GetLocalizedText("E_UNAUTHORIZED");
+        $message = $this->app->GetLocalizedText("E_UNAUTHORIZED_DESC");
         $errResponse = $this->FormatException("Unauthorized", $title, $message, $e->getTraceAsString(), 401, $mimeType);
 
-        $this->app->response->header("Content-Type", $mimeType);
-        $this->app->halt(401, $errResponse);
+        $this->app->Halt(401, $errResponse, $mimeType, $challenge);
     }
 }

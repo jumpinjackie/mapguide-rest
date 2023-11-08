@@ -19,6 +19,7 @@
 
 require_once dirname(__FILE__)."/../../controller/coordinatesystemcontroller.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
+require_once dirname(__FILE__)."/../../core/app.php";
 
 /**
  *     @SWG\Get(
@@ -33,9 +34,13 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/coordsys/baselibrary.:format", function($format) use ($app) {
+$app->get("/coordsys/baselibrary.{format}", function($req, $resp, $args) {
+    $format = $args['format'];
+    $app = $this->get("AppServices");
     $ctrl = new MgCoordinateSystemController($app);
     $ctrl->GetBaseLibrary($format);
+    return $app->Done();
+
 });
 /**
  *     @SWG\Post(
@@ -51,9 +56,12 @@ $app->get("/coordsys/baselibrary.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/coordsys/validatewkt.:format", function($format) use ($app) {
+$app->post("/coordsys/validatewkt.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgCoordinateSystemController($app);
-    $ctrl->ValidateWkt($format);
+    $ctrl->ValidateWkt($type);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -69,9 +77,12 @@ $app->post("/coordsys/validatewkt.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/coordsys/wkttoepsg.:format", function($format) use ($app) {
+$app->post("/coordsys/wkttoepsg.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgCoordinateSystemController($app);
-    $ctrl->WktToEpsg($format);
+    $ctrl->WktToEpsg($type);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -87,9 +98,12 @@ $app->post("/coordsys/wkttoepsg.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/coordsys/wkttomentor.:format", function($format) use ($app) {
+$app->post("/coordsys/wkttomentor.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgCoordinateSystemController($app);
-    $ctrl->WktToMentor($format);
+    $ctrl->WktToMentor($type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -104,13 +118,16 @@ $app->post("/coordsys/wkttomentor.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/coordsys/categories.:format", function($format) use ($app) {
+$app->get("/coordsys/categories.{format}", function($req, $resp, $args) {
+    $format = $args['format'];
+    $app = $this->get("AppServices");
     $ctrl = new MgCoordinateSystemController($app);
-    $ctrl->EnumerateCategories($format); 
+    $ctrl->EnumerateCategories($format);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
- *        path="/coordsys/category/{category}.{type}",
+ *        path="/coordsys/category.{type}/{category}",
  *        operationId="EnumerateCoordinateSystemsByCategory",
  *        summary="Enumerates coordinate systems under the specified category",
  *        tags={"coordsys"},
@@ -122,9 +139,13 @@ $app->get("/coordsys/categories.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/coordsys/category.:format/:category", function($format, $category) use ($app) {
+$app->get("/coordsys/category.{format}/{category}", function($req, $resp, $args) {
+    $format = $args['format'];
+    $category = $args['category'];
+    $app = $this->get("AppServices");
     $ctrl = new MgCoordinateSystemController($app);
     $ctrl->EnumerateCoordinateSystemsByCategory($category, $format);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -140,9 +161,13 @@ $app->get("/coordsys/category.:format/:category", function($format, $category) u
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/coordsys/mentor/:cscode/epsg.:format", function($cscode, $format) use ($app) {
+$app->get("/coordsys/mentor/{cscode}/epsg.{type}", function($req, $resp, $args) {
+    $cscode = $args['cscode'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgCoordinateSystemController($app);
-    $ctrl->ConvertCsCodeToEpsg($cscode, $format);
+    $ctrl->ConvertCsCodeToEpsg($cscode, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -158,9 +183,13 @@ $app->get("/coordsys/mentor/:cscode/epsg.:format", function($cscode, $format) us
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/coordsys/mentor/:cscode/wkt.:format", function($cscode, $format) use ($app) {
+$app->get("/coordsys/mentor/{cscode}/wkt.{type}", function($req, $resp, $args) {
+    $cscode = $args['cscode'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgCoordinateSystemController($app);
-    $ctrl->ConvertCsCodeToWkt($cscode, $format); 
+    $ctrl->ConvertCsCodeToWkt($cscode, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -176,9 +205,13 @@ $app->get("/coordsys/mentor/:cscode/wkt.:format", function($cscode, $format) use
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/coordsys/epsg/:epsg/mentor.:format", function($epsg, $format) use ($app) {
+$app->get("/coordsys/epsg/{epsg}/mentor.{type}", function($req, $resp, $args) {
+    $epsg = $args['epsg'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgCoordinateSystemController($app);
-    $ctrl->ConvertEpsgToCsCode($epsg, $format);
+    $ctrl->ConvertEpsgToCsCode($epsg, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -194,23 +227,27 @@ $app->get("/coordsys/epsg/:epsg/mentor.:format", function($epsg, $format) use ($
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/coordsys/epsg/:epsg/wkt.:format", function($epsg, $format) use ($app) {
+$app->get("/coordsys/epsg/{epsg}/wkt.{type}", function($req, $resp, $args) {
+    $epsg = $args['epsg'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgCoordinateSystemController($app);
-    $ctrl->ConvertEpsgToWkt($epsg, $format);
+    $ctrl->ConvertEpsgToWkt($epsg, $type);
+    return $app->Done();
 });
 /*
-$app->post("/coordsys/tomentor/:wkt+", function($wkt) use ($app) {
+$app->post("/coordsys/tomentor/:wkt+", function($wkt) {
     $wktStr = implode("/", $wkt);
     echo $wktStr;
     die;
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
     $ctrl->ConvertWktToCsCode($wktStr);
 });
-$app->post("/coordsys/toepsg/:wkt+", function($wkt) use ($app) {
+$app->post("/coordsys/toepsg/:wkt+", function($wkt) {
     $wktStr = implode("/", $wkt);
     echo $wktStr;
     die;
-    $ctrl = new MgCoordinateSystemController($app);
+    $ctrl = new MgCoordinateSystemController($this->get("AppServices"));
     $ctrl->ConvertWktToEpsg($wktStr);
 });
 */

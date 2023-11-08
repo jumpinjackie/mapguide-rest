@@ -45,14 +45,6 @@
     </target>
 
     <!-- ============================================  -->
-    <!-- Target: integration_test_para                 -->
-    <!-- ============================================  -->
-    <target name="integration_test_para">
-        <!-- NOTE: Window-ism -->
-        <exec command="vendor\bin\paratest --bootstrap test\cli_bootstrap.php --phpunit vendor\bin\phpunit integration_test" dir="." logoutput="true" checkReturn="true" />
-    </target>
-
-    <!-- ============================================  -->
     <!-- Target: build                                 -->
     <!-- ============================================  -->
     <target name="build" depends="prepare, docgen">

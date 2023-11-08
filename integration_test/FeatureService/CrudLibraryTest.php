@@ -147,8 +147,8 @@ class CrudLibraryTest extends ServiceTest {
         }
         throw new Exception("Unknown kind: $kind");
     }
-    protected function setUp() {
-        parent::setUp();
+    protected function set_up() {
+        parent::set_up();
         $resp = $this->apiTest("/services/copyresource", "POST", array(
             "session" => $this->anonymousSessionId,
             "source" => "Library://RestUnitTests/RedlineLayer.FeatureSource",
@@ -157,8 +157,8 @@ class CrudLibraryTest extends ServiceTest {
         ));
         $this->assertStatusCodeIs(200, $resp);
     }
-    protected function tearDown() {
-        parent::tearDown();
+    protected function tear_down() {
+        parent::tear_down();
     }
     private function getSessionFsPart() {
         return "/session/" . $this->anonymousSessionId . "/RedlineLayer.FeatureSource";

@@ -30,7 +30,10 @@ class WktForEpsg4326Test extends ServiceTest {
     }
 
     public function __testOperation($extension, $mimeType) {
-        $wkt = 'GEOGCS["LL84",DATUM["WGS84",SPHEROID["WGS84",6378137.000,298.25722293]],PRIMEM["Greenwich",0],UNIT["Degree",0.01745329251994]]';
+        $resp = $this->apiTestAnon("/coordsys/mentor/LL84/wkt.json", "GET", array());
+        $this->assertStatusCodeIs(200, $resp);
+        $json = json_decode($resp->getContent());
+        $wkt = $json->PrimitiveValue->Value;
 
         $resp = $this->apiTest("/coordsys/epsg/4326/wkt.$extension", "GET", array());
         $this->assertStatusCodeIs(200, $resp);

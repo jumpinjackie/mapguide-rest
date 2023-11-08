@@ -21,3 +21,4 @@
 /node_modules
 /test/data/Sheboygan.mgp
 /.vscode
+composer.phar

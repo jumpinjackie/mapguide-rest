@@ -1,17 +1,15 @@
 {
     "require-dev": {
-        "brianium/paratest": "0.14.0",
-        "zircote/swagger-php": "2.0.*",
-        "doctrine/annotations": "1.2.*",
-        "phpunit/phpunit": "4.8.*",
-        "phing/phing": "2.15.*",
-        "jakub-onderka/php-parallel-lint": "0.9"
+        "zircote/swagger-php": "2.0.16",
+        "doctrine/annotations": "1.2.6",
+        "phing/phing": "2.17.4",
+        "php-parallel-lint/php-parallel-lint": "1.3.2",
+        "yoast/phpunit-polyfills": "2.0.0"
     },
     "require": {
-        "slim/slim": "2.6.*",
-        "smarty/smarty": "3.1.*",
-        "tecnickcom/tcpdf": "6.2.*",
-        "glenscott/url-normalizer": "1.2.*",
-        "palanik/corsslim": "1.1.*"
+        "slim/slim": "3.12.5",
+        "smarty/smarty": "4.3.2",
+        "tecnickcom/tcpdf": "6.6.2",
+        "glenscott/url-normalizer": "1.4.0"
     }
 }

@@ -26,6 +26,7 @@ require_once dirname(__FILE__)."/../../controller/tileservicecontroller.php";
 require_once dirname(__FILE__)."/../../controller/mappingservicecontroller.php";
 require_once dirname(__FILE__)."/../../controller/renderingservicecontroller.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
+require_once dirname(__FILE__)."/../../core/app.php";
 
 /**
  *     @SWG\Post(
@@ -40,9 +41,12 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session.:format", function($format) use ($app) {
+$app->post("/session.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgRestServiceController($app);
-    $ctrl->CreateSession($format);
+    $ctrl->CreateSession($type);
+    return $app->Done();
 });
 /**
  *     @SWG\Delete(
@@ -56,9 +60,12 @@ $app->post("/session.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/session/:sessionId", function($sessionId) use ($app) {
+$app->delete("/session/{session}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $app = $this->get("AppServices");
     $ctrl = new MgRestServiceController($app);
-    $ctrl->DestroySession($sessionId);
+    $ctrl->DestroySession($session);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -73,9 +80,13 @@ $app->delete("/session/:sessionId", function($sessionId) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/timeout.:format", function($sessionId, $format) use ($app) {
+$app->get("/session/{session}/timeout.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgRestServiceController($app);
-    $ctrl->GetSessionTimeout($sessionId, $format);
+    $ctrl->GetSessionTimeout($session, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -103,9 +114,13 @@ $app->get("/session/:sessionId/timeout.:format", function($sessionId, $format) u
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/image.:format", function($sessionId, $mapName, $format) use ($app) {
+$app->get("/session/{session}/{mapName}.Map/image.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $type = $args['type'];
     $ctrl = new MgRenderingServiceController($app);
-    $ctrl->RenderRuntimeMap($sessionId, $mapName, $format);
+    $ctrl->RenderRuntimeMap($session, $mapName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -135,9 +150,14 @@ $app->get("/session/:sessionId/:mapName.Map/image.:format", function($sessionId,
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/overlayimage.:format", function($sessionId, $mapName, $format) use ($app) {
+$app->get("/session/{session}/{mapName}.Map/overlayimage.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgRenderingServiceController($app);
-    $ctrl->RenderDynamicOverlayImage($sessionId, $mapName, $format);
+    $ctrl->RenderDynamicOverlayImage($session, $mapName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -155,9 +175,14 @@ $app->get("/session/:sessionId/:mapName.Map/overlayimage.:format", function($ses
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/legendimage.:format", function($sessionId, $mapName, $format) use ($app) {
+$app->get("/session/{session}/{mapName}.Map/legendimage.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgRenderingServiceController($app);
-    $ctrl->RenderRuntimeMapLegend($sessionId, $mapName, $format);
+    $ctrl->RenderRuntimeMapLegend($session, $mapName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -179,9 +204,14 @@ $app->get("/session/:sessionId/:mapName.Map/legendimage.:format", function($sess
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/layers.:format", function($sessionId, $mapName, $format) use ($app) {
+$app->get("/session/{session}/{mapName}.Map/layers.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgMapController($app);
-    $ctrl->EnumerateMapLayers($sessionId, $mapName, $format);
+    $ctrl->EnumerateMapLayers($session, $mapName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -197,9 +227,14 @@ $app->get("/session/:sessionId/:mapName.Map/layers.:format", function($sessionId
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/layergroups.:format", function($sessionId, $mapName, $format) use ($app) {
+$app->get("/session/{session}/{mapName}.Map/layergroups.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgMapController($app);
-    $ctrl->EnumerateMapLayerGroups($sessionId, $mapName, $format);
+    $ctrl->EnumerateMapLayerGroups($session, $mapName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -228,9 +263,14 @@ $app->get("/session/:sessionId/:mapName.Map/layergroups.:format", function($sess
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/plot.:format", function($sessionId, $mapName, $format) use ($app) {
+$app->get("/session/{session}/{mapName}.Map/plot.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgMappingServiceController($app);
-    $ctrl->GeneratePlot($sessionId, $mapName, $format);
+    $ctrl->GeneratePlot($session, $mapName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -251,9 +291,14 @@ $app->get("/session/:sessionId/:mapName.Map/plot.:format", function($sessionId, 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/description.:format", function($sessionId, $mapName, $format) use ($app) {
+$app->get("/session/{session}/{mapName}.Map/description.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgMappingServiceController($app);
-    $ctrl->DescribeRuntimeMap($sessionId, $mapName, $format);
+    $ctrl->DescribeRuntimeMap($session, $mapName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -269,9 +314,14 @@ $app->get("/session/:sessionId/:mapName.Map/description.:format", function($sess
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->put("/session/:sessionId/:mapName.Map/layersandgroups.:format", function($sessionId, $mapName, $format) use ($app) {
+$app->put("/session/{session}/{mapName}.Map/layersandgroups.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgMapController($app);
-    $ctrl->UpdateMapLayersAndGroups($sessionId, $mapName, $format);
+    $ctrl->UpdateMapLayersAndGroups($session, $mapName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -286,9 +336,13 @@ $app->put("/session/:sessionId/:mapName.Map/layersandgroups.:format", function($
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $mapName) use ($app) {
+$app->get("/session/{session}/{mapName}.Selection/xml", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $app = $this->get("AppServices");
     $ctrl = new MgMapController($app);
-    $ctrl->GetSelectionXml($sessionId, $mapName);
+    $ctrl->GetSelectionXml($session, $mapName);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -304,9 +358,14 @@ $app->get("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $ma
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Selection/layers.:format", function($sessionId, $mapName, $format) use ($app) {
+$app->get("/session/{session}/{mapName}.Selection/layers.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgMapController($app);
-    $ctrl->GetSelectionLayerNames($sessionId, $mapName, $format);
+    $ctrl->GetSelectionLayerNames($session, $mapName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -323,9 +382,14 @@ $app->get("/session/:sessionId/:mapName.Selection/layers.:format", function($ses
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Selection/overview.:format", function($sessionId, $mapName, $format) use ($app) {
+$app->get("/session/{session}/{mapName}.Selection/overview.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgMapController($app);
-    $ctrl->GetSelectionOverview($sessionId, $mapName, $format);
+    $ctrl->GetSelectionOverview($session, $mapName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -349,10 +413,16 @@ $app->get("/session/:sessionId/:mapName.Selection/overview.:format", function($s
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Selection/features.:format/:layerName", function($sessionId, $mapName, $format, $layerName) use ($app) {
+$app->get("/session/{session}/{mapName}.Selection/features.{type}/{layerName}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $type = $args['type'];
+    $layerName = $args['layerName'];
+    $app = $this->get("AppServices");
     $ctrl = new MgMapController($app);
-    $ctrl->GetSelectedFeatures($sessionId, $mapName, $layerName, $format);
-})->name("get_selected_features_$namespace");
+    $ctrl->GetSelectedFeatures($session, $mapName, $layerName, $type);
+    return $app->Done();
+})->setName("get_selected_features_$namespace");
 /**
  *     @SWG\Post(
  *        path="/session/{session}/{mapName}.Selection/xml",
@@ -367,9 +437,13 @@ $app->get("/session/:sessionId/:mapName.Selection/features.:format/:layerName", 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $mapName) use ($app) {
+$app->post("/session/{session}/{mapName}.Selection/xml", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $app = $this->get("AppServices");
     $ctrl = new MgMapController($app);
-    $ctrl->UpdateSelectionFromXml($sessionId, $mapName);
+    $ctrl->UpdateSelectionFromXml($session, $mapName);
+    return $app->Done();
 });
 /**
  *     @SWG\Put(
@@ -397,9 +471,13 @@ $app->post("/session/:sessionId/:mapName.Selection/xml", function($sessionId, $m
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->put("/session/:sessionId/:mapName.Selection", function($sessionId, $mapName) use ($app) {
+$app->put("/session/{session}/{mapName}.Selection", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $app = $this->get("AppServices");
     $ctrl = new MgMapController($app);
-    $ctrl->QueryMapFeatures($sessionId, $mapName);
+    $ctrl->QueryMapFeatures($session, $mapName);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -415,11 +493,15 @@ $app->put("/session/:sessionId/:mapName.Selection", function($sessionId, $mapNam
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:resName.Map", function($sessionId, $resName) use($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.Map");
+$app->post("/session/{session}/{mapName}.Map", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.Map");
+    $app = $this->get("AppServices");
     $ctrl = new MgMapController($app);
     $ctrl->CreateMap($resId);
-})->name("session_resource_id_$namespace");
+    return $app->Done();
+})->setName("session_resource_id_$namespace");
 //
 // NOTE:
 // Although the session repository allows for resources of multiple depth, for the sake of simplicity the REST API only
@@ -442,10 +524,14 @@ $app->post("/session/:sessionId/:resName.Map", function($sessionId, $resName) us
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/status", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->get("/session/{session}/{resName}.FeatureSource/status", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->TestConnection($resId);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -461,10 +547,15 @@ $app->get("/session/:sessionId/:resName.FeatureSource/status", function($session
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/spatialcontexts.:format", function($sessionId, $resName, $format) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->get("/session/{session}/{resName}.FeatureSource/spatialcontexts.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetSpatialContexts($resId, $format);
+    $ctrl->GetSpatialContexts($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -481,14 +572,15 @@ $app->get("/session/:sessionId/:resName.FeatureSource/spatialcontexts.:format", 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/longtransactions.:format", function($sessionId, $resName, $format) use ($app) {
-    $count = count($resourcePath);
-    if ($count > 0) {
-        $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
-    }
-    $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+$app->get("/session/{session}/{resName}.FeatureSource/longtransactions.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetLongTransactions($resId, $format);
+    $ctrl->GetLongTransactions($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -504,10 +596,15 @@ $app->get("/session/:sessionId/:resName.FeatureSource/longtransactions.:format",
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/schemas.:format", function($sessionId, $resName, $format) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->get("/session/{session}/{resName}.FeatureSource/schemas.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetSchemaNames($resId, $format);
+    $ctrl->GetSchemaNames($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -525,10 +622,16 @@ $app->get("/session/:sessionId/:resName.FeatureSource/schemas.:format", function
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/schema.:format/:schemaName", function($sessionId, $resName, $format, $schemaName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->get("/session/{session}/{resName}.FeatureSource/schema.{type}/{schemaName}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $schemaName = $args['schemaName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->DescribeSchema($resId, $schemaName, $format);
+    $ctrl->DescribeSchema($resId, $schemaName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -545,10 +648,16 @@ $app->get("/session/:sessionId/:resName.FeatureSource/schema.:format/:schemaName
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/classes.:format/:schemaName", function($sessionId, $resName, $format, $schemaName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->get("/session/{session}/{resName}.FeatureSource/classes.{type}/{schemaName}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $schemaName = $args['schemaName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetClassNames($resId, $schemaName, $format);
+    $ctrl->GetClassNames($resId, $schemaName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -566,10 +675,17 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classes.:format/:schemaNam
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->get("/session/{session}/{resName}.FeatureSource/classdef.{type}/{schemaName}/{className}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $schemaName = $args['schemaName'];
+    $className = $args['className'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetClassDefinition($resId, $schemaName, $className, $format);
+    $ctrl->GetClassDefinition($resId, $schemaName, $className, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -586,8 +702,13 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:schemaNa
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:qualifiedClassName", function($sessionId, $resName, $format, $qualifiedClassName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->get("/session/{session}/{resName}.FeatureSource/classdef.{type}/{qualifiedClassName}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $qualifiedClassName = $args['qualifiedClassName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
     $tokens = explode(":", $qualifiedClassName);
     $schemaName = "";
@@ -598,7 +719,8 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:qualifie
     } else {
         $className = $qualifiedClassName;
     }
-    $ctrl->GetClassDefinition($resId, $schemaName, $className, $format);
+    $ctrl->GetClassDefinition($resId, $schemaName, $className, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -614,10 +736,14 @@ $app->get("/session/:sessionId/:resName.FeatureSource/classdef.:format/:qualifie
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:resName.FeatureSource/xml", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->post("/session/{session}/{resName}.FeatureSource/xml", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->CreateFeatureSource($resId, "xml");
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -633,10 +759,14 @@ $app->post("/session/:sessionId/:resName.FeatureSource/xml", function($sessionId
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:resName.FeatureSource/json", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->post("/session/{session}/{resName}.FeatureSource/json", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->CreateFeatureSource($resId, "json");
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -655,10 +785,17 @@ $app->post("/session/:sessionId/:resName.FeatureSource/json", function($sessionI
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->post("/session/{session}/{resName}.FeatureSource/features.{type}/{schemaName}/{className}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $schemaName = $args['schemaName'];
+    $className = $args['className'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->InsertFeatures($resId, $schemaName, $className, $format);
+    $ctrl->InsertFeatures($resId, $schemaName, $className, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Put(
@@ -677,10 +814,17 @@ $app->post("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaN
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->put("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->put("/session/{session}/{resName}.FeatureSource/features.{type}/{schemaName}/{className}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $schemaName = $args['schemaName'];
+    $className = $args['className'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->UpdateFeatures($resId, $schemaName, $className, $format);
+    $ctrl->UpdateFeatures($resId, $schemaName, $className, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Delete(
@@ -699,10 +843,17 @@ $app->put("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaNa
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->delete("/session/{session}/{resName}.FeatureSource/features.{type}/{schemaName}/{className}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $schemaName = $args['schemaName'];
+    $className = $args['className'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->DeleteFeatures($resId, $schemaName, $className, $format);
+    $ctrl->DeleteFeatures($resId, $schemaName, $className, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -725,10 +876,17 @@ $app->delete("/session/:sessionId/:resName.FeatureSource/features.:format/:schem
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaName/:className", function($sessionId, $resName, $format, $schemaName, $className) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->get("/session/{session}/{resName}.FeatureSource/features.{type}/{schemaName}/{className}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $schemaName = $args['schemaName'];
+    $className = $args['className'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->SelectFeatures($resId, $schemaName, $className, $format);
+    $ctrl->SelectFeatures($resId, $schemaName, $className, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -752,10 +910,15 @@ $app->get("/session/:sessionId/:resName.FeatureSource/features.:format/:schemaNa
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.LayerDefinition/features.:format", function($sessionId, $resName, $format) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
+$app->get("/session/{session}/{resName}.LayerDefinition/features.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.LayerDefinition");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->SelectLayerFeatures($resId, $format);
+    $ctrl->SelectLayerFeatures($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -774,10 +937,18 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/features.:format", funct
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/aggregates.:format/:type/:schemaName/:className", function($sessionId, $resName, $format, $type, $schemaName, $className) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->get("/session/{session}/{resName}.FeatureSource/aggregates.{type}/{aggregateType}/{schemaName}/{className}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $aggregateType = $args['aggregateType'];
+    $schemaName = $args['schemaName'];
+    $className = $args['className'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->SelectAggregates($resId, $schemaName, $className, $type, $format);
+    $ctrl->SelectAggregates($resId, $schemaName, $className, $aggregateType, $type);
+    return $app->Done();
 });
 //========================= Resource Service APIs ================================
 
@@ -795,10 +966,15 @@ $app->get("/session/:sessionId/:resName.FeatureSource/aggregates.:format/:type/:
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName/datalist.:format", function($sessionId, $resName, $format) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+$app->get("/session/{session}/{resName}/datalist.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName");
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->EnumerateResourceData($resId, $format);
+    $ctrl->EnumerateResourceData($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -814,10 +990,15 @@ $app->get("/session/:sessionId/:resName/datalist.:format", function($sessionId, 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+$app->get("/session/{session}/{resName}/data/{dataName}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $dataName = $args['dataName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName");
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->GetResourceData($resId, $dataName);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -835,10 +1016,15 @@ $app->get("/session/:sessionId/:resName/data/:dataName", function($sessionId, $r
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+$app->post("/session/{session}/{resName}/data/{dataName}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $dataName = $args['dataName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName");
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->SetResourceData($resId, $dataName);
+    return $app->Done();
 });
 /**
  *     @SWG\Delete(
@@ -854,19 +1040,24 @@ $app->post("/session/:sessionId/:resName/data/:dataName", function($sessionId, $
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/session/:sessionId/:resName/data/:dataName", function($sessionId, $resName, $dataName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+$app->delete("/session/{session}/{resName}/data/{dataName}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $dataName = $args['dataName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName");
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->DeleteResourceData($resId, $dataName);
+    return $app->Done();
 });
 /*
 //Need to confirm if like EnumerateResources, this is not permitted on session repos
-$app->get("/session/:sessionId/:resName/header", function($sessionId, $resName) use ($app) {
+$app->get("/session/:sessionId/:resName/header", function($sessionId, $resName) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->GetResourceHeader($resId, "xml");
 });
-$app->get("/session/:sessionId/:resName/header.:format", function($sessionId, $resName, $format) use ($app) {
+$app->get("/session/:sessionId/:resName/header.:format", function($sessionId, $resName, $format) {
     $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->GetResourceHeader($resId, $format);
@@ -888,10 +1079,15 @@ $app->get("/session/:sessionId/:resName/header.:format", function($sessionId, $r
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:resName/contentorheader.:format", function($sessionId, $resName, $format) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+$app->post("/session/{session}/{resName}/contentorheader.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName");
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->SetResourceContentOrHeader($resId, $format);
+    $ctrl->SetResourceContentOrHeader($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -908,10 +1104,15 @@ $app->post("/session/:sessionId/:resName/contentorheader.:format", function($ses
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/session/:sessionId/:resName/content.:format", function($sessionId, $resName, $format) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+$app->post("/session/{session}/{resName}/content.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName");
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->SetResourceContent($resId, $format);
+    $ctrl->SetResourceContent($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -927,10 +1128,15 @@ $app->post("/session/:sessionId/:resName/content.:format", function($sessionId, 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName/content.:format", function($sessionId, $resName, $format) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+$app->get("/session/{session}/{resName}/content.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName");
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->GetResourceContent($resId, $format);
+    $ctrl->GetResourceContent($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -946,14 +1152,19 @@ $app->get("/session/:sessionId/:resName/content.:format", function($sessionId, $
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName/references.:format", function($sessionId, $resName, $format) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+$app->get("/session/{session}/{resName}/references.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName");
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->EnumerateResourceReferences($resId, $format);
+    $ctrl->EnumerateResourceReferences($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Delete(
- *        path="/session/{session}/{resName}",
+ *        path="/session/{session}/{resName}/resource",
  *        operationId="DeleteResource",
  *        summary="Deletes the given resource",
  *        tags={"session"},
@@ -964,16 +1175,20 @@ $app->get("/session/:sessionId/:resName/references.:format", function($sessionId
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/session/:sessionId/:resName", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName");
+$app->delete("/session/{session}/{resName}/resource", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName");
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->DeleteResource($resId);
+    return $app->Done();
 });
 //================================== Tile Service APIs =======================================
 
 /**
  *     @SWG\Get(
- *        path="/session/{session}/{resName}/tile.{type}/{groupName}/{scaleIndex}/{col}/{row}",
+ *        path="/session/{session}/{resName}.MapDefinition/tile.{type}/{groupName}/{scaleIndex}/{col}/{row}",
  *        operationId="GetTile",
  *        summary="Gets the specified tile for the given map definition",
  *        tags={"session"},
@@ -989,10 +1204,19 @@ $app->delete("/session/:sessionId/:resName", function($sessionId, $resName) use 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.MapDefinition/tile.:format/:groupName/:scaleIndex/:col/:row", function($sessionId, $resName, $format, $groupName, $scaleIndex, $col, $row) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
+$app->get("/session/{session}/{resName}.MapDefinition/tile.{type}/{groupName}/{scaleIndex}/{col}/{row}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $groupName = $args['groupName'];
+    $scaleIndex = $args['scaleIndex'];
+    $col = $args['col'];
+    $row = $args['row'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.MapDefinition");
+    $app = $this->get("AppServices");
     $ctrl = new MgTileServiceController($app);
-    $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $format);
+    $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $type);
+    return $app->Done();
 });
 //============================== Mapping Service APIs =====================================
 
@@ -1015,10 +1239,18 @@ $app->get("/session/:sessionId/:resName.MapDefinition/tile.:format/:groupName/:s
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.LayerDefinition/legend/:scale/:geomtype/:themecat/icon.:format", function($sessionId, $resName, $scale, $geomtype, $themecat, $format) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
+$app->get("/session/{session}/{resName}.LayerDefinition/legend/{scale}/{geomType}/{themecat}/icon.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $scale = $args['scale'];
+    $geomType = $args['geomType'];
+    $themecat = $args['themecat'];
+    $type = $args['type'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.LayerDefinition");
+    $app = $this->get("AppServices");
     $ctrl = new MgMappingServiceController($app);
-    $ctrl->GenerateLegendImage($resId, $scale, $geomtype, $themecat, $format);
+    $ctrl->GenerateLegendImage($resId, $scale, $geomType, $themecat, $type);
+    return $app->Done();
 });
 //============================= Rendering Service APIs ====================================
 
@@ -1044,10 +1276,15 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/legend/:scale/:geomtype/
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.MapDefinition/image.:format", function($sessionId, $resName, $format) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
+$app->get("/session/{session}/{resName}.MapDefinition/image.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.MapDefinition");
+    $app = $this->get("AppServices");
     $ctrl = new MgRenderingServiceController($app);
-    $ctrl->RenderMapDefinition($resId, $format);
+    $ctrl->RenderMapDefinition($resId, $type);
+    return $app->Done();
 });
 
 // ----------------------------- Viewer/Preview Launchers ----------------------------- //
@@ -1065,10 +1302,14 @@ $app->get("/session/:sessionId/:resName.MapDefinition/image.:format", function($
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.WebLayout/viewer", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.WebLayout");
+$app->get("/session/{session}/{resName}.WebLayout/viewer", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.WebLayout");
+    $app = $this->get("AppServices");
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchAjaxViewer($resId);
+    return $app->Done();
 });
 
 /**
@@ -1085,10 +1326,15 @@ $app->get("/session/:sessionId/:resName.WebLayout/viewer", function($sessionId, 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.ApplicationDefinition/viewer/:template", function($sessionId, $resName, $template) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.ApplicationDefinition");
+$app->get("/session/{session}/{resName}.ApplicationDefinition/viewer/{template}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $template = $args['template'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.ApplicationDefinition");
+    $app = $this->get("AppServices");
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchFusionViewer($resId, $template);
+    return $app->Done();
 });
 
 /**
@@ -1104,10 +1350,14 @@ $app->get("/session/:sessionId/:resName.ApplicationDefinition/viewer/:template",
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.FeatureSource/preview", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.FeatureSource");
+$app->get("/session/{session}/{resName}.FeatureSource/preview", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.FeatureSource");
+    $app = $this->get("AppServices");
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchResourcePreview($resId);
+    return $app->Done();
 });
 
 /**
@@ -1123,10 +1373,14 @@ $app->get("/session/:sessionId/:resName.FeatureSource/preview", function($sessio
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.LayerDefinition/preview", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
+$app->get("/session/{session}/{resName}.LayerDefinition/preview", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.LayerDefinition");
+    $app = $this->get("AppServices");
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchResourcePreview($resId);
+    return $app->Done();
 });
 
 /**
@@ -1142,10 +1396,14 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/preview", function($sess
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.MapDefinition/preview", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
+$app->get("/session/{session}/{resName}.MapDefinition/preview", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.MapDefinition");
+    $app = $this->get("AppServices");
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchResourcePreview($resId);
+    return $app->Done();
 });
 
 /**
@@ -1161,10 +1419,14 @@ $app->get("/session/:sessionId/:resName.MapDefinition/preview", function($sessio
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.SymbolDefinition/preview", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.SymbolDefinition");
+$app->get("/session/{session}/{resName}.SymbolDefinition/preview", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.SymbolDefinition");
+    $app = $this->get("AppServices");
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchResourcePreview($resId);
+    return $app->Done();
 });
 
 /**
@@ -1180,10 +1442,14 @@ $app->get("/session/:sessionId/:resName.SymbolDefinition/preview", function($ses
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.WatermarkDefinition/preview", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.WatermarkDefinition");
+$app->get("/session/{session}/{resName}.WatermarkDefinition/preview", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.WatermarkDefinition");
+    $app = $this->get("AppServices");
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchResourcePreview($resId);
+    return $app->Done();
 });
 
 // =========================================== KML Service APIs ====================================================
@@ -1202,9 +1468,13 @@ $app->get("/session/:sessionId/:resName.WatermarkDefinition/preview", function($
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:mapName.Map/kml", function($sessionId, $mapName) use ($app) {
+$app->get("/session/{session}/{mapName}.Map/kml", function($req, $resp, $args) {
+    $session = $args['session'];
+    $mapName = $args['mapName'];
+    $app = $this->get("AppServices");
     $ctrl = new MgKmlServiceController($app);
     $ctrl->GetSessionMapKml($sessionId, $mapName, "kml");
+    return $app->Done();
 });
 
 /**
@@ -1221,10 +1491,14 @@ $app->get("/session/:sessionId/:mapName.Map/kml", function($sessionId, $mapName)
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.MapDefinition/kml", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.MapDefinition");
+$app->get("/session/{session}/{resName}.MapDefinition/kml", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.MapDefinition");
+    $app = $this->get("AppServices");
     $ctrl = new MgKmlServiceController($app);
     $ctrl->GetMapKml($resId, "kml");
+    return $app->Done();
 });
 
 /**
@@ -1245,10 +1519,14 @@ $app->get("/session/:sessionId/:resName.MapDefinition/kml", function($sessionId,
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.LayerDefinition/kml", function($sessionId, $resName) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
+$app->get("/session/{session}/{resName}.LayerDefinition/kml", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.LayerDefinition");
+    $app = $this->get("AppServices");
     $ctrl = new MgKmlServiceController($app);
     $ctrl->GetLayerKml($resId, "kml");
+    return $app->Done();
 });
 
 /**
@@ -1270,8 +1548,13 @@ $app->get("/session/:sessionId/:resName.LayerDefinition/kml", function($sessionI
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/session/:sessionId/:resName.LayerDefinition/kmlfeatures.:format", function($sessionId, $resName, $format) use ($app) {
-    $resId = new MgResourceIdentifier("Session:$sessionId//$resName.LayerDefinition");
+$app->get("/session/{session}/{resName}.LayerDefinition/kmlfeatures.{type}", function($req, $resp, $args) {
+    $session = $args['session'];
+    $resName = $args['resName'];
+    $type = $args['type'];
+    $resId = new MgResourceIdentifier("Session:$session//$resName.LayerDefinition");
+    $app = $this->get("AppServices");
     $ctrl = new MgKmlServiceController($app);
-    $ctrl->GetFeaturesKml($resId, $format);
+    $ctrl->GetFeaturesKml($resId, $type);
+    return $app->Done();
 });

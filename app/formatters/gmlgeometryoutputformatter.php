@@ -25,7 +25,7 @@ class MgGmlGeometryOutputFormatter extends MgGeometryOutputFormatter
         parent::__construct();
     }
 
-    protected function OutputGeom($geom, $reader) {
+    protected function OutputGeom(MgGeometry $geom, IReader $reader) {
         $zval = null;
         $geomType = $geom->GetGeometryType();
         switch($geomType) {
@@ -44,7 +44,7 @@ class MgGmlGeometryOutputFormatter extends MgGeometryOutputFormatter
         }
     }
 
-    private function OutputCoordinateIterator($iter, $zval) {
+    private function OutputCoordinateIterator(MgCoordinateIterator $iter, /*php_double*/ $zval) {
         $bFirstCoord = true;
         $output = "<gml:posList>";
         while ($iter->MoveNext()) {

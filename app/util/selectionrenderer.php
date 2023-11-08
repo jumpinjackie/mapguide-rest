@@ -27,7 +27,7 @@ class MgSelectionRequestedFeatures {
 class MgSelectionRenderer {
     public function __construct() { }
     
-    protected function RenderSelection($selection) {
+    protected function RenderSelection(MgSelectionBase $selection) {
         $selXml = $selection->ToXml();
         if (strlen($selXml) > 0) {
             //Need to strip the XML prolog from this fragment
@@ -40,7 +40,7 @@ class MgSelectionRenderer {
         }
     }
     
-    protected function RenderSelectedFeature($reader, $geomPropName, $propMappings, $agfRw) {
+    protected function RenderSelectedFeature(MgReader $reader, /*php_string*/ $geomPropName, array $propMappings, MgAgfReaderWriter $agfRw) {
         $xml = "<Feature>\n";
         $bounds = "";
         if (!$reader->IsNull($geomPropName)) {
@@ -64,7 +64,7 @@ class MgSelectionRenderer {
         return $xml;
     }
     
-    public function Render($resSvc, $reqData, $featInfo, $selection, $bRequestAttributes, $inlineSelectionImg) {
+    public function Render(MgResourceService $resSvc, /*php_int*/ $reqData, MgFeatureInformation $featInfo, MgSelectionBase $selection, /*php_bool*/ $bRequestAttributes, MgByteReader $inlineSelectionImg) {
         $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<FeatureInformation>\n";
 
         $tooltip = "";
@@ -162,18 +162,18 @@ class MgStatelessSelectionRenderer extends MgSelectionRenderer {
         parent::__construct();
     }
     
-    protected function RenderSelection($selection) { //Override
+    protected function RenderSelection(MgSelectionBase $selection) { //Override
         //Selection XML is useless in stateless mode, so do nothing 
         return "";
     }
 }
 
 abstract class MgSelectionUpdaterBase {
-    public abstract function Update($selection, $featInfo, $bAppend);
+    public abstract function Update(MgSelectionBase $selection, MgFeatureInformation $featInfo, /*php_bool*/ $bAppend);
 }
 
 class MgNullSelectionUpdater extends MgSelectionUpdaterBase {
-    public function Update($selection, $featInfo, $bAppend) {
+    public function Update(MgSelectionBase $selection, MgFeatureInformation $featInfo, /*php_bool*/ $bAppend) {
         //no-op
     }
 }
@@ -185,7 +185,7 @@ class MgSelectionUpdater extends MgSelectionUpdaterBase {
     private $mapName;
     private $persist;
     
-    public function __construct($map, $resSvc, $mapName, $persist) {
+    public function __construct(MgMapBase $map, MgResourceService $resSvc, /*php_string*/ $mapName, /*php_bool*/ $persist) {
         $this->bHasNewSelection = false;
         $this->map = $map;
         $this->resSvc = $resSvc; 
@@ -195,7 +195,7 @@ class MgSelectionUpdater extends MgSelectionUpdaterBase {
     
     public function HasNewSelection() { return $this->bHasNewSelection; }
     
-    public function Update($selection, $featInfo, $bAppend) {
+    public function Update(MgSelectionBase $selection, MgFeatureInformation $featInfo, /*php_bool*/ $bAppend) {
         $map = $this->map;
         $resSvc = $this->resSvc; 
         $mapName = $this->mapName;

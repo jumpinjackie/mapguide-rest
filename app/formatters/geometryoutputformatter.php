@@ -17,6 +17,8 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+require_once dirname(__FILE__)."/../core/interfaces.php";
+
 abstract class MgGeometryOutputFormatter
 {
     private $agfRw;
@@ -25,9 +27,9 @@ abstract class MgGeometryOutputFormatter
         $this->agfRw = new MgAgfReaderWriter();
     }
 
-    protected abstract function OutputGeom($geom, $reader);
+    protected abstract function OutputGeom(MgGeometry $geom, IReader $reader);
     
-    public function Output($reader, $geomName, $transform) {
+    public function Output(IReader $reader, /*php_string*/ $geomName, MgTransform $transform = null) {
         $output = "";
         try {
             if (!$reader->IsNull($geomName)) {

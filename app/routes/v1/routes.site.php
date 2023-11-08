@@ -19,6 +19,7 @@
 
 require_once dirname(__FILE__)."/../../controller/siteadmincontroller.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
+require_once dirname(__FILE__)."/../../core/app.php";
 
 /**
  *     @SWG\Get(
@@ -32,9 +33,12 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/site/status.:format", function($format) use ($app) {
+$app->get("/site/status.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgSiteAdminController($app);
-    $ctrl->GetSiteStatus($format);
+    $ctrl->GetSiteStatus($type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -48,9 +52,12 @@ $app->get("/site/status.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/site/info.:format", function($format) use ($app) {
+$app->get("/site/info.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgSiteAdminController($app);
-    $ctrl->GetSiteInformation($format);
+    $ctrl->GetSiteInformation($type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -64,9 +71,12 @@ $app->get("/site/info.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/site/version.:format", function($format) use ($app) {
+$app->get("/site/version.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgSiteAdminController($app);
-    $ctrl->GetSiteVersion($format);
+    $ctrl->GetSiteVersion($type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -80,9 +90,12 @@ $app->get("/site/version.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/site/groups.:format", function($format) use ($app) {
+$app->get("/site/groups.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgSiteAdminController($app);
-    $ctrl->EnumerateGroups($format);
+    $ctrl->EnumerateGroups($type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -97,9 +110,13 @@ $app->get("/site/groups.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/site/groups/:groupName/users.:format", function($groupName, $format) use ($app) {
+$app->get("/site/groups/{groupName}/users.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $groupName = $args['groupName'];
+    $app = $this->get("AppServices");
     $ctrl = new MgSiteAdminController($app);
-    $ctrl->EnumerateUsersForGroup($groupName, $format);
+    $ctrl->EnumerateUsersForGroup($groupName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -114,9 +131,13 @@ $app->get("/site/groups/:groupName/users.:format", function($groupName, $format)
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/site/user/:userName/groups.:format", function($userName, $format) use ($app) {
+$app->get("/site/user/{userName}/groups.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $userName = $args['userName'];
+    $app = $this->get("AppServices");
     $ctrl = new MgSiteAdminController($app);
-    $ctrl->EnumerateGroupsForUser($userName, $format);
+    $ctrl->EnumerateGroupsForUser($userName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -131,7 +152,11 @@ $app->get("/site/user/:userName/groups.:format", function($userName, $format) us
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/site/user/:userName/roles.:format", function($userName, $format) use ($app) {
+$app->get("/site/user/{userName}/roles.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $userName = $args['userName'];
+    $app = $this->get("AppServices");
     $ctrl = new MgSiteAdminController($app);
-    $ctrl->EnumerateRolesForUser($userName, $format);
+    $ctrl->EnumerateRolesForUser($userName, $type);
+    return $app->Done();
 });

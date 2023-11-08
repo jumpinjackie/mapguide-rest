@@ -22,4 +22,45 @@ $app->get("/admin/:args+", function($args) use ($app) {
     var_dump($args);
     var_dump($app->request->get());
 });
+
+//TODO: Add these to current unit (not integration) test suite
+
+require_once dirname(__FILE__)."/../../core/bytereaderstreamadapter.php";
+require_once dirname(__FILE__)."/../../core/stringcontentadapter.php";
+require_once dirname(__FILE__)."/../../core/aggregatecontentadapter.php";
+
+$app->get("/bytereadertest", function($req, $resp, $args) {
+    $bs = new MgByteSource(dirname(__FILE__)."/../../../test/data/Parcels_Writeable.FeatureSource.xml");
+    $bs->SetMimeType(MgMimeType::Xml);
+    $br = $bs->GetReader();
+    $adapter = new MgByteReaderStreamAdapter($br);
+    return $resp->withHeader("Content-Type", MgMimeType::Xml)
+                ->withBody($adapter);
+});
+
+$app->get("/stringadaptertest", function($req, $resp, $args) {
+    $adapter = new StringContentAdapter(file_get_contents(dirname(__FILE__)."/../../../test/data/Parcels_Writeable.FeatureSource.xml"));
+    return $resp->withHeader("Content-Type", MgMimeType::Xml)
+                ->withBody($adapter);
+});
+
+$app->get("/aggregateadaptertest", function($req, $resp, $args) {
+    $adapter = new AggregateContentAdapter([
+        new StringContentAdapter("Hello "),
+        new StringContentAdapter("World!")
+    ]);
+    return $resp->withHeader("Content-Type", "text/plain")
+                ->withBody($adapter);
+});
+
+$app->get("/testlocalizer", function($req, $resp, $args) {
+    $app = $this->get("AppServices");
+    echo $app->GetLocalizedText("E_UNSUPPORTED_REPRESENTATION", "adsfkj");
+    die;
+});
+
+$app->get("/testing/{uriPart:.*}/config", function($req, $resp, $args) {
+    var_dump($args);
+    die;
+});
 */

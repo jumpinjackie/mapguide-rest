@@ -20,7 +20,7 @@
 require_once "controller.php";
 
 class MgProcessingController extends MgBaseController {
-    public function __construct($app) {
+    public function __construct(IAppServices $app) {
         parent::__construct($app);
     }
 
@@ -38,7 +38,7 @@ class MgProcessingController extends MgBaseController {
     const P_TOUCHES = "touches";
     const P_WITHIN = "within";
 
-    private function GeometryPredicate($wktA, $wktB, $op) {
+    private function GeometryPredicate(/*php_string*/ $wktA, /*php_string*/ $wktB, /*php_string*/ $op) {
         $wktRw = new MgWktReaderWriter();
         $geomA = $wktRw->Read($wktA);
         $geomB = $wktRw->Read($wktB);
@@ -72,17 +72,17 @@ class MgProcessingController extends MgBaseController {
                 break;
         }
 
-        $this->app->response->header("Content-Type", MgMimeType::Json);
+        $this->app->SetResponseHeader("Content-Type", MgMimeType::Json);
         $body = MgBoxedValue::Boolean($result, "json");
         /*
         $o = json_decode($body);
         $o->op = $op;
         $body = json_encode($o);
         */
-        $this->app->response->write($body);
+        $this->app->WriteResponseContent($body);
     }
 
-    private function GeometryOperation($wktA, $wktB, $op, $transformto, $format) {
+    private function GeometryOperation(/*php_string*/ $wktA, /*php_string*/ $wktB, /*php_string*/ $op, /*php_string*/ $transformto, /*php_string*/ $format) {
         $wktRw = new MgWktReaderWriter();
         $geomA = $wktRw->Read($wktA);
         $geomB = $wktRw->Read($wktB);
@@ -110,69 +110,69 @@ class MgProcessingController extends MgBaseController {
         }
     }
 
-    private function OutputGeom($oGeom, $transformto, $wktRw, $csFactory, $format) {
+    private function OutputGeom(MgGeometry $oGeom, /*php_string*/ $transformto, MgWktReaderWriter $wktRw, MgCoordinateSystemFactory $csFactory, /*php_string*/ $format) {
         if ($transformto != "") {
             $csDest = $csFactory->CreateFromCode($transformto);
             $xform = $csFactory->GetTransform($cs, $csDest);
             $oGeom = $buffered->Transform($xform);
         }
 
-        $this->app->response->header("Content-Type", MgMimeType::Json);
+        $this->app->SetResponseHeader("Content-Type", MgMimeType::Json);
         switch ($format) {
             case "wkt":
                 $resp = '{"type": "wkt", "result": "'.$wktRw->Write($oGeom).'"}';
-                $this->app->response->write($resp);
+                $this->app->WriteResponseContent($resp);
                 break;
             case "geojson":
                 $resp = '{"type": "geojson", "result": { "type": "Feature", "id": "'.uniqid().'", '.MgReaderToGeoJsonWriter::ToGeoJson($oGeom).'} }';
-                $this->app->response->write($resp);
+                $this->app->WriteResponseContent($resp);
                 break;
         }
     }
 
     public function Difference() {
-        $wktA = $this->GetRequestParameter("geometry_a");
-        $wktB = $this->GetRequestParameter("geometry_b");
-        $format = $this->ValidateValueInDomain($this->GetRequestParameter("format"), array("wkt", "geojson"));
-        $transformto = $this->GetRequestParameter("transformto");
+        $wktA = $this->app->GetRequestParameter("geometry_a");
+        $wktB = $this->app->GetRequestParameter("geometry_b");
+        $format = $this->ValidateValueInDomain($this->app->GetRequestParameter("format"), array("wkt", "geojson"));
+        $transformto = $this->app->GetRequestParameter("transformto");
 
         $this->GeometryOperation($wktA, $wktB, self::OP_DIFFERENCE, $transformto, $format);
     }
 
     public function Intersection() {
-        $wktA = $this->GetRequestParameter("geometry_a");
-        $wktB = $this->GetRequestParameter("geometry_b");
-        $format = $this->ValidateValueInDomain($this->GetRequestParameter("format"), array("wkt", "geojson"));
-        $transformto = $this->GetRequestParameter("transformto");
+        $wktA = $this->app->GetRequestParameter("geometry_a");
+        $wktB = $this->app->GetRequestParameter("geometry_b");
+        $format = $this->ValidateValueInDomain($this->app->GetRequestParameter("format"), array("wkt", "geojson"));
+        $transformto = $this->app->GetRequestParameter("transformto");
 
         $this->GeometryOperation($wktA, $wktB, self::OP_INTERSECTION, $transformto, $format);
     }
 
     public function SymmetricDifference() {
-        $wktA = $this->GetRequestParameter("geometry_a");
-        $wktB = $this->GetRequestParameter("geometry_b");
-        $format = $this->ValidateValueInDomain($this->GetRequestParameter("format"), array("wkt", "geojson"));
-        $transformto = $this->GetRequestParameter("transformto");
+        $wktA = $this->app->GetRequestParameter("geometry_a");
+        $wktB = $this->app->GetRequestParameter("geometry_b");
+        $format = $this->ValidateValueInDomain($this->app->GetRequestParameter("format"), array("wkt", "geojson"));
+        $transformto = $this->app->GetRequestParameter("transformto");
 
         $this->GeometryOperation($wktA, $wktB, self::OP_SYMMETRICDIFFERENCE, $transformto, $format);
     }
 
     public function Union() {
-        $wktA = $this->GetRequestParameter("geometry_a");
-        $wktB = $this->GetRequestParameter("geometry_b");
-        $format = $this->ValidateValueInDomain($this->GetRequestParameter("format"), array("wkt", "geojson"));
-        $transformto = $this->GetRequestParameter("transformto");
+        $wktA = $this->app->GetRequestParameter("geometry_a");
+        $wktB = $this->app->GetRequestParameter("geometry_b");
+        $format = $this->ValidateValueInDomain($this->app->GetRequestParameter("format"), array("wkt", "geojson"));
+        $transformto = $this->app->GetRequestParameter("transformto");
 
         $this->GeometryOperation($wktA, $wktB, self::OP_UNION, $transformto, $format);
     }
 
     public function Buffer() {
-        $geometry = $this->GetRequestParameter("geometry");
-        $coordsys = $this->GetRequestParameter("coordsys");
-        $distance = $this->GetRequestParameter("distance");
-        $format = $this->ValidateValueInDomain($this->GetRequestParameter("format"), array("wkt", "geojson"));
-        $units = $this->ValidateValueInDomain($this->GetRequestParameter("units", "m"), array("m", "km", "mi", "ft"));
-        $transformto = $this->GetRequestParameter("transformto");
+        $geometry = $this->app->GetRequestParameter("geometry");
+        $coordsys = $this->app->GetRequestParameter("coordsys");
+        $distance = $this->app->GetRequestParameter("distance");
+        $format = $this->ValidateValueInDomain($this->app->GetRequestParameter("format"), array("wkt", "geojson"));
+        $units = $this->ValidateValueInDomain($this->app->GetRequestParameter("units", "m"), array("m", "km", "mi", "ft"));
+        $transformto = $this->app->GetRequestParameter("transformto");
 
         try {
             $wktRw = new MgWktReaderWriter();
@@ -205,9 +205,9 @@ class MgProcessingController extends MgBaseController {
     }
 
     public function SpatialPredicate() {
-        $wktA = $this->GetRequestParameter("geometry_a");
-        $wktB = $this->GetRequestParameter("geometry_b");
-        $op = $this->ValidateValueInDomain($this->GetRequestParameter("operator"), array("contains", "crosses", "disjoint", "equals", "intersects", "overlaps", "touches", "within"));
+        $wktA = $this->app->GetRequestParameter("geometry_a");
+        $wktB = $this->app->GetRequestParameter("geometry_b");
+        $op = $this->ValidateValueInDomain($this->app->GetRequestParameter("operator"), array("contains", "crosses", "disjoint", "equals", "intersects", "overlaps", "touches", "within"));
 
         $this->GeometryPredicate($wktA, $wktB, $op);
     }

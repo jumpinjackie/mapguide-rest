@@ -19,6 +19,7 @@
 
 require_once dirname(__FILE__)."/../../controller/datacontroller.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
+require_once dirname(__FILE__)."/../../core/app.php";
 
 /**
  *     @SWG\Get(
@@ -33,9 +34,12 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/data/configs.:format", function($format) use ($app) {
+$app->get("/data/configs.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgDataController($app);
-    $ctrl->EnumerateDataConfigurations($format);
+    $ctrl->EnumerateDataConfigurations($type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -50,9 +54,12 @@ $app->get("/data/configs.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/data/:args+/config", function($args) use ($app) {
+$app->get("/data/{uriPart:.*}/config", function($req, $resp, $args) {
+    $uriPart = explode('/', $args['uriPart']);
+    $app = $this->get("AppServices");
     $ctrl = new MgDataController($app);
-    $ctrl->GetDataConfiguration($args);
+    $ctrl->GetDataConfiguration($uriPart);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -68,9 +75,12 @@ $app->get("/data/:args+/config", function($args) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/data/:args+/config", function($args) use ($app) {
+$app->post("/data/{uriPart:.*}/config", function($req, $resp, $args) {
+    $uriPart = explode('/', $args['uriPart']);
+    $app = $this->get("AppServices");
     $ctrl = new MgDataController($app);
-    $ctrl->PutDataConfiguration($args);
+    $ctrl->PutDataConfiguration($uriPart);
+    return $app->Done();
 });
 /**
  *     @SWG\Delete(
@@ -85,9 +95,12 @@ $app->post("/data/:args+/config", function($args) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/data/:args+/config", function($args) use ($app) {
+$app->delete("/data/{uriPart:.*}/config", function($req, $resp, $args) {
+    $uriPart = explode('/', $args['uriPart']);
+    $app = $this->get("AppServices");
     $ctrl = new MgDataController($app);
-    $ctrl->DeleteConfiguration($args);
+    $ctrl->DeleteConfiguration($uriPart);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -103,9 +116,13 @@ $app->delete("/data/:args+/config", function($args) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/data/:args+/files.:format", function($args, $format) use ($app) {
+$app->get("/data/{uriPart:.*}/files.{type}", function($req, $resp, $args) {
+    $uriPart = explode('/', $args['uriPart']);
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgDataController($app);
-    $ctrl->EnumerateDataFiles($args, $format);
+    $ctrl->EnumerateDataFiles($uriPart, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -122,9 +139,12 @@ $app->get("/data/:args+/files.:format", function($args, $format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/data/:args+/file", function($args) use ($app) {
+$app->post("/data/{uriPart:.*}/file", function($req, $resp, $args) {
+    $uriPart = explode('/', $args['uriPart']);
+    $app = $this->get("AppServices");
     $ctrl = new MgDataController($app);
-    $ctrl->PutDataFile($args);
+    $ctrl->PutDataFile($uriPart);
+    return $app->Done();
 });
 /**
  *     @SWG\Delete(
@@ -140,68 +160,93 @@ $app->post("/data/:args+/file", function($args) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/data/:args+/file", function($args) use ($app) {
+$app->delete("/data/{uriPart:.*}/file", function($req, $resp, $args) {
+    $uriPart = explode('/', $args['uriPart']);
+    $app = $this->get("AppServices");
     $ctrl = new MgDataController($app);
-    $ctrl->DeleteDataFile($args);
+    $ctrl->DeleteDataFile($uriPart);
+    return $app->Done();
 });
 
-$app->get("/data/:args+/doc/index.html", function($args) use ($app) {
+$app->get("/data/{uriPart:.*}/doc/index.html", function($req, $resp, $args) {
+    $uriPart = explode('/', $args['uriPart']);
+    $app = $this->get("AppServices");
     $ctrl = new MgDataController($app);
-    $ctrl->GetApiDocViewer($args);
+    $ctrl->GetApiDocViewer($uriPart);
+    return $app->Done();
 });
-$app->get("/data/:args+/apidoc", function($args) use ($app) {
+$app->get("/data/{uriPart:.*}/apidoc", function($req, $resp, $args) {
+    $uriPart = explode('/', $args['uriPart']);
+    $app = $this->get("AppServices");
     $ctrl = new MgDataController($app);
-    $ctrl->GetApiDoc($args);
+    $ctrl->GetApiDoc($uriPart);
+    return $app->Done();
 });
-$app->get("/data/:args+/:filename", function($args, $filename) use ($app) {
+$app->get("/data/{uriPart:.*}/{filename}", function($req, $resp, $args) {
+    $uriPart = explode('/', $args['uriPart']);
+    $filename = $args['filename'];
     $tokens = explode(".", $filename);
+    $app = $this->get("AppServices");
     $ctrl = new MgDataController($app);
     if (count($tokens) == 2) {
         if (strlen($tokens[0]) === 0) {
-            $ctrl->HandleGet($args, $tokens[1]);
+            $ctrl->HandleGet($uriPart, $tokens[1]);
         } else {
-            $ctrl->HandleGetSingle($args, $tokens[0], $tokens[1]);
+            $ctrl->HandleGetSingle($uriPart, $tokens[0], $tokens[1]);
         }
     } else {
-        $ctrl->HandleGet($args, substr($filename, 1));
+        $ctrl->HandleGet($uriPart, substr($filename, 1));
     }
+    return $app->Done();
 });
-$app->post("/data/:args+/:filename", function($args, $filename) use ($app) {
+$app->post("/data/{uriPart:.*}/{filename}", function($req, $resp, $args) {
+    $uriPart = explode('/', $args['uriPart']);
+    $filename = $args['filename'];
     $tokens = explode(".", $filename);
+    $app = $this->get("AppServices");
     $ctrl = new MgDataController($app);
     if (count($tokens) == 2) {
         if (strlen($tokens[0]) === 0) {
-            $ctrl->HandlePost($args, $tokens[1]);
+            $ctrl->HandlePost($uriPart, $tokens[1]);
         } else {
-            $ctrl->HandlePostSingle($args, $tokens[0], $tokens[1]);
+            $ctrl->HandlePostSingle($uriPart, $tokens[0], $tokens[1]);
         }
     } else {
-        $ctrl->HandlePost($args, substr($filename, 1));
+        $ctrl->HandlePost($uriPart, substr($filename, 1));
     }
+    return $app->Done();
 });
-$app->put("/data/:args+/:filename", function($args, $filename) use ($app) {
+$app->put("/data/{uriPart:.*}/{filename}", function($req, $resp, $args) {
+    $uriPart = explode('/', $args['uriPart']);
+    $filename = $args['filename'];
     $tokens = explode(".", $filename);
+    $app = $this->get("AppServices");
     $ctrl = new MgDataController($app);
     if (count($tokens) == 2) {
         if (strlen($tokens[0]) === 0) {
-            $ctrl->HandlePut($args, $tokens[1]);
+            $ctrl->HandlePut($uriPart, $tokens[1]);
         } else {
-            $ctrl->HandlePutSingle($args, $tokens[0], $tokens[1]);
+            $ctrl->HandlePutSingle($uriPart, $tokens[0], $tokens[1]);
         }
     } else {
-        $ctrl->HandlePut($args, substr($filename, 1));
+        $ctrl->HandlePut($uriPart, substr($filename, 1));
     }
+    return $app->Done();
 });
-$app->delete("/data/:args+/:filename", function($args, $filename) use ($app) {
+$app->delete("/data/{uriPart:.*}/{filename}", function($req, $resp, $args) {
+    $uriPart = explode('/', $args['uriPart']);
+    $filename = $args['filename'];
     $tokens = explode(".", $filename);
+    $app = $this->get("AppServices");
     $ctrl = new MgDataController($app);
     if (count($tokens) == 2) {
         if (strlen($tokens[0]) === 0) {
-            $ctrl->HandleDelete($args, $tokens[1]);
+            $ctrl->HandleDelete($uriPart, $tokens[1]);
         } else {
-            $ctrl->HandleDeleteSingle($args, $tokens[0], $tokens[1]);
+            $ctrl->HandleDeleteSingle($uriPart, $tokens[0], $tokens[1]);
         }
     } else {
-        $ctrl->HandleDelete($args, substr($filename, 1));
+        $ctrl->HandleDelete($uriPart, substr($filename, 1));
     }
+    return $app->Done();
 });

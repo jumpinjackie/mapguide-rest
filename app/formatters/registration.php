@@ -27,50 +27,50 @@ require_once "envelopecommaseparatedgeometryoutputformatter.php";
 require_once "defaultdatetimeoutputformatter.php";
 
 //Geometry formatters
-$app->container->GeomWKT = function() {
+$container['GeomWKT'] = function($c) {
     return new MgWktGeometryOutputFormatter();
 };
-$app->container->GeomKML = function() {
+$container['GeomKML'] = function($c) {
     return new MgKmlGeometryOutputFormatter();
 };
-$app->container->GeomRSSSimple = function() {
+$container['GeomRSSSimple'] = function($c) {
     return new MgGeoRssSimpleGeometryOutputFormatter();
 };
-$app->container->GeomRSSGml = function() {
+$container['GeomRSSGml'] = function($c) {
     return new MgGeoRssGmlGeometryOutputFormatter();
 };
-$app->container->GeomGml = function() {
+$container['GeomGml'] = function($c) {
     return new MgGmlGeometryOutputFormatter();
 };
-$app->container->EnvelopeCommaSeparated = function() {
+$container['EnvelopeCommaSeparated'] = function($c) {
     return new MgEnvelopeCommaSeparatedGeometryOutputFormatter();
 };
-$app->container->CentroidCommaSeparated = function() {
+$container['CentroidCommaSeparated'] = function($c) {
     return new MgCentroidCommaSeparatedGeometryOutputFormatter();
 };
 
 //Date formatters
-$app->container->DateDefault = function() {
+$container['DateDefault'] = function($c) {
     return new MgDefaultDateTimeOutputFormatter();
 };
-$app->container->DateDMY = function() {
+$container['DateDMY'] = function($c) {
     return new MgDMYDateTimeFormatter();
 };
-$app->container->DateMDY = function() {
+$container['DateMDY'] = function($c) {
     return new MgMDYDateTimeFormatter();
 };
-$app->container->DateISO9601 = function() {
+$container['DateISO9601'] = function($c) {
     return new MgISO9601DateTimeFormatter();
 };
-$app->container->DateDMYFull = function() {
+$container['DateDMYFull'] = function($c) {
     return new MgDMYFullDateTimeFormatter();
 };
-$app->container->DateMDYFull = function() {
+$container['DateMDYFull'] = function($c) {
     return new MgMDYFullDateTimeFormatter();
 };
-$app->container->DateISO9601Full = function() {
+$container['DateISO9601Full'] = function($c) {
     return new MgISO9601FullDateTimeFormatter();
 };
-$app->container->DateAtom = function() {
+$container['DateAtom'] = function($c) {
     return new MgAtomDateTimeFormatter();
 };

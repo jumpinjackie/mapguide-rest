@@ -20,6 +20,8 @@
 require_once dirname(__FILE__)."/../app/adapters/templateadapter.php";
 require_once dirname(__FILE__)."/TestUtils.php";
 
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 class MockIDProperty
 {
     public function GetName() {
@@ -59,7 +61,7 @@ class MockClass
     }
 }
 
-class MockReader
+class MockReader implements IReader
 {
     private $i;
     private $data;
@@ -124,6 +126,18 @@ class MockReader
         return new MockClass();
     }
     
+    public function GetBoolean($indexOrProp) { throw new Exception("Not implemented"); }
+
+    public function GetByte($indexOrProp) { throw new Exception("Not implemented"); }
+
+    public function GetDateTime($indexOrProp) { throw new Exception("Not implemented"); }
+
+    public function GetDouble($indexOrProp) { throw new Exception("Not implemented"); }
+
+    public function GetGeometry($indexOrProp) { throw new Exception("Not implemented"); }
+
+    public function GetInt16($indexOrProp) { throw new Exception("Not implemented"); }
+
     public function GetInt32($indexOrProp) {
         if ($this->closed)
             throw new Exception("Reader already closed");
@@ -133,6 +147,12 @@ class MockReader
         else
             throw new Exception("Invalid property index or name");
     }
+
+    public function GetInt64($indexOrProp) { throw new Exception("Not implemented"); }
+
+    public function GetSingle($indexOrProp) { throw new Exception("Not implemented"); }
+
+    public function GetString($indexOrProp) { throw new Exception("Not implemented"); }
     
     public function IsNull($indexOrProp) {
         if ($this->closed)
@@ -153,14 +173,14 @@ class MockReader
     }
 }
 
-class MockFormatterSet
+class MockFormatterSet implements IFormatterSet
 {
     public function GetFormatter($formatterName) {
         return null;
     }
 }
 
-class FeatureReaderModelTest extends PHPUnit_Framework_TestCase
+class FeatureReaderModelTest extends TestCase
 {
     public function testMockReader() {
         //Test our mock is in good order before feeding it to our 

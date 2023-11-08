@@ -21,6 +21,7 @@ require_once dirname(__FILE__)."/../../controller/coordinatesystemcontroller.php
 require_once dirname(__FILE__)."/../../controller/resourceservicecontroller.php";
 require_once dirname(__FILE__)."/../../controller/mappingservicecontroller.php";
 require_once dirname(__FILE__)."/../../controller/restservicecontroller.php";
+require_once dirname(__FILE__)."/../../core/app.php";
 
 /**
  *     @SWG\Get(
@@ -35,9 +36,12 @@ require_once dirname(__FILE__)."/../../controller/restservicecontroller.php";
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/services/fusiontemplates.:format", function($format) use ($app) {
+$app->get("/services/fusiontemplates.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgRestServiceController($app);
-    $ctrl->EnumerateApplicationTemplates($format);
+    $ctrl->EnumerateApplicationTemplates($type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -52,9 +56,12 @@ $app->get("/services/fusiontemplates.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/services/fusionwidgets.:format", function($format) use ($app) {
+$app->get("/services/fusionwidgets.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgRestServiceController($app);
-    $ctrl->EnumerateApplicationWidgets($format);
+    $ctrl->EnumerateApplicationWidgets($type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -69,9 +76,12 @@ $app->get("/services/fusionwidgets.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/services/fusioncontainers.:format", function($format) use ($app) {
+$app->get("/services/fusioncontainers.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgRestServiceController($app);
-    $ctrl->EnumerateApplicationContainers($format);
+    $ctrl->EnumerateApplicationContainers($type);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -90,9 +100,12 @@ $app->get("/services/fusioncontainers.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/services/listunmanageddata.:format", function($format) use ($app) {
+$app->post("/services/listunmanageddata.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->EnumerateUnmanagedData($format);
+    $ctrl->EnumerateUnmanagedData($type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -109,9 +122,12 @@ $app->post("/services/listunmanageddata.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/services/getschemamapping.:format", function($format) use ($app) {
+$app->get("/services/getschemamapping.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetSchemaMapping($format);
+    $ctrl->GetSchemaMapping($type);
+    return $app->Done();
 });
 
 /**
@@ -128,9 +144,11 @@ $app->get("/services/getschemamapping.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/services/copyresource", function() use ($app) {
+$app->post("/services/copyresource", function() {
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->CopyResource();
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -147,9 +165,11 @@ $app->post("/services/copyresource", function() use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/services/moveresource", function() use ($app) {
+$app->post("/services/moveresource", function() {
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->MoveResource();
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -166,9 +186,11 @@ $app->post("/services/moveresource", function() use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/services/transformcoords", function() use ($app) {
+$app->post("/services/transformcoords", function() {
+    $app = $this->get("AppServices");
     $ctrl = new MgCoordinateSystemController($app);
     $ctrl->TransformCoordinates();
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -192,7 +214,10 @@ $app->post("/services/transformcoords", function() use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/services/createmap.:format", function($format) use ($app) {
+$app->post("/services/createmap.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgMappingServiceController($app);
-    $ctrl->CreateRuntimeMap($format);
+    $ctrl->CreateRuntimeMap($type);
+    return $app->Done();
 });

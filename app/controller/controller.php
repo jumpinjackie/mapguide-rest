@@ -26,30 +26,21 @@ class MgBaseController extends MgResponseHandler
     protected $userName;
     protected $sessionId;
 
-    protected function __construct($app) {
+    protected function __construct(IAppServices $app) {
         parent::__construct($app);
         $this->userInfo = null;
         $this->userName = null;
         $this->sessionId = null;
     }
-
-    public function GetBooleanRequestParameter($name, $defaultValue) {
-        $val = strtolower($this->GetRequestParameter($name, $defaultValue));
-        if ($val == "true")
-            $val = "1";
-        else if ($val == "false")
-            $val = "0";
-        return $val;
-    }
     
-    protected function TrySetCredentialsFromRequest($req) {
+    protected function TrySetCredentialsFromRequest() {
         //HACK-ish: We must allow username/password request parameters for this
         //operation instead of the normal base64 encoded Basic authentication header
         //
         //So if we find such parameters, stuff them in the PHP_AUTH_USER and PHP_AUTH_PW
         //$_SERVER vars before calling EnsureAuthenticationForSite()
-        $user = $req->params("username");
-        $pwd = $req->params("password");
+        $user = $this->app->GetRequestParameter("username");
+        $pwd = $this->app->GetRequestParameter("password");
         if ($user != null) {
             $_SERVER['PHP_AUTH_USER'] = $user;
             if ($pwd != null)
@@ -57,7 +48,7 @@ class MgBaseController extends MgResponseHandler
         }
     }
 
-    protected function EnsureAuthenticationForHttp($callback, $allowAnonymous = false, $agentUri = "", $nominatedSessionId = "", $mimeType = MgMimeType::Html) {
+    protected function EnsureAuthenticationForHttp(/*php_callable*/ $callback, /*php_bool*/ $allowAnonymous = false, /*php_string*/ $agentUri = "", /*php_string*/ $nominatedSessionId = "", /*php_string*/ $mimeType = MgMimeType::Html) {
         //agent URI is only required if responses must contain a reference
         //back to the mapagent. This is not the case for most, if not all
         //our scenarios so the passed URI can be assumed to be empty most of the
@@ -65,7 +56,7 @@ class MgBaseController extends MgResponseHandler
         $req = new MgHttpRequest($agentUri);
         $param = $req->GetRequestParam();
         //Try session id first
-        $session = $this->app->request->params("session");
+        $session = $this->app->GetRequestParameter("session");
         if ($session != null) {
             $param->AddParameter("SESSION", $session);
         } else {
@@ -131,27 +122,27 @@ class MgBaseController extends MgResponseHandler
             }
         }
         //All good if we get here. Set up common request parameters so upstream callers don't have to
-        $param->AddParameter("LOCALE", $this->app->config("Locale"));
+        $param->AddParameter("LOCALE", $this->app->GetConfig("Locale"));
         $param->AddParameter("CLIENTAGENT", "MapGuide REST Extension");
         $param->AddParameter("CLIENTIP", $this->GetClientIp());
 
         //Apply file download parameters if specified
-        if ($this->app->request->params("download") === "1" || $this->app->request->params("download") === "true") {
+        if ($this->app->GetRequestParameter("download") === "1" || $this->app->GetRequestParameter("download") === "true") {
             $param->AddParameter("X-DOWNLOAD-ATTACHMENT", "true");
-            if ($this->app->request->params("downloadname")) {
-                $param->AddParameter("X-DOWNLOAD-ATTACHMENT-NAME", $this->app->request->params("downloadname"));
+            if ($this->app->GetRequestParameter("downloadname")) {
+                $param->AddParameter("X-DOWNLOAD-ATTACHMENT-NAME", $this->app->GetRequestParameter("downloadname"));
             }
         }
         $callback($req, $param);
     }
 
-    protected function EnsureAuthenticationForSite($nominatedSessionId = "", $allowAnonymous = false, $mimeType = MgMimeType::Html) {
+    protected function EnsureAuthenticationForSite(/*php_string*/ $nominatedSessionId = "", /*php_bool*/ $allowAnonymous = false, /*php_string*/ $mimeType = MgMimeType::Html) {
         if ($this->userInfo == null) {
             $this->userInfo = new MgUserInformation();
             $this->userInfo->SetClientAgent("MapGuide REST Extension");
             $this->userInfo->SetClientIp($this->GetClientIp());
             //Try session id first
-            $session = $this->app->request->params("session");
+            $session = $this->app->GetRequestParameter("session");
             if ($session != null) {
                 $this->userInfo->SetMgSessionId($session);
                 $this->sessionId = $session;
@@ -161,7 +152,7 @@ class MgBaseController extends MgResponseHandler
                     $this->sessionId = $nominatedSessionId;
                 } else {
                     //One last fallback, check request header from session id
-                    $session = $this->app->request->headers->get("X-MG-SESSION-ID");
+                    $session = $this->app->GetRequestHeader("X-MG-SESSION-ID");
                     if ($session != null && $session !== "") {
                         $this->userInfo->SetMgSessionId($session);
                         $this->sessionId = $session;

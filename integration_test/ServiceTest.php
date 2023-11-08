@@ -28,7 +28,7 @@ abstract class ServiceTest extends IntegrationTest {
     protected $anonymousSessionId;
     protected $adminSessionId;
 
-    protected function setUp() {
+    protected function set_up() {
         $resp = $this->apiTestWithCredentials("/session.json", "POST", array(), "Anonymous", "");
         $this->assertStatusCodeIsNot(401, $resp);
         $this->anonymousSessionId = json_decode($resp->getContent(), true)["PrimitiveValue"]["Value"];
@@ -37,7 +37,7 @@ abstract class ServiceTest extends IntegrationTest {
         $this->assertStatusCodeIsNot(401, $resp);
         $this->adminSessionId = json_decode($resp->getContent(), true)["PrimitiveValue"]["Value"];
     }
-    protected function tearDown() {
+    protected function tear_down() {
         $resp = $this->apiTest("/session/".$this->anonymousSessionId, "DELETE", null);
         $this->assertStatusCodeIs(200, $resp);
         $this->anonymousSessionId = null;

@@ -66,7 +66,7 @@ class MgPdfPlotter
     const VALIGN_CENTER = 'M'; //Docs say 'C', usage says 'M' ???
     const VALIGN_BOTTOM = 'B';
 
-    public function __construct($app, $renderingService, $map, $dpi = 96, $margin = NULL, $orientation = self::ORIENTATION_PORTRAIT, $paperType = 'A4', $showLegend = false, $showCoordinates = false, $showDisclaimer = false, $showScaleBar = false, $drawNorthArrow = false, $title = "", $subTitle = "") {
+    public function __construct(IAppServices $app, $renderingService, $map, $dpi = 96, $margin = NULL, $orientation = self::ORIENTATION_PORTRAIT, $paperType = 'A4', $showLegend = false, $showCoordinates = false, $showDisclaimer = false, $showScaleBar = false, $drawNorthArrow = false, $title = "", $subTitle = "") {
         $this->app = $app;
         $this->renderingService = $renderingService;
         $this->map = $map;
@@ -494,8 +494,8 @@ class MgPdfPlotter
                                                        $selection,
                                                        $center,
                                                        $scale,
-                                                       $toSize->width,
-                                                       $toSize->height,
+                                                       intval($toSize->width),
+                                                       intval($toSize->height),
                                                        $color,
                                                        MgImageFormats::Png,
                                                        true);
@@ -765,8 +765,8 @@ class MgPdfPlotter
                 $this->pdf->endLayer();
             }
         } else {
-            $filelocation = $this->RenderMap(MgUtils::InToPx($this->printSize->width, $this->dpi),
-                                             MgUtils::InToPx($this->printSize->height, $this->dpi),
+            $filelocation = $this->RenderMap(MgUtils::InToPx(floatval($this->printSize->width), intval($this->dpi)),
+                                             MgUtils::InToPx(floatval($this->printSize->height), intval($this->dpi)),
                                              $center,
                                              $scale);
 
@@ -803,7 +803,7 @@ class MgPdfPlotter
         //header sent. Doing this will most likely double up the mime type, but
         //will ensure we can view pdfs inline in chrome. I've erred on letting
         //the mime type double up
-        $this->app->response->header("Content-Type", "application/pdf");
+        $this->app->SetResponseHeader("Content-Type", "application/pdf");
         $mode = 'I';
         $name = 'Map.pdf';
         if (strlen($this->title) > 0)

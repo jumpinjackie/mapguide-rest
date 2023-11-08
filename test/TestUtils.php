@@ -36,15 +36,52 @@ class FakeStringCollection
         return -1;
     }
 }
+
+class FakeByteReader {
+    private $mimeType;
+    private $content;
+    public function __construct($mimeType, $content) {
+        $this->mimeType = $mimeType;
+        $this->content = $content;
+    }
+    public function GetMimeType() { return $this->mimeType; }
+    public function ToString() { return $this->content; }
+}
+
+class FakeSite {
+    private $groupBr;
+    private $roleMap;
+    public function __construct($groupBr, $roleMap = null) {
+        $this->groupBr = $groupBr;
+        $this->roleMap = $roleMap;
+        if ($this->roleMap == null) {
+            $this->roleMap = array(
+                "Author" => new FakeStringCollection(array()),
+                "Anonymous" => new FakeStringCollection(array()),
+                "Administrator" => new FakeStringCollection(array())
+            );
+        } else {
+            $this->roleMap = $roleMap;
+        }
+    }
+    public function EnumerateGroups($userName) { return $this->groupBr; }
+    public function EnumerateRoles($arg) {
+        if (array_key_exists($arg, $this->roleMap)) {
+            return $this->roleMap[$arg];
+        }
+        return new FakeStringCollection(array());
+    }
+}
     
 class TestUtils
 {
+    public static function mockSite($testCase, $groupBr, $roleMap) {
+        $stub = new FakeSite($groupBr, $roleMap);
+        return $stub;
+    }
+
     public static function mockByteReader($testCase, $xml) {
-        $stub = $testCase->getMockBuilder("MgByteReader")->getMock();
-        $stub->method("GetMimeType")
-            ->will($testCase->returnValue("text/xml"));
-        $stub->method("ToString")
-            ->will($testCase->returnValue($xml));
+        $stub = new FakeByteReader("text/xml", $xml);
         return $stub;
     }
 }

@@ -21,14 +21,14 @@ require_once "controller.php";
 require_once dirname(__FILE__)."/../util/pdfplotter.php";
 
 class MgMappingServiceController extends MgBaseController {
-    public function __construct($app) {
+    public function __construct(IAppServices $app) {
         parent::__construct($app);
     }
 
-    public function GenerateLegendImage($resId, $scale, $geomtype, $themecat, $format) {
+    public function GenerateLegendImage(MgResourceIdentifier $resId, /*php_double*/ $scale, /*php_int*/ $geomtype, /*php_string*/ $themecat, /*php_string*/ $format) {
         $resIdStr = $resId->ToString();
-        $width = $this->app->request->params("width");
-        $height = $this->app->request->params("height");
+        $width = $this->app->GetRequestParameter("width");
+        $height = $this->app->GetRequestParameter("height");
         $that = $this;
         $this->EnsureAuthenticationForHttp(function($req, $param) use ($that, $resIdStr, $width, $height, $scale, $geomtype, $themecat, $format) {
             $param->AddParameter("OPERATION", "GETLEGENDIMAGE");
@@ -50,7 +50,7 @@ class MgMappingServiceController extends MgBaseController {
     const REQUEST_LAYER_ICONS = 2;
     const REQUEST_LAYER_FEATURE_SOURCE = 4;
 
-    public static function CreateGroupItem($group, $parent) {
+    public static function CreateGroupItem(MgLayerGroup $group, MgLayerGroup $parent) {
         $xml  = "<Group>\n";
         $xml .= "<Name>".$group->GetName()."</Name>\n";
         $xml .= "<Type>".$group->GetLayerGroupType()."</Type>\n";
@@ -67,7 +67,7 @@ class MgMappingServiceController extends MgBaseController {
         return $xml;
     }
 
-    public static function CreateLayerItem($reqFeatures, $iconsPerScaleRange, $iconFormat, $iconWidth, $iconHeight, $layer, $parent, $xmldoc, $mappingService) {
+    public static function CreateLayerItem(/*php_int*/ $reqFeatures, /*php_int*/ $iconsPerScaleRange, /*php_string*/ $iconFormat, /*php_int*/ $iconWidth, /*php_int*/ $iconHeight, MgLayerBase $layer, MgLayerGroup $parent, DOMDocument $xmldoc, MgMappingService $mappingService) {
         $xml  = "<Layer>\n";
         $xml .= "<Name>".$layer->GetName()."</Name>\n";
         $xml .= "<Type>".$layer->GetLayerType()."</Type>\n";
@@ -267,7 +267,7 @@ class MgMappingServiceController extends MgBaseController {
         return $xml;
     }
 
-    private function DescribeRuntimeMapXml($mapDefinition, $map, $sessionId, $mapName, $iconFormat, $iconWidth, $iconHeight, $reqFeatures, $iconsPerScaleRange, $resSvc, $mappingSvc) {
+    private function DescribeRuntimeMapXml(/*php_string*/ $mapDefinition, MgMapBase $map, /*php_string*/ $sessionId, /*php_string*/ $mapName, /*php_string*/ $iconFormat, /*php_int*/ $iconWidth, /*php_int*/ $iconHeight, /*php_int*/ $reqFeatures, /*php_int*/ $iconsPerScaleRange, MgResourceService $resSvc, MgMappingService $mappingSvc) {
         //TODO: Caching opportunity here
 
         $admin = new MgServerAdmin();
@@ -414,17 +414,17 @@ class MgMappingServiceController extends MgBaseController {
         return $br;
     }
 
-    public function CreateRuntimeMap($format) {
-        $session = $this->app->request->params("session");
-        $mapDefIdStr = $this->app->request->params("mapdefinition");
-        $mapName = $this->app->request->params("targetmapname");
-        $reqFeatures = $this->app->request->params("requestedfeatures");
-        $iconFormat = $this->app->request->params("iconformat");
-        $iconWidth = $this->app->request->params("iconwidth");
-        $iconHeight = $this->app->request->params("iconheight");
-        $iconsPerScaleRange = $this->app->request->params("iconsperscalerange");
+    public function CreateRuntimeMap(/*php_string*/ $format) {
+        $session = $this->app->GetRequestParameter("session");
+        $mapDefIdStr = $this->app->GetRequestParameter("mapdefinition");
+        $mapName = $this->app->GetRequestParameter("targetmapname");
+        $reqFeatures = $this->app->GetRequestParameter("requestedfeatures");
+        $iconFormat = $this->app->GetRequestParameter("iconformat");
+        $iconWidth = $this->app->GetRequestParameter("iconwidth");
+        $iconHeight = $this->app->GetRequestParameter("iconheight");
+        $iconsPerScaleRange = $this->app->GetRequestParameter("iconsperscalerange");
 
-        $this->TrySetCredentialsFromRequest($this->app->request);
+        $this->TrySetCredentialsFromRequest();
 
         $this->EnsureAuthenticationForSite($session);
         $siteConn = new MgSiteConnection();
@@ -481,7 +481,7 @@ class MgMappingServiceController extends MgBaseController {
         $admin->Open($this->userInfo);
         $version = explode(".", $admin->GetSiteVersion());
         */
-        $version = $this->app->MG_VERSION;
+        $version = $this->app->GetMapGuideVersion();
         $bCanUseNative = false;
         if (intval($version[0]) > 2) { //3.0 or greater
             $bCanUseNative = true;
@@ -536,12 +536,12 @@ class MgMappingServiceController extends MgBaseController {
         }
     }
 
-    public function DescribeRuntimeMap($sessionId, $mapName, $format) {
-        $reqFeatures = $this->app->request->params("requestedfeatures");
-        $iconFormat = $this->app->request->params("iconformat");
-        $iconWidth = $this->app->request->params("iconwidth");
-        $iconHeight = $this->app->request->params("iconheight");
-        $iconsPerScaleRange = $this->app->request->params("iconsperscalerange");
+    public function DescribeRuntimeMap(/*php_string*/ $sessionId, /*php_string*/ $mapName, /*php_string*/ $format) {
+        $reqFeatures = $this->app->GetRequestParameter("requestedfeatures");
+        $iconFormat = $this->app->GetRequestParameter("iconformat");
+        $iconWidth = $this->app->GetRequestParameter("iconwidth");
+        $iconHeight = $this->app->GetRequestParameter("iconheight");
+        $iconsPerScaleRange = $this->app->GetRequestParameter("iconsperscalerange");
 
         $this->EnsureAuthenticationForSite($sessionId, false);
         $siteConn = new MgSiteConnection();
@@ -626,12 +626,12 @@ class MgMappingServiceController extends MgBaseController {
         }
     }
 
-    public function GeneratePlotFromMapDefinition($resId, $format) {
+    public function GeneratePlotFromMapDefinition(MgResourceIdentifier $resId, /*php_string*/ $format) {
         $fmt = $this->ValidateRepresentation($format, array("dwf", "pdf"));
-        $x = $this->GetRequestParameter("x", "");
-        $y = $this->GetRequestParameter("y", "");
-        $scale = $this->GetRequestParameter("scale", "");
-        $dpi = intval($this->GetRequestParameter("dpi", "96"));
+        $x = $this->app->GetRequestParameter("x", "");
+        $y = $this->app->GetRequestParameter("y", "");
+        $scale = $this->app->GetRequestParameter("scale", "");
+        $dpi = intval($this->app->GetRequestParameter("dpi", "96"));
 
         $showPdfCoords = $this->GetBooleanRequestParameter("pdf_coords", false);
         $showPdfNorthArrow = $this->GetBooleanRequestParameter("pdf_north_arrow", false);
@@ -640,11 +640,11 @@ class MgMappingServiceController extends MgBaseController {
         $showPdfLegend = $this->GetBooleanRequestParameter("pdf_legend", false);
 
         if ($x == "")
-            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "x"), MgMimeType::Html);
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "x"), MgMimeType::Html);
         if ($y == "")
-            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "y"), MgMimeType::Html);
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "y"), MgMimeType::Html);
         if ($scale == "")
-            $this->BadRequest($this->app->localizer->getText("E_MISSING_REQUIRED_PARAMETER", "scale"), MgMimeType::Html);
+            $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "scale"), MgMimeType::Html);
 
         $this->EnsureAuthenticationForSite();
         $siteConn = new MgSiteConnection();
@@ -653,13 +653,13 @@ class MgMappingServiceController extends MgBaseController {
         $map = new MgMap($siteConn);
         $map->Create($resId, "Plot");
 
-        $title = $this->GetRequestParameter("title", "");
-        $paperSize = $this->GetRequestParameter("papersize", 'A4');
-        $orientation = $this->GetRequestParameter("orientation", 'P');
-        $marginLeft = floatval($this->GetRequestParameter("marginleft", 0.5));
-        $marginRight = floatval($this->GetRequestParameter("marginright", 0.5));
-        $marginTop = floatval($this->GetRequestParameter("margintop", ($title == "") ? 0.5: 1.0));
-        $marginBottom = floatval($this->GetRequestParameter("marginbottom", 0.5));
+        $title = $this->app->GetRequestParameter("title", "");
+        $paperSize = $this->app->GetRequestParameter("papersize", 'A4');
+        $orientation = $this->app->GetRequestParameter("orientation", 'P');
+        $marginLeft = floatval($this->app->GetRequestParameter("marginleft", 0.5));
+        $marginRight = floatval($this->app->GetRequestParameter("marginright", 0.5));
+        $marginTop = floatval($this->app->GetRequestParameter("margintop", ($title == "") ? 0.5: 1.0));
+        $marginBottom = floatval($this->app->GetRequestParameter("marginbottom", 0.5));
 
         $geomFact = new MgGeometryFactory();
         $center = $geomFact->CreateCoordinateXY(floatval($x), floatval($y));
@@ -667,13 +667,18 @@ class MgMappingServiceController extends MgBaseController {
         if ($fmt == "dwf") {
             $size = MgUtils::GetPaperSize($this->app, $paperSize);
             //If landscape, flip the width/height
-            $width = ($orientation == 'L') ? MgUtils::MMToIn($size[1]) : MgUtils::MMToIn($size[0]);
-            $height = ($orientation == 'L') ? MgUtils::MMToIn($size[0]) : MgUtils::MMToIn($size[1]);
-            $printLayoutStr = $this->GetRequestParameter("printlayout", null);
+            $width = ($orientation == 'L') ? MgUtils::MMToIn(floatval($size[1])) : MgUtils::MMToIn(floatval($size[0]));
+            $height = ($orientation == 'L') ? MgUtils::MMToIn(floatval($size[0])) : MgUtils::MMToIn(floatval($size[1]));
+            $printLayoutStr = $this->app->GetRequestParameter("printlayout", null);
             $mappingSvc = $siteConn->CreateService(MgServiceType::MappingService);
 
             $dwfVersion = new MgDwfVersion("6.01", "1.2");
-            $plotSpec = new MgPlotSpecification($width, $height, MgPageUnitsType::Inches);
+            $mgVer = $this->app->GetMapGuideVersion();
+            if (intval($mgVer[0]) > 3) { //4.0 or greater
+                $plotSpec = new MgPlotSpecification($width, $height, MgPageUnitsType::Inches, 0.0, 0.0, 0.0, 0.0);
+            } else {
+                $plotSpec = new MgPlotSpecification($width, $height, MgPageUnitsType::Inches);
+            }
             $plotSpec->SetMargins($marginLeft, $marginTop, $marginRight, $marginBottom);
 
             $layout = null;
@@ -685,21 +690,21 @@ class MgMappingServiceController extends MgBaseController {
             $map->SetDisplayDpi($dpi);
             $br = $mappingSvc->GeneratePlot($map, $center, floatval($scale), $plotSpec, $layout, $dwfVersion);
             //Apply download headers
-            $downloadFlag = $this->app->request->params("download");
+            $downloadFlag = $this->app->GetRequestParameter("download");
             if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
-                $name = $this->app->request->params("downloadname");
+                $name = $this->app->GetRequestParameter("downloadname");
                 if (!$name) {
                     $name = "download";
                 }
                 $name .= ".dwf";
-                $this->app->response->header("Content-Disposition", "attachment; filename=".$name);
+                $this->app->SetResponseHeader("Content-Disposition", "attachment; filename=".$name);
             }
             $this->OutputByteReader($br);
         } else { //pdf
             //FIXME: Initial visibility state is inconsistent (probably because this map hasn't been rendered
             //yet). As a result, adding layered PDF support won't really work here.
             /*
-            $bLayered = $this->app->request->params("layeredpdf");
+            $bLayered = $this->app->GetRequestParameter("layeredpdf");
             if ($bLayered == null)
                 $bLayered = false;
             else
@@ -715,14 +720,14 @@ class MgMappingServiceController extends MgBaseController {
             $plotter->ShowScaleBar($showPdfScaleBar);
             $plotter->ShowDisclaimer($showPdfDisclaimer);
             $plotter->ShowLegend($showPdfLegend);
-            $plotter->SetDisclaimer($this->app->config("PDF.PlotDisclaimer"));
+            $plotter->SetDisclaimer($this->app->GetConfig("PDF.PlotDisclaimer"));
             //$plotter->SetLayered($bLayered);
             $plotter->SetMargins($marginTop, $marginBottom, $marginLeft, $marginRight);
 
             //Apply download headers
-            $downloadFlag = $this->app->request->params("download");
+            $downloadFlag = $this->app->GetRequestParameter("download");
             if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
-                $name = $this->app->request->params("downloadname");
+                $name = $this->app->GetRequestParameter("downloadname");
                 if (!$name) {
                     $name = "download";
                 }
@@ -734,7 +739,7 @@ class MgMappingServiceController extends MgBaseController {
         }
     }
 
-    public function GeneratePlot($sessionId, $mapName, $format) {
+    public function GeneratePlot(/*php_string*/ $sessionId, /*php_string*/ $mapName, /*php_string*/ $format) {
         $fmt = $this->ValidateRepresentation($format, array("dwf", "pdf"));
         $this->EnsureAuthenticationForSite($sessionId);
         $siteConn = new MgSiteConnection();
@@ -745,13 +750,13 @@ class MgMappingServiceController extends MgBaseController {
 
         $mappingSvc = $siteConn->CreateService(MgServiceType::MappingService);
 
-        $title = $this->GetRequestParameter("title", "");
-        $paperSize = $this->GetRequestParameter("papersize", 'A4');
-        $orientation = $this->GetRequestParameter("orientation", 'P');
-        $marginLeft = floatval($this->GetRequestParameter("marginleft", 0.5));
-        $marginRight = floatval($this->GetRequestParameter("marginright", 0.5));
-        $marginTop = floatval($this->GetRequestParameter("margintop", ($title == "") ? 0.5: 1.0));
-        $marginBottom = floatval($this->GetRequestParameter("marginbottom", 0.5));
+        $title = $this->app->GetRequestParameter("title", "");
+        $paperSize = $this->app->GetRequestParameter("papersize", 'A4');
+        $orientation = $this->app->GetRequestParameter("orientation", 'P');
+        $marginLeft = floatval($this->app->GetRequestParameter("marginleft", 0.5));
+        $marginRight = floatval($this->app->GetRequestParameter("marginright", 0.5));
+        $marginTop = floatval($this->app->GetRequestParameter("margintop", ($title == "") ? 0.5: 1.0));
+        $marginBottom = floatval($this->app->GetRequestParameter("marginbottom", 0.5));
         
         $showPdfCoords = $this->GetBooleanRequestParameter("pdf_coords", false);
         $showPdfNorthArrow = $this->GetBooleanRequestParameter("pdf_north_arrow", false);
@@ -764,7 +769,7 @@ class MgMappingServiceController extends MgBaseController {
             //If landscape, flip the width/height
             $width = ($orientation == 'L') ? MgUtils::MMToIn($size[1]) : MgUtils::MMToIn($size[0]);
             $height = ($orientation == 'L') ? MgUtils::MMToIn($size[0]) : MgUtils::MMToIn($size[1]);
-            $printLayoutStr = $this->GetRequestParameter("printlayout", null);
+            $printLayoutStr = $this->app->GetRequestParameter("printlayout", null);
 
             $dwfVersion = new MgDwfVersion("6.01", "1.2");
             $plotSpec = new MgPlotSpecification($width, $height, MgPageUnitsType::Inches);
@@ -778,18 +783,18 @@ class MgMappingServiceController extends MgBaseController {
 
             $br = $mappingSvc->GeneratePlot($map, $plotSpec, $layout, $dwfVersion);
             //Apply download headers
-            $downloadFlag = $this->app->request->params("download");
+            $downloadFlag = $this->app->GetRequestParameter("download");
             if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
-                $name = $this->app->request->params("downloadname");
+                $name = $this->app->GetRequestParameter("downloadname");
                 if (!$name) {
                     $name = "download";
                 }
                 $name .= ".dwf";
-                $this->app->response->header("Content-Disposition", "attachment; filename=".$name);
+                $this->app->SetResponseHeader("Content-Disposition", "attachment; filename=".$name);
             }
             $this->OutputByteReader($br);
         } else { //pdf
-            $bLayered = $this->app->request->params("layeredpdf");
+            $bLayered = $this->app->GetRequestParameter("layeredpdf");
             if ($bLayered == null)
                 $bLayered = false;
             else
@@ -805,15 +810,15 @@ class MgMappingServiceController extends MgBaseController {
             $plotter->ShowScaleBar($showPdfScaleBar);
             $plotter->ShowDisclaimer($showPdfDisclaimer);
             $plotter->ShowLegend($showPdfLegend);
-            $plotter->SetDisclaimer($this->app->config("PDF.PlotDisclaimer"));
+            $plotter->SetDisclaimer($this->app->GetConfig("PDF.PlotDisclaimer"));
             $plotter->SetLayered($bLayered);
             $plotter->SetMargins($marginTop, $marginBottom, $marginLeft, $marginRight);
 
             $mapCenter = $map->GetViewCenter();
             //Apply download headers
-            $downloadFlag = $this->app->request->params("download");
+            $downloadFlag = $this->app->GetRequestParameter("download");
             if ($downloadFlag && ($downloadFlag === "1" || $downloadFlag === "true")) {
-                $name = $this->app->request->params("downloadname");
+                $name = $this->app->GetRequestParameter("downloadname");
                 if (!$name) {
                     $name = "download";
                 }

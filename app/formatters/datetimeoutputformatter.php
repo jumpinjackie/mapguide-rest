@@ -17,15 +17,17 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+require_once dirname(__FILE__)."/../core/interfaces.php";
+
 abstract class MgDateTimeOutputFormatter
 {
     protected function __construct() {
         
     }
 
-    protected abstract function OutputDateTime($dateTime);
+    protected abstract function OutputDateTime(MgDateTime $dateTime);
     
-    public function Output($reader, $propName) {
+    public function Output(IReader $reader, /*php_string*/ $propName) {
         $output = "";
         try {
             if (!$reader->IsNull($propName)) {

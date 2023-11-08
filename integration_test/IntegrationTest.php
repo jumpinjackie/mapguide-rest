@@ -20,11 +20,14 @@
 require_once dirname(__FILE__)."/Config.php";
 require_once dirname(__FILE__)."/ApiResponse.php";
 
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use Yoast\PHPUnitPolyfills\Polyfills\AssertStringContains;
+
 /**
  * This is the base class of all our integration tests. Provides common boilerplates and
  * functions for integration tests to use.
  */
-abstract class IntegrationTest extends PHPUnit_Framework_TestCase
+abstract class IntegrationTest extends TestCase
 {
     protected function apiTestAnon($url, $type, $data) {
         return $this->apiTestWithCredentials($url, $type, $data, "Anonymous", "");
@@ -84,7 +87,7 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
         $response = curl_exec($curl);
         if ($response === false) {
             $err = curl_error($curl);
-            throw new Exception("Curl Error: $err");
+            throw new Exception("Curl Error: $err (requesting: $absUrl)");
         }
 
         //echo "**** $type ($origType) $absUrl\n";
@@ -129,7 +132,7 @@ abstract class IntegrationTest extends PHPUnit_Framework_TestCase
     }
 
     protected function assertMimeType($expectedMime, $response) {
-        $this->assertContains($expectedMime, $response->getContentType(), $response->dump());
+        $this->assertStringContainsString($expectedMime, $response->getContentType(), $response->dump());
     }
 
     protected function assertStatusCodeIs($code, $resp) {

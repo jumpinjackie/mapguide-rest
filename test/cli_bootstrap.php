@@ -92,10 +92,19 @@ $user2Pass = "user2";
 $userGroup = "RestUsers";
 
 try {
+    echo "*****************************************************\n";
+    echo "* IMPORTANT NOTICE!!!!                              *\n";
+    echo "*                                                   *\n";
+    echo "* Make sure your MapGuide Server tier is running    *\n";
+    echo "* on the ports indicated in the webconfig.ini       *\n";
+    echo "* otherwise the integration test suite will         *\n";
+    echo "* entirely fail                                     *\n";
+    echo "*****************************************************\n";
     echo "Bootstrapping the test environment with required data\n\n";
 
     $webConfigPath = dirname(__FILE__)."/../../webconfig.ini";
     MgInitializeWebTier($webConfigPath);
+    echo "Initialized web tier using: $webConfigPath\n";
 
     $mgp = dirname(__FILE__)."/data/Sheboygan.mgp";
     if (!file_exists($mgp)) {

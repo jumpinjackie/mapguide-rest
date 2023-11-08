@@ -1,7 +1,7 @@
 <?php
 
 //
-//  Copyright (C) 2015 by Jackie Ng
+//  Copyright (C) 2023 by Jackie Ng
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of version 2.1 of the GNU Lesser
@@ -17,15 +17,28 @@
 //  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-class LogWriter extends \Slim\LogWriter
-{
-    public function __construct($path) {
-        parent::__construct(fopen($path, "a"));
-    }
-}
+use Monolog\Logger;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\NullHandler;
+use Monolog\Formatter\LineFormatter;
 
-return array(
-    "log.enabled" => false,
-    "log.level" => \Slim\Log::DEBUG,
-    "log.writer" => new LogWriter(dirname(__FILE__)."/../cache/debug.log")
-);
+$container = $app->getContainer();
+
+$container["logger"] = function ($c) {
+    $logger = new Logger("slim");
+
+    $formatter = new LineFormatter(
+        "[%datetime%] [%level_name%]: %message% %context%\n",
+        null,
+        true,
+        true
+    );
+
+    /* Log to timestamped files */
+    $rotating = new RotatingFileHandler(dirname(__FILE__)."/../cache/debug.log", 0, Logger::DEBUG);
+    $rotating->setFormatter($formatter);
+    $logger->pushHandler($rotating);
+
+    return $logger;
+};

@@ -40,7 +40,7 @@ class MgWhitelist
     }
     */
     
-    private static function VerifyWhitelistInternal($fsConf, $mimeType, $forbiddenAction, $requiredAction, $requiredRepresentation, $site, $userName) {
+    private static function VerifyWhitelistInternal(array $fsConf, /*php_string*/ $mimeType, /*php_callable*/ $forbiddenAction, /*php_string*/ $requiredAction, /*php_string*/ $requiredRepresentation, /*MgSite*/ $site, /*php_string*/ $userName) {
         $supportedActions = null;
         $supportedRepresentations = null;
         if (!empty($fsConf) && array_key_exists("Actions", $fsConf)) {
@@ -91,7 +91,7 @@ class MgWhitelist
         }
     }
     
-    public function VerifyGlobalWhitelist($mimeType, $forbiddenAction, $requiredAction, $requiredRepresentation, $site, $userName) {
+    public function VerifyGlobalWhitelist(/*php_string*/ $mimeType, /*php_callable*/ $forbiddenAction, /*php_callable*/ $requiredAction, /*php_string*/ $requiredRepresentation, /*MgSite*/ $site, /*php_string*/ $userName) {
         if ($this->conf && !empty($this->conf)) {
             $fsConf = null;
             if (!array_key_exists("Globals", $this->conf)) {
@@ -106,7 +106,7 @@ class MgWhitelist
         }
     }
     
-    public function VerifyWhitelist($resIdStr, $mimeType, $forbiddenAction, $requiredAction, $requiredRepresentation, $site, $userName) {
+    public function VerifyWhitelist(/*php_string*/ $resIdStr, /*php_string*/ $mimeType, /*php_callable*/ $forbiddenAction, /*php_callable*/ $requiredAction, /*php_string*/ $requiredRepresentation, /*MgSite*/ $site, /*php_string*/ $userName) {
         if ($this->conf && !empty($this->conf)) {
             $fsConf = null;
             //If resource configuration does not exist, then fall back to the global one

@@ -21,11 +21,11 @@ require_once dirname(__FILE__)."/../Config.php";
 require_once dirname(__FILE__)."/../ServiceTest.php";
 
 class SetGetDeleteResourceApiTest extends ServiceTest {
-    protected function setUp() {
-        parent::setUp();
+    protected function set_up() {
+        parent::set_up();
     }
-    protected function tearDown() {
-        parent::tearDown();
+    protected function tear_down() {
+        parent::tear_down();
     }
     private function getSessionResourceUrlPart() {
         return "/session/" . $this->anonymousSessionId . "/Empty.FeatureSource";
@@ -62,11 +62,11 @@ class SetGetDeleteResourceApiTest extends ServiceTest {
         $this->assertStatusCodeIs(201, $resp);
 
         if ($bTestUnauth) {
-            $resp = $this->apiTestAnon("$resPart", "DELETE", null);
+            $resp = $this->apiTestAnon("$resPart/resource", "DELETE", null);
             $this->assertStatusCodeIs(401, $resp);
         }
 
-        $resp = $this->apiTestAdmin("$resPart", "DELETE", null);
+        $resp = $this->apiTestAdmin("$resPart/resource", "DELETE", null);
         $this->assertStatusCodeIs(200, $resp);
     }
     private function __testOperationAltRoute($resPart, $resPart2, $bTestUnauth, $bTestGetHeader) {
@@ -99,11 +99,11 @@ class SetGetDeleteResourceApiTest extends ServiceTest {
         }
 
         if ($bTestUnauth) {
-            $resp = $this->apiTestAnon("$resPart2", "DELETE", null);
+            $resp = $this->apiTestAnon("$resPart2/resource", "DELETE", null);
             $this->assertStatusCodeIs(401, $resp);
         }
 
-        $resp = $this->apiTestAdmin("$resPart2", "DELETE", null);
+        $resp = $this->apiTestAdmin("$resPart2/resource", "DELETE", null);
         $this->assertStatusCodeIs(200, $resp);
     }
     public function testLibraryOperation() {

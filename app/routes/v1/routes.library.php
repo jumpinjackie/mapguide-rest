@@ -25,6 +25,7 @@ require_once dirname(__FILE__)."/../../controller/mappingservicecontroller.php";
 require_once dirname(__FILE__)."/../../controller/renderingservicecontroller.php";
 require_once dirname(__FILE__)."/../../controller/viewercontroller.php";
 require_once dirname(__FILE__)."/../../util/utils.php";
+require_once dirname(__FILE__)."/../../core/app.php";
 
 //======================== Feature Service APIs =======================================
 
@@ -42,14 +43,18 @@ require_once dirname(__FILE__)."/../../util/utils.php";
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/status.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}.FeatureSource/status.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->TestConnection($resId, $format);
+    $ctrl->TestConnection($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -66,14 +71,18 @@ $app->get("/library/:resourcePath+.FeatureSource/status.:format", function($reso
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/editcapabilities.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}.FeatureSource/editcapabilities.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetEditCapabilities($resId, $format);
+    $ctrl->GetEditCapabilities($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -90,14 +99,17 @@ $app->get("/library/:resourcePath+.FeatureSource/editcapabilities.:format", func
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+.FeatureSource/xml", function($resourcePath) use ($app) {
+$app->post("/library/{resourcePath:.*}.FeatureSource/xml", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->CreateFeatureSource($resId, "xml");
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -114,14 +126,17 @@ $app->post("/library/:resourcePath+.FeatureSource/xml", function($resourcePath) 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+.FeatureSource/json", function($resourcePath) use ($app) {
+$app->post("/library/{resourcePath:.*}.FeatureSource/json", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
     $ctrl->CreateFeatureSource($resId, "json");
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -140,14 +155,18 @@ $app->post("/library/:resourcePath+.FeatureSource/json", function($resourcePath)
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+.FeatureSource/editcapabilities.:format", function($resourcePath, $format) use ($app) {
+$app->post("/library/{resourcePath:.*}.FeatureSource/editcapabilities.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->SetEditCapabilities($resId, $format);
+    $ctrl->SetEditCapabilities($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -163,14 +182,18 @@ $app->post("/library/:resourcePath+.FeatureSource/editcapabilities.:format", fun
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/spatialcontexts.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}.FeatureSource/spatialcontexts.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetSpatialContexts($resId, $format);
+    $ctrl->GetSpatialContexts($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -187,14 +210,18 @@ $app->get("/library/:resourcePath+.FeatureSource/spatialcontexts.:format", funct
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/longtransactions.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}.FeatureSource/longtransactions.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetLongTransactions($resId, $format);
+    $ctrl->GetLongTransactions($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -210,14 +237,18 @@ $app->get("/library/:resourcePath+.FeatureSource/longtransactions.:format", func
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/schemas.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}.FeatureSource/schemas.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetSchemaNames($resId, $format);
+    $ctrl->GetSchemaNames($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -235,14 +266,19 @@ $app->get("/library/:resourcePath+.FeatureSource/schemas.:format", function($res
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/schema.:format/:schemaName", function($resourcePath, $format, $schemaName) use ($app) {
+$app->get("/library/{resourcePath:.*}.FeatureSource/schema.{type}/{schemaName}", function($req, $resp, $args) {
+    $resourcePath =explode('/', $args['resourcePath']);
+    $type = $args['type'];
+    $schemaName = $args['schemaName'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->DescribeSchema($resId, $schemaName, $format);
+    $ctrl->DescribeSchema($resId, $schemaName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -259,14 +295,19 @@ $app->get("/library/:resourcePath+.FeatureSource/schema.:format/:schemaName", fu
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/classes.:format/:schemaName", function($resourcePath, $format, $schemaName) use ($app) {
+$app->get("/library/{resourcePath:.*}.FeatureSource/classes.{type}/{schemaName}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
+    $schemaName = $args['schemaName'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetClassNames($resId, $schemaName, $format);
+    $ctrl->GetClassNames($resId, $schemaName, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -284,14 +325,20 @@ $app->get("/library/:resourcePath+.FeatureSource/classes.:format/:schemaName", f
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+$app->get("/library/{resourcePath:.*}.FeatureSource/classdef.{type}/{schemaName}/{className}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
+    $schemaName = $args['schemaName'];
+    $className = $args['className'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->GetClassDefinition($resId, $schemaName, $className, $format);
+    $ctrl->GetClassDefinition($resId, $schemaName, $className, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -308,12 +355,16 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:schemaName/:c
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:qualifiedClassName", function($resourcePath, $format, $qualifiedClassName) use ($app) {
+$app->get("/library/{resourcePath:.*}.FeatureSource/classdef.{type}/{qualifiedClassName}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
+    $qualifiedClassName = $args['qualifiedClassName'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
     $tokens = explode(":", $qualifiedClassName);
     $schemaName = "";
@@ -324,7 +375,8 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:qualifiedClas
     } else {
         $className = $qualifiedClassName;
     }
-    $ctrl->GetClassDefinition($resId, $schemaName, $className, $format);
+    $ctrl->GetClassDefinition($resId, $schemaName, $className, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -345,14 +397,20 @@ $app->get("/library/:resourcePath+.FeatureSource/classdef.:format/:qualifiedClas
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+$app->post("/library/{resourcePath:.*}.FeatureSource/features.{type}/{schemaName}/{className}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
+    $schemaName = $args['schemaName'];
+    $className = $args['className'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->InsertFeatures($resId, $schemaName, $className, $format);
+    $ctrl->InsertFeatures($resId, $schemaName, $className, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Put(
@@ -374,14 +432,20 @@ $app->post("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->put("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+$app->put("/library/{resourcePath:.*}.FeatureSource/features.{type}/{schemaName}/{className}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
+    $schemaName = $args['schemaName'];
+    $className = $args['className'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->UpdateFeatures($resId, $schemaName, $className, $format);
+    $ctrl->UpdateFeatures($resId, $schemaName, $className, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Delete(
@@ -403,14 +467,20 @@ $app->put("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:c
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+$app->delete("/library/{resourcePath:.*}.FeatureSource/features.{type}/{schemaName}/{className}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
+    $schemaName = $args['schemaName'];
+    $className = $args['className'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->DeleteFeatures($resId, $schemaName, $className, $format);
+    $ctrl->DeleteFeatures($resId, $schemaName, $className, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -438,14 +508,20 @@ $app->delete("/library/:resourcePath+.FeatureSource/features.:format/:schemaName
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:className", function($resourcePath, $format, $schemaName, $className) use ($app) {
+$app->get("/library/{resourcePath:.*}.FeatureSource/features.{type}/{schemaName}/{className}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
+    $schemaName = $args['schemaName'];
+    $className = $args['className'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->SelectFeatures($resId, $schemaName, $className, $format);
+    $ctrl->SelectFeatures($resId, $schemaName, $className, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -472,14 +548,18 @@ $app->get("/library/:resourcePath+.FeatureSource/features.:format/:schemaName/:c
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.LayerDefinition/features.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}.LayerDefinition/features.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->SelectLayerFeatures($resId, $format);
+    $ctrl->SelectLayerFeatures($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -499,14 +579,21 @@ $app->get("/library/:resourcePath+.LayerDefinition/features.:format", function($
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/aggregates.:format/:type/:schemaName/:className", function($resourcePath, $format, $type, $schemaName, $className) use ($app) {
+$app->get("/library/{resourcePath:.*}.FeatureSource/aggregates.{type}/{aggregateType}/{schemaName}/{className}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
+    $aggregateType = $args['aggregateType'];
+    $schemaName = $args['schemaName'];
+    $className = $args['className'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgFeatureServiceController($app);
-    $ctrl->SelectAggregates($resId, $schemaName, $className, $type, $format);
+    $ctrl->SelectAggregates($resId, $schemaName, $className, $aggregateType, $type);
+    return $app->Done();
 });
 
 //================================== Resource Service APIs ======================================================
@@ -527,9 +614,11 @@ $app->get("/library/:resourcePath+.FeatureSource/aggregates.:format/:type/:schem
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library", function() use ($app) {
+$app->post("/library", function() {
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->ApplyResourcePackage();
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -545,10 +634,14 @@ $app->post("/library", function() use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+/datalist.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}/datalist.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->EnumerateResourceData($resId, $format);
+    $ctrl->EnumerateResourceData($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -566,10 +659,13 @@ $app->get("/library/:resourcePath+/datalist.:format", function($resourcePath, $f
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/list.:format", function($format) use ($app) {
+$app->get("/library/list.{type}", function($req, $resp, $args) {
+    $type = $args['type'];
     $resId = new MgResourceIdentifier("Library://");
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->EnumerateResources($resId, $format);
+    $ctrl->EnumerateResources($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -588,10 +684,14 @@ $app->get("/library/list.:format", function($format) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+/list.:format", function($resourcePath, $format) use ($app) {
-    $resId = MgUtils::ParseLibraryResourceID($resourcePath, "list.".$format);
+$app->get("/library/{resourcePath:.*}/list.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
+    $resId = MgUtils::ParseLibraryResourceID($resourcePath, "list.".$type);
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->EnumerateResources($resId, $format);
+    $ctrl->EnumerateResources($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -607,10 +707,14 @@ $app->get("/library/:resourcePath+/list.:format", function($resourcePath, $forma
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+/data/:dataName", function($resourcePath, $dataName) use ($app) {
+$app->get("/library/{resourcePath:.*}/data/{dataName}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $dataName = $args['dataName'];
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->GetResourceData($resId, $dataName);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -629,10 +733,14 @@ $app->get("/library/:resourcePath+/data/:dataName", function($resourcePath, $dat
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+/data/:dataName", function($resourcePath, $dataName) use ($app) {
+$app->post("/library/{resourcePath:.*}/data/{dataName}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $dataName = $args['dataName'];
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->SetResourceData($resId, $dataName);
+    return $app->Done();
 });
 /**
  *     @SWG\Delete(
@@ -648,10 +756,14 @@ $app->post("/library/:resourcePath+/data/:dataName", function($resourcePath, $da
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/library/:resourcePath+/data/:dataName", function($resourcePath, $dataName) use ($app) {
+$app->delete("/library/{resourcePath:.*}/data/{dataName}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $dataName = $args['dataName'];
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->DeleteResourceData($resId, $dataName);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -670,10 +782,14 @@ $app->delete("/library/:resourcePath+/data/:dataName", function($resourcePath, $
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+/header.:format", function($resourcePath, $format) use ($app) {
+$app->post("/library/{resourcePath:.*}/header.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->SetResourceHeader($resId, $format);
+    $ctrl->SetResourceHeader($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -690,10 +806,14 @@ $app->post("/library/:resourcePath+/header.:format", function($resourcePath, $fo
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+/header.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}/header.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->GetResourceHeader($resId, $format);
+    $ctrl->GetResourceHeader($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -713,10 +833,14 @@ $app->get("/library/:resourcePath+/header.:format", function($resourcePath, $for
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+/contentorheader.:format", function($resourcePath, $format) use ($app) {
+$app->post("/library/{resourcePath:.*}/contentorheader.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->SetResourceContentOrHeader($resId, $format);
+    $ctrl->SetResourceContentOrHeader($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Post(
@@ -735,10 +859,14 @@ $app->post("/library/:resourcePath+/contentorheader.:format", function($resource
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->post("/library/:resourcePath+/content.:format", function($resourcePath, $format) use ($app) {
+$app->post("/library/{resourcePath:.*}/content.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->SetResourceContent($resId, $format);
+    $ctrl->SetResourceContent($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -753,10 +881,13 @@ $app->post("/library/:resourcePath+/content.:format", function($resourcePath, $f
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+/html", function($resourcePath) use ($app) {
+$app->get("/library/{resourcePath:.*}/html", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->GetResourceInfo($resId, "html");
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -772,10 +903,14 @@ $app->get("/library/:resourcePath+/html", function($resourcePath) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+/content.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}/content.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->GetResourceContent($resId, $format);
+    $ctrl->GetResourceContent($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -791,14 +926,18 @@ $app->get("/library/:resourcePath+/content.:format", function($resourcePath, $fo
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+/references.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}/references.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
-    $ctrl->EnumerateResourceReferences($resId, $format);
+    $ctrl->EnumerateResourceReferences($resId, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Delete(
- *        path="/library/{resourcePath}",
+ *        path="/library/{resourcePath}/resource",
  *        operationId="DeleteResource",
  *        summary="Deletes the given resource",
  *        tags={"library"},
@@ -809,10 +948,13 @@ $app->get("/library/:resourcePath+/references.:format", function($resourcePath, 
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->delete("/library/:resourcePath+", function($resourcePath) use ($app) {
+$app->delete("/library/{resourcePath:.*}/resource", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgResourceServiceController($app);
     $ctrl->DeleteResource($resId);
+    return $app->Done();
 });
 //============================== Tile Service APIs ============================================
 
@@ -835,7 +977,13 @@ $app->delete("/library/:resourcePath+", function($resourcePath) use ($app) {
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:z/:x/:y/tile.:format", function($resourcePath, $groupName, $z, $x, $y, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}.MapDefinition/xyz/{groupName}/{z}/{x}/{y}/tile.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $groupName = $args['groupName'];
+    $z = $args['z'];
+    $x = $args['x'];
+    $y = $args['y'];
+    $type = $args['type'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
@@ -843,8 +991,10 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:z/:x/:y/tile.:f
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     //echo "ResId: ".$resId->ToString()."<br/>Group: $groupName<br/>X: $x<br/>Y: $y<br/>Z: $z<br/>Format: $format";
     //die;
+    $app = $this->get("AppServices");
     $ctrl = new MgTileServiceController($app);
-    $ctrl->GetTileXYZ($resId, $groupName, $x, $y, $z, $format);
+    $ctrl->GetTileXYZ($resId, $groupName, $x, $y, $z, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -866,7 +1016,14 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:z/:x/:y/tile.:f
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:layerName/:z/:x/:y/tile.:format", function($resourcePath, $groupName, $layerName, $z, $x, $y, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}.MapDefinition/xyz/{groupName}/{layerName}/{z}/{x}/{y}/tile.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $groupName = $args['groupName'];
+    $layerName = $args['layerName'];
+    $z = $args['z'];
+    $x = $args['x'];
+    $y = $args['y'];
+    $type = $args['type'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
@@ -874,8 +1031,10 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:layerName/:z/:x
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     //echo "ResId: ".$resId->ToString()."<br/>Group: $groupName<br/>X: $x<br/>Y: $y<br/>Z: $z<br/>Format: $format";
     //die;
+    $app = $this->get("AppServices");
     $ctrl = new MgTileServiceController($app);
-    $ctrl->GetTileXYZForLayer($resId, $groupName, $layerName, $x, $y, $z, $format);
+    $ctrl->GetTileXYZForLayer($resId, $groupName, $layerName, $x, $y, $z, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -897,7 +1056,14 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz/:groupName/:layerName/:z/:x
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/xyz@:scale/:groupName/:z/:x/:y/tile.:format", function($resourcePath, $scale, $groupName, $z, $x, $y, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}.MapDefinition/xyz@{scale}/{groupName}/{z}/{x}/{y}/tile.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $scale = $args['scale'];
+    $groupName = $args['groupName'];
+    $z = $args['z'];
+    $x = $args['x'];
+    $y = $args['y'];
+    $type = $args['type'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
@@ -905,8 +1071,10 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz@:scale/:groupName/:z/:x/:y/
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
     //echo "ResId: ".$resId->ToString()."<br/>Group: $groupName<br/>X: $x<br/>Y: $y<br/>Z: $z<br/>Format: $format";
     //die;
+    $app = $this->get("AppServices");
     $ctrl = new MgTileServiceController($app);
-    $ctrl->GetTileXYZRetina($resId, $groupName, $x, $y, $z, $format, $scale);
+    $ctrl->GetTileXYZRetina($resId, $groupName, $x, $y, $z, $type, $scale);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -927,14 +1095,22 @@ $app->get("/library/:resourcePath+.MapDefinition/xyz@:scale/:groupName/:z/:x/:y/
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/tile.:format/:groupName/:scaleIndex/:col/:row", function($resourcePath, $format, $groupName, $scaleIndex, $col, $row) use ($app) {
+$app->get("/library/{resourcePath:.*}.MapDefinition/tile.{type}/{groupName}/{scaleIndex}/{col}/{row}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
+    $groupName = $args['groupName'];
+    $scaleIndex = $args['scaleIndex'];
+    $col = $args['col'];
+    $row = $args['row'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgTileServiceController($app);
-    $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $format);
+    $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $type);
+    return $app->Done();
 });
 
 /**
@@ -956,14 +1132,22 @@ $app->get("/library/:resourcePath+.MapDefinition/tile.:format/:groupName/:scaleI
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.TileSetDefinition/tile.:format/:groupName/:scaleIndex/:col/:row", function($resourcePath, $format, $groupName, $scaleIndex, $col, $row) use ($app) {
+$app->get("/library/{resourcePath:.*}.TileSetDefinition/tile.{type}/{groupName}/{scaleIndex}/{col}/{row}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
+    $groupName = $args['groupName'];
+    $scaleIndex = $args['scaleIndex'];
+    $col = $args['col'];
+    $row = $args['row'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".TileSetDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgTileServiceController($app);
-    $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $format);
+    $ctrl->GetTile($resId, $groupName, $scaleIndex, $col, $row, $type);
+    return $app->Done();
 });
 
 //============================== Mapping Service APIs ==========================================
@@ -987,14 +1171,21 @@ $app->get("/library/:resourcePath+.TileSetDefinition/tile.:format/:groupName/:sc
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.LayerDefinition/legend/:scale/:geomtype/:themecat/icon.:format", function($resourcePath, $scale, $geomtype, $themecat, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}.LayerDefinition/legend/{scale}/{geomType}/{themecat}/icon.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $scale = $args['scale'];
+    $geomType = $args['geomType'];
+    $themecat = $args['themecat'];
+    $type = $args['type'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgMappingServiceController($app);
-    $ctrl->GenerateLegendImage($resId, $scale, $geomtype, $themecat, $format);
+    $ctrl->GenerateLegendImage($resId, $scale, $geomType, $themecat, $type);
+    return $app->Done();
 });
 /**
  *     @SWG\Get(
@@ -1027,14 +1218,18 @@ $app->get("/library/:resourcePath+.LayerDefinition/legend/:scale/:geomtype/:them
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/plot.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}.MapDefinition/plot.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgMappingServiceController($app);
-    $ctrl->GeneratePlotFromMapDefinition($resId, $format);
+    $ctrl->GeneratePlotFromMapDefinition($resId, $type);
+    return $app->Done();
 });
 //================================= Rendering Service APIs ==================================
 
@@ -1060,14 +1255,18 @@ $app->get("/library/:resourcePath+.MapDefinition/plot.:format", function($resour
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/image.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}.MapDefinition/image.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgRenderingServiceController($app);
-    $ctrl->RenderMapDefinition($resId, $format);
+    $ctrl->RenderMapDefinition($resId, $type);
+    return $app->Done();
 });
 
 // ----------------------------- Viewer/Preview Launchers ----------------------------- //
@@ -1085,14 +1284,17 @@ $app->get("/library/:resourcePath+.MapDefinition/image.:format", function($resou
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.WebLayout/viewer", function($resourcePath) use ($app) {
+$app->get("/library/{resourcePath:.*}.WebLayout/viewer", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".WebLayout";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchAjaxViewer($resId);
+    return $app->Done();
 });
 
 /**
@@ -1109,14 +1311,18 @@ $app->get("/library/:resourcePath+.WebLayout/viewer", function($resourcePath) us
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.ApplicationDefinition/viewer/:template", function($resourcePath, $template) use ($app) {
+$app->get("/library/{resourcePath:.*}.ApplicationDefinition/viewer/{template}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $template = $args['template'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".ApplicationDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchFusionViewer($resId, $template);
+    return $app->Done();
 });
 
 /**
@@ -1132,14 +1338,17 @@ $app->get("/library/:resourcePath+.ApplicationDefinition/viewer/:template", func
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.FeatureSource/preview", function($resourcePath) use ($app) {
+$app->get("/library/{resourcePath:.*}.FeatureSource/preview", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".FeatureSource";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchResourcePreview($resId);
+    return $app->Done();
 });
 
 /**
@@ -1155,14 +1364,17 @@ $app->get("/library/:resourcePath+.FeatureSource/preview", function($resourcePat
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.LayerDefinition/preview", function($resourcePath) use ($app) {
+$app->get("/library/{resourcePath:.*}.LayerDefinition/preview", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchResourcePreview($resId);
+    return $app->Done();
 });
 
 /**
@@ -1178,14 +1390,17 @@ $app->get("/library/:resourcePath+.LayerDefinition/preview", function($resourceP
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/preview", function($resourcePath) use ($app) {
+$app->get("/library/{resourcePath:.*}.MapDefinition/preview", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchResourcePreview($resId);
+    return $app->Done();
 });
 
 /**
@@ -1201,14 +1416,17 @@ $app->get("/library/:resourcePath+.MapDefinition/preview", function($resourcePat
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.SymbolDefinition/preview", function($resourcePath) use ($app) {
+$app->get("/library/{resourcePath:.*}.SymbolDefinition/preview", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".SymbolDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchResourcePreview($resId);
+    return $app->Done();
 });
 
 /**
@@ -1224,14 +1442,17 @@ $app->get("/library/:resourcePath+.SymbolDefinition/preview", function($resource
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.WatermarkDefinition/preview", function($resourcePath) use ($app) {
+$app->get("/library/{resourcePath:.*}.WatermarkDefinition/preview", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".WatermarkDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgViewerController($app);
     $ctrl->LaunchResourcePreview($resId);
+    return $app->Done();
 });
 
 // =========================================== KML Service APIs ====================================================
@@ -1250,14 +1471,17 @@ $app->get("/library/:resourcePath+.WatermarkDefinition/preview", function($resou
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.MapDefinition/kml", function($resourcePath) use ($app) {
+$app->get("/library/{resourcePath:.*}.MapDefinition/kml", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".MapDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgKmlServiceController($app);
     $ctrl->GetMapKml($resId, "kml");
+    return $app->Done();
 });
 
 /**
@@ -1279,14 +1503,17 @@ $app->get("/library/:resourcePath+.MapDefinition/kml", function($resourcePath) u
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.LayerDefinition/kml", function($resourcePath) use ($app) {
+$app->get("/library/{resourcePath:.*}.LayerDefinition/kml", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgKmlServiceController($app);
     $ctrl->GetLayerKml($resId, "kml");
+    return $app->Done();
 });
 
 /**
@@ -1308,12 +1535,16 @@ $app->get("/library/:resourcePath+.LayerDefinition/kml", function($resourcePath)
  *        @SWG\Response(response=500, description="An error occurred during the operation")
  *     )
  */
-$app->get("/library/:resourcePath+.LayerDefinition/kmlfeatures.:format", function($resourcePath, $format) use ($app) {
+$app->get("/library/{resourcePath:.*}.LayerDefinition/kmlfeatures.{type}", function($req, $resp, $args) {
+    $resourcePath = explode('/', $args['resourcePath']);
+    $type = $args['type'];
     $count = count($resourcePath);
     if ($count > 0) {
         $resourcePath[$count - 1] = $resourcePath[$count - 1].".LayerDefinition";
     }
     $resId = MgUtils::ParseLibraryResourceID($resourcePath);
+    $app = $this->get("AppServices");
     $ctrl = new MgKmlServiceController($app);
-    $ctrl->GetFeaturesKml($resId, $format);
+    $ctrl->GetFeaturesKml($resId, $type);
+    return $app->Done();
 });
