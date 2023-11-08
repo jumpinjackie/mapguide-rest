@@ -5,17 +5,17 @@ environment:
     - job_name: PHP 8.1
       PLATFORM: x64
       MG_REL_SUFFIX: php81
-      COMPOSER: composer.php5.json
+      COMPOSER: composer.json
       PHP_COMPOSER_VER: 2.5.8
       PHP_DIST_NAME: php-8.1.17-nts-Win32-vs16-x64
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022 # We only care that it's Windows
     - job_name: PHP 5.6
       PLATFORM: x64
       MG_REL_SUFFIX: php56
-      COMPOSER: composer.json
+      COMPOSER: composer.php5.json
       PHP_COMPOSER_VER: 2.2.21
       PHP_DIST_NAME: php-5.6.40-nts-Win32-VC11-x64
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022 # We only care that it's Windows
 
 matrix:
   fast_finish: true
@@ -42,10 +42,60 @@ for:
         - job_name: PHP 5.6
 
     init:
-      - echo init PHP 5.6
+      - echo PLATFORM                       %PLATFORM%
+      - echo MG_REL_SUFFIX                  %MG_REL_SUFFIX%
+      - echo COMPOSER                       %COMPOSER%
+      - echo PHP_COMPOSER_VER               %PHP_COMPOSER_VER%
+      - echo PHP_DIST_NAME                  %PHP_DIST_NAME%
+      - echo APPVEYOR_PROJECT_NAME          %APPVEYOR_PROJECT_NAME%
+      - echo APPVEYOR_PROJECT_SLUG          %APPVEYOR_PROJECT_SLUG%
+      - echo APPVEYOR_BUILD_FOLDER          %APPVEYOR_BUILD_FOLDER%
+      - echo APPVEYOR_BUILD_ID              %APPVEYOR_BUILD_ID%
+      - echo APPVEYOR_BUILD_NUMBER          %APPVEYOR_BUILD_NUMBER%
+      - echo APPVEYOR_BUILD_VERSION         %APPVEYOR_BUILD_VERSION%
+      - echo APPVEYOR_REPO_NAME             %APPVEYOR_REPO_NAME%
+      - echo APPVEYOR_REPO_BRANCH           %APPVEYOR_REPO_BRANCH%
+      - echo APPVEYOR_REPO_TAG              %APPVEYOR_REPO_TAG%
+      - echo APPVEYOR_REPO_TAG_NAME         %APPVEYOR_REPO_TAG_NAME%
+      - echo APPVEYOR_REPO_COMMIT           %APPVEYOR_REPO_COMMIT%
+      - echo APPVEYOR_REPO_COMMIT_TIMESTAMP %APPVEYOR_REPO_COMMIT_TIMESTAMP%
+      - SET PATH=c:\php_%PLATFORM%;%PATH%
+      - SET COMPOSER_NO_INTERACTION=1
+      - SET PHP=1
 
-    build_script:
-      - echo build PHP 5.6
+    install:
+      - IF EXIST c:\php_%PLATFORM% (SET PHP=0) ELSE (mkdir c:\php_%PLATFORM%)
+      - cd c:\php_%PLATFORM%
+      - IF %PHP%==1 curl -fksSL -o %PHP_DIST_NAME%.zip https://windows.php.net/downloads/releases/archives/%PHP_DIST_NAME%.zip
+      - IF %PHP%==1 7z x %PHP_DIST_NAME%.zip -y >nul
+      - IF %PHP%==1 del /Q *.zip
+      - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
+      - IF %PHP%==1 copy /Y php.ini-development php.ini
+      - IF %PHP%==1 echo max_execution_time=1200 >> php.ini
+      - IF %PHP%==1 echo date.timezone="UTC" >> php.ini
+      - IF %PHP%==1 echo extension_dir=ext >> php.ini
+      - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini
+      - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini
+      - IF %PHP%==1 echo extension=php_curl.dll >> php.ini
+      - IF %PHP%==1 echo extension=php_gd2.dll >> php.ini
+      - IF %PHP%==1 echo extension=php_xsl.dll >> php.ini
+      - appveyor DownloadFile https://getcomposer.org/download/%PHP_COMPOSER_VER%/composer.phar
+      - SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_BUILD_VERSION%
+      - IF "%APPVEYOR_REPO_TAG%" == "true" SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_REPO_TAG_NAME%
+      - cd c:\projects\mapguide-rest
+      - composer install --prefer-source --no-progress --ansi
+
+    test_script:
+      - vendor\bin\parallel-lint.bat -s -e php,phpt --exclude vendor .
+      - vendor\bin\phpunit test
+
+    after_test:
+      - vendor\bin\phing -Dapp.version=%ARTIFACT_RELEASE_LABEL%-%MG_REL_SUFFIX% -f build.phing.xml dist
+
+    artifacts:
+      - path: .\dist\mapguide-rest-$(ARTIFACT_RELEASE_LABEL)-$(MG_REL_SUFFIX).zip
+        name: dist
+        type: zip
 
   # ======================================
   #      PHP 8.1
@@ -56,7 +106,26 @@ for:
         - job_name: PHP 8.1
 
     init:
-      - echo init PHP 8.1
+      - echo PLATFORM                       %PLATFORM%
+      - echo MG_REL_SUFFIX                  %MG_REL_SUFFIX%
+      - echo COMPOSER                       %COMPOSER%
+      - echo PHP_COMPOSER_VER               %PHP_COMPOSER_VER%
+      - echo PHP_DIST_NAME                  %PHP_DIST_NAME%
+      - echo APPVEYOR_PROJECT_NAME          %APPVEYOR_PROJECT_NAME%
+      - echo APPVEYOR_PROJECT_SLUG          %APPVEYOR_PROJECT_SLUG%
+      - echo APPVEYOR_BUILD_FOLDER          %APPVEYOR_BUILD_FOLDER%
+      - echo APPVEYOR_BUILD_ID              %APPVEYOR_BUILD_ID%
+      - echo APPVEYOR_BUILD_NUMBER          %APPVEYOR_BUILD_NUMBER%
+      - echo APPVEYOR_BUILD_VERSION         %APPVEYOR_BUILD_VERSION%
+      - echo APPVEYOR_REPO_NAME             %APPVEYOR_REPO_NAME%
+      - echo APPVEYOR_REPO_BRANCH           %APPVEYOR_REPO_BRANCH%
+      - echo APPVEYOR_REPO_TAG              %APPVEYOR_REPO_TAG%
+      - echo APPVEYOR_REPO_TAG_NAME         %APPVEYOR_REPO_TAG_NAME%
+      - echo APPVEYOR_REPO_COMMIT           %APPVEYOR_REPO_COMMIT%
+      - echo APPVEYOR_REPO_COMMIT_TIMESTAMP %APPVEYOR_REPO_COMMIT_TIMESTAMP%
+      - SET PATH=c:\php_%PLATFORM%;%PATH%
+      - SET COMPOSER_NO_INTERACTION=1
+      - SET PHP=1
 
     build_script:
       - echo build PHP 8.1
