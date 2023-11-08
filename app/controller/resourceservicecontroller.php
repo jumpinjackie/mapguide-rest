@@ -271,7 +271,7 @@ class MgResourceServiceController extends MgBaseController {
             } else if ($fmt === "xml") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             } else if ($fmt === "html") {
-                $thisUrl = $selfUrl.$pathInfo;
+                $thisUrl = MgUtils::EnsureEndingSlash($selfUrl).$pathInfo;
                 //Chop off the list.html
                 $rootPath = substr($thisUrl, 0, strlen($thisUrl) - strlen("data/list.html"));
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
