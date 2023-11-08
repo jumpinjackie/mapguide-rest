@@ -30,6 +30,7 @@ init:
     - SET PATH=c:\php_%PLATFORM%;%PATH%
     - SET COMPOSER_NO_INTERACTION=1
     - SET PHP=1
+    - SET COMPOSER=composer.php5.json
     - echo PLATFORM %PLATFORM%
 
 install:
@@ -58,7 +59,7 @@ test_script:
     - vendor\bin\phpunit test
 
 after_test:
-    - vendor\bin\phing -Dapp.version=%ARTIFACT_RELEASE_LABEL% -f build.phing.xml dist
+    - vendor\bin\phing -Dapp.version=%ARTIFACT_RELEASE_LABEL%-php56 -f build.phing.xml dist
 
 artifacts:
   - path: .\dist\mapguide-rest-$(ARTIFACT_RELEASE_LABEL).zip
