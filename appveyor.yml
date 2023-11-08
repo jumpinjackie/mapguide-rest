@@ -1,6 +1,7 @@
 version: 1.0.0.{build}
 
 environment:
+  APPVEYOR_RDP_PASSWORD: What1swrongwithyou
   matrix:
     - job_name: PHP 8.1
       PLATFORM: x64
@@ -42,6 +43,9 @@ for:
         - job_name: PHP 5.6
 
     init:
+      - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+    install:
       - echo PLATFORM                       %PLATFORM%
       - echo MG_REL_SUFFIX                  %MG_REL_SUFFIX%
       - echo COMPOSER                       %COMPOSER%
@@ -62,8 +66,6 @@ for:
       - SET PATH=c:\php;%PATH%
       - SET COMPOSER_NO_INTERACTION=1
       - SET PHP=1
-
-    install:
       - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
       - cd c:\php
       - IF %PHP%==1 curl -fksSL -o %PHP_DIST_NAME%.zip https://windows.php.net/downloads/releases/archives/%PHP_DIST_NAME%.zip
@@ -98,6 +100,9 @@ for:
       - path: .\dist\mapguide-rest-$(ARTIFACT_RELEASE_LABEL)-$(MG_REL_SUFFIX).zip
         name: dist
         type: zip
+
+    on_finish:
+      - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
   # ======================================
   #      PHP 8.1
