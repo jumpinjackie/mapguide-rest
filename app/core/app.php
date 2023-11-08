@@ -60,7 +60,10 @@ class AppServices implements IAppServices {
     }
 
     public /* internal */ function GetAllRequestParams() {
-        return $this->request->params();
+        if ($this->request->isGet())
+            return $this->request->getQueryParams();
+        else
+            return $this->request->getParsedBody();
     }
 
     /**

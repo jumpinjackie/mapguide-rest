@@ -105,7 +105,7 @@ class MgHtmlBodyModel
     public $propertyCount;
     private $displayMap;
 
-    public function __construct(MgReader $reader, MgTransform $transform = null, /*php_int*/ $limit = -1, array $displayMap = null) {
+    public function __construct(/* MgReader | MgPaginatedFeatureReader */ $reader, MgTransform $transform = null, /*php_int*/ $limit = -1, array $displayMap = null) {
         $this->reader = $reader;
         $this->propertyCount = $this->reader->GetPropertyCount();
         $this->agfRw = new MgAgfReaderWriter();
@@ -204,7 +204,7 @@ class MgReaderChunkedResult
     private $orientation;
     private $templateRootDir;
 
-    public function __construct(MgFeatureService $featSvc, MgReader $reader, /*php_int*/ $limit, MgChunkWriter $writer) {
+    public function __construct(MgFeatureService $featSvc, /* MgReader | MgPaginatedFeatureReader */ $reader, /*php_int*/ $limit, MgChunkWriter $writer) {
         $this->featSvc = $featSvc;
         $this->reader = $reader;
         $this->limit = $limit;
