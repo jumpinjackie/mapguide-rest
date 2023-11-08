@@ -82,7 +82,8 @@ for:
       - SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_BUILD_VERSION%
       - IF "%APPVEYOR_REPO_TAG%" == "true" SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_REPO_TAG_NAME%
       - cd c:\projects\mapguide-rest
-      - appveyor DownloadFile https://getcomposer.org/download/%PHP_COMPOSER_VER%/composer.phar
+      - curl -fksSL -o composer.phar https://getcomposer.org/download/%PHP_COMPOSER_VER%/composer.phar
+      - php -v
       - php composer.phar install --prefer-source --no-progress --ansi
 
     test_script:
