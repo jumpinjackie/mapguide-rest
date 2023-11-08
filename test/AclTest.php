@@ -33,9 +33,7 @@ class AclTest extends TestCase
         $br = TestUtils::mockByteReader($this, $groupXml);
         $this->assertEquals("text/xml", $br->GetMimeType());
         $this->assertEquals($groupXml, $br->ToString());
-        $site = $this->getMockBuilder("MgSite")->getMock();
-        $site->method("EnumerateGroups")
-            ->will($this->returnValue($br));
+        $site = TestUtils::mockSite($this, $br, null);
         $conf1 = array(
             "AllowUsers" => array("Anonymous"),
             "AllowGroups" => array("Everyone")
@@ -59,17 +57,11 @@ class AclTest extends TestCase
         $br = TestUtils::mockByteReader($this, $groupXml);
         $this->assertEquals("text/xml", $br->GetMimeType());
         $this->assertEquals($groupXml, $br->ToString());
-        $site = $this->getMockBuilder("MgSite")->getMock();
-        $site->method("EnumerateGroups")
-            ->will($this->returnValue($br));
-        
         $roleMethodMap = array(
-            array("Author", new FakeStringCollection(array("Authors"))),
-            array("Anonymous", new FakeStringCollection(array("Users")))	
+            "Author" => new FakeStringCollection(array("Authors")),
+            "Anonymous" => new FakeStringCollection(array("Users"))
         );
-        $site->method("EnumerateRoles")
-            ->will($this->returnValueMap($roleMethodMap));
-        
+        $site = TestUtils::mockSite($this, $br, $roleMethodMap);
         $conf1 = array(
             "AllowUsers" => array("Administrator"),
             "AllowGroups" => array("Foo"),

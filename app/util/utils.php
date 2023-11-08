@@ -91,7 +91,7 @@ class MgUtils
         return $errResponse;
     }
 
-    public static function ValidateAcl(/*php_string*/ $userName, MgSite $site, array $config) {
+    public static function ValidateAcl(/*php_string*/ $userName, /*MgSite*/ $site, array $config) {
         // Empty ACL config = open season
         if (empty($config))
             return true;
