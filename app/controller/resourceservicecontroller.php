@@ -617,7 +617,7 @@ class MgResourceServiceController extends MgBaseController {
 
         $pathInfo = $this->app->GetRequestPathInfo();
         $selfUrl = $this->app->GetConfig("SelfUrl");
-        $thisUrl = $selfUrl.$pathInfo;
+        $thisUrl = MgUtils::EnsureEndingSlash($selfUrl).$pathInfo;
         //Chop off the html part of the url
         $rootPath = substr($thisUrl, 0, strlen($thisUrl) - strlen("/html"));
 
@@ -667,17 +667,18 @@ class MgResourceServiceController extends MgBaseController {
             } else if ($fmt === "xml") {
                 $param->AddParameter("FORMAT", MgMimeType::Xml);
             } else if ($fmt === "html") {
-                $thisUrl = $selfUrl.$pathInfo;
+                $thisUrl = MgUtils::EnsureEndingSlash($selfUrl).$pathInfo;
                 //Chop off the list.html
                 $rootPath = substr($thisUrl, 0, strlen($thisUrl) - strlen("list.html"));
                 $folderPath = substr($pathInfo, 0, strlen($pathInfo) - strlen("list.html"));
                 $tokens = explode("/", $pathInfo);
-                if (count($tokens) > 3) {
+                if (count($tokens) >= 3) {
                     //Pop off list.html and current folder name
                     array_pop($tokens);
                     array_pop($tokens);
                     $parentPath = implode("/", $tokens);
-                    $param->AddParameter("XSLPARAM.PARENTPATHROOT", $selfUrl.$parentPath);
+                    $parentRoot = MgUtils::EnsureEndingSlash($selfUrl).$parentPath;
+                    $param->AddParameter("XSLPARAM.PARENTPATHROOT", $parentRoot);
                 }
                 $param->AddParameter("XSLPARAM.ASSETPATH", MgUtils::GetSelfUrlRoot($selfUrl)."/assets");
                 $param->AddParameter("XSLPARAM.FOLDERPATH", $folderPath);

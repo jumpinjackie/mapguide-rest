@@ -8,6 +8,7 @@
         <style type="text/css">
             #resourcePane { border: none; position: absolute; top: 230px; bottom: 5px; right: 5px; left: 5px; }
             .fullwidthandheight { width: 100%; height: 100%; }
+            textarea { font-family: Courier; }
             .borderless { border: none; }
             ul.itemlist { margin-top: 70px; }
         </style>

@@ -372,6 +372,10 @@ class MgUtils
         return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
     }
 
+    public static function EnsureEndingSlash(/*php_string*/ $str) {
+        return self::StringEndsWith($str, "/") ? $str : ($str . "/");
+    }
+
     public static function EscapeJsonString(/*php_string*/ $str) {
         $escapers = array("\\", "/", "\"", "\n", "\r", "\t", "\x08", "\x0c");
         $replacements = array("\\\\", "\\/", "\\\"", "\\n", "\\r", "\\t", "\\f", "\\b");

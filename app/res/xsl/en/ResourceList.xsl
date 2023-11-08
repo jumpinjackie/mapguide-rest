@@ -21,6 +21,7 @@
                 <style type="text/css">
                     #resourcePane { width: 65%; height: 80%; border: none; position: fixed; margin-top: 70px; }
                     .fullwidthandheight { width: 100%; height: 100%; }
+                    textarea { font-family: Courier; }
                     .borderless { border: none; }
                     ul.itemlist { margin-top: 70px; }
                 </style>
