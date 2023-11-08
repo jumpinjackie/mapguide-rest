@@ -53,7 +53,7 @@ for:
   - 
     matrix:
       only:
-        - job_name: PHP 5.1
+        - job_name: PHP 8.1
 
     init:
       - echo init PHP 8.1
