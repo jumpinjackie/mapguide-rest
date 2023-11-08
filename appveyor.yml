@@ -59,13 +59,13 @@ for:
       - echo APPVEYOR_REPO_TAG_NAME         %APPVEYOR_REPO_TAG_NAME%
       - echo APPVEYOR_REPO_COMMIT           %APPVEYOR_REPO_COMMIT%
       - echo APPVEYOR_REPO_COMMIT_TIMESTAMP %APPVEYOR_REPO_COMMIT_TIMESTAMP%
-      - SET PATH=c:\php_%PLATFORM%;%PATH%
+      - SET PATH=c:\php;%PATH%
       - SET COMPOSER_NO_INTERACTION=1
       - SET PHP=1
 
     install:
-      - IF EXIST c:\php_%PLATFORM% (SET PHP=0) ELSE (mkdir c:\php_%PLATFORM%)
-      - cd c:\php_%PLATFORM%
+      - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
+      - cd c:\php
       - IF %PHP%==1 curl -fksSL -o %PHP_DIST_NAME%.zip https://windows.php.net/downloads/releases/archives/%PHP_DIST_NAME%.zip
       - IF %PHP%==1 7z x %PHP_DIST_NAME%.zip -y >nul
       - IF %PHP%==1 del /Q *.zip
@@ -83,6 +83,7 @@ for:
       - IF "%APPVEYOR_REPO_TAG%" == "true" SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_REPO_TAG_NAME%
       - cd c:\projects\mapguide-rest
       - curl -fksSL -o composer.phar https://getcomposer.org/download/%PHP_COMPOSER_VER%/composer.phar
+      - php --ini
       - php -v
       - php composer.phar install --prefer-source --no-progress --ansi
 
@@ -124,7 +125,7 @@ for:
       - echo APPVEYOR_REPO_TAG_NAME         %APPVEYOR_REPO_TAG_NAME%
       - echo APPVEYOR_REPO_COMMIT           %APPVEYOR_REPO_COMMIT%
       - echo APPVEYOR_REPO_COMMIT_TIMESTAMP %APPVEYOR_REPO_COMMIT_TIMESTAMP%
-      - SET PATH=c:\php_%PLATFORM%;%PATH%
+      - SET PATH=c:\php;%PATH%
       - SET COMPOSER_NO_INTERACTION=1
       - SET PHP=1
 
