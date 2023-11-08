@@ -138,6 +138,9 @@ for:
       - IF %PHP%==1 7z x %PHP_DIST_NAME%.zip -y >nul
       - IF %PHP%==1 del /Q *.zip
       - IF %PHP%==1 copy /Y php.ini-development php.ini
+      - IF %PHP%==1 echo extension=openssl >> php.ini
+      - IF %PHP%==1 echo extension=curl >> php.ini
+      - IF %PHP%==1 echo extension=mbstring >> php.ini
       - SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_BUILD_VERSION%
       - IF "%APPVEYOR_REPO_TAG%" == "true" SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_REPO_TAG_NAME%
       - cd c:\projects\mapguide-rest
