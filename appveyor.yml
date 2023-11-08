@@ -2,13 +2,13 @@ version: 1.0.0.{build}
 
 environment:
   matrix:
-    - job_name: PHP 8.1
-      PLATFORM: x64
-      MG_REL_SUFFIX: php81
-      COMPOSER: composer.php5.json
-      PHP_COMPOSER_VER: 2.5.8
-      PHP_DIST_NAME: php-8.1.17-nts-Win32-vs16-x64
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    #- job_name: PHP 8.1
+    #  PLATFORM: x64
+    #  MG_REL_SUFFIX: php81
+    #  COMPOSER: composer.php5.json
+    #  PHP_COMPOSER_VER: 2.5.8
+    #  PHP_DIST_NAME: php-8.1.17-nts-Win32-vs16-x64
+    #  APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
     - job_name: PHP 5.6
       PLATFORM: x64
       MG_REL_SUFFIX: php56
@@ -31,7 +31,15 @@ branches:
     only:
       - master
 
-before_build:
+init:
+    - SET PATH=c:\php_%PLATFORM%;%PATH%
+    - SET COMPOSER_NO_INTERACTION=1
+    - SET PHP=1
+    - echo PLATFORM                       %PLATFORM%
+    - echo MG_REL_SUFFIX                  %MG_REL_SUFFIX%
+    - echo COMPOSER                       %COMPOSER%
+    - echo PHP_COMPOSER_VER               %PHP_COMPOSER_VER%
+    - echo PHP_DIST_NAME                  %PHP_DIST_NAME%
     - echo APPVEYOR_PROJECT_NAME          %APPVEYOR_PROJECT_NAME%
     - echo APPVEYOR_PROJECT_SLUG          %APPVEYOR_PROJECT_SLUG%
     - echo APPVEYOR_BUILD_FOLDER          %APPVEYOR_BUILD_FOLDER%
@@ -44,13 +52,6 @@ before_build:
     - echo APPVEYOR_REPO_TAG_NAME         %APPVEYOR_REPO_TAG_NAME%
     - echo APPVEYOR_REPO_COMMIT           %APPVEYOR_REPO_COMMIT%
     - echo APPVEYOR_REPO_COMMIT_TIMESTAMP %APPVEYOR_REPO_COMMIT_TIMESTAMP%
-
-init:
-    - SET PATH=c:\php_%PLATFORM%;%PATH%
-    - SET COMPOSER_NO_INTERACTION=1
-    - SET PHP=1
-    - SET COMPOSER=composer.php5.json
-    - echo PLATFORM %PLATFORM%
 
 install:
     - IF EXIST c:\php_%PLATFORM% (SET PHP=0) ELSE (mkdir c:\php_%PLATFORM%)
