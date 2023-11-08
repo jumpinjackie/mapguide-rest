@@ -55,7 +55,7 @@ class MgCzmlWriter
         return $output;
     }
 
-    public static function FeatureToCzml(MgReader $reader, MgAgfReaderWriter $agfRw, MgTransform $transform, /*php_string*/ $geometryName, array $style, /*php_string*/ $idName = NULL) {
+    public static function FeatureToCzml(MgReader $reader, MgAgfReaderWriter $agfRw, MgTransform $transform, /*php_string*/ $geometryName, CzmlStyle $style, /*php_string*/ $idName = NULL) {
         if (!$reader->IsNull($geometryName)) {
 
             $agf = null;
@@ -167,7 +167,7 @@ class MgCzmlWriter
         }
     }
 
-    private static function GeometryToCzml(MgGeometry $geom, MgReader $reader, array $style, /*php_double*/ $zval = 0.0) {
+    private static function GeometryToCzml(MgGeometry $geom, MgReader $reader, CzmlStyle $style, /*php_double*/ $zval = 0.0) {
         $geomType = $geom->GetGeometryType();
         //TODO: Convert all the geometry types.
         //TODO: Translate Layer Definition styles to CZML styles

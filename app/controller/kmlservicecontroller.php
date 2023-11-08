@@ -137,12 +137,9 @@ class MgKmlServiceController extends MgBaseController {
         $writer->WriteChunk($layerKml);
     }
 
-    private function _GetKmlForMap(MgMapBase $map, /*php_string*/ $sessionId, /*php_string*/ $format = "kml", /*php_string*/ $chunk = "1") {
+    private function _GetKmlForMap(MgMapBase $map, /*php_string*/ $sessionId, /*php_string*/ $format = "kml") {
         MgUtils::ApplyCorsIfApplicable($this->app);
-        if ($chunk === "0")
-            $writer = new MgSlimChunkWriter($this->app);
-        else
-            $writer = new MgHttpChunkWriter();
+        $writer = new MgSlimChunkWriter($this->app);
         $doc = new MgKmlDocument($writer);
         $csFactory = new MgCoordinateSystemFactory();
 
@@ -281,8 +278,6 @@ class MgKmlServiceController extends MgBaseController {
         //Check for unsupported representations
         $fmt = $this->ValidateRepresentation($format, array("kml", "kmz"));
         $native = ($this->GetBooleanRequestParameter("native", "0") == "1");
-        //Internal debugging flag
-        $chunk = $this->GetBooleanRequestParameter("chunk", true);
         $sessionId = "";
         if ($resId->GetRepositoryType() == MgRepositoryType::Session) {
             $sessionId = $resId->GetRepositoryName();
@@ -310,15 +305,13 @@ class MgKmlServiceController extends MgBaseController {
             $map = new MgMap($siteConn);
             $map->Create($resId, $resId->GetName());
 
-            $this->_GetKmlForMap($map, $sessionId, $format, $chunk);
+            $this->_GetKmlForMap($map, $sessionId, $format);
         }
     }
 
     public function GetSessionMapKml(/*php_string*/ $sessionId, /*php_string*/ $mapName, /*php_string*/ $format = "kml") {
         $fmt = $this->ValidateRepresentation($format, array("kml", "kmz"));
         $native = ($this->GetBooleanRequestParameter("native", "0") == "1");
-        //Internal debugging flag
-        $chunk = $this->GetBooleanRequestParameter("chunk", true);
 
         $this->EnsureAuthenticationForSite($sessionId, true);
         $siteConn = new MgSiteConnection();
@@ -333,7 +326,7 @@ class MgKmlServiceController extends MgBaseController {
             $selfUrl = MgUtils::GetSelfUrlRoot($this->app->GetConfig("SelfUrl"));
             $this->app->Redirect("$selfUrl/../mapagent/mapagent.fcgi?OPERATION=GETMAPKML&VERSION=1.0.0&SESSION=$sessionId&MAPDEFINITION=$mdfIdStr&CLIENTAGENT=MapGuide REST Extension");
         } else {
-            $this->_GetKmlForMap($map, $sessionId, $format, $chunk);
+            $this->_GetKmlForMap($map, $sessionId, $format);
         }
     }
 

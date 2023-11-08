@@ -376,11 +376,7 @@ abstract class MgResponseHandler
             $this->app->SetResponseBody(new MgByteReaderStreamAdapter($byteReader));
         }
         /*
-        $writer = null;
-        if ($bChunkResult)
-            $writer = new MgHttpChunkWriter();
-        else
-            $writer = new MgSlimChunkWriter($this->app);
+        $writer = new MgSlimChunkWriter($this->app);
 
         $writer->SetHeader("Content-Type", $mimeType);
         if (!$bChunkResult) {

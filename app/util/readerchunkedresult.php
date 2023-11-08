@@ -187,56 +187,6 @@ class MgHtmlBodyModel
     }
 }
 
-class MgHttpChunkWriter extends MgChunkWriter
-{
-    private $headers;
-
-    public function __construct() {
-        $this->headers = array();
-    }
-
-    public function SetHeader($name, $value) {
-        $this->headers["$name"] = $value;
-    }
-
-    public function WriteChunk($chunk) {
-        echo sprintf("%x\r\n", strlen($chunk));
-        echo $chunk;
-        echo "\r\n";
-        flush();
-        ob_flush();
-    }
-
-    public function StartChunking() {
-        //Fix for Apache. Have to turn off compression
-        if(function_exists('apache_setenv')) {
-            apache_setenv('no-gzip', '1');
-        }
-
-        //Remove PHP time limit
-        if(!ini_get('safe_mode')) {
-            @set_time_limit(0);
-        }
-
-        $this->headers["Transfer-Encoding"] = "chunked";
-        foreach ($this->headers as $name => $value) {
-            header("$name: $value");
-        }
-        flush();
-
-        while (ob_get_level()) {
-            ob_end_flush();
-        }
-        if (ob_get_length() === false) {
-            ob_start();
-        }
-    }
-
-    public function EndChunking() {
-        $this->WriteChunk("");
-    }
-}
-
 class MgReaderChunkedResult
 {
     private $featSvc;
@@ -262,10 +212,7 @@ class MgReaderChunkedResult
         $this->transform = null;
         $this->orientation = "h";
         $this->thisReqParams = array();
-        if ($writer != null)
-            $this->writer = $writer;
-        else
-            $this->writer = new MgHttpChunkWriter();
+        $this->writer = $writer;
     }
 
     public function SetDisplayMappings($displayMap) {

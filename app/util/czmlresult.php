@@ -54,10 +54,7 @@ class MgCzmlResult
         $this->pointStyleNo = 1;
         $this->lineStyleNo = 1;
         $this->areaStyleNo = 1;
-        if ($writer != null)
-            $this->writer = $writer;
-        else
-            $this->writer = new MgHttpChunkWriter();
+        $this->writer = $writer;
     }
 
     public function CheckAndSetDownloadHeaders(IAppServices $app, /*php_string*/ $format) {

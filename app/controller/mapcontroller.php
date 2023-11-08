@@ -836,9 +836,6 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
         $pageNo = $this->app->GetRequestParameter("page", -1);
         $orientation = $this->app->GetRequestParameter("orientation", "h");
 
-        //Internal debugging flag
-        $chunk = $this->GetBooleanRequestParameter("chunk", true);
-
         try {
             $this->EnsureAuthenticationForSite($sessionId);
             $siteConn = new MgSiteConnection();
@@ -878,11 +875,7 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                         $transform = MgUtils::GetTransform($featSvc, $resId, $tokens[0], $tokens[1], $transformto);
                     }
 
-                    $owriter = null;
-                    if ($chunk === "0")
-                        $owriter = new MgSlimChunkWriter($this->app);
-                    else
-                        $owriter = new MgHttpChunkWriter();
+                    $owriter = new MgSlimChunkWriter($this->app);
 
                     $displayMap = array();
 
@@ -937,7 +930,7 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                     $result->Output($format);
                 }
             } else {
-                $owriter = new MgHttpChunkWriter();
+                $owriter = new MgSlimChunkWriter($this->app);
                 $reader = new MgNullFeatureReader();
                 $result = new MgReaderChunkedResult($featSvc, $reader, -1, $owriter);
                 if ($fmt === "html") {

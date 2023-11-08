@@ -1274,9 +1274,6 @@ class MgFeatureServiceController extends MgBaseController {
             $bDisplayProperties = ($this->GetBooleanRequestParameter("displayproperties", "0") == "1");
             $bMapped = ($this->GetBooleanRequestParameter("mappedonly", "0") == "1");
 
-            //Internal debugging flag
-            $chunk = $this->GetBooleanRequestParameter("chunk", true);
-
             if ($pageNo >= 0 && $pageSize === -1) {
                 $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "pagesize"), $mimeType);
             } else {
@@ -1455,11 +1452,7 @@ class MgFeatureServiceController extends MgBaseController {
                             }
                         }
 
-                        $owriter = null;
-                        if ($chunk === "0")
-                            $owriter = new MgSlimChunkWriter($this->app);
-                        else
-                            $owriter = new MgHttpChunkWriter();
+                        $owriter = new MgSlimChunkWriter($this->app);
 
                         MgUtils::ApplyCorsIfApplicable($this->app);
                         if ($fmt == "czml") {
@@ -1530,9 +1523,6 @@ class MgFeatureServiceController extends MgBaseController {
             $pageSize = $this->app->GetRequestParameter("pagesize", -1);
             $pageNo = $this->app->GetRequestParameter("page", -1);
 
-            //Internal debugging flag
-            $chunk = $this->GetBooleanRequestParameter("chunk", true);
-
             if ($pageNo >= 0 && $pageSize === -1) {
                 $this->BadRequest($this->app->GetLocalizedText("E_MISSING_REQUIRED_PARAMETER", "pagesize"), $mimeType);
             }
@@ -1589,11 +1579,7 @@ class MgFeatureServiceController extends MgBaseController {
 
             $reader = $featSvc->SelectFeatures($resId, "$schemaName:$className", $query);
 
-            $owriter = null;
-            if ($chunk === "0")
-                $owriter = new MgSlimChunkWriter($this->app);
-            else
-                $owriter = new MgHttpChunkWriter();
+            $owriter = new MgSlimChunkWriter($this->app);
 
             if ($pageSize > 0) {
                 if ($pageNo < 1) {
