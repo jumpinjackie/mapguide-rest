@@ -79,11 +79,11 @@ for:
       - IF %PHP%==1 echo extension=php_curl.dll >> php.ini
       - IF %PHP%==1 echo extension=php_gd2.dll >> php.ini
       - IF %PHP%==1 echo extension=php_xsl.dll >> php.ini
-      - appveyor DownloadFile https://getcomposer.org/download/%PHP_COMPOSER_VER%/composer.phar
       - SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_BUILD_VERSION%
       - IF "%APPVEYOR_REPO_TAG%" == "true" SET ARTIFACT_RELEASE_LABEL=%APPVEYOR_REPO_TAG_NAME%
       - cd c:\projects\mapguide-rest
-      - composer install --prefer-source --no-progress --ansi
+      - appveyor DownloadFile https://getcomposer.org/download/%PHP_COMPOSER_VER%/composer.phar
+      - php composer.phar install --prefer-source --no-progress --ansi
 
     test_script:
       - vendor\bin\parallel-lint.bat -s -e php,phpt --exclude vendor .
