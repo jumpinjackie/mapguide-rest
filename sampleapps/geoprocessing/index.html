@@ -578,7 +578,8 @@
                     type: "POST",
                     data: args
                 }).then(function(res) {
-                    var feat = geoJSON.readFeature(res.result);
+                    var json = JSON.parse(res);
+                    var feat = geoJSON.readFeature(json.result);
                     resultsLayer.getSource().addFeature(feat);
                 });
             }
@@ -627,7 +628,8 @@
                     type: "POST",
                     data: args
                 }).then(function(res) {
-                    var feat = geoJSON.readFeature(res.result);
+                    var json = JSON.parse(res);
+                    var feat = geoJSON.readFeature(json.result);
                     resultsLayer.getSource().addFeature(feat);
                 });
             }
