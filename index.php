@@ -114,7 +114,7 @@ $settings->replace([
 //Now we can init the main slim app
 $app = new \Slim\App($container);
 
-//require dirname(__FILE__)."/app/log_config.php";
+require dirname(__FILE__)."/app/log_config.php";
 //$corsOptions = $container->get('settings')["MapGuide.Cors"];
 //if ($corsOptions != null) {
 //    $app->add(new \CorsSlim\CorsSlim($corsOptions));

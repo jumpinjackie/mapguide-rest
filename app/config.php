@@ -22,12 +22,13 @@ return [
         //
         //displayErrorDetails
         //
-        //
+        //Set to true to show detailed errors in the default slim error page
         "displayErrorDetails" => false,
+
         //
         //debug
         //
-        //Enable/disable debugging facilities in the slim framework
+        //Enable/disable debug logging
         "debug" => false,
 
         //

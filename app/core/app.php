@@ -27,12 +27,14 @@ class AppServices implements IAppServices {
     private $localizer;
     private $request;
     private $response;
+    private $logger;
     public function __construct(\Slim\Container $container) {
         $this->container = $container;
         $this->config = $this->container->get('settings');
         $this->localizer = $this->container->get('localizer');
         $this->request = $this->container->get('request');
         $this->response = $this->container->get('response');
+        $this->logger = $this->container->get('logger');
     }
 
     public /* internal */ function GetLocalizedText(/*php_string*/ $key) {
@@ -116,7 +118,9 @@ class AppServices implements IAppServices {
     }
 
     public /* internal */ function LogDebug(/*php_string*/ $message) {
-        //$this->app->log->debug($message);
+        if ($this->config["debug"]) {
+            $this->logger->debug($message);
+        }
     }
 
     public /* internal */ function SetResponseExpiry(/*php_string*/ $expires) {
