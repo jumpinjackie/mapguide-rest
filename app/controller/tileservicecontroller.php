@@ -86,7 +86,7 @@ class MgTileServiceController extends MgBaseController {
 
             $tmd = $that->GetTileModificationDate($resIdStr, $groupName, $scaleIndex, $row, $col);
             if ($tmd !== FALSE) {
-                $that->SetResponseLastModified($tmd);
+                $app->SetResponseLastModified($tmd);
             }
 
             $param->AddParameter("OPERATION", "GETTILEIMAGE");
@@ -100,7 +100,7 @@ class MgTileServiceController extends MgBaseController {
 
             $tmd = $that->GetTileModificationDate($resIdStr, $groupName, $scaleIndex, $row, $col);
             if ($tmd !== FALSE) {
-                $that->SetResponseLastModified($tmd);
+                $app->SetResponseLastModified($tmd);
             }
             $app->SetResponseExpiry("+6 months");
             $app->SetResponseHeader("Cache-Control", "max-age=31536000, must-revalidate");
