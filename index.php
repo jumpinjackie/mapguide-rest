@@ -99,11 +99,19 @@ $container['mgVersion'] = function ($c) use ($ver) {
     return array(intval($ver[0]), intval($ver[1]), intval($ver[2]), intval($ver[3]));
 };
 
+if ( (! empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'https') ||
+     (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ||
+     (! empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443') ) {
+    $scheme = 'https';
+} else {
+    $scheme = 'http';
+}
+
 //Add extra settings
 $settings->replace([
     //Set the root dir of this file for code that needs to know about it
     "AppRootDir" => dirname(__FILE__),
-    "SelfUrl" => MgUtils::GetSelfUrlRoot("$_SERVER[REQUEST_SCHEME]://$_SERVER[HTTP_HOST]$_SERVER[SCRIPT_NAME]")
+    "SelfUrl" => MgUtils::GetSelfUrlRoot("$scheme://$_SERVER[HTTP_HOST]$_SERVER[SCRIPT_NAME]")
 ]);
 
 $un = new URL\Normalizer($settings["SelfUrl"] . "/" . $settings["MapGuide.MapAgentUrl"]);
