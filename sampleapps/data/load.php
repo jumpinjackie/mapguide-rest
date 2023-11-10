@@ -24,7 +24,9 @@
         </nav>
 <?php
 
+if (!class_exists("MgServiceType")) {
 include(dirname(__FILE__)."/../../../mapadmin/constants.php");
+}
 
 try
 {
@@ -122,7 +124,7 @@ if (array_key_exists("USERNAME", $_POST) && array_key_exists("PASSWORD", $_POST)
         <p>Sample resources required for OpenLayers integration samples loaded.</p>
         <p><a class="btn btn-primary" href="../index.php">Return to samples</a></p>
     </div>
-<? } else { ?>
+<?php } else { ?>
     <div class="container">
         <div class="well">
             <p>To load the sample resources required for OpenLayers integration samples, login as Administrator</p>
@@ -141,7 +143,7 @@ if (array_key_exists("USERNAME", $_POST) && array_key_exists("PASSWORD", $_POST)
             <a class="btn btn-primary" href="../index.php">Return to samples</a>
         </form>
     </div>
-<? }
+<?php }
 } catch (MgException $e) {
 ?>
     <div class="alert alert-danger">
@@ -152,7 +154,7 @@ if (array_key_exists("USERNAME", $_POST) && array_key_exists("PASSWORD", $_POST)
     </div>
     <p><a href="javascript:history.go(-1)">Go back</a></p>
     <p><a href="../index.php">Return to samples</a></p>
-<? } ?>
+<?php } ?>
 
     </body>
 </html>
