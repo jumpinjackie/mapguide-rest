@@ -44,18 +44,7 @@
                     tooltip: "OpenStreetMap",
                     iconUrl: "../../assets/ol3-cesium/cesium/Widgets/Images/ImageryProviders/openStreetMap.png",
                     creationFunction: function() {
-                        return new Cesium.OpenStreetMapImageryProvider();
-                    }
-                }),
-                new Cesium.ProviderViewModel({
-                    name: "Stamen Toner",
-                    tooltip: "Stamen Toner",
-                    iconUrl: "../../assets/ol3-cesium/cesium/Widgets/Images/ImageryProviders/stamenToner.png",
-                    creationFunction: function() {
-                        return new Cesium.OpenStreetMapImageryProvider({
-                            url: "//stamen-tiles.a.ssl.fastly.net/toner/",
-                            credit: "Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under CC BY SA"
-                        });
+                        return Cesium.createOpenStreetMapImageryProvider();
                     }
                 })
             ];
@@ -78,7 +67,8 @@
     var providers = createImageryProviders();
     var viewer = new Cesium.Viewer('cesiumContainer', {
         selectedImageryProviderViewModel: providers[0],
-        imageryProviderViewModels: providers  
+        imageryProviderViewModels: providers,
+        terrainProviderViewModels: []
     });
     viewer.scene.camera.flyTo({
         destination: Cesium.Cartesian3.fromDegrees(-87.727283, 43.749034, 15000.0)
