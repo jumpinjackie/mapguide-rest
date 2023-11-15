@@ -164,22 +164,6 @@
                 map = new OpenLayers.Map('map', mapOptions );
                 
                 map.addLayers([
-                    new OpenLayers.Layer.Google(
-                        "Google Physical",
-                        {type: google.maps.MapTypeId.TERRAIN}
-                    ),
-                    new OpenLayers.Layer.Google(
-                        "Google Streets", // the default
-                        {numZoomLevels: 20}
-                    ),
-                    new OpenLayers.Layer.Google(
-                        "Google Hybrid",
-                        {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20}
-                    ),
-                    new OpenLayers.Layer.Google(
-                        "Google Satellite",
-                        {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
-                    ),
                     new OpenLayers.Layer.OSM("OpenStreetMap")
                 ]);
                 
@@ -227,8 +211,8 @@
         <div id="main">
             <div class="container">
                 <div class="alert alert-info">
-                    <p>This example demonstrates MapGuide layer integration with Google/OSM. The map is created with the MapGuide REST API.</p>
-                    <p>The Map Definition is in WGS84.PseudoMercator which allows for the MapGuide map to line up with any Google/OSM layer</p>
+                    <p>This example demonstrates MapGuide layer integration with external base layers (like OSM). The map is created with the MapGuide REST API.</p>
+                    <p>The Map Definition is in WGS84.PseudoMercator which allows for the MapGuide map to line up with most external base layers</p>
                     <p>Sample not loading?
                         <a href="../data/load.php">Check that the required resources have been loaded</a>
                     </p>
