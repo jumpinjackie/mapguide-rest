@@ -64,7 +64,7 @@ class MgReaderAdapter implements IReader {
     }
 
     public function GetGeometry(/*php_int|php_string*/ $indexOrProp) {
-        return $this->inner->GetBoolean($indexOrProp);
+        return $this->inner->GetGeometry($indexOrProp);
     }
 
     public function GetInt16(/*php_int|php_string*/ $indexOrProp) {
