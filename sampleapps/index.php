@@ -128,7 +128,7 @@ function is_installed($feature)
                                 <li class="list-group-item"><a href="selection2/index.html">Basic Sheboygan un-tiled map example with selection property palette</a></li>
                                 <li class="list-group-item"><a href="mixed/index.html">Basic Sheboygan mixed map (tiled and untiled) example (OpenLayers 2)</a></li>
                                 <li class="list-group-item"><a href="mixed/ol3.html">Basic Sheboygan mixed map (tiled and untiled) example (OpenLayers 3)</a></li>
-                                <li class="list-group-item"><a href="commercial/index.html">Sheboygan map with Google/OSM layers</a></li>
+                                <li class="list-group-item"><a href="commercial/index.html">Sheboygan map with external base layers</a></li>
                                 <li class="list-group-item"><a href="xyz/index.html">Sheboygan map as an XYZ tile layer (OpenLayers 2)</a></li>
                                 <li class="list-group-item"><a href="ol3_xyz/index.html">Sheboygan map as an XYZ tile layer (OpenLayers 3)</a></li>
                                 <li class="list-group-item"><a href="ol3_xyz/index_retina.html">Sheboygan map as an XYZ retina tile layer (OpenLayers 3)</a></li>
