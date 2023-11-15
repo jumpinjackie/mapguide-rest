@@ -578,7 +578,7 @@ class MgTemplateRestAdapter extends MgRestAdapter
         }
     }
 
-    private static function GetPropertyValue(MgReader $reader, /*php_string*/ $propName) {
+    private static function GetPropertyValue(/*MgReader | MgReaderAdapter*/ $reader, /*php_string*/ $propName) {
         $type = $reader->GetPropertyType($propName);
         //NOTE: Only querying the subset that are possible candidates for identity properties
         switch ($type) {
