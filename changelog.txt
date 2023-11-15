@@ -5,6 +5,7 @@
     - MapGuide Open Source 4.0 with bundled PHP 8.1
 
  - #201: Migrated to slim framework 3
+ - Fixes to various sample apps
  - REST API changes:
     - DELETE /library/{resourcePath} -> DELETE /library/{resourcePath}/resource
        - This is to avoid ambiguous route matching
