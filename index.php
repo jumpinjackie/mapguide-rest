@@ -123,10 +123,41 @@ $settings->replace([
 $app = new \Slim\App($container);
 
 require dirname(__FILE__)."/app/log_config.php";
-//$corsOptions = $container->get('settings')["MapGuide.Cors"];
-//if ($corsOptions != null) {
-//    $app->add(new \CorsSlim\CorsSlim($corsOptions));
-//}
+$corsOptions = $container->get('settings')["MapGuide.Cors"];
+// If there's CORS settings, add middleware to inject CORS response headers
+if ($corsOptions != null) {
+    $app->options('/{routes:.+}', function ($request, $response, $args) {
+        return $response;
+    });
+
+    $app->add(function ($req, $res, $next) use ($corsOptions) {
+        $response = $next($req, $res);
+
+        foreach ($corsOptions as $key => $value) {
+            switch ($key) {
+                case "origin":
+                    $response = $response->withHeader("Access-Control-Allow-Origin", $value);
+                    break;
+                case "exposeHeaders":
+                    $response = $response->withHeader("Access-Control-Expose-Headers", implode(", ", $value));
+                    break;
+                case "maxAge":
+                    $response = $response->withHeader("Access-Control-Max-Age", $value);
+                    break;
+                case "allowCredentials":
+                    $response = $response->withHeader("Access-Control-Allow-Credentials", ($value ? "true" : "false"));
+                    break;
+                case "allowMethods":
+                    $response = $response->withHeader("Access-Control-Allow-Methods", implode(", ", $value));
+                    break;
+                case "allowHeaders":
+                    $response = $response->withHeader("Access-Control-Allow-Headers: ", implode(", ", $value));
+                    break;
+            }
+        }
+        return $response;
+    });
+}
 /*
 var_dump($app->localizer->getText("E_METHOD_NOT_SUPPORTED"));
 var_dump($app->localizer->getText("E_METHOD_NOT_SUPPORTED", "test"));
@@ -147,8 +178,6 @@ die;
 //Register known REST adapters and geom formatters to our DI container
 include dirname(__FILE__)."/app/adapters/registration.php";
 include dirname(__FILE__)."/app/formatters/registration.php";
-
-
 
 //$namespace is used to uniquely suffix named routes. Otherwise the slim router can throw
 //an error about duplicate routes
@@ -184,63 +213,7 @@ $app->get("/", function() {
     echo "Hello World";
 });
 */
-/*
-$app->get("/chunktest", function() use ($app) {
-    function dump_chunk($chunk)
-    {
-        echo sprintf("%x\r\n", strlen($chunk));
-        echo $chunk;
-        echo "\r\n";
-        flush();
-        ob_flush();
-    }
 
-    while (ob_get_level()) {
-        ob_end_flush();
-    }
-    if (ob_get_length() === false) {
-        ob_start();
-    }
-    //@ini_set("output_buffering", "off");
-    header("Transfer-Encoding: chunked");
-    header("Content-Type: text/xml");
-    //$app->response->header("Content-Type", "text/xml; charset=utf-8");
-    flush();
-    $userInfo = new MgUserInformation("Anonymous", "");
-    $siteConn = new MgSiteConnection();
-    $siteConn->Open($userInfo);
-    $featSvc = $siteConn->CreateService(MgServiceType::FeatureService);
-    $fsId = new MgResourceIdentifier("Library://Samples/Sheboygan/Data/Parcels.FeatureSource");
-    $reader = $featSvc->SelectFeatures($fsId, "SHP_Schema:Parcels", null);
-    dump_chunk("<?xml version=\"1.0\" encoding=\"utf-8\"?><queryresult>");
-
-    //ob_flush();
-    //flush();
-    $count = 0;
-    while($reader->ReadNext()) {
-        if ($count >= 8000) {
-            break;
-        }
-        $xml = "<feature>";
-        for ($i = 0; $i < $reader->GetPropertyCount(); $i++) {
-            if (!$reader->IsNull($i)) {
-                $xml .= "<property>";
-                $xml .= $reader->GetPropertyName($i);
-                $xml .= "</property>";
-            } else {
-                $xml .= "<nullproperty>";
-                $xml .= $reader->GetPropertyName($i);
-                $xml .= "</nullproperty>";
-            }
-        }
-        $xml .= "</feature>";
-        dump_chunk($xml);
-        $count++;
-    }
-    $reader->Close();
-    dump_chunk("</queryresult>");
-});
-*/
 // Uncomment below to dump the known route table
 /*
 $routes = $app->getContainer()->get('router')->getRoutes();
@@ -252,6 +225,15 @@ foreach ($routes as $route) {
 }
 echo "</ul>";
 */
+
+if ($corsOptions != null) {
+    // Catch-all route to serve a 404 Not Found page if none of the routes match
+    // NOTE: make sure this route is defined last
+    $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
+        $handler = $this->notFoundHandler; // handle using the default Slim page not found handler
+        return $handler($req, $res);
+    });
+}
 $app->run();
 
 ?>

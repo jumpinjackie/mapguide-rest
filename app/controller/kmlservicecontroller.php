@@ -138,7 +138,6 @@ class MgKmlServiceController extends MgBaseController {
     }
 
     private function _GetKmlForMap(MgMapBase $map, /*php_string*/ $sessionId, /*php_string*/ $format = "kml") {
-        MgUtils::ApplyCorsIfApplicable($this->app);
         $writer = new MgSlimChunkWriter($this->app);
         $doc = new MgKmlDocument($writer);
         $csFactory = new MgCoordinateSystemFactory();
