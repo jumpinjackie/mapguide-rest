@@ -59,6 +59,6 @@ class ApiResponse {
     }
 
     public function dump() {
-        return "Action: ".$this->getRequestMethod().($this->ovMethod != null ? " (Ov: ".$this->ovMethod.")" : "")." ".$this->url."\nRequest: ".var_export($this->reqData, true)."\nHeaders: ".var_export($this->headers, true)."\nContent Type: ".$this->contentType."\nResponse was:\n".$this->dumpContent();
+        return "Action: ".$this->status." - ".$this->getRequestMethod().($this->ovMethod != null ? " (Ov: ".$this->ovMethod.")" : "")." ".$this->url."\nRequest: ".var_export($this->reqData, true)."\nHeaders: ".var_export($this->headers, true)."\nContent Type: ".$this->contentType."\nResponse was:\n".$this->dumpContent();
     }
 }

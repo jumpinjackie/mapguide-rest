@@ -73,11 +73,19 @@ abstract class MgRestAdapter extends MgResponseHandler
         if (array_key_exists("MaxCount", $config)) {
             $this->limit = intval($config["MaxCount"]);
         }
-        if (array_key_exists("TransformTo", $config)) {
+        $qTargetCs = $app->GetRequestParameter("transformto");
+        if (array_key_exists("TransformTo", $config) || $qTargetCs != null) {
             $tokens = explode(":", $this->className);
             $schemaName = $tokens[0];
             $className = $tokens[1];
-            $this->transform = MgUtils::GetTransform($this->featSvc, $this->featureSourceId, $schemaName, $className, $config["TransformTo"]);
+            // Start with query string, then fallback to config
+            $targetCs = $qTargetCs;
+            if ($targetCs == null) {
+                $targetCs =  array_key_exists("TransformTo", $config) ? $config["TransformTo"] : null;
+            }
+            if ($targetCs != null) {
+                $this->transform = MgUtils::GetTransform($this->featSvc, $this->featureSourceId, $schemaName, $className, $targetCs);
+            }
         }
         if (array_key_exists("UseTransaction", $config)) {
             $this->useTransaction = ($config["UseTransaction"] === true || $config["UseTransaction"] === "true");

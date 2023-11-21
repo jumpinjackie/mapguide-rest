@@ -601,6 +601,18 @@ abstract class RestPublishingTest extends IntegrationTest {
         $this->assertContentKind($resp, $extension);
         $this->assertMimeType($mimeType, $resp);
 
+        //Test transformto
+        $login = Configuration::getUser2Login();
+        $resp = $this->apiTestWithCredentials("/data/$folderName/$testID2.xml?transformto=WGS84.PseudoMercator", "GET", array(), $login->user, $login->pass);
+        $this->assertStatusCodeIs($this->getExpectedStatusCodeForLogin($username, $login), $resp);
+        $this->assertContentKind($resp, "xml");
+        $this->assertMimeType("text/xml", $resp);
+        if ($resp->getStatusCode() == 200) {
+            $this->assertStringContainsString("<Value>POLYGON ((3339584.723798207 1118889.974857959, 4452779.631730943 4865942.2795031751, 2226389.8158654715 4865942.2795031751, 1113194.9079327357 2273030.9269876885, 3339584.723798207 1118889.974857959))</Value>",
+                $resp->getContent(),
+                $resp->dump());
+        }
+
         //Update - Single Access - Session ID
         $resp = $this->apiTest("/data/$folderName/$testID2.$extension", "PUT", $this->createUpdatePayload($extension, "", "anonymous credentials", "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))", $this->anonymousSessionId));
         $this->assertStatusCodeIs($this->getExpectedStatusCodeForSession($username, $this->anonymousSessionId), $resp);
