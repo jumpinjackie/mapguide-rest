@@ -31,6 +31,7 @@
        - Touches
        - Within
  - GeoJSON coordinate precision now defaults to 7 decimal places
+ - #216: Honor transformto in published data sources if specified as a query string parameter
 
 1.0 RC5
 =======
