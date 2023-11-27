@@ -5352,16 +5352,16 @@
                     },
                     {
                         "name": "selectioncolor",
-                        "in": "path",
+                        "in": "query",
                         "description": "The selection color as HTML color string",
-                        "required": true,
+                        "required": false,
                         "type": "string"
                     },
                     {
                         "name": "behavior",
-                        "in": "path",
+                        "in": "query",
                         "description": "A bitmask controlling rendering behavior. 1=Render Selection, 2=Render layers, 4=Keep Selection, 8=Render Base Layers (only for MapGuide Open Source 2.5 and above)",
-                        "required": true,
+                        "required": false,
                         "type": "integer"
                     },
                     {

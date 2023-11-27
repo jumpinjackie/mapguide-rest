@@ -6,6 +6,7 @@
 
  - #201: Migrated to slim framework 3
  - Fixes to various sample apps
+ - Fixes to swagger API documentation for some operations
  - REST API changes:
     - DELETE /library/{resourcePath} -> DELETE /library/{resourcePath}/resource
        - This is to avoid ambiguous route matching
