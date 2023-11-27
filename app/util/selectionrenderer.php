@@ -64,7 +64,7 @@ class MgSelectionRenderer {
         return $xml;
     }
     
-    public function Render(MgResourceService $resSvc, /*php_int*/ $reqData, MgFeatureInformation $featInfo, MgSelectionBase $selection, /*php_bool*/ $bRequestAttributes, MgByteReader $inlineSelectionImg) {
+    public function Render(MgResourceService $resSvc, /*php_int*/ $reqData, MgFeatureInformation $featInfo, MgSelectionBase $selection, /*php_bool*/ $bRequestAttributes, /*?MgByteReader*/ $inlineSelectionImg) {
         $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<FeatureInformation>\n";
 
         $tooltip = "";
