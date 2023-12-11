@@ -1,3 +1,7 @@
+next
+====
+ - #219: Fix missing reverse routing on selection overview
+
 1.0 RC6
 =======
  - This release is supported on:

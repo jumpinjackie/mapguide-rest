@@ -67,5 +67,35 @@ class SelectionUpdateTest extends ServiceTest {
 
         //Should've selected 45 features
         $this->assertEquals(45, count($selResult->FeatureInformation->FeatureSet->Layer[0]->Class->ID));
+
+        //Test layers route
+        $resp = $this->apiTest("/session/".$this->anonymousSessionId."/".$anonMapName.".Selection/layers.json", "GET", array());
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertMimeType(Configuration::MIME_JSON, $resp);
+        $layersResult = json_decode($resp->getContent());
+        $this->assertTrue(isset($layersResult->SelectedLayerCollection));
+        $this->assertTrue(isset($layersResult->SelectedLayerCollection->SelectedLayer));
+        $this->assertEquals(1, count($layersResult->SelectedLayerCollection->SelectedLayer));
+        $this->assertEquals(45, $layersResult->SelectedLayerCollection->SelectedLayer[0]->Count);
+
+        //Test overview route
+        $resp = $this->apiTest("/session/".$this->anonymousSessionId."/".$anonMapName.".Selection/overview.json", "GET", array(
+            "bounds" => "true"
+        ));
+        $this->assertStatusCodeIs(200, $resp);
+        $this->assertMimeType(Configuration::MIME_JSON, $resp);
+        $overviewResult = json_decode($resp->getContent());
+
+        $this->assertTrue(isset($overviewResult->SelectionOverview->Bounds));
+        $this->assertEquals(1, count($overviewResult->SelectionOverview->Layer));
+        
+        //The features URL is present
+        $this->assertTrue(isset($overviewResult->SelectionOverview->Layer[0]->FeaturesUrl));
+
+        //And the URL checks out
+        // Slice off the /mapguide/rest part
+        $url = substr($overviewResult->SelectionOverview->Layer[0]->FeaturesUrl, strlen("/mapguide/rest"));
+        $resp = $this->apiTest($url, "GET", array());
+        $this->assertStatusCodeIs(200, $resp);
     }
 }

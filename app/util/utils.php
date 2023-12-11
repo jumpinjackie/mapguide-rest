@@ -152,7 +152,7 @@ class MgUtils
             $apiNamespace = "default";
         }
         $routeName .= "_$apiNamespace";
-        return $app->urlFor($routeName, $params);
+        return $app->ReverseRoute($routeName, $params);
     }
 
     public static function GetApiVersionNamespace(IAppServices $app, /*php_string*/ $prefix) {

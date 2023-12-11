@@ -766,7 +766,7 @@ $app->post("/library/:resourcePath+.MapDefinition/query.:format", function($reso
                 $output .= "</SelectionCount>";
                 $output .= "<FeaturesUrl>";
                 $innerFormat = ($format == "json" ? "geojson" : $format);
-                $output .= MgUtils::GetNamedRoute($this->app, "/session", "get_selected_features", array("sessionId" => $sessionId, "mapName" => $mapName, "layerName" => $layerName, "format" => $innerFormat));
+                $output .= MgUtils::GetNamedRoute($this->app, "/session", "get_selected_features", array("session" => $sessionId, "mapName" => $mapName, "layerName" => $layerName, "type" => $innerFormat));
                 $output .= "</FeaturesUrl>";
 
                 $output .= "</Layer>";

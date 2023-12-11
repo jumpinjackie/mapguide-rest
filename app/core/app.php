@@ -169,6 +169,10 @@ class AppServices implements IAppServices {
             return $value;
         };
     }
+
+    public function ReverseRoute(/*php_string*/ $routeName, array $params) {
+        return $this->container['router']->pathFor($routeName, $params);
+    }
     
     public function Done() {
         return $this->response;

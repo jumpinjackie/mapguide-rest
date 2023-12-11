@@ -58,6 +58,8 @@ interface IAppServices {
 
     public /* internal */ function RegisterDependency(/*php_string*/ $name, /*php_mixed*/ $value);
 
+    public function ReverseRoute(/*php_string*/ $routeName, array $params);
+
     public function Done();
 }
 
