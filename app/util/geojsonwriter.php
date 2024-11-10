@@ -19,7 +19,7 @@
 
 class MgReaderToGeoJsonWriter
 {
-    public static function FeatureToGeoJson(MgReader $reader, MgAgfReaderWriter $agfRw, MgTransform $transform = NULL, /*php_string*/ $idName = NULL, array $displayMap = NULL) {
+    public static function FeatureToGeoJson(/*MgReader*/ $reader, MgAgfReaderWriter $agfRw, MgTransform $transform = NULL, /*php_string*/ $idName = NULL, array $displayMap = NULL) {
         $idVal = NULL;
         $propVals = array();
         $geomJson = "";
