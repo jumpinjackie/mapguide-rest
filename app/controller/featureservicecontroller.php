@@ -1305,8 +1305,21 @@ class MgFeatureServiceController extends MgBaseController {
                 $flt = $vlNode->getElementsByTagName("Filter");
                 $elev = $vlNode->getElementsByTagName("ElevationSettings");
                 $mappings = $vlNode->getElementsByTagName("PropertyMapping");
-                if ($fsId->length == 1) {
-                    $fsId = new MgResourceIdentifier($fsId->item(0)->nodeValue);
+                $fsIdVal = "";
+                // If a LayerDefinition is watermarked, there will be multiple matches for tags with <ResourceId>
+                // The one we care about is the one pointing to a feature source
+                if ($fsId->length > 0) {
+                    for ($i = 0; $i < $fsId->length; $i++) {
+                        $nodeVal = $fsId->item($i)->nodeValue;
+                        if (MgUtils::StringEndsWith($nodeVal, ".FeatureSource")) {
+                            $fsIdVal = $nodeVal;
+                            break;
+                        }
+                    }
+                }
+
+                if ($fsIdVal !== "") {
+                    $fsId = new MgResourceIdentifier($fsIdVal);
 
                     $site = $siteConn->GetSite();
 
