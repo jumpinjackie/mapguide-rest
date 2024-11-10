@@ -404,6 +404,7 @@ $app->get("/session/{session}/{mapName}.Selection/overview.{type}", function($re
  *          @SWG\Parameter(name="mappedonly", in="query", required=false, type="boolean", description="Only return properties mapped in the Layer Definition"),
  *          @SWG\Parameter(name="includegeom", in="query", required=false, type="boolean", description="Include the geometry, only applicable when mappedonly=1"),
  *          @SWG\Parameter(name="displayproperties", in="query", required=false, type="boolean", description="Use the display name of mapped properties, only applicable when mappedonly=1 and format is HTML/GeoJSON"),
+ *          @SWG\Parameter(name="properties", in="query", required=false, type="string", description="A comma-separated list of property names to include"),
  *          @SWG\Parameter(name="transformto", in="query", required=false, type="string", description="The CS-Map coordinate system code to transform these features to"),
  *          @SWG\Parameter(name="pagesize", in="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the number of results for the page."),
  *          @SWG\Parameter(name="page", in="query", required=false, type="integer", description="Applies pagination on the query result. This specifies the page number of the page. You must specify a valid page size value (> 0) for this parameter to apply."),
