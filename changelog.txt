@@ -1,6 +1,10 @@
-next
-====
+1.0 RC6.1
+=========
+
  - #219: Fix missing reverse routing on selection overview
+ - #222: Fix bad feature query preparation when querying against watermarked layers
+ - #223: Relax strict-typing on MgReaderToGeoJsonWriter::FeatureToGeoJson() so that it can work with MgPaginatedFeatureReader allowing pagination to work again
+ - Added missing "properties" parameter to swagger defn for session-based feature selection route
 
 1.0 RC6
 =======
