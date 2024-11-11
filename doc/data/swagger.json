@@ -6205,6 +6205,13 @@
                         "type": "boolean"
                     },
                     {
+                        "name": "properties",
+                        "in": "query",
+                        "description": "A comma-separated list of property names to include",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
                         "name": "transformto",
                         "in": "query",
                         "description": "The CS-Map coordinate system code to transform these features to",
