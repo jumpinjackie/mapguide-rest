@@ -1,0 +1,90 @@
+# @import ./shared_variables.http
+###
+# Create MapGuide Session ID with admin
+# @name create_session
+
+POST {{endpoint_base}}/session.{{default_content_type}}
+Authorization: Basic {{admin_user}}:{{admin_pass}}
+
+?? status == 201
+?? header content-type == {{default_content_mime}}
+
+@session = {{create_session.PrimitiveValue.Value}}
+###
+# Get site status
+# @name get_site_status
+# @ref create_session
+
+GET {{endpoint_base}}/site/status.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Get site info
+# @name get_site_info
+# @ref create_session
+
+GET {{endpoint_base}}/site/info.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Get site version
+# @name get_site_version
+# @ref create_session
+
+GET {{endpoint_base}}/site/version.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Get site groups
+# @name get_site_groups
+# @ref create_session
+
+GET {{endpoint_base}}/site/groups.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+?? body includes Everyone
+
+@example_group = {{get_site_groups.GroupList.Group[0].Name}}
+###
+# Get users in site group
+# @name get_site_group_users
+# @ref get_site_groups
+
+GET {{endpoint_base}}/site/groups/{{example_group}}/users.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+?? body includes Administrator
+?? body includes Author
+?? body includes Anonymous
+###
+# Get groups of user
+# @name get_user_groups
+# @ref create_session
+
+GET {{endpoint_base}}/site/user/Administrator/groups.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+?? body includes Everyone
+###
+# Get roles of user
+# @name get_user_roles
+# @ref create_session
+
+GET {{endpoint_base}}/site/user/Administrator/roles.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+?? body includes Administrator
