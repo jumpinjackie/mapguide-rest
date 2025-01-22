@@ -1,0 +1,146 @@
+# @import ./shared_variables.http
+@test_map_def = Samples/Sheboygan/Maps/Sheboygan.MapDefinition
+###
+# Create MapGuide Session ID with admin
+# @name create_session
+
+POST {{endpoint_base}}/session.{{default_content_type}}
+Authorization: Basic {{admin_user}}:{{admin_pass}}
+
+?? status == 201
+?? header content-type == {{default_content_mime}}
+
+@session = {{create_session.PrimitiveValue.Value}}
+###
+# Create runtime map
+# @name create_runtime_map
+# @ref create_session
+
+POST {{endpoint_base}}/services/createmap.{{default_content_type}}
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+
+session={{session}}&mapdefinition=Library://{{test_map_def}}&requestedfeatures=7&format=json
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+
+@test_map_name = {{create_runtime_map.RuntimeMap.Name}}
+###
+# List fusion templates
+# @name list_fusion_templates
+# @ref create_session
+
+GET {{endpoint_base}}/services/fusiontemplates.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+?? body includes Aqua
+?? body includes Slate
+?? body includes TurquoiseYellow
+?? body includes Maroon
+?? body includes LimeGold
+###
+# List fusion widgets
+# @name list_fusion_widgets
+# @ref create_session
+
+GET {{endpoint_base}}/services/fusionwidgets.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# List fusion containers
+# @name list_fusion_containers
+# @ref create_session
+
+GET {{endpoint_base}}/services/fusioncontainers.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Get FDO Schema Mapping
+# @name get_fdo_schema_mapping
+# @ref create_session
+
+#GET {{endpoint_base}}/services/getschemamapping.{{default_content_type}}
+#    ?session={{session}}
+#    &provider=OSGeo.WMS
+#
+#?? status == 200
+#?? header content-type == {{default_content_mime}}
+###
+# Copy resource
+# @name copy_resource
+# @ref create_session
+
+@source = Library://Samples/Sheboygan/Layers/Parcels.LayerDefinition
+@destination = Library://IntegrationTesting/Test.LayerDefinition
+@overwrite = true
+
+POST {{endpoint_base}}/services/copyresource
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+
+session={{session}}&source={{source}}&destination={{destination}}&overwrite={{overwrite}}
+
+?? status == 200
+###
+# Get content of copied resource
+# @name get_copied_resource_content
+# @ref copy_resource
+
+GET {{endpoint_base}}/library/IntegrationTesting/Test.LayerDefinition/content.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Move resource
+# @name move_resource
+# @ref create_session
+
+@source = Library://IntegrationTesting/Test.LayerDefinition
+@destination = Library://IntegrationTesting/Test2.LayerDefinition
+@overwrite = true
+
+POST {{endpoint_base}}/services/moveresource
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+
+session={{session}}&source={{source}}&destination={{destination}}&overwrite={{overwrite}}
+
+?? status == 200
+###
+# Get content of moved resource
+# @name get_moved_resource_content
+# @ref move_resource
+
+GET {{endpoint_base}}/library/IntegrationTesting/Test2.LayerDefinition/content.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Get content of moved resource source
+# @name verify_moved_source_resource_gone
+# @ref move_resource
+
+GET {{endpoint_base}}/library/IntegrationTesting/Test.LayerDefinition/content.{{default_content_type}}?session={{session}}
+
+?? status == 404
+?? header content-type == {{default_content_mime}}
+###
+# List unmanaged data
+# TODO
+###
+# Transform coordinates
+# @name transform_coordinates
+# @ref create_session
+
+@from = LL84
+@to = WGS84.PseudoMercator
+@coords = -87.7398334220901 43.73822699224595,-87.72068284176505 43.75068777906662
+
+POST {{endpoint_base}}/services/transformcoords
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+
+from={{from}}&to={{to}}&format={{default_content_type}}&coords={{coords}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}

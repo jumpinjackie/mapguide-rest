@@ -446,20 +446,6 @@ GET {{endpoint_base}}/library/{{test_map_def}}/preview
 ?? status == 200
 ?? header content-type includes text/html
 ###
-# Create runtime map
-# @name create_runtime_map
-# @ref create_session
-
-POST {{endpoint_base}}/services/createmap.{{default_content_type}}
-Content-Type: application/x-www-form-urlencoded; charset=UTF-8
-
-session={{session}}&mapdefinition=Library://{{test_map_def}}&requestedfeatures=7&format=json
-
-?? status == 200
-?? header content-type == {{default_content_mime}}
-
-@test_map_name = {{create_runtime_map.RuntimeMap.Name}}
-###
 # Get map plot (pdf)
 # @name get_map_plot_pdf
 
