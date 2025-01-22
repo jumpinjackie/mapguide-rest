@@ -1,0 +1,64 @@
+@endpoint_base = http://localhost:8018/mapguide/rest
+@admin_user = Administrator
+@admin_pass = admin
+@default_content_type = json
+@default_content_mime = application/json
+###
+# Create MapGuide Session ID with admin
+# @name create_session
+
+POST {{endpoint_base}}/session.{{default_content_type}}
+Authorization: Basic {{admin_user}}:{{admin_pass}}
+
+?? status == 201
+?? header content-type == {{default_content_mime}}
+
+@session = {{create_session.PrimitiveValue.Value}}
+###
+# List FDO providers
+# @name list_fdo_providers
+# @ref create_session
+
+GET {{endpoint_base}}/providers.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+?? body includes OSGeo.SDF
+?? body includes OSGeo.SHP
+?? body includes OSGeo.Gdal
+?? body includes OSGeo.OGR
+###
+# Get FDO provider capabilities
+# @name get_fdo_provider_capabilities
+# @ref create_session
+
+GET {{endpoint_base}}/providers/OSGeo.SDF/capabilities.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# List FDO provider data stores
+# @name get_fdo_provider_capabilities
+# @ref create_session
+
+# TODO: Need to use a RDBMS-based provider here
+#@connection = fill me in
+#
+#GET {{endpoint_base}}/providers/OSGeo.SDF/datastores.{{default_content_type}}
+#    ?session={{session}}
+#    &connection={{connection}}
+#
+#?? status == 200
+#?? header content-type == {{default_content_mime}}
+###
+# Get FDO provider connect values
+# @name get_fdo_provider_connect_values
+# @ref create_session
+
+GET {{endpoint_base}}/providers/OSGeo.SDF/connectvalues.{{default_content_type}}/ReadOnly
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
