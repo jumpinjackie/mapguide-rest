@@ -1,0 +1,5 @@
+@endpoint_base = http://localhost:8018/mapguide/rest
+@admin_user = Administrator
+@admin_pass = admin
+@default_content_type = json
+@default_content_mime = application/json

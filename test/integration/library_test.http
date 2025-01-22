@@ -1,8 +1,4 @@
-@endpoint_base = http://localhost:8018/mapguide/rest
-@admin_user = Administrator
-@admin_pass = admin
-@default_content_type = json
-@default_content_mime = application/json
+# @import ./shared_variables.http
 #HACK: Have to pre-encode this string as httpYac (or this notebook) doesn't do it and there's no
 #built-in encoding function
 #@test_fdo_filter = RNAME LIKE 'SCHMITT%'
