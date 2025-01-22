@@ -1,0 +1,638 @@
+@endpoint_base = http://localhost:8018/mapguide/rest
+@admin_user = Administrator
+@admin_pass = admin
+@default_content_type = json
+@default_content_mime = application/json
+#HACK: Have to pre-encode this string as httpYac (or this notebook) doesn't do it and there's no
+#built-in encoding function
+#@test_fdo_filter = RNAME LIKE 'SCHMITT%'
+@test_fdo_filter = RNAME%20LIKE%20'SCHMITT%25'
+@test_feature_source = Samples/Sheboygan/Data/Parcels.FeatureSource
+@test_layer_def = Samples/Sheboygan/Layers/Parcels.LayerDefinition
+@test_map_def = Samples/Sheboygan/Maps/Sheboygan.MapDefinition
+@test_map_def_xyz = Samples/Sheboygan/MapsTiled/SheboyganNoWatermark.MapDefinition
+@test_map_def_xyz_geojson = Samples/Sheboygan/MapsTiled/Sheboygan.MapDefinition
+@test_tileset_def = Samples/Sheboygan/TileSets/Sheboygan.TileSetDefinition
+@test_tileset_xyz_def = Samples/Sheboygan/TileSets/SheboyganXYZ.TileSetDefinition
+@test_weblayout = Samples/Sheboygan/Layouts/SheboyganPhp.WebLayout
+@test_appdef = Samples/Sheboygan/FlexibleLayouts/Slate.ApplicationDefinition
+@test_symboldef = Samples/Sheboygan/Symbols/Rail.SymbolDefinition
+@test_watermarkdef = Samples/Sheboygan/Watermarks/MapText.WatermarkDefinition
+#HACK: Same pre-encoding
+@test_map_def_xyz_group = Base%20Layer%20Group
+@example_schema = SHP_Schema
+@example_class = Parcels
+###
+# Create MapGuide Session ID with admin
+# @name create_session
+
+POST {{endpoint_base}}/session.{{default_content_type}}
+Authorization: Basic {{admin_user}}:{{admin_pass}}
+
+?? status == 201
+?? header content-type == {{default_content_mime}}
+
+@session = {{create_session.PrimitiveValue.Value}}
+###
+# List resources at root
+# @ref create_session
+
+GET {{endpoint_base}}/library/list.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# List resources in folder
+# @ref create_session
+
+GET {{endpoint_base}}/library/Samples/Sheboygan/list.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Get content of resource
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/content.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# List data of resource
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/datalist.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Get header of resource
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/header.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Get HTML page of resource
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/html?session={{session}}
+
+?? status == 200
+?? header content-type includes text/html
+###
+# Get resource references
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/references.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Test feature source connection status
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/status.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Get edit capabilities of feature source
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/editcapabilities.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# List spatial contexts of feature source
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/spatialcontexts.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+
+#GET {{endpoint_base}}/library/{{test_feature_source}}/longtransactions.{{default_content_type}}?session={{session}}
+###
+# List schemas of feature source
+# @ref create_session
+# @name describe_schema
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/schemas.{{default_content_type}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+
+@example_schema = {{describe_schema.StringCollection.Item[0]}}
+###
+# Describe schema
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/schema.{{default_content_type}}/{{example_schema}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# List class names of feature source
+# @name get_classes
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/classes.{{default_content_type}}/{{example_schema}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+
+@example_class_full = {{get_classes.StringCollection.Item[0]}}
+###
+# Get class definition in feature source
+# @ref get_classes
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/classdef.{{default_content_type}}/{{example_class_full}}?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Feature query (filter)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example_schema}}/{{example_class}}
+    ?session={{session}}
+    &filter={{test_fdo_filter}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Feature query (filter + pagination)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example_schema}}/{{example_class}}
+    ?session={{session}}
+    &filter={{test_fdo_filter}}
+    &pagesize=10
+    &page=2
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Feature query (filter + limiter)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example_schema}}/{{example_class}}
+    ?session={{session}}
+    &filter={{test_fdo_filter}}
+    &maxfeatures=5
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Feature query (filter + limiter + property list)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example_schema}}/{{example_class}}
+    ?session={{session}}
+    &filter={{test_fdo_filter}}
+    &maxfeatures=5
+    &properties=Autogenerated_SDF_ID,RNAME,SHPGEOM
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Feature query (filter + limiter + property list + xform)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example_schema}}/{{example_class}}
+    ?session={{session}}
+    &filter={{test_fdo_filter}}
+    &maxfeatures=5
+    &properties=Autogenerated_SDF_ID,RNAME,SHPGEOM
+    &transformto=WGS84.PseudoMercator
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Feature aggregate query (count)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/aggregates.{{default_content_type}}/count/{{example_schema}}/{{example_class}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Feature aggregate query (bbox)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/aggregates.{{default_content_type}}/bbox/{{example_schema}}/{{example_class}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Feature aggregate query (bbox + xform)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/aggregates.{{default_content_type}}/bbox/{{example_schema}}/{{example_class}}
+    ?session={{session}}
+    &transformto=WGS84.PseudoMercator
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Feature aggregate query (distinctvalues)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/aggregates.{{default_content_type}}/distinctvalues/{{example_schema}}/{{example_class}}
+    ?session={{session}}
+    &property=RTYPE
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Feature source preview
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_feature_source}}/preview
+    ?session={{session}}
+
+?? status == 200
+?? header content-type includes text/html
+###
+# Feature query by layer (filter)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
+    ?session={{session}}
+    &filter={{test_fdo_filter}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Feature query by layer (filter + pagination)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
+    ?session={{session}}
+    &filter={{test_fdo_filter}}
+    &pagesize=10
+    &page=2
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Feature query by layer (filter + limiter)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
+    ?session={{session}}
+    &filter={{test_fdo_filter}}
+    &maxfeatures=5
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Feature query by layer (filter + limiter + property list)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
+    ?session={{session}}
+    &filter={{test_fdo_filter}}
+    &maxfeatures=5
+    &properties=Autogenerated_SDF_ID,RNAME,SHPGEOM
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Feature query by layer (filter + limiter + property list + xform)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
+    ?session={{session}}
+    &filter={{test_fdo_filter}}
+    &maxfeatures=5
+    &properties=Autogenerated_SDF_ID,RNAME,SHPGEOM
+    &transformto=WGS84.PseudoMercator
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Layer legend icon
+# @ref create_session
+
+@scale = 0
+@geom_type = 3
+@theme_cat = 0
+
+GET {{endpoint_base}}/library/{{test_layer_def}}/legend/{{scale}}/{{geom_type}}/{{theme_cat}}/icon.png
+    ?session={{session}}
+    &width=24
+    &height=24
+
+?? status == 200
+?? header content-type == image/png
+###
+# Layer definition preview
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_layer_def}}/preview
+    ?session={{session}}
+
+?? status == 200
+?? header content-type includes text/html
+###
+# Get XYZ image tile
+
+GET {{endpoint_base}}/library/{{test_map_def_xyz}}/xyz/{{test_map_def_xyz_group}}/13/2099/2986/tile.png
+
+?? status == 200
+?? header content-type == image/png
+###
+# Get XYZ GeoJSON vector tile
+
+GET {{endpoint_base}}/library/{{test_map_def_xyz_geojson}}/xyz/{{test_map_def_xyz_group}}/13/2099/2986/tile.json
+
+?? status == 200
+?? header content-type == application/json
+###
+# Get XYZ retina image tile
+
+GET {{endpoint_base}}/library/{{test_map_def_xyz}}/xyz@2/{{test_map_def_xyz_group}}/12/1049/1493/tile.png
+
+?? status == 200
+?? header content-type == image/png
+###
+# Get map image tile
+
+GET {{endpoint_base}}/library/{{test_tileset_def}}/tile.img/{{test_map_def_xyz_group}}/8/0/0
+
+?? status == 200
+?? header content-type == image/png
+###
+# Get XYZ image tile (from tileset def)
+
+GET {{endpoint_base}}/library/{{test_tileset_xyz_def}}/tile.img/{{test_map_def_xyz_group}}/13/2099/2986
+
+?? status == 200
+?? header content-type == image/png
+###
+# Get map image
+
+GET {{endpoint_base}}/library/{{test_map_def}}/image.png
+    ?session={{session}}
+    &x=-87.73025425093128
+    &y=43.744459064634064
+    &scale=100000
+    &width=585
+    &height=893
+
+?? status == 200
+?? header content-type == image/png
+###
+# Get map image (custom dpi)
+
+GET {{endpoint_base}}/library/{{test_map_def}}/image.png
+    ?session={{session}}
+    &x=-87.73025425093128
+    &y=43.744459064634064
+    &scale=100000
+    &width=585
+    &height=893
+    &dpi=192
+
+?? status == 200
+?? header content-type == image/png
+###
+# Map defn preview
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_map_def}}/preview
+    ?session={{session}}
+
+?? status == 200
+?? header content-type includes text/html
+###
+# Create runtime map
+# @name create_runtime_map
+# @ref create_session
+
+POST {{endpoint_base}}/services/createmap.{{default_content_type}}
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+
+session={{session}}&mapdefinition=Library://{{test_map_def}}&requestedfeatures=7&format=json
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+
+@test_map_name = {{create_runtime_map.RuntimeMap.Name}}
+###
+# Get map plot (pdf)
+
+GET {{endpoint_base}}/library/{{test_map_def}}/plot.pdf
+    ?session={{session}}
+    &x=-87.73025425093128
+    &y=43.744459064634064
+    &scale=100000
+    &width=585
+    &height=893
+    &papersize=A3
+    &orientation=L
+    &type=pdf
+
+?? status == 200
+?? header content-type == application/pdf
+###
+# Get map plot (dwf)
+
+GET {{endpoint_base}}/library/{{test_map_def}}/plot.dwf
+    ?session={{session}}
+    &x=-87.73025425093128
+    &y=43.744459064634064
+    &scale=100000
+    &width=585
+    &height=893
+    &papersize=A3
+    &orientation=L
+    &type=dwf
+
+?? status == 200
+?? header content-type == model/vnd.dwf
+###
+# Get WebLayout viewer
+
+GET {{endpoint_base}}/library/{{test_weblayout}}/viewer
+
+?? status == 200
+?? header content-type includes text/html
+###
+# Get Fusion viewer (slate)
+
+#GET {{endpoint_base}}/library/{{test_appdef}}/slate
+#
+#?? status == 200
+#?? header content-type includes text/html
+###
+# Get watermark preview
+
+GET {{endpoint_base}}/library/{{test_watermarkdef}}/preview
+
+?? status == 200
+?? header content-type includes text/html
+###
+# Get symbol def preview
+
+GET {{endpoint_base}}/library/{{test_symboldef}}/preview
+
+?? status == 200
+?? header content-type == image/png
+###
+# Get mapdef kml
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_map_def}}/kml
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == application/vnd.google-earth.kml+xml
+###
+# Get mapdef kml (native)
+# @ref create_session
+
+GET {{endpoint_base}}/library/{{test_map_def}}/kml
+    ?session={{session}}
+    &native=true
+
+?? status == 200
+?? header content-type == application/vnd.google-earth.kml+xml
+###
+# Get layerdef kml
+# @ref create_session
+
+@bbox = -87.7398334220901,43.73822699224595,-87.72068284176505,43.75068777906662
+@width = 796
+@height = 717
+
+GET {{endpoint_base}}/library/{{test_layer_def}}/kml
+    ?session={{session}}
+    &bbox={{bbox}}
+    &dpi=96
+    &width={{width}}
+    &height={{height}}
+    &draworder=0
+
+?? status == 200
+?? header content-type == application/vnd.google-earth.kml+xml
+###
+# Get layerdef features kml
+# @ref create_session
+
+# httpYac cannot run this
+
+#@bbox = -87.7398334220901,43.73822699224595,-87.72068284176505,43.75068777906662
+#@width = 796
+#@height = 717
+#
+#GET {{endpoint_base}}/library/{{test_layer_def}}/kmlfeatures.kml
+#    ?session={{session}}
+#    &bbox={{bbox}}
+#    &dpi=96
+#    &width={{width}}
+#    &height={{height}}
+#    &draworder=0
+#
+#?? status == 200
+#?? header content-type == application/vnd.google-earth.kml+xml
+###
+# Set resource
+# @name set_resource_content
+# @ref create_session
+
+POST {{endpoint_base}}/library/IntegrationTesting/Test.WatermarkDefinition/content.xml
+X-MG-SESSION-ID: {{session}}
+<?xml version="1.0" encoding="utf-8"?>
+<WatermarkDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="2.4.0" xsi:noNamespaceSchemaLocation="WatermarkDefinition-2.4.0.xsd">
+  <Content>
+    <SimpleSymbolDefinition>
+      <Name />
+      <Description />
+      <Graphics>
+        <Text>
+          <Content>'MapGuide Sheboygan Sample'</Content>
+          <FontName>'Arial'</FontName>
+          <Height>3</Height>
+          <Frame>
+            <FillColor>0xFFFFFFFF</FillColor>
+            <OffsetX>0.0</OffsetX>
+            <OffsetY>0.0</OffsetY>
+          </Frame>
+        </Text>
+      </Graphics>
+      <PointUsage />
+      <ParameterDefinition />
+    </SimpleSymbolDefinition>
+  </Content>
+  <Appearance />
+  <Position>
+    <XYPosition>
+      <XPosition>
+        <Offset>5</Offset>
+        <Unit>Pixels</Unit>
+        <Alignment>Right</Alignment>
+      </XPosition>
+      <YPosition>
+        <Offset>5</Offset>
+        <Unit>Points</Unit>
+        <Alignment>Bottom</Alignment>
+      </YPosition>
+    </XYPosition>
+  </Position>
+</WatermarkDefinition>
+
+?? status == 201
+?? header content-type includes text/xml
+?? body includes Library://IntegrationTesting/Test.WatermarkDefinition
+###
+# Get created resource content
+# @ref set_resource_content
+
+GET {{endpoint_base}}/library/IntegrationTesting/Test.WatermarkDefinition/content.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == application/json
+?? body includes MapGuide Sheboygan Sample
+###
+# Set resource header
+# @name set_resource_header
+# @ref create_session
+
+POST {{endpoint_base}}/library/IntegrationTesting/Test.WatermarkDefinition/header.xml
+X-MG-SESSION-ID: {{session}}
+<ResourceDocumentHeader xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="ResourceDocumentHeader-1.0.0.xsd">
+    <Security>
+        <Inherited>true</Inherited>
+    </Security>
+    <Metadata>
+        <Simple>
+            <Property>
+                <Name>HelloWorld</Name>
+                <Value>1</Value>
+            </Property>
+        </Simple>
+    </Metadata>
+</ResourceDocumentHeader>
+
+?? status == 200
+?? header content-type includes text/xml
+?? body includes Library://IntegrationTesting/Test.WatermarkDefinition
+###
+# Get created resource header
+# @ref set_resource_content
+
+GET {{endpoint_base}}/library/IntegrationTesting/Test.WatermarkDefinition/header.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == application/json
+?? body includes HelloWorld
