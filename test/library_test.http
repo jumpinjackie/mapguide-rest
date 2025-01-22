@@ -35,6 +35,7 @@ Authorization: Basic {{admin_user}}:{{admin_pass}}
 @session = {{create_session.PrimitiveValue.Value}}
 ###
 # List resources at root
+# @name list_resources_at_root
 # @ref create_session
 
 GET {{endpoint_base}}/library/list.{{default_content_type}}?session={{session}}
@@ -43,6 +44,7 @@ GET {{endpoint_base}}/library/list.{{default_content_type}}?session={{session}}
 ?? header content-type == {{default_content_mime}}
 ###
 # List resources in folder
+# @name list_resources_in_folder
 # @ref create_session
 
 GET {{endpoint_base}}/library/Samples/Sheboygan/list.{{default_content_type}}?session={{session}}
@@ -51,6 +53,7 @@ GET {{endpoint_base}}/library/Samples/Sheboygan/list.{{default_content_type}}?se
 ?? header content-type == {{default_content_mime}}
 ###
 # Get content of resource
+# @name get_resource_content
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/content.{{default_content_type}}?session={{session}}
@@ -59,6 +62,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/content.{{default_content_
 ?? header content-type == {{default_content_mime}}
 ###
 # List data of resource
+# @name list_resource_data
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/datalist.{{default_content_type}}?session={{session}}
@@ -67,6 +71,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/datalist.{{default_content
 ?? header content-type == {{default_content_mime}}
 ###
 # Get header of resource
+# @name get_resource_header
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/header.{{default_content_type}}?session={{session}}
@@ -75,6 +80,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/header.{{default_content_t
 ?? header content-type == {{default_content_mime}}
 ###
 # Get HTML page of resource
+# @name get_resource_html_page
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/html?session={{session}}
@@ -83,6 +89,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/html?session={{session}}
 ?? header content-type includes text/html
 ###
 # Get resource references
+# @name get_resource_references
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/references.{{default_content_type}}?session={{session}}
@@ -91,6 +98,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/references.{{default_conte
 ?? header content-type == {{default_content_mime}}
 ###
 # Test feature source connection status
+# @name test_feature_source_connection_status
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/status.{{default_content_type}}?session={{session}}
@@ -99,6 +107,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/status.{{default_content_t
 ?? header content-type == {{default_content_mime}}
 ###
 # Get edit capabilities of feature source
+# @name get_feature_source_edit_capabilities
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/editcapabilities.{{default_content_type}}?session={{session}}
@@ -107,6 +116,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/editcapabilities.{{default
 ?? header content-type == {{default_content_mime}}
 ###
 # List spatial contexts of feature source
+# @name get_spatial_contexts
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/spatialcontexts.{{default_content_type}}?session={{session}}
@@ -118,18 +128,19 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/spatialcontexts.{{default_
 #GET {{endpoint_base}}/library/{{test_feature_source}}/longtransactions.{{default_content_type}}?session={{session}}
 ###
 # List schemas of feature source
+# @name get_feature_schemas
 # @ref create_session
-# @name describe_schema
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/schemas.{{default_content_type}}?session={{session}}
 
 ?? status == 200
 ?? header content-type == {{default_content_mime}}
 
-@example_schema = {{describe_schema.StringCollection.Item[0]}}
+@example_schema = {{get_feature_schemas.StringCollection.Item[0]}}
 ###
 # Describe schema
-# @ref create_session
+# @name describe_schema
+# @ref get_feature_schemas
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/schema.{{default_content_type}}/{{example_schema}}?session={{session}}
 
@@ -148,6 +159,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/classes.{{default_content_
 @example_class_full = {{get_classes.StringCollection.Item[0]}}
 ###
 # Get class definition in feature source
+# @name get_class_definition
 # @ref get_classes
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/classdef.{{default_content_type}}/{{example_class_full}}?session={{session}}
@@ -156,6 +168,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/classdef.{{default_content
 ?? header content-type == {{default_content_mime}}
 ###
 # Feature query (filter)
+# @name feature_query_with_filter
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example_schema}}/{{example_class}}
@@ -166,6 +179,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example
 ?? header content-type == {{default_content_mime}}
 ###
 # Feature query (filter + pagination)
+# @name feature_query_with_filter_and_pagination
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example_schema}}/{{example_class}}
@@ -178,6 +192,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example
 ?? header content-type == {{default_content_mime}}
 ###
 # Feature query (filter + limiter)
+# @name feature_query_with_filter_and_limiter
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example_schema}}/{{example_class}}
@@ -189,6 +204,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example
 ?? header content-type == {{default_content_mime}}
 ###
 # Feature query (filter + limiter + property list)
+# @name feature_query_with_filter_and_limiter_and_property_list
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example_schema}}/{{example_class}}
@@ -201,6 +217,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example
 ?? header content-type == {{default_content_mime}}
 ###
 # Feature query (filter + limiter + property list + xform)
+# @name feature_query_with_filter_and_limiter_and_property_list_and_xform
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example_schema}}/{{example_class}}
@@ -214,6 +231,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/features.geojson/{{example
 ?? header content-type == {{default_content_mime}}
 ###
 # Feature aggregate query (count)
+# @name feature_aggregate_count
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/aggregates.{{default_content_type}}/count/{{example_schema}}/{{example_class}}
@@ -223,6 +241,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/aggregates.{{default_conte
 ?? header content-type == {{default_content_mime}}
 ###
 # Feature aggregate query (bbox)
+# @name feature_aggregate_bbox
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/aggregates.{{default_content_type}}/bbox/{{example_schema}}/{{example_class}}
@@ -232,6 +251,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/aggregates.{{default_conte
 ?? header content-type == {{default_content_mime}}
 ###
 # Feature aggregate query (bbox + xform)
+# @name feature_aggregate_bbox_with_xform
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/aggregates.{{default_content_type}}/bbox/{{example_schema}}/{{example_class}}
@@ -242,6 +262,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/aggregates.{{default_conte
 ?? header content-type == {{default_content_mime}}
 ###
 # Feature aggregate query (distinctvalues)
+# @name feature_aggregate_distinctvalues
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/aggregates.{{default_content_type}}/distinctvalues/{{example_schema}}/{{example_class}}
@@ -252,6 +273,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/aggregates.{{default_conte
 ?? header content-type == {{default_content_mime}}
 ###
 # Feature source preview
+# @name feature_source_preview
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_feature_source}}/preview
@@ -261,6 +283,7 @@ GET {{endpoint_base}}/library/{{test_feature_source}}/preview
 ?? header content-type includes text/html
 ###
 # Feature query by layer (filter)
+# @name layer_feature_query_with_filter
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
@@ -271,6 +294,7 @@ GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
 ?? header content-type == {{default_content_mime}}
 ###
 # Feature query by layer (filter + pagination)
+# @name layer_feature_query_with_filter_and_pagination
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
@@ -283,6 +307,7 @@ GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
 ?? header content-type == {{default_content_mime}}
 ###
 # Feature query by layer (filter + limiter)
+# @name layer_feature_query_with_filter_and_limiter
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
@@ -294,6 +319,7 @@ GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
 ?? header content-type == {{default_content_mime}}
 ###
 # Feature query by layer (filter + limiter + property list)
+# @name layer_feature_query_with_filter_and_limiter_and_property_list
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
@@ -306,6 +332,7 @@ GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
 ?? header content-type == {{default_content_mime}}
 ###
 # Feature query by layer (filter + limiter + property list + xform)
+# @name layer_feature_query_with_filter_and_limiter_and_property_list_and_xform
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
@@ -319,6 +346,7 @@ GET {{endpoint_base}}/library/{{test_layer_def}}/features.geojson
 ?? header content-type == {{default_content_mime}}
 ###
 # Layer legend icon
+# @name layer_legend_icon
 # @ref create_session
 
 @scale = 0
@@ -334,6 +362,7 @@ GET {{endpoint_base}}/library/{{test_layer_def}}/legend/{{scale}}/{{geom_type}}/
 ?? header content-type == image/png
 ###
 # Layer definition preview
+# @name layer_defn_preview
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_layer_def}}/preview
@@ -343,6 +372,7 @@ GET {{endpoint_base}}/library/{{test_layer_def}}/preview
 ?? header content-type includes text/html
 ###
 # Get XYZ image tile
+# @name get_xyz_image_tile
 
 GET {{endpoint_base}}/library/{{test_map_def_xyz}}/xyz/{{test_map_def_xyz_group}}/13/2099/2986/tile.png
 
@@ -350,6 +380,7 @@ GET {{endpoint_base}}/library/{{test_map_def_xyz}}/xyz/{{test_map_def_xyz_group}
 ?? header content-type == image/png
 ###
 # Get XYZ GeoJSON vector tile
+# @name get_geojson_vector_tile
 
 GET {{endpoint_base}}/library/{{test_map_def_xyz_geojson}}/xyz/{{test_map_def_xyz_group}}/13/2099/2986/tile.json
 
@@ -357,6 +388,7 @@ GET {{endpoint_base}}/library/{{test_map_def_xyz_geojson}}/xyz/{{test_map_def_xy
 ?? header content-type == application/json
 ###
 # Get XYZ retina image tile
+# @name get_xyz_retina_image_tile
 
 GET {{endpoint_base}}/library/{{test_map_def_xyz}}/xyz@2/{{test_map_def_xyz_group}}/12/1049/1493/tile.png
 
@@ -364,6 +396,7 @@ GET {{endpoint_base}}/library/{{test_map_def_xyz}}/xyz@2/{{test_map_def_xyz_grou
 ?? header content-type == image/png
 ###
 # Get map image tile
+# @name get_map_image_tile
 
 GET {{endpoint_base}}/library/{{test_tileset_def}}/tile.img/{{test_map_def_xyz_group}}/8/0/0
 
@@ -371,6 +404,7 @@ GET {{endpoint_base}}/library/{{test_tileset_def}}/tile.img/{{test_map_def_xyz_g
 ?? header content-type == image/png
 ###
 # Get XYZ image tile (from tileset def)
+# @name get_xyz_image_tile_from_tileset
 
 GET {{endpoint_base}}/library/{{test_tileset_xyz_def}}/tile.img/{{test_map_def_xyz_group}}/13/2099/2986
 
@@ -378,6 +412,7 @@ GET {{endpoint_base}}/library/{{test_tileset_xyz_def}}/tile.img/{{test_map_def_x
 ?? header content-type == image/png
 ###
 # Get map image
+# @name get_map_image
 
 GET {{endpoint_base}}/library/{{test_map_def}}/image.png
     ?session={{session}}
@@ -391,6 +426,7 @@ GET {{endpoint_base}}/library/{{test_map_def}}/image.png
 ?? header content-type == image/png
 ###
 # Get map image (custom dpi)
+# @name get_map_image_with_dpi
 
 GET {{endpoint_base}}/library/{{test_map_def}}/image.png
     ?session={{session}}
@@ -405,6 +441,7 @@ GET {{endpoint_base}}/library/{{test_map_def}}/image.png
 ?? header content-type == image/png
 ###
 # Map defn preview
+# @name map_defn_preview
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_map_def}}/preview
@@ -428,6 +465,7 @@ session={{session}}&mapdefinition=Library://{{test_map_def}}&requestedfeatures=7
 @test_map_name = {{create_runtime_map.RuntimeMap.Name}}
 ###
 # Get map plot (pdf)
+# @name get_map_plot_pdf
 
 GET {{endpoint_base}}/library/{{test_map_def}}/plot.pdf
     ?session={{session}}
@@ -444,6 +482,7 @@ GET {{endpoint_base}}/library/{{test_map_def}}/plot.pdf
 ?? header content-type == application/pdf
 ###
 # Get map plot (dwf)
+# @name get_map_plot_dwf
 
 GET {{endpoint_base}}/library/{{test_map_def}}/plot.dwf
     ?session={{session}}
@@ -460,6 +499,7 @@ GET {{endpoint_base}}/library/{{test_map_def}}/plot.dwf
 ?? header content-type == model/vnd.dwf
 ###
 # Get WebLayout viewer
+# @name weblayout_viewer
 
 GET {{endpoint_base}}/library/{{test_weblayout}}/viewer
 
@@ -467,6 +507,7 @@ GET {{endpoint_base}}/library/{{test_weblayout}}/viewer
 ?? header content-type includes text/html
 ###
 # Get Fusion viewer (slate)
+# @name fusion_viewer
 
 #GET {{endpoint_base}}/library/{{test_appdef}}/slate
 #
@@ -474,6 +515,7 @@ GET {{endpoint_base}}/library/{{test_weblayout}}/viewer
 #?? header content-type includes text/html
 ###
 # Get watermark preview
+# @name watermark_preview
 
 GET {{endpoint_base}}/library/{{test_watermarkdef}}/preview
 
@@ -481,6 +523,7 @@ GET {{endpoint_base}}/library/{{test_watermarkdef}}/preview
 ?? header content-type includes text/html
 ###
 # Get symbol def preview
+# @name symbol_defn_preview
 
 GET {{endpoint_base}}/library/{{test_symboldef}}/preview
 
@@ -488,6 +531,7 @@ GET {{endpoint_base}}/library/{{test_symboldef}}/preview
 ?? header content-type == image/png
 ###
 # Get mapdef kml
+# @name get_map_defn_kml
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_map_def}}/kml
@@ -497,6 +541,7 @@ GET {{endpoint_base}}/library/{{test_map_def}}/kml
 ?? header content-type == application/vnd.google-earth.kml+xml
 ###
 # Get mapdef kml (native)
+# @name get_map_defn_kml_native
 # @ref create_session
 
 GET {{endpoint_base}}/library/{{test_map_def}}/kml
@@ -507,6 +552,7 @@ GET {{endpoint_base}}/library/{{test_map_def}}/kml
 ?? header content-type == application/vnd.google-earth.kml+xml
 ###
 # Get layerdef kml
+# @name get_layer_defn_kml
 # @ref create_session
 
 @bbox = -87.7398334220901,43.73822699224595,-87.72068284176505,43.75068777906662
@@ -525,6 +571,7 @@ GET {{endpoint_base}}/library/{{test_layer_def}}/kml
 ?? header content-type == application/vnd.google-earth.kml+xml
 ###
 # Get layerdef features kml
+# @name get_layer_defn_features_kml
 # @ref create_session
 
 # httpYac cannot run this
@@ -594,6 +641,7 @@ X-MG-SESSION-ID: {{session}}
 ?? body includes Library://IntegrationTesting/Test.WatermarkDefinition
 ###
 # Get created resource content
+# @name get_created_resource_content
 # @ref set_resource_content
 
 GET {{endpoint_base}}/library/IntegrationTesting/Test.WatermarkDefinition/content.{{default_content_type}}
@@ -628,6 +676,7 @@ X-MG-SESSION-ID: {{session}}
 ?? body includes Library://IntegrationTesting/Test.WatermarkDefinition
 ###
 # Get created resource header
+# @name get_created_resource_header
 # @ref set_resource_content
 
 GET {{endpoint_base}}/library/IntegrationTesting/Test.WatermarkDefinition/header.{{default_content_type}}
