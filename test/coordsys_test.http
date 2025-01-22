@@ -1,0 +1,159 @@
+@endpoint_base = http://localhost:8018/mapguide/rest
+@admin_user = Administrator
+@admin_pass = admin
+@default_content_type = json
+@default_content_mime = application/json
+###
+# Create MapGuide Session ID with admin
+# @name create_session
+
+POST {{endpoint_base}}/session.{{default_content_type}}
+Authorization: Basic {{admin_user}}:{{admin_pass}}
+
+?? status == 201
+?? header content-type == {{default_content_mime}}
+
+@session = {{create_session.PrimitiveValue.Value}}
+###
+# Get coordsys library
+# @name get_coordsys_library
+# @ref create_session
+
+GET {{endpoint_base}}/coordsys/baselibrary.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+?? body includes Mentor Coordinate System Library
+###
+# Get coordsys categories
+# @name get_coordsys_categories
+# @ref create_session
+
+GET {{endpoint_base}}/coordsys/categories.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+
+@example_category = {{get_coordsys_categories.StringCollection.Item[0]}}
+###
+# Get coordinate systems under category
+# @name get_coordsys_in_category
+# @ref get_coordsys_categories
+
+GET {{endpoint_base}}/coordsys/category.{{default_content_type}}/{{example_category}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Convert mentor to epsg code
+# @name convert_mentor_to_epsg
+# @ref create_session
+
+@from = WGS84.PseudoMercator
+
+GET {{endpoint_base}}/coordsys/mentor/{{from}}/epsg.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+?? body includes 3857
+###
+# Convert mentor to WKT
+# @name convert_mentor_to_wkt
+# @ref create_session
+
+@from = WGS84.PseudoMercator
+
+GET {{endpoint_base}}/coordsys/mentor/{{from}}/wkt.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Convert epsg code to mentor code
+# @name convert_epsg_to_mentor
+# @ref create_session
+
+@from = 3857
+
+GET {{endpoint_base}}/coordsys/epsg/{{from}}/mentor.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+?? body includes WGS84.PseudoMercator
+###
+# Convert epsg code to wkt
+# @name convert_epsg_to_wkt
+# @ref create_session
+
+@from = 3857
+
+GET {{endpoint_base}}/coordsys/epsg/{{from}}/wkt.{{default_content_type}}
+    ?session={{session}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
+# Validate WKT (happy case)
+# @name validate_wkt_happy
+# @ref create_session
+
+@wkt = GEOGCS["LL84",DATUM["WGS84",SPHEROID["WGS84",6378137.000,298.25722356]],PRIMEM["Greenwich",0],UNIT["Degree",0.01745329251994]]
+
+POST {{endpoint_base}}/coordsys/validatewkt.{{default_content_type}}
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+
+session={{session}}&wkt={{wkt}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+?? body includes true
+###
+# Validate WKT (fail case)
+# @name validate_wkt_fail
+# @ref create_session
+
+@wkt = I am not a valid wkt string
+
+POST {{endpoint_base}}/coordsys/validatewkt.{{default_content_type}}
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+
+session={{session}}&wkt={{wkt}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+?? body includes false
+###
+# WKT to EPSG
+# @name convert_wkt_to_epsg
+# @ref create_session
+
+@wkt = GEOGCS["LL84",DATUM["WGS84",SPHEROID["WGS84",6378137.000,298.25722356]],PRIMEM["Greenwich",0],UNIT["Degree",0.01745329251994]]
+
+POST {{endpoint_base}}/coordsys/wkttoepsg.{{default_content_type}}
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+
+session={{session}}&wkt={{wkt}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+?? body includes 4326
+###
+# WKT to mentor
+# @name convert_wkt_to_mentor
+# @ref create_session
+
+@wkt = GEOGCS["LL84",DATUM["WGS84",SPHEROID["WGS84",6378137.000,298.25722356]],PRIMEM["Greenwich",0],UNIT["Degree",0.01745329251994]]
+
+POST {{endpoint_base}}/coordsys/wkttomentor.{{default_content_type}}
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+
+session={{session}}&wkt={{wkt}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+?? body includes LL84
