@@ -118,6 +118,7 @@ $app->get("/session/{session}/{mapName}.Map/image.{type}", function($req, $resp,
     $session = $args['session'];
     $mapName = $args['mapName'];
     $type = $args['type'];
+    $app = $this->get("AppServices");
     $ctrl = new MgRenderingServiceController($app);
     $ctrl->RenderRuntimeMap($session, $mapName, $type);
     return $app->Done();

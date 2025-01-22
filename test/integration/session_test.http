@@ -1,0 +1,37 @@
+# @import ./shared_variables.http
+@test_map_def = Samples/Sheboygan/Maps/Sheboygan.MapDefinition
+###
+# Create runtime map
+# @name create_runtime_map
+
+POST {{endpoint_base}}/services/createmap.{{default_content_type}}
+Authorization: Basic {{admin_user}}:{{admin_pass}}
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+
+mapdefinition=Library://{{test_map_def}}&requestedfeatures=7&format=json
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+
+@test_map_name = {{create_runtime_map.RuntimeMap.Name}}
+@session = {{create_runtime_map.RuntimeMap.SessionId}}
+###
+# Render session map
+# @name session_render_map
+# @ref create_runtime_map
+
+@x = -87.73025425093128
+@y = 43.744459064634064
+@scale = 100000
+@width = 585
+@height = 893
+
+GET {{endpoint_base}}/session/{{session}}/{{test_map_name}}.Map/image.png
+    ?x={{x}}
+    &y={{y}}
+    &scale={{scale}}
+    &width={{width}}
+    &height={{height}}
+
+?? status == 200
+?? header content-type == image/png
