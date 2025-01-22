@@ -572,6 +572,7 @@ $app->get("/library/{resourcePath:.*}.LayerDefinition/features.{type}", function
  *          @SWG\Parameter(name="schemaName", in="path", required=true, type="string", description="The FDO schema name"),
  *          @SWG\Parameter(name="className", in="path", required=true, type="string", description="The class name"),
  *          @SWG\Parameter(name="aggregateType", in="path", required=true, type="string", description="aggregate type", enum={"count", "bbox", "distinctvalues"}),
+ *          @SWG\Parameter(name="transformto", in="query", required=false, type="string", description="The CS-Map coordinate system code to transform the resulting features into. Only applicable if aggregate type is 'bbox'"),
  *          @SWG\Parameter(name="property", in="query", required=false, type="string", description="The property name to get distinct values of. Only applies if aggregate type is 'distinctvalues'"),
  *          @SWG\Parameter(name="type", in="path", required=true, type="string", description="xml or json", enum={"json", "xml"}),
  *        @SWG\Response(response=400, description="You supplied a bad request due to one or more missing or invalid parameters"),
