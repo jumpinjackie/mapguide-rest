@@ -40,8 +40,10 @@ require_once dirname(__FILE__)."/../../core/app.php";
  *     )
  */
 $app->post("/processing/buffer", function() {
-    $ctrl = new MgProcessingController($this->get("AppServices"));
+    $app = $this->get("AppServices");
+    $ctrl = new MgProcessingController($app);
     $ctrl->Buffer();
+    return $app->Done();
 });
 
 /**
@@ -61,8 +63,10 @@ $app->post("/processing/buffer", function() {
  *     )
  */
 $app->post("/processing/difference", function() {
-    $ctrl = new MgProcessingController($this->get("AppServices"));
+    $app = $this->get("AppServices");
+    $ctrl = new MgProcessingController($app);
     $ctrl->Difference();
+    return $app->Done();
 });
 
 /**
@@ -82,8 +86,10 @@ $app->post("/processing/difference", function() {
  *     )
  */
 $app->post("/processing/intersection", function() {
-    $ctrl = new MgProcessingController($this->get("AppServices"));
+    $app = $this->get("AppServices");
+    $ctrl = new MgProcessingController($app);
     $ctrl->Intersection();
+    return $app->Done();
 });
 
 /**
@@ -103,8 +109,10 @@ $app->post("/processing/intersection", function() {
  *     )
  */
 $app->post("/processing/symmetricdifference", function() {
-    $ctrl = new MgProcessingController($this->get("AppServices"));
+    $app = $this->get("AppServices");
+    $ctrl = new MgProcessingController($app);
     $ctrl->SymmetricDifference();
+    return $app->Done();
 });
 
 /**
@@ -124,8 +132,10 @@ $app->post("/processing/symmetricdifference", function() {
  *     )
  */
 $app->post("/processing/union", function() {
-    $ctrl = new MgProcessingController($this->get("AppServices"));
+    $app = $this->get("AppServices");
+    $ctrl = new MgProcessingController($app);
     $ctrl->Union();
+    return $app->Done();
 });
 
 /**
@@ -144,6 +154,8 @@ $app->post("/processing/union", function() {
  *     )
  */
 $app->post("/processing/spatialpredicate", function() {
-    $ctrl = new MgProcessingController($this->get("AppServices"));
+    $app = $this->get("AppServices");
+    $ctrl = new MgProcessingController($app);
     $ctrl->SpatialPredicate();
+    return $app->Done();
 });
