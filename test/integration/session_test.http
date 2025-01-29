@@ -16,9 +16,122 @@ mapdefinition=Library://{{test_map_def}}&requestedfeatures=7&format=json
 @test_map_name = {{create_runtime_map.RuntimeMap.Name}}
 @session = {{create_runtime_map.RuntimeMap.SessionId}}
 ###
+# Render dynamic overlay (setting params)
+# @name session_render_map_dynamic_overlay
+# @ref create_runtime_map
+
+@x = -87.730254250931
+@y = 43.744459064634
+@scale = 89298.21045858331
+@width = 975
+@height = 750
+@dpi = 96
+@behavior = 2
+@selectioncolor = 0xFF000000
+
+GET {{endpoint_base}}/session/{{session}}/{{test_map_name}}.Map/overlayimage.png
+    ?x={{x}}
+    &y={{y}}
+    &scale={{scale}}
+    &dpi={{dpi}}
+    &width={{width}}
+    &height={{height}}
+    &behavior={{behavior}}
+    &selectioncolor={{selectioncolor}}
+
+?? status == 200
+?? header content-type == image/png
+###
+# Render dynamic overlay (close up)
+# @name session_render_map_dynamic_overlay_closeup
+# @ref create_runtime_map
+
+@x = -87.72446586606
+@y = 43.747871546072
+@scale = 5581.138153661457
+@width = 975
+@height = 750
+@dpi = 96
+@behavior = 2
+@selectioncolor = 0xFF000000
+
+GET {{endpoint_base}}/session/{{session}}/{{test_map_name}}.Map/overlayimage.png
+    ?x={{x}}
+    &y={{y}}
+    &scale={{scale}}
+    &dpi={{dpi}}
+    &width={{width}}
+    &height={{height}}
+    &behavior={{behavior}}
+    &selectioncolor={{selectioncolor}}
+
+?? status == 200
+?? header content-type == image/png
+###
+# Select by polygon
+# @name polygon_map_selection
+# @ref session_render_map_dynamic_overlay_closeup
+
+@geometry = POLYGON((-87.724078899179 43.750312349121,-87.726042153805 43.748508277302,-87.725803379594 43.747208284374,-87.723150332802 43.746969510163,-87.721346260983 43.748932764789,-87.722261562126 43.749954187804,-87.724078899179 43.750312349121))
+@selectionvariant = INTERSECTS
+@requestdata = 15
+@selectioncolor = 0xFF000000
+@selectionformat = PNG
+@maxfeatures = -1
+@persist = 1
+@format = json
+
+PUT {{endpoint_base}}/session/{{session}}/{{test_map_name}}.Selection
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+
+geometry={{geometry}}&selectionvariant={{selectionvariant}}&requestdata={{requestdata}}&selectioncolor={{selectioncolor}}&selectionformat={{selectionformat}}&maxfeatures={{maxfeatures}}&persist={{persist}}&format={{format}}
+
+?? status == 200
+?? header content-type == application/json
+###
+# Get selection xml
+# @name get_selection_xml
+# @ref polygon_map_selection
+
+GET {{endpoint_base}}/session/{{session}}/{{test_map_name}}.Selection/xml
+
+?? status == 200
+?? header content-type includes text/xml
+###
+# Get layers of selection
+# @name get_selection_layers
+# @ref polygon_map_selection
+
+GET {{endpoint_base}}/session/{{session}}/{{test_map_name}}.Selection/layers.{{default_content_type}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+?? body contains Parcels
+?? body contains 120
+###
+# Get selection overview
+# @name get_selection_overview
+# @ref polygon_map_selection
+
+GET {{endpoint_base}}/session/{{session}}/{{test_map_name}}.Selection/overview.{{default_content_type}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+
+@features_url = {{get_selection_overview.SelectionOverview.Layer[0].FeaturesUrl}}
+###
+# Get selection features
+# @name get_selection_features
+# @ref get_selection_overview
+
+GET {{endpoint_domain}}{{features_url}}
+
+?? status == 200
+?? header content-type == {{default_content_mime}}
+###
 # Render session map
 # @name session_render_map
-# @ref create_runtime_map
+# @ref session_render_map_dynamic_overlay
 
 @x = -87.73025425093128
 @y = 43.744459064634064
@@ -27,11 +140,6 @@ mapdefinition=Library://{{test_map_def}}&requestedfeatures=7&format=json
 @height = 893
 
 GET {{endpoint_base}}/session/{{session}}/{{test_map_name}}.Map/image.png
-    ?x={{x}}
-    &y={{y}}
-    &scale={{scale}}
-    &width={{width}}
-    &height={{height}}
 
 ?? status == 200
 ?? header content-type == image/png

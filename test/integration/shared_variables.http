@@ -1,4 +1,5 @@
-@endpoint_base = http://localhost:8018/mapguide/rest
+@endpoint_domain = http://localhost:8018
+@endpoint_base = {{endpoint_domain}}/mapguide/rest
 @admin_user = Administrator
 @admin_pass = admin
 @default_content_type = json
