@@ -1,3 +1,10 @@
+next
+====
+
+ - #226: Fix incorrectly documented session map image operation parameters
+ - #225: Fix incorrect mime types of processing operation responses
+ - #224: Fix broken session map image response
+
 1.0 RC6.1
 =========
 
