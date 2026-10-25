@@ -246,9 +246,9 @@ class MgMapImageRestAdapter extends MgRestAdapter {
             $image = $renderSvc->RenderMap($this->map,
                                            ($bSelection ? $this->sel : NULL),
                                            $center,
-                                           $this->viewScale,
-                                           $this->imgWidth,
-                                           $this->imgHeight,
+                                           doubleval($this->viewScale),
+										   intval($this->imgWidth),
+										   intval($this->imgHeight),
                                            $bgColor,
                                            $this->imgFormat,
                                            $bKeepSelection);
